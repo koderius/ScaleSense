@@ -1,0 +1,128 @@
+@import "../website-page.component.scss";
+
+ion-content {
+  --background: white;
+}
+
+.title {
+  background: url("../../../assets/website/title_background.png") 0/100% 100%;
+  height: 4em;
+  line-height: 3.5;
+  width: 100%;
+  color: #99dbdd;
+  text-align: center;
+  margin: 0;
+  user-select: none;
+  font-size: 1.5em;
+}
+
+#step {
+  margin: 1.5em auto;
+  max-width: 450px;
+  ion-col {
+    div {
+      width: 5em;
+      text-align: center;
+      margin: auto;
+      user-select: none;
+    }
+  }
+}
+
+.form {
+  max-width: 300px;
+  margin: auto;
+  ion-col {
+    //padding: 0;
+  }
+}
+.double {
+  max-width: calc(600px + 2em);
+  .send-btn > ion-button {
+    width: 25%;
+  }
+}
+
+ion-input {
+  height: 2.5em;
+  border-radius: 1.75em;
+  border: solid #e2e1e1 1px;
+  background-color: #f2f1f0;
+  --padding-start: 1.5em;
+  --padding-end: 1.5em;
+  --placeholder-color: #a9a9a9;
+  --placeholder-opacity: 1;
+  margin-bottom: 1em;
+}
+
+
+#logo-input {
+  display: inline-block;
+  background-color: transparent;
+  border: none;
+  width: 50%;
+}
+#logo-input + ion-button {
+  --background: var(--ion-color-primary);
+  vertical-align: middle;
+}
+
+.extended-input {
+  ion-input {
+    width: calc(100% - 3em);
+    display: inline-block;
+  }
+  ion-fab-button {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0.18em 0;
+    --box-shadow: none;
+    width: 2.5em;
+    height: 2.5em;
+  }
+}
+
+
+.send-btn {
+  margin: 2em 0 0;
+  ion-button {
+    margin: auto;
+    width: 50%;
+  }
+}
+
+.scs-msg {
+  font-weight: bold;
+  text-align: center;
+}
+
+.reset-password-msg {
+  text-align: center;
+  margin: 1em;
+}
+
+#done {
+  text-align: center;
+  width: fit-content;
+  margin: auto;
+  user-select: none;
+  h1 {
+    font-weight: bold;
+    color: var(--ion-color-primary);
+  }
+  h2 {
+    font-weight: bold;
+    margin: 0;
+  }
+  ion-img {
+    width: 6em;
+    margin: auto;
+  }
+}
+
+#required-comment {
+  text-align: center;
+  color: var(--ion-color-secondary);
+  font-size: smaller;
+  margin: 1em auto;
+}

@@ -2,8 +2,18 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)},
+
+  /** Website */
+  {
+    path: '',
+    loadChildren: () => import('./website/website.module').then(m => m.WebsitePageModule)
+  },
+
+  /** Customer main page. The customer app is under the customer routing */
+  {
+    path: 'customer',
+    loadChildren: () => import('./customer/customer.module').then( m => m.CustomerPageModule)
+  },
 ];
 
 @NgModule({

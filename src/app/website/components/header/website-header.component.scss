@@ -1,0 +1,33 @@
+@import "../../website-page.component.scss";
+
+ion-row {
+  user-select: none;
+  padding: 1em;
+  max-width: 60em;
+  margin: auto;
+}
+
+#container {
+  text-align: center;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+.header-btn {
+  margin: 0 1em;
+  display: inline-block;
+  cursor: pointer;
+}
+
+ion-col:last-child {
+  height: 2.5em;
+}
+
+.round-btn {
+  cursor: pointer;
+  display: inline-block;
+  height: 2.5em;
+  width: 2.5em;
+  margin: 0.2em;
+}

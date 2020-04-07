@@ -1,0 +1,128 @@
+<ion-content [fullscreen]="true">
+
+  <website-header></website-header>
+
+  <div id="upper-section" style="background: url('../../assets/website/background.png') center/cover fixed">
+
+    <div class="bg-image">
+      <img src="../../assets/website/upper_image.png" style="object-position: bottom">
+      <div id="upper-container">
+        <h1>SCALE SENSE</h1>
+        <div></div>
+        <p>לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית נולום ארווס סאפיאן - פוסיליס קוויס, אקווזמן סחטיר בלובק. תצטנפל בלינדו למרקל אס לכימפו, דול, צוט ומעיוט - לפתיעם ברשג - ולתיעם גדדיש. קוויז דומור ליאמום בלינך רוגצה. לפמעט מוסן מנת. לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. סת אלמנקום ניסי נון ניבאה. דס</p>
+        <p>לפמעט מוסן מנת. לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. סת אלמנקום ניסי נון ניבאה. דס</p>
+        <ion-row id="login-buttons">
+          <ion-col class="login-btn">
+            <div class="ion-float-end" (click)="enterAs = 'c'">
+              <ion-img [src]="'../../assets/website/login_user' + (enterAs == 'c' ? '_select' : '') + '.png'"></ion-img>
+            </div>
+          </ion-col>
+          <ion-col class="login-btn">
+            <div class="ion-float-start" (click)="enterAs = 's'">
+              <ion-img [src]="'../../assets/website/login_supplier' + (enterAs == 's' ? '_select' : '') + '.png'"></ion-img>
+            </div>
+          </ion-col>
+        </ion-row>
+      </div>
+    </div>
+
+
+    <div id="login-container" *ngIf="enterAs">
+      <ion-row>
+        <ion-col size="4">
+          <ion-label color="dark" class="ion-float-end">שם משתמש</ion-label>
+        </ion-col>
+        <ion-col>
+          <ion-input></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="4">
+          <ion-label color="dark" class="ion-float-end">סיסמה</ion-label>
+        </ion-col>
+        <ion-col>
+          <ion-input type="password"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-button shape="round">כניסה למערכת</ion-button>
+      </ion-row>
+      <a (click)="goToRegister()">הרשמה</a>
+      <a (click)="goToResetPassword()">שכחתי סיסמה</a>
+    </div>
+
+    <div class="bg-image" style="top: -2em; pointer-events: none">
+      <img src="../../assets/website/lower_image.png">
+      <div id="more-btn">
+        <h1>קצת עלינו</h1>
+        <ion-icon name="chevron-down" color="secondary" size="large"></ion-icon>
+      </div>
+      <div id="bottom-container">
+        <h1>
+          <span>כותרת</span>
+          <span> שיווקית</span>
+        </h1>
+        <p>לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית סחטיר בלובק. תצטנפל בלינדו למרקל אס לכימפו, דול, צוט ומעיוט - לפתיעם ברשג - ולתיעם גדדיש. קוויז דומור ליאמום בלינך רוגצה. לפמעט מוסן מנת.</p>
+        <p>צש בליא, מנסוטו צמלח לביקו ננבי, צמוקו בלוקריה שיצמה ברורק. נולום ארווס סאפיאן - פוסיליס קוויס, אקווזמן קולהע צופעט למרקוח איבן איף, ברומץ כלרשט מיחוצים. קלאצי נולום ארווס סאפיאן - פוסיליס קוויס, אקווזמן קוואזי במר מודוף. אודיפו בלאסטיק מונופץ קליר,</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div>
+
+    <div id="orange-section" class="bg-image">
+      <img src="../../assets/website/orange_bg.png" id="orange-img">
+      <ion-row>
+        <ion-col>
+          <ion-img src="../../assets/website/pic1.png"></ion-img>
+        </ion-col>
+        <ion-col>
+          <ion-img src="../../assets/website/pic2.png"></ion-img>
+        </ion-col>
+        <ion-col>
+          <ion-img src="../../assets/website/pic3.png"></ion-img>
+        </ion-col>
+      </ion-row>
+      <div id="orange-container">
+        <h1>
+          <span>כותרת</span>
+          <span>תוכן</span>
+        </h1>
+        <p>לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית סחטיר בלובק. תצטנפל בלינדו למרקל אס לכימפו, דול, צוט ומעיוט - לפתיעם ברשג - ולתיעם גדדיש. קוויז דומור ליאמום בלינך רוגצה. לפמעט מוסן מנת.</p>
+        <p>צש בליא, מנסוטו צמלח לביקו ננבי, צמוקו בלוקריה שיצמה ברורק. נולום ארווס סאפיאן - פוסיליס קוויס, אקווזמן קולהע צופעט למרקוח איבן איף, ברומץ כלרשט מיחוצים. קלאצי נולום ארווס סאפיאן - פוסיליס קוויס, אקווזמן קוואזי במר מודוף. אודיפו בלאסטיק מונופץ קליר,</p>
+      </div>
+    </div>
+
+    <div id="contact">
+      <h1>למידע נוסף</h1>
+      <h6>השאר פרטים ונחזור אליך עם מידע נוסף</h6>
+      <ion-row>
+        <ion-col>
+          <ion-input placeholder="שם מלא"></ion-input>
+        </ion-col>
+        <ion-col>
+          <ion-input placeholder="טלפון"></ion-input>
+        </ion-col>
+        <ion-col>
+          <ion-input placeholder="דוא&quot;ל"></ion-input>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-textarea rows="2" placeholder="מהות הפניה" autoGrow="true"></ion-textarea>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col push="9" size="3">
+          <ion-button shape="round" strong="true" id="send-contact">שליחה</ion-button>
+        </ion-col>
+      </ion-row>
+    </div>
+
+  </div>
+
+  <website-footer></website-footer>
+
+</ion-content>
+

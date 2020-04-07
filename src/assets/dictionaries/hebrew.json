@@ -1,0 +1,12 @@
+{
+  "lang": "iw",
+  "dir": "rtl",
+  "name": "Hebrew",
+  "name_org": "עברית",
+  "dictionary": {
+    "bsns_name": "שם העסק",
+    "full_name": "שם מלא",
+    "email": "דוא&quot;ל",
+    "phone": "טלפון"
+  }
+}

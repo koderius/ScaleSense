@@ -1,0 +1,201 @@
+@import "../app.component.scss";
+
+ion-button {
+  height: 2.5em;
+}
+
+ion-content {
+  --background: #f3f3f3;
+}
+
+.bg-image {
+  position: relative;
+  img {
+    position: absolute;
+    object-fit: cover;
+    object-position: top;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+#upper-container {
+  margin: 0 auto;
+  max-width: 40em;
+  color: white;
+  position: relative;
+  h1 {
+    width: fit-content;
+    font-weight: 800;
+    text-align: center;
+    margin: auto;
+    font-size: 2.5em;
+    padding-top: 0.75em;
+    padding-bottom: 0.5em;
+  }
+  h1 + div {
+    width: 20%;
+    margin: auto;
+    border-bottom: solid #a8fcff 1px;
+  }
+  p {
+    text-align: center;
+  }
+  p:last-child {
+    font-weight: bold;
+  }
+  #login-buttons {
+    width: 60%;
+    margin: auto;
+    padding: 3em 0;
+    div {
+      cursor: pointer;
+    }
+  }
+}
+
+
+#login-container {
+  position: relative;
+  max-width: 20em;
+  margin: auto;
+  ion-input {
+    --background: white;
+    border: solid #959595 1px;
+    border-radius: 1em;
+    height: 2em;
+  }
+  ion-label {
+    line-height: 2em;
+    font-weight: bold;
+  }
+  ion-button {
+    margin: 1em auto;
+  }
+  a {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    color: var(--ion-color-dark);
+    cursor: pointer;
+    user-select: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  a:last-child {
+    font-size: smaller;
+  }
+}
+@keyframes open-login {
+  from {height: 0}
+  to {height: auto}
+}
+
+#more-btn {
+  position: absolute;
+  top: 13%;
+  right: 20%;
+  user-select: none;
+  pointer-events: auto;
+  cursor: pointer;
+  h1 {
+    display: inline-block;
+    font-size: 2em;
+    margin: 0;
+    font-weight: bold;
+    color: white;
+  }
+  ion-icon {
+    height: 2em;
+    width: 2em;
+    vertical-align: middle;
+  }
+}
+
+#bottom-container {
+  position: relative;
+  margin: auto;
+  max-width: 30em;
+  padding: 20em 0 10em 0;
+  text-align: center;
+  h1 {
+    margin: 2em 0;
+    span {
+      font-size: 2.5em;
+    }
+    span:last-child {
+      color: var(--ion-color-secondary);
+      font-weight: bold;
+    }
+  }
+}
+
+#orange-section {
+  position: relative;
+  top: -2em;
+  img {
+    object-fit: fill;
+  }
+  ion-row {
+    transform: translateY(-50%);
+    position: relative;
+    max-width: 45em;
+    margin: auto;
+    ion-col {
+      padding: 1em;
+      ion-img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: solid white 0.75em;
+      }
+    }
+  }
+  #orange-container {
+    transform: translateY(-50%);
+    max-width: 30em;
+    margin: auto;
+    text-align: center;
+    position: relative;
+    h1 {
+      //margin: 2em 0;
+      span {
+        font-size: 2.5em;
+      }
+      span:first-child {
+        color: white;
+      }
+      span:last-child {
+        color: black;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+#contact {
+  max-width: 45em;
+  margin: 0 auto 3em;
+  h1 {
+    text-align: center;
+    font-size: 2em;
+    color: var(--ion-color-secondary);
+  }
+  h6 {
+    text-align: center;
+    font-size: 1.3em;
+    margin: 0 0 1em;
+  }
+  ion-input, ion-textarea {
+    background-color: white;
+    border-radius: 1.5em;
+    --padding-start: 1em;
+  }
+}
+
+#send-contact {
+  width: 100%;
+  --background: var(--ion-color-secondary);
+}

@@ -1,0 +1,53 @@
+@import "../../website-page.component.scss";
+
+#container {
+  height: 200px;
+  background-color: #3c3c3c;
+}
+
+#left {
+  position: absolute;
+  left: 0;
+  width: 45%;
+  border-bottom: solid #232222 200px;
+  border-right: solid transparent 100px;
+}
+
+#inner {
+  max-width: 50em;
+  margin: auto;
+  ion-col {
+    padding: 2em 0 0;
+  }
+  span, a {
+    display: block;
+    color: white;
+    line-height: 1.5;
+  }
+  a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  .title {
+    font-weight: bold;
+    text-decoration: underline;
+    text-decoration-color: #b0b0b0;
+    user-select: none;
+  }
+}
+
+ion-button {
+  display: block;
+  height: 2.5em;
+  margin-bottom: 1em;
+}
+
+ion-button:first-child {
+  --background: #00a2a7;
+}
+ion-button:last-child {
+  --background: #f49013;
+}

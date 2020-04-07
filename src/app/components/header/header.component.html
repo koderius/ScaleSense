@@ -1,0 +1,48 @@
+<ion-row id="container">
+
+  <ion-col size="3">
+    <ion-img src="../../assets/logo_small.png"></ion-img>
+    <div id="customer-logo">
+      <div>
+        <ion-img [src]="DEFAULT_LOGO"></ion-img>
+      </div>
+    </div>
+  </ion-col>
+
+  <ion-col id="main">
+    <ion-button fill="clear" color="dark">
+      <ion-icon slot="start" src="../../assets/svg/icon_reports.svg"></ion-icon>
+      <ion-text>דוחות</ion-text>
+    </ion-button>
+    <ion-button fill="clear" color="dark">
+      <ion-icon slot="start" src="../../assets/svg/icon_settings.svg"></ion-icon>
+      <ion-text>הגדרות</ion-text>
+    </ion-button>
+    <ion-button fill="clear" color="dark">
+      <ion-icon slot="start" src="../../assets/svg/icon_stock.svg"></ion-icon>
+      <ion-text>ניהול מלאי</ion-text>
+    </ion-button>
+    <ion-button fill="clear" color="dark">
+      <ion-icon slot="start" src="../../assets/svg/icon_office.svg"></ion-icon>
+      <ion-text>משרד ראשי</ion-text>
+    </ion-button>
+    <ion-button fill="clear" color="dark">
+      <ion-icon slot="start" src="../../assets/svg/icon_drafts.svg"></ion-icon>
+      <ion-text>טיוטות</ion-text>
+    </ion-button>
+  </ion-col>
+
+  <ion-col size="2" id="buttons">
+    <ion-fab-button size="small">
+      <ion-icon src="../../assets/svg/icon_info.svg"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button size="small">
+      <ion-icon src="../../assets/svg/icon_man.svg"></ion-icon>
+    </ion-fab-button>
+  </ion-col>
+
+</ion-row>
+
+<div id="sub-header" *ngIf="pageTitle">
+  <h1>{{pageTitle}}</h1>
+</div>

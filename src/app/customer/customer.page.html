@@ -1,0 +1,86 @@
+<ion-header>
+  <app-header></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="buttons-container">
+
+      <div class="circle-btn first">
+        <ion-button size="large" fill="clear" strong="true" shape="round">הזמנה<br>חדשה</ion-button>
+      </div>
+      <div class="action-div">
+        <ion-button size="large" fill="clear" shape="round" strong="true">
+          <ion-icon slot="start" src="../../assets/svg/icon_order_edit.svg"></ion-icon>
+          <ion-text>עריכת הזמנה</ion-text>
+        </ion-button>
+        <ion-button size="large" fill="clear" shape="round" strong="true">
+          <ion-icon slot="start" src="../../assets/svg/icon_order_status.svg"></ion-icon>
+          <ion-text>סטטוס הזמנות</ion-text>
+        </ion-button>
+      </div>
+
+      <div class="circle-btn second">
+        <ion-button size="large" fill="clear" strong="true" shape="round">קבלת<br>סחורה</ion-button>
+      </div>
+      <div class="action-div">
+        <ion-button size="large" fill="clear" shape="round" color="dark" strong="true">
+          <ion-icon slot="start" src="../../assets/svg/icon_return_goods.svg"></ion-icon>
+          <ion-text>החזרת סחורה</ion-text>
+        </ion-button>
+        <div id="system-and-weight">
+          <div id="system-status">
+            <p>מצב<br>מערכת</p>
+            <ion-img src="../../assets/images/scales_on.png" class="on"></ion-img>
+            <ion-img src="../../assets/images/printer_on.png" class="on"></ion-img>
+            <ion-img src="../../assets/images/camera_on.png" class="on"></ion-img>
+          </div>
+          <div id="weight">
+            <ion-button size="large" fill="clear" strong="true">שקילה</ion-button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="notifications-title">
+    <p>הודעות ועדכונים</p>
+  </div>
+
+  <div class="page-container">
+
+    <ion-grid id="orders-table">
+
+      <ion-row>
+        <ion-col size="1" class="ion-text-center">סטטוס</ion-col>
+        <ion-col class="center">שם ספק</ion-col>
+        <ion-col class="center">מספר הזמנה</ion-col>
+        <ion-col size="6">נושא</ion-col>
+      </ion-row>
+
+      <div *ngIf="!notifications.length" id="no-notes">אין הודעות</div>
+
+      <ion-row *ngFor="let note of notifications; let odd = odd" [ngClass]="odd ? '' : 'odd'">
+        <ion-col size="1" class="ion-text-center">
+          <ion-img src="../../assets/images/unread.png"></ion-img>
+        </ion-col>
+        <ion-col>תנובה בע"מ</ion-col>
+        <ion-col class="center">20-123456</ion-col>
+        <ion-col size="3.5">הזמנה ממתינה לטיפול</ion-col>
+        <ion-col size="2.5">
+          <ion-button color="secondary" shape="round">פתיחה</ion-button>
+          <ion-button class="del-btn" color="secondary" fill="clear" (click)="notifications.splice(0,1)">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+
+  </div>
+
+</ion-content>
