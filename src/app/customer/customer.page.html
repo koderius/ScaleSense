@@ -9,14 +9,14 @@
     <div id="buttons-container">
 
       <div class="circle-btn first">
-        <ion-button size="large" fill="clear" strong="true" shape="round">הזמנה<br>חדשה</ion-button>
+        <ion-button size="large" fill="clear" strong="true" shape="round" (click)="goToNewOrder()">הזמנה<br>חדשה</ion-button>
       </div>
       <div class="action-div">
-        <ion-button size="large" fill="clear" shape="round" strong="true">
+        <ion-button size="large" fill="clear" shape="round" strong="true" (click)="goToEditOrder()">
           <ion-icon slot="start" src="../../assets/svg/icon_order_edit.svg"></ion-icon>
           <ion-text>עריכת הזמנה</ion-text>
         </ion-button>
-        <ion-button size="large" fill="clear" shape="round" strong="true">
+        <ion-button size="large" fill="clear" shape="round" strong="true" (click)="goToOrdersStatus()">
           <ion-icon slot="start" src="../../assets/svg/icon_order_status.svg"></ion-icon>
           <ion-text>סטטוס הזמנות</ion-text>
         </ion-button>
@@ -68,12 +68,12 @@
         <ion-col size="1" class="ion-text-center">
           <ion-img src="../../assets/images/unread.png"></ion-img>
         </ion-col>
-        <ion-col>תנובה בע"מ</ion-col>
+        <ion-col>MOCK</ion-col>
         <ion-col class="center">20-123456</ion-col>
         <ion-col size="3.5">הזמנה ממתינה לטיפול</ion-col>
         <ion-col size="2.5">
           <ion-button color="secondary" shape="round">פתיחה</ion-button>
-          <ion-button class="del-btn" color="secondary" fill="clear" (click)="notifications.splice(0,1)">
+          <ion-button class="small-circle-btn" fill="clear" (click)="notifications.splice(0,1)">
             <ion-icon slot="icon-only" name="close"></ion-icon>
           </ion-button>
         </ion-col>

@@ -7,17 +7,6 @@
   // App font (hebrew)
   --ion-font-family: 'Open Sans Hebrew';
 
-  // The app's background
-  ion-content {--background: url('/../assets/background.png') top/100% 100% no-repeat}
-
-  // Headers *without* border and shadow
-  ion-header:after {content: none}
-
-  // Main rules for all buttons
-  ion-button, ion-fab-button {
-    --box-shadow: none;         // No shadow
-  }
-
   // Primary
   --ion-color-primary: #00979c;
   --ion-color-primary-rgb: 0,151,156;

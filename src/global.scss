@@ -29,10 +29,36 @@
 @import url('https://fonts.googleapis.com/earlyaccess/opensanshebrew.css');
 @import url('https://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css');
 
+// The app's background
+ion-content {--background: url('/assets/background.png') top/100% 100% no-repeat}
+
+// Headers *without* border and shadow
+ion-header:after {content: none}
+
+// Main rules for all buttons
+ion-button, ion-fab-button {
+  --box-shadow: none;         // No shadow
+}
+
+// Contains all main content of the page
 .page-container {
   max-width: 800px;
   margin: auto;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+// An only icon button. Icon is orange, with dark rounded border
+.small-circle-btn {
+  height: 1.7em;
+  width: 1.7em;
+  margin: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --border-width: 2px;
+  --border-style: solid;
+  --border-color: var(--ion-color-dark);
+  --border-radius: 50%;
+  ion-icon {color: var(--ion-color-secondary)}
 }

@@ -1,0 +1,20 @@
+<div id="wizard-container">
+
+  <div id="wizard-inner">
+
+    <div class="circle" [ngClass]="step == 1 ? 'current' : 'after'">בחירת ספק</div>
+
+    <div class="line"></div>
+
+    <div class="circle" [ngClass]="step == 2 ? 'current' : (step == 3 ? 'after' : '')">ביצוע הזמנה</div>
+
+    <div class="line"></div>
+
+    <div class="circle" [ngClass]="step == 3 ? 'current' : 'before'">סיכום הזמנה</div>
+
+  </div>
+
+  <ion-button id="back-btn" color="secondary" fill="clear" strong="true" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+
+</div>
+
