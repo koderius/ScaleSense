@@ -1,0 +1,24 @@
+ion-item {
+  margin: 0 3.5em 0 4.5em;
+  --inner-padding-start: 0;
+  --inner-padding-end: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  border-top: solid var(--ion-color-primary) 1px;
+  #inner-total {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 0.25em;
+  }
+  h6:first-child {
+    color: black;
+    font-weight: normal;
+  }
+  h6:last-child {
+    font-weight: bold;
+  }
+  p {
+    font-size: 0.8em;
+  }
+}

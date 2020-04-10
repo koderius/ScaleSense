@@ -1,7 +1,7 @@
 import {UserInfo} from 'firebase';
 import {BusinessSide} from './Business';
 
-/** User document - the user data which stored in firebase. */
+/** User document - the user data which is stored in firestore. */
 export interface UserDoc extends UserInfo {
 
   /** Additional unique identity detail */
@@ -11,7 +11,7 @@ export interface UserDoc extends UserInfo {
   email2?: string;
   phoneNumber2?: string;
 
-  /** User's business (ID and side) */
+  /** User's business belonging (ID and side) */
   bid: string;
   side: BusinessSide;
 

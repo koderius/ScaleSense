@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NavController} from '@ionic/angular';
 
 @Component({
@@ -9,6 +9,7 @@ import {NavController} from '@ionic/angular';
 export class OredersWizardComponent implements OnInit {
 
   @Input() step: 1 | 2 | 3 = 1;
+  @Output() goToStep = new EventEmitter();
 
   constructor(private navCtrl: NavController) { }
 
@@ -16,6 +17,11 @@ export class OredersWizardComponent implements OnInit {
 
   backToMain() {
     this.navCtrl.navigateRoot('customer');
+  }
+
+  stepClicked(step: number) {
+    if(this.step > step)
+      this.goToStep.emit(step);
   }
 
 }

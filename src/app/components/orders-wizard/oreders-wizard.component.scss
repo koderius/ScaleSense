@@ -15,7 +15,7 @@
 
 .line {
   width: calc((100% - 15em)/2);
-  border: solid var(--ion-color-primary) 1px;
+  border-top: solid var(--ion-color-primary) 3px;
   height: 0;
 }
 
@@ -35,6 +35,7 @@
 
 .circle.after {
   font-weight: bold;
+  cursor: pointer;
 }
 .circle.after:before {
   content: '\2713';

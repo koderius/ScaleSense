@@ -2,11 +2,11 @@
 
   <div id="wizard-inner">
 
-    <div class="circle" [ngClass]="step == 1 ? 'current' : 'after'">בחירת ספק</div>
+    <div class="circle" [ngClass]="step == 1 ? 'current' : 'after'" (click)="stepClicked(1)">בחירת ספק</div>
 
     <div class="line"></div>
 
-    <div class="circle" [ngClass]="step == 2 ? 'current' : (step == 3 ? 'after' : '')">ביצוע הזמנה</div>
+    <div class="circle" [ngClass]="step == 2 ? 'current' : (step == 3 ? 'after' : '')" (click)="stepClicked(2)">ביצוע הזמנה</div>
 
     <div class="line"></div>
 

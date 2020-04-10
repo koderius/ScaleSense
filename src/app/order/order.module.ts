@@ -8,6 +8,9 @@ import { orderPageRoutingModule } from './order-routing.module';
 
 import { OrderPage } from './order-page.component';
 import {ComponentsModule} from '../components/components.module';
+import {ProductToCartComponent} from '../components/product-to-cart/product-to-cart.component';
+import {ProductSummeryComponent} from '../components/product-summery/product-summery.component';
+import {ProductsTotalPriceComponent} from '../components/products-total-price/products-total-price.component';
 
 @NgModule({
   imports: [
@@ -17,6 +20,11 @@ import {ComponentsModule} from '../components/components.module';
     orderPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [OrderPage]
+  declarations: [
+    OrderPage,
+    ProductToCartComponent,
+    ProductSummeryComponent,
+    ProductsTotalPriceComponent,
+  ]
 })
 export class OrderPageModule {}

@@ -1,8 +1,128 @@
 <ion-header>
-  <app-header></app-header>
-  <app-reservation-wizard [step]="wizardStep" *ngIf="wizardStep"></app-reservation-wizard>
+  <app-header [pageTitle]="pageTitle"></app-header>
+  <app-reservation-wizard [step]="wizardStep" (goToStep)="wizardStep = $event" *ngIf="wizardStep"></app-reservation-wizard>
 </ion-header>
 
 <ion-content>
+
+  <div class="page-container" *ngIf="wizardStep == 1">
+
+    <ion-searchbar placeholder="הקלד שם ספק | פריט | קטגוריה" (ionChange)="searchSupplier($event.detail.value)">
+      <ion-icon src="../../assets/svg/search.svg"></ion-icon>
+    </ion-searchbar>
+
+    <div class="select-container">
+      <ion-text *ngIf="!selectedSupplier">רשימת ספקים</ion-text>
+      <select [(ngModel)]="selectedSupplier">
+        <option></option>
+        <option *ngFor="let supplier of mySuppliers" [value]="supplier.id">{{supplier.name}}</option>
+      </select>
+    </div>
+
+    <div class="suppliers-header" *ngIf="suppliersSearchResults.length">תוצאות החיפוש</div>
+    <div class="suppliers-boxes">
+      <div class="supplier-box" *ngFor="let supplier of suppliersSearchResults" (click)="selectedSupplier = supplier.id" [ngClass]="selectedSupplier == supplier.id ? 'selected' : ''">
+        <ion-img [src]="supplier.logo || '../../assets/defaults/default_logo.png'"></ion-img>
+        <ion-text>{{supplier.name}}</ion-text>
+      </div>
+    </div>
+
+    <div class="suppliers-header" *ngIf="getCommonSearches()">חיפושים שכיחים</div>
+    <div class="suppliers-boxes">
+      <div class="supplier-box" *ngFor="let supplier of getCommonSearches()" (click)="selectedSupplier = supplier.id" [ngClass]="selectedSupplier == supplier.id ? 'selected' : ''">
+        <ion-img [src]="supplier.logo || '../../assets/defaults/default_logo.png'"></ion-img>
+        <ion-text>{{supplier.name}}</ion-text>
+      </div>
+    </div>
+
+    <div class="suppliers-header" *ngIf="showAllSuppliers">כל הספקים</div>
+    <div class="suppliers-boxes" *ngIf="showAllSuppliers">
+      <div class="supplier-box" *ngFor="let supplier of mySuppliers" (click)="selectedSupplier = supplier.id" [ngClass]="selectedSupplier == supplier.id ? 'selected' : ''">
+        <ion-img [src]="supplier.logo || '../../assets/defaults/default_logo.png'"></ion-img>
+        <ion-text>{{supplier.name}}</ion-text>
+      </div>
+    </div>
+
+    <ion-row *ngIf="!showAllSuppliers">
+      <ion-button fill="outline" color="dark" shape="round" (click)="loadAllSuppliers()" id="show-all-btn">
+        <ion-icon slot="start" name="add"></ion-icon>
+        <ion-text>כל הספקים</ion-text>
+      </ion-button>
+    </ion-row>
+
+    <ion-button size="large" color="medium" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!selectedSupplier" (click)="wizardStep = 2">המשך הזמנה</ion-button>
+
+  </div>
+
+
+  <div class="page-container" *ngIf="wizardStep == 2">
+
+    <ion-searchbar placeholder="הקלד שם פריט | קטגוריה">
+      <ion-icon src="../../assets/svg/search.svg"></ion-icon>
+    </ion-searchbar>
+
+    <ion-row>
+
+      <ion-col>
+        <ion-list id="products-list">
+
+          <ion-list-header>
+            <ion-title color="secondary">{{getSelectedSupplier() ? getSelectedSupplier().name : 'משה שיווק השקמה'}}</ion-title>
+          </ion-list-header>
+
+          <app-product-to-cart></app-product-to-cart>
+
+        </ion-list>
+      </ion-col>
+
+      <ion-col>
+        <div id="summery">
+
+          <ion-list id="summery-list">
+            <ion-list-header class="ion-padding-horizontal">
+              <ion-title>
+                <ion-text>פרטי הזמנה</ion-text>
+                <ion-text class="ion-float-end">{{order.id}}</ion-text>
+              </ion-title>
+            </ion-list-header>
+
+            <app-product-summery [isEdit]="true"></app-product-summery>
+
+            <app-products-total-price></app-products-total-price>
+
+          </ion-list>
+
+          <br><br>
+          <p>המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
+
+          <ion-row class="ion-padding ion-justify-content-between">
+            <ion-button shape="round" (click)="wizardStep = 3">
+              <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
+              <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
+            </ion-button>
+            <ion-button shape="round">שמירת טיוטה</ion-button>
+          </ion-row>
+
+        </div>
+
+      </ion-col>
+
+    </ion-row>
+
+  </div>
+
+
+  <div class="page-container" *ngIf="wizardStep == 3">
+
+    <h1 class="ion-text-center" style="margin: 1em 0">
+      <ion-text>פרטי הזמנה</ion-text>
+      <ion-text *ngIf="wizardStep == 3"> מס. {{order.id}}</ion-text>
+    </h1>
+
+    <ion-list id="order-list">
+      <app-product-summery [isEdit]="true" [withComments]="true"></app-product-summery>
+    </ion-list>
+
+  </div>
 
 </ion-content>

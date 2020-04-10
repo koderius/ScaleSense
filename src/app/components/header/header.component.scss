@@ -14,6 +14,13 @@ $content-max-width: 1200px;
   ion-button {
     height: fit-content;
     --padding-top: 1em;
+    --ripple-color: transparent;
+    --background-hover: transparent;
+    --color: var(--ion-color-dark);
+    --color-hover: var(--ion-color-primary);
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 

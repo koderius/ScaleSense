@@ -1,0 +1,24 @@
+<ion-item lines="none">
+  <ion-thumbnail slot="start">
+    <img src="../../assets/defaults/default_logo.png">
+  </ion-thumbnail>
+  <ion-label>
+    <h2>עגבניות שרי
+      <ion-icon name="information-circle" color="dark"></ion-icon>
+    </h2>
+    <p>מק"ט: 12345567890</p>
+    <h6>מחיר לק"ג | 5.60 ש"ח</h6>
+  </ion-label>
+  <div class="item-amount">
+    <ion-button class="small-circle-btn" fill="clear" color="secondary">
+      <ion-icon slot="icon-only" name="remove"></ion-icon>
+    </ion-button>
+    <ion-input inputmode="number"></ion-input>
+    <ion-button class="small-circle-btn" fill="clear" color="secondary">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+  </div>
+  <ion-button slot="end" color="secondary" shape="round" (click)="addToCart.emit()">
+    <ion-icon slot="icon-only" src="../../assets/svg/icon_cart.svg"></ion-icon>
+  </ion-button>
+</ion-item>

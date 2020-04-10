@@ -42,12 +42,13 @@ ion-button, ion-fab-button {
 
 // Contains all main content of the page
 .page-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  //display: flex;
+  //justify-content: center;
+  //align-items: center;
 }
+.page-container > * {margin: auto}
 
 // An only icon button. Icon is orange, with dark rounded border
 .small-circle-btn {
@@ -61,4 +62,56 @@ ion-button, ion-fab-button {
   --border-color: var(--ion-color-dark);
   --border-radius: 50%;
   ion-icon {color: var(--ion-color-secondary)}
+}
+
+// Search bar styling + search icon (need to add inside)
+ion-searchbar {
+  width: 60% !important;
+  --box-shadow: none !important;
+  --icon-color: transparent !important;
+  .searchbar-input {
+    height: 3.5em !important;
+    border-radius: 1.75em !important;
+  }
+}
+ion-searchbar > ion-icon {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  padding-left: 2em;
+  width: 2em;
+  height: 2em;
+}
+ion-searchbar:focus-within > ion-icon {
+  height: 0;
+  display: none;
+}
+
+
+.select-container {
+  border-radius: 1em;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  ion-text {
+    position: absolute;
+    padding: 0 1em;
+    color: var(--ion-color-medium);
+    user-select: none;
+    pointer-events: none;
+  }
+  select {
+    display: block;
+    margin: auto;
+    width: calc(100% - 2em);
+    height: 2em;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    option:first-child {
+      cursor: pointer;
+      color: var(--ion-color-medium);
+    }
+  }
 }
