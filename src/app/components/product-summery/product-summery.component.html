@@ -2,19 +2,31 @@
   <ion-thumbnail slot="start">
     <img src="../../assets/defaults/default_logo.png">
   </ion-thumbnail>
-  <div class="inner-item" [ngClass]="rowLength ? ('plus' + rowLength) : ''">
-    <h6>עגבניות שרי</h6>
-    <h6>5.90 ש"ח</h6>
-    <h6>2.5 ק"ג</h6>
-    <h6>8.85 ש"ח</h6>
-    <div *ngIf="isEdit">
-      <ion-button class="small-circle-btn" fill="clear">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
-      <ion-button fill="clear">
-        <ion-icon slot="icon-only"src="../../assets/svg/icon_pen.svg"></ion-icon>
-      </ion-button>
-    </div>
-    <ion-input *ngIf="withComments" placeholder="הערות בנוגע למוצר"></ion-input>
-  </div>
+  <ion-row class="inner-item">
+    <ion-col size="3">
+      <h6>עגבניות שרי ברוטב עגבניות וחסה מגובלנת עם פלפלים קלויים מעל</h6>
+    </ion-col>
+    <ion-col>
+      <h6>5.90 ש"ח</h6>
+    </ion-col>
+    <ion-col>
+      <h6>2.5 ק"ג</h6>
+    </ion-col>
+    <ion-col>
+      <h6>8.85 ש"ח</h6>
+    </ion-col>
+    <ion-col [size]="withComments ? 1 : 2" *ngIf="isEdit">
+      <div>
+        <ion-button class="small-circle-btn" fill="clear">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear">
+          <ion-icon slot="icon-only"src="../../assets/svg/icon_pen.svg"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-col>
+    <ion-col size="4" *ngIf="withComments">
+      <ion-input placeholder="הערות בנוגע למוצר"></ion-input>
+    </ion-col>
+  </ion-row>
 </ion-item>

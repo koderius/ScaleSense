@@ -9,27 +9,22 @@ ion-item {
   }
   .inner-item {
     width: 100%;
-    display: grid;
-    grid-template-columns: 25% 20% 20% 20%;
     & > * {
       display: flex;
       align-items: center;
     }
   }
-  .inner-item.plus1 {
-    grid-template-columns: 25% 20% 20% 20% max-content;
-  }
-  .inner-item.plus2 {
-    grid-template-columns: 25% 10% 10% 10% max-content max-content;
+  ion-col {
+    padding: 0;
   }
   h6 {
     font-size: 0.9em;
   }
-  h6:first-child {
+  ion-col:first-child > h6 {
     color: var(--ion-color-primary);
     font-weight: bold;
   }
-  h6:last-of-type {
+  ion-col:nth-child(4) > h6 {
     font-weight: bold;
   }
   ion-button {

@@ -15,8 +15,4 @@ export class ProductSummeryComponent implements OnInit {
 
   ngOnInit() {}
 
-  get rowLength() : number {
-    return (+this.isEdit || 0) + (+this.withComments || 0);
-  }
-
 }

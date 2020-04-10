@@ -121,7 +121,20 @@
 
     <ion-list id="order-list">
       <app-product-summery [isEdit]="true" [withComments]="true"></app-product-summery>
+
+      <ion-item lines="none">
+        <ion-row style="width: 100%">
+          <ion-col size="5.5" push="2.5">
+            <app-products-total-price></app-products-total-price>
+          </ion-col>
+        </ion-row>
+      </ion-item>
+
     </ion-list>
+
+    <div id="dates">
+
+    </div>
 
   </div>
 
