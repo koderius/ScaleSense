@@ -11,7 +11,7 @@ export interface UserDoc extends UserInfo {
   email2?: string;
   phoneNumber2?: string;
 
-  /** User's business belonging (ID and side) */
+  /** User's business belonging (ID and side - customer or supplier) */
   bid: string;
   side: BusinessSide;
 

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
+import {NavController} from '@ionic/angular';
 
 @Component({
   selector: 'app-order',
@@ -8,10 +9,20 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class OrderPage implements OnInit {
 
+  /** The order to show/edit/create */
   order = {id: '20-123456'};
 
+  /** In creation of new order - the step of creation */
   wizardStep: 1 | 2 | 3;
+
+  /** Whether in edit mode (Not in new order) */
   isEdit: boolean;
+
+  /** In edit mode: show screen of adding new products (same screen as creation wizard step 2) */
+  addProductsScreen: boolean;
+
+  /** Whether the order (or order changes) was sent */
+  orderSent: boolean;
 
   mySuppliers = [
     {
@@ -58,6 +69,7 @@ export class OrderPage implements OnInit {
 
   constructor(
     private activeRoute: ActivatedRoute,
+    private navCtrl: NavController,
   ) {}
 
   get isNewOrder() : boolean {
@@ -109,6 +121,37 @@ export class OrderPage implements OnInit {
   loadAllSuppliers() {
     // TODO: Load from server
     this.showAllSuppliers = true;
+  }
+
+  backToMain() {
+    this.navCtrl.navigateRoot('customer');
+  }
+
+  goToSummery() {
+    if(this.isNewOrder)
+      this.wizardStep = 3;
+    else if(this.isEdit)
+      this.addProductsScreen = false
+  }
+
+  goToAddProducts() {
+    if(this.isNewOrder)
+      this.wizardStep = 2;
+    else if(this.isEdit)
+      this.addProductsScreen = true;
+  }
+
+  saveOrder() {
+    // TODO: Save as a draft
+  }
+
+  sendOrder() {
+    // TODO: Send the order
+    this.orderSent = true;
+  }
+
+  cancelOrder() {
+    // TODO: Cancel
   }
 
 }

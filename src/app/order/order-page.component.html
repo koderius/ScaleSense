@@ -55,7 +55,7 @@
   </div>
 
 
-  <div class="page-container" *ngIf="wizardStep == 2">
+  <div class="page-container" *ngIf="wizardStep == 2 || (isEdit && addProductsScreen)">
 
     <ion-searchbar placeholder="הקלד שם פריט | קטגוריה">
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
@@ -70,7 +70,7 @@
             <ion-title color="secondary">{{getSelectedSupplier() ? getSelectedSupplier().name : 'משה שיווק השקמה'}}</ion-title>
           </ion-list-header>
 
-          <app-product-to-cart></app-product-to-cart>
+          <app-product-to-cart [product]="{}"></app-product-to-cart>
 
         </ion-list>
       </ion-col>
@@ -96,7 +96,7 @@
           <p>המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
 
           <ion-row class="ion-padding ion-justify-content-between">
-            <ion-button shape="round" (click)="wizardStep = 3">
+            <ion-button shape="round" (click)="goToSummery()">
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
@@ -112,27 +112,60 @@
   </div>
 
 
-  <div class="page-container" *ngIf="wizardStep == 3">
+  <div class="page-container" *ngIf="wizardStep == 3 || (!isNewOrder && !addProductsScreen)">
 
     <h1 class="ion-text-center" style="margin: 1em 0">
       <ion-text>פרטי הזמנה</ion-text>
       <ion-text *ngIf="wizardStep == 3"> מס. {{order.id}}</ion-text>
     </h1>
 
-    <ion-list id="order-list">
-      <app-product-summery [isEdit]="true" [withComments]="true"></app-product-summery>
+    <div *ngIf="!orderSent">
+      <ion-list id="order-list">
+        <app-product-summery [isEdit]="true" [withComments]="true"></app-product-summery>
 
-      <ion-item lines="none">
-        <ion-row style="width: 100%">
-          <ion-col size="5.5" push="2.5">
-            <app-products-total-price></app-products-total-price>
-          </ion-col>
+        <ion-item lines="none">
+          <ion-row style="width: 100%">
+            <ion-col size="5.5" push="2.5">
+              <app-products-total-price></app-products-total-price>
+            </ion-col>
+          </ion-row>
+        </ion-item>
+
+      </ion-list>
+
+      <div id="bottom-section">
+        <div id="dates">
+          <p>בחירת תאריך אספקה:</p>
+          <ion-input readonly value="תאריך"><ion-icon name="caret-down"></ion-icon></ion-input>
+          <ion-input readonly value=שעה><ion-icon name="caret-down"></ion-icon></ion-input>
+        </div>
+        <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}"></ion-textarea>
+      </div>
+
+      <div id="bottom-buttons">
+        <ion-row>
+          <ion-button shape="round" color="dark" *ngIf="isNewOrder || isEdit" (click)="goToAddProducts()">הוספת פריטים להזמנה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="isNewOrder" (click)="saveOrder()">שמירה כטיוטה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
-      </ion-item>
+        <ion-row>
+          <ion-button shape="round" strong="true" *ngIf="isNewOrder || isEdit" (click)="sendOrder()">
+            <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
+            <ion-text *ngIf="!isNewOrder">שמירת שינויים ו</ion-text>
+            <ion-text>שליחת הזמנה לספק</ion-text>
+          </ion-button>
+          <ion-button shape="round" *ngIf="!isNewOrder && !isEdit" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+        </ion-row>
+      </div>
+    </div>
 
-    </ion-list>
+    <div *ngIf="orderSent" id="order-sent">
 
-    <div id="dates">
+      <h1>ההזמנה התקבלה בהצלחה<br>ונשלחה לספק</h1>
+
+      <ion-row>
+        <ion-button shape="round" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+      </ion-row>
 
     </div>
 
