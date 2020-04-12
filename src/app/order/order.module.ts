@@ -18,7 +18,7 @@ import {ProductsTotalPriceComponent} from '../components/products-total-price/pr
     FormsModule,
     IonicModule,
     orderPageRoutingModule,
-    ComponentsModule
+    ComponentsModule,
   ],
   declarations: [
     OrderPage,

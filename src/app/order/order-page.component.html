@@ -157,7 +157,7 @@
       <div id="bottom-section">
         <div id="dates">
           <p>בחירת תאריך אספקה:</p>
-<!--          <ion-input readonly value="תאריך" (ionFocus)="dateFocus = true" *ngIf="!dateFocus && !supplyDate"><ion-icon name="caret-down"></ion-icon></ion-input>-->
+<!--          <ion-input readonly [value]="supplyDate | date : 'dd/MM/yy' || 'תאריך'" ><ion-icon name="caret-down"></ion-icon></ion-input>-->
 <!--          <ion-input readonly value="שעה" (ionFocus)="timeFocus = true" *ngIf="!timeFocus && !supplyTime"><ion-icon name="caret-down"></ion-icon></ion-input>-->
           <ion-input placeholder="תאריך" [(ngModel)]="supplyDate" (ionFocus)="dateFocus = true" (ionBlur)="dateFocus = false" [type]="dateFocus || supplyDate ? 'date' : 'text'"></ion-input>
           <ion-input placeholder="שעה" [(ngModel)]="supplyTime" (ionFocus)="timeFocus = true" (ionBlur)="timeFocus = false" [type]="timeFocus || supplyTime ? 'time' : 'text'"></ion-input>
