@@ -33,11 +33,20 @@
 ion-content {--background: url('/assets/background.png') top/100% 100% no-repeat}
 
 // Headers *without* border and shadow
-ion-header:after {content: none}
+ion-header:after {content: none !important}
 
 // Main rules for all buttons
 ion-button, ion-fab-button {
   --box-shadow: none;         // No shadow
+}
+
+// No arrows in input of type number
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 // Contains all main content of the page
@@ -87,12 +96,22 @@ ion-searchbar:focus-within > ion-icon {
   display: none;
 }
 
-
+html[dir="rtl"] {.select-container:after {left: 0}}
+html[dir="ltr"] {.select-container:after {right: 0}}
 .select-container {
   border-radius: 1em;
   background-color: white;
   display: flex;
   align-items: center;
+  position: relative;
+  &:after {
+    position: absolute;
+    content: "▼";
+    color: var(--ion-color-dark);
+    padding: 0 1em;
+    transform: scaleX(1.5);
+    pointer-events: none;
+  }
   ion-text {
     position: absolute;
     padding: 0 1em;
@@ -109,6 +128,7 @@ ion-searchbar:focus-within > ion-icon {
     border: none;
     outline: none;
     cursor: pointer;
+    appearance: none;
     option:first-child {
       cursor: pointer;
       color: var(--ion-color-medium);

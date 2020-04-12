@@ -1,6 +1,7 @@
 ion-item {
   --background: transparent;
   user-select: none;
+  --inner-padding-end: 0;
   ion-thumbnail {
     width: 4.5em;
     margin-top: 0;
@@ -25,7 +26,7 @@ ion-item {
     }
   }
   .item-amount {
-    width: 6em;
+    width: 8em;
     display: flex;
     align-items: center;
     margin: auto auto 0 auto;

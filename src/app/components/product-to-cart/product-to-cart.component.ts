@@ -27,4 +27,10 @@ export class ProductToCartComponent implements OnInit {
     this._amount = amount;
   }
 
+
+  // Select input text when focusing on it
+  selectInput(ev) {
+    ev.target.firstChild.select();
+  }
+
 }

@@ -57,11 +57,11 @@
 
   <div class="page-container" *ngIf="wizardStep == 2 || (isEdit && addProductsScreen)">
 
-    <ion-searchbar placeholder="הקלד שם פריט | קטגוריה">
+    <ion-searchbar placeholder="הקלד שם פריט | קטגוריה" (ionChange)="searchProduct($event.detail.value)">
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
     </ion-searchbar>
 
-    <ion-row>
+    <ion-row style="margin-top: 2em">
 
       <ion-col>
         <ion-list id="products-list">
@@ -70,7 +70,7 @@
             <ion-title color="secondary">{{getSelectedSupplier().name}}</ion-title>
           </ion-list-header>
 
-          <app-product-to-cart *ngFor="let product of supplierProducts"
+          <app-product-to-cart *ngFor="let product of (filteredSupplierProducts || supplierProducts)"
                                [product]="product"
                                [amount]="order.getProductById(product.id) ? order.getProductById(product.id).amount : 0"
                                (addToCart)="order.setProductAmount(product.id, $event, product.pricePerUnit)"
@@ -90,29 +90,34 @@
               </ion-title>
             </ion-list-header>
 
-            <app-product-summery *ngFor="let product of order.products"
-                                 [productOrder]="product"
-                                 [productDetails]="findProductDetails(product.id)"
-                                 [isEdit]="true"
-            ></app-product-summery>
+            <div *ngIf="order.products.length">
+              <app-product-summery *ngFor="let product of order.products"
+                                   [productOrder]="product"
+                                   [productDetails]="findProductDetails(product.id)"
+                                   [isEdit]="true"
+                                   (clearClicked)="order.setProductAmount(product.id, 0, null)"
+                                   (editClicked)="editProduct()"
+              ></app-product-summery>
 
-            <app-products-total-price [price]="order.orderTotalPrice()" [pricePlusVat]="order.orderTotalPrice()*1.17"></app-products-total-price>
+              <app-products-total-price [price]="order.orderTotalPrice()" [pricePlusVat]="order.orderTotalPrice()*1.17"></app-products-total-price>
+            </div>
+
 
           </ion-list>
 
+          <p id="no-products" *ngIf="!order.products.length">לא קיימים פריטים בהזמנה</p>
           <br><br>
-          <p>המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
+          <p id="price-comment" *ngIf="order.products.length">המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
 
           <ion-row class="ion-padding ion-justify-content-between">
-            <ion-button shape="round" (click)="goToSummery()">
+            <ion-button shape="round" (click)="goToSummery()" [disabled]="!order.products.length" [color]="order.products.length ? 'primary' : 'dark'" style="margin: auto">
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
-            <ion-button shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
+            <ion-button *ngIf="order.products.length" shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
           </ion-row>
 
         </div>
-
       </ion-col>
 
     </ion-row>
@@ -135,9 +140,11 @@
                 [productDetails]="findProductDetails(product.id)"
                 [isEdit]="true"
                 [withComments]="true"
+                (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? goToAddProducts() : ''"
+                (editClicked)="editProduct()"
         ></app-product-summery>
 
-        <ion-item lines="none">
+        <ion-item lines="none" *ngIf="order.products.length">
           <ion-row style="width: 100%">
             <ion-col size="5.5" push="2.5">
               <app-products-total-price [price]="order.orderTotalPrice()" [pricePlusVat]="order.orderTotalPrice()*1.17"></app-products-total-price>
@@ -150,8 +157,10 @@
       <div id="bottom-section">
         <div id="dates">
           <p>בחירת תאריך אספקה:</p>
-          <ion-input readonly value="תאריך"><ion-icon name="caret-down"></ion-icon></ion-input>
-          <ion-input readonly value=שעה><ion-icon name="caret-down"></ion-icon></ion-input>
+<!--          <ion-input readonly value="תאריך" (ionFocus)="dateFocus = true" *ngIf="!dateFocus && !supplyDate"><ion-icon name="caret-down"></ion-icon></ion-input>-->
+<!--          <ion-input readonly value="שעה" (ionFocus)="timeFocus = true" *ngIf="!timeFocus && !supplyTime"><ion-icon name="caret-down"></ion-icon></ion-input>-->
+          <ion-input placeholder="תאריך" [(ngModel)]="supplyDate" (ionFocus)="dateFocus = true" (ionBlur)="dateFocus = false" [type]="dateFocus || supplyDate ? 'date' : 'text'"></ion-input>
+          <ion-input placeholder="שעה" [(ngModel)]="supplyTime" (ionFocus)="timeFocus = true" (ionBlur)="timeFocus = false" [type]="timeFocus || supplyTime ? 'time' : 'text'"></ion-input>
         </div>
         <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}"></ion-textarea>
       </div>

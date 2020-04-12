@@ -37,6 +37,12 @@ export class OrderPage implements OnInit {
   selectedSupplier: string;
 
   supplierProducts: ProductDoc[] = [];
+  filteredSupplierProducts: ProductDoc[] = null;
+
+  dateFocus: boolean;
+  timeFocus: boolean;
+  supplyDate: Date;
+  supplyTime: Date;
 
   constructor(
     private activeRoute: ActivatedRoute,
@@ -113,11 +119,21 @@ export class OrderPage implements OnInit {
       this.suppliersSearchResults = [];
       return;
     }
+    q = q.toLowerCase();
     if(this.showAllSuppliers)
-      this.suppliersSearchResults = this.mySuppliers.filter((s)=>s.name.startsWith(q));
+      this.suppliersSearchResults = this.mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
     else
       // TODO: Query from server + by category + by products
-      this.suppliersSearchResults = this.mySuppliers.filter((s)=>s.name.startsWith(q));
+      this.suppliersSearchResults = this.mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
+  }
+
+  searchProduct(q: string) {
+    if(!q) {
+      this.filteredSupplierProducts = null;
+      return;
+    }
+    q = q.toLowerCase();
+    this.filteredSupplierProducts = this.supplierProducts.filter((p)=>p.name.toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
   }
 
 
@@ -133,6 +149,10 @@ export class OrderPage implements OnInit {
 
   backToMain() {
     this.navCtrl.navigateRoot('customer');
+  }
+
+  editProduct() {
+    alert('מה הכפתור הזה אמור לעשות?');
   }
 
   goToSummery() {

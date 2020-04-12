@@ -1,3 +1,7 @@
+.page-container {
+  padding-top: 3em;
+}
+
 .select-container {
   width: 40%;
 }
@@ -49,14 +53,27 @@
 #products-list {
   display: block;
   background-color: transparent;
+  padding: 0;
+  ion-list-header {
+    align-items: flex-start;
+    padding-bottom: 0.5em;
+    ion-title {
+      padding: 0;
+    }
+  }
 }
 
 #summery {
   background-color: white;
   margin: 0 1em;
   p {
-    font-size: 0.8em;
     text-align: center;
+  }
+  #price-comment {
+    font-size: 0.8em;
+  }
+  #no-products {
+    color: var(--ion-color-dark);
   }
 }
 
@@ -79,14 +96,14 @@
   width: 100%;
   padding: 3em 1em;
   #dates {
-    width: 50%;
+    width: 60%;
     display: flex;
     align-items: center;
     p {
       font-weight: bold;
     }
     & > * {
-      margin: 1em;
+      margin: 0.5em;
     }
     ion-input {
       height: 2em;
@@ -94,6 +111,7 @@
       border: solid var(--ion-color-medium) 1px;
       border-radius: 1em;
       --padding-start: 1em;
+      --padding-end: 1em;
       ion-icon {
         position: absolute;
         left: 0.5em;

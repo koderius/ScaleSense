@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductOrder} from '../../models/Order';
 import {ProductDoc} from '../../models/Product';
 
@@ -13,6 +13,9 @@ export class ProductSummeryComponent implements OnInit {
   @Input() productDetails: ProductDoc;
   @Input() isEdit: boolean;
   @Input() withComments: boolean;
+
+  @Output() editClicked = new EventEmitter();
+  @Output() clearClicked = new EventEmitter();
 
   constructor() { }
 
