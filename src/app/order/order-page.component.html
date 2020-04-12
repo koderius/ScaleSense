@@ -1,9 +1,9 @@
 <ion-header>
-  <app-header [pageTitle]="pageTitle"></app-header>
+  <app-header [pageTitle]="pageTitle" *ngIf="order"></app-header>
   <app-reservation-wizard [step]="wizardStep" (goToStep)="wizardStep = $event" *ngIf="wizardStep"></app-reservation-wizard>
 </ion-header>
 
-<ion-content>
+<ion-content *ngIf="order">
 
   <div class="page-container" *ngIf="wizardStep == 1">
 
@@ -50,7 +50,7 @@
       </ion-button>
     </ion-row>
 
-    <ion-button size="large" color="medium" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!selectedSupplier" (click)="wizardStep = 2">המשך הזמנה</ion-button>
+    <ion-button size="large" color="medium" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!selectedSupplier" (click)="chooseSupplier()">המשך הזמנה</ion-button>
 
   </div>
 
@@ -67,10 +67,14 @@
         <ion-list id="products-list">
 
           <ion-list-header>
-            <ion-title color="secondary">{{getSelectedSupplier() ? getSelectedSupplier().name : 'משה שיווק השקמה'}}</ion-title>
+            <ion-title color="secondary">{{getSelectedSupplier().name}}</ion-title>
           </ion-list-header>
 
-          <app-product-to-cart [product]="{}"></app-product-to-cart>
+          <app-product-to-cart *ngFor="let product of supplierProducts"
+                               [product]="product"
+                               [amount]="order.getProductById(product.id) ? order.getProductById(product.id).amount : 0"
+                               (addToCart)="order.setProductAmount(product.id, $event, product.pricePerUnit)"
+          ></app-product-to-cart>
 
         </ion-list>
       </ion-col>
@@ -86,9 +90,13 @@
               </ion-title>
             </ion-list-header>
 
-            <app-product-summery [isEdit]="true"></app-product-summery>
+            <app-product-summery *ngFor="let product of order.products"
+                                 [productOrder]="product"
+                                 [productDetails]="findProductDetails(product.id)"
+                                 [isEdit]="true"
+            ></app-product-summery>
 
-            <app-products-total-price></app-products-total-price>
+            <app-products-total-price [price]="order.orderTotalPrice()" [pricePlusVat]="order.orderTotalPrice()*1.17"></app-products-total-price>
 
           </ion-list>
 
@@ -100,7 +108,7 @@
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
-            <ion-button shape="round">שמירת טיוטה</ion-button>
+            <ion-button shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
           </ion-row>
 
         </div>
@@ -121,12 +129,18 @@
 
     <div *ngIf="!orderSent">
       <ion-list id="order-list">
-        <app-product-summery [isEdit]="true" [withComments]="true"></app-product-summery>
+        <app-product-summery
+                *ngFor="let product of order.products"
+                [productOrder]="product"
+                [productDetails]="findProductDetails(product.id)"
+                [isEdit]="true"
+                [withComments]="true"
+        ></app-product-summery>
 
         <ion-item lines="none">
           <ion-row style="width: 100%">
             <ion-col size="5.5" push="2.5">
-              <app-products-total-price></app-products-total-price>
+              <app-products-total-price [price]="order.orderTotalPrice()" [pricePlusVat]="order.orderTotalPrice()*1.17"></app-products-total-price>
             </ion-col>
           </ion-row>
         </ion-item>

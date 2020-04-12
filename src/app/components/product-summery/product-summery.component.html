@@ -1,19 +1,28 @@
-<ion-item lines="none">
+<ion-item *ngIf="!productDetails">
   <ion-thumbnail slot="start">
-    <img src="../../assets/defaults/default_logo.png">
+    <ion-skeleton-text animated></ion-skeleton-text>
+  </ion-thumbnail>
+  <h6>
+    <ion-skeleton-text style="width: 80%"></ion-skeleton-text>
+  </h6>
+</ion-item>
+
+<ion-item lines="none" *ngIf="productDetails">
+  <ion-thumbnail slot="start">
+    <img [src]="productDetails.image || '../../assets/defaults/default_logo.png'">
   </ion-thumbnail>
   <ion-row class="inner-item">
     <ion-col size="3">
-      <h6>עגבניות שרי ברוטב עגבניות וחסה מגובלנת עם פלפלים קלויים מעל</h6>
+      <h6>{{productDetails.name}}</h6>
     </ion-col>
     <ion-col>
-      <h6>5.90 ש"ח</h6>
+      <h6>{{productOrder.pricePerUnit || productDetails.pricePerUnit}} ש"ח</h6>
     </ion-col>
     <ion-col>
-      <h6>2.5 ק"ג</h6>
+      <h6>{{productOrder.amount}} ק"ג</h6>
     </ion-col>
     <ion-col>
-      <h6>8.85 ש"ח</h6>
+      <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.pricePerUnit)}} ש"ח</h6>
     </ion-col>
     <ion-col [size]="withComments ? 1 : 2" *ngIf="isEdit">
       <div>

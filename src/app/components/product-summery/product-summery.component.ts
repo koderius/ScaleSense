@@ -1,4 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {ProductOrder} from '../../models/Order';
+import {ProductDoc} from '../../models/Product';
 
 @Component({
   selector: 'app-product-summery',
@@ -7,7 +9,8 @@ import {Component, Input, OnInit} from '@angular/core';
 })
 export class ProductSummeryComponent implements OnInit {
 
-  @Input() product;
+  @Input() productOrder: ProductOrder;
+  @Input() productDetails: ProductDoc;
   @Input() isEdit: boolean;
   @Input() withComments: boolean;
 

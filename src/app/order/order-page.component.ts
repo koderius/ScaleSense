@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NavController} from '@ionic/angular';
+import {SuppliersService} from '../services/suppliers.service';
+import {Order} from '../models/Order';
+import {OrdersService} from '../services/orders.service';
+import {ProductsService} from '../services/products.service';
+import {ProductDoc} from '../models/Product';
 
 @Component({
   selector: 'app-order',
@@ -10,7 +15,7 @@ import {NavController} from '@ionic/angular';
 export class OrderPage implements OnInit {
 
   /** The order to show/edit/create */
-  order = {id: '20-123456'};
+  order: Order;
 
   /** In creation of new order - the step of creation */
   wizardStep: 1 | 2 | 3;
@@ -24,52 +29,21 @@ export class OrderPage implements OnInit {
   /** Whether the order (or order changes) was sent */
   orderSent: boolean;
 
-  mySuppliers = [
-    {
-      id: '1',
-      name: 'moshe',
-      logo: '',
-    },
-    {
-      id: '2',
-      name: 'jud',
-      logo: '',
-    },
-    {
-      id: '3',
-      name: 'dror',
-      logo: '',
-    },
-    {
-      id: '4',
-      name: 'kobi',
-      logo: '',
-    },
-    {
-      id: '5',
-      name: 'ruti',
-      logo: '',
-    },
-    {
-      id: '6',
-      name: 'deb',
-      logo: '',
-    },
-    {
-      id: '7',
-      name: 'dabeshet',
-      logo: '',
-    }
-  ];
+  mySuppliers = [];
 
   suppliersSearchResults : any[] = [];
   showAllSuppliers: boolean;
 
   selectedSupplier: string;
 
+  supplierProducts: ProductDoc[] = [];
+
   constructor(
     private activeRoute: ActivatedRoute,
     private navCtrl: NavController,
+    private suppliers: SuppliersService,
+    private ordersService: OrdersService,
+    private productsService: ProductsService,
   ) {}
 
   get isNewOrder() : boolean {
@@ -85,18 +59,46 @@ export class OrderPage implements OnInit {
 
     // Get the order ID from the URL, or a new order
     const urlSnapshot = this.activeRoute.snapshot;
-    if(urlSnapshot.params['id'] == 'new')
+    const orderId = urlSnapshot.params['id'];
+
+    // Create new order and go to step 1 (choosing supplier)
+    if(orderId == 'new') {
+      this.order = this.ordersService.createNewOrder();
       this.wizardStep = 1;
+      this.mySuppliers = this.suppliers.mySuppliers;
+    }
+    // Or, get the order details and check whether its edit mode (or only preview)
     else {
-      // TODO: Load order by ID
-      this.isEdit = urlSnapshot.queryParams['edit'];
+      this.order = this.ordersService.getOrderById(orderId);
+      if(this.order) {
+        this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
+        this.isEdit = urlSnapshot.queryParams['edit'];
+      }
     }
 
   }
 
 
-  getSelectedSupplier() {
-    //TODO
+  /** On new order, step 1: Go to next step with the selected supplier */
+  chooseSupplier() {
+    if(this.selectedSupplier) {
+      this.order.setSupplier(this.selectedSupplier);
+      this.wizardStep = 2;
+      this.loadSupplierProducts();
+    }
+  }
+
+
+  /** Load all the products of the supplier.
+   * In new order - after choosing supplier.
+   * On editing - when adding new products */
+  loadSupplierProducts() {
+    this.supplierProducts = this.productsService.loadAllProductsOfSupplier(this.order.sid);
+  }
+
+
+  findProductDetails(id: string) {
+    return this.productsService.getProductDetails(id);
   }
 
 
@@ -118,9 +120,15 @@ export class OrderPage implements OnInit {
       this.suppliersSearchResults = this.mySuppliers.filter((s)=>s.name.startsWith(q));
   }
 
+
   loadAllSuppliers() {
     // TODO: Load from server
     this.showAllSuppliers = true;
+  }
+
+  /** Get supplier details */
+  getSelectedSupplier() {
+    return this.suppliers.getSupplierById(this.selectedSupplier);
   }
 
   backToMain() {
@@ -137,8 +145,10 @@ export class OrderPage implements OnInit {
   goToAddProducts() {
     if(this.isNewOrder)
       this.wizardStep = 2;
-    else if(this.isEdit)
+    else if(this.isEdit) {
+      this.loadSupplierProducts();
       this.addProductsScreen = true;
+    }
   }
 
   saveOrder() {

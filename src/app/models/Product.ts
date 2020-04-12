@@ -1,4 +1,6 @@
-export interface Product {
+import {ProductOrder} from './Order';
+
+export interface ProductDoc {
 
   /** Server ID */
   id: string;
@@ -6,40 +8,42 @@ export interface Product {
   /** Catalog number */
   nid: number;
 
-  /** Product's name */
+  /** ProductDoc's name */
   name: string;
 
   /** Barcode */
-  barcode: number;
+  barcode?: number;
 
   /** Image URL */
-  image: string;
+  image?: string;
 
-  /** Product description */
-  description: string;
+  /** ProductDoc description */
+  description?: string;
 
-  /** Product category (name or ID?) */
-  category: string;
+  /** ProductDoc category (name or ID?) */
+  category?: string;
 
-  /** Product type (?) */
-  type: string;
+  /** ProductDoc type (?) */
+  type?: string;
 
   /** Weight of unit (?) */
   unitWeight: number;
 
   /** Minimum for order (by units or weight?) */
-  orderMin: number;
+  orderMin?: number;
 
   /** The weight of the packing */
-  tara: number;
+  tara?: number;
 
   /** General price (if no other price was specified) - per unit or per weight? */
-  pricePerUnit: number;
+  pricePerUnit?: number;
 
   /** Time of creation */
-  created: Date;
+  created?: Date;
 
   /** Time of updating */
-  updated: Date;
+  updated?: Date;
 
 }
+
+export interface Product extends ProductDoc, ProductOrder {}

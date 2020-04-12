@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-products-total-price',
@@ -6,6 +6,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./products-total-price.component.scss'],
 })
 export class ProductsTotalPriceComponent implements OnInit {
+
+  @Input() price: number;
+  @Input() pricePlusVat: number;
 
   constructor() { }
 

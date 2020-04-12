@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Product} from '../../models/Product';
+import {ProductDoc} from '../../models/Product';
 
 @Component({
   selector: 'app-product-to-cart',
@@ -10,7 +10,7 @@ export class ProductToCartComponent implements OnInit {
 
   private _amount = 0;
 
-  @Input() product: Product;
+  @Input() product: ProductDoc;
   @Output() addToCart = new EventEmitter();
 
   constructor() { }
