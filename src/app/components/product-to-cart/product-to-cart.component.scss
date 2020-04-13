@@ -46,4 +46,31 @@ ion-item {
   ion-button[slot=end] {
     margin: auto auto 1em auto;
   }
+  overflow: visible; // To see bubble outside of item's border
+}
+
+.info-bubble {
+  position: absolute;
+  bottom: 6.5em;
+  margin: 0 13em;
+  padding: 1em;
+  background-color: var(--ion-color-dark);
+  font-size: x-small;
+  color: white;
+  height: auto;
+  width: 15em;
+  border-radius: 2em;
+  div {
+    position: absolute;
+    height: 1em;
+    border-bottom: solid var(--ion-color-dark) 1em;
+  }
+  &:after {
+    content: "";
+    right: -1em;
+    bottom: 0;
+    position: absolute;
+    border: solid transparent 1.2em;
+    border-bottom: solid var(--ion-color-dark) 2em;
+  }
 }

@@ -10,6 +10,8 @@ export class ProductToCartComponent implements OnInit {
 
   private _amount = 0;
 
+  showBubble: boolean;
+
   @Input() product: ProductDoc;
   @Output() addToCart = new EventEmitter();
 

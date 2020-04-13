@@ -5,7 +5,8 @@
   <ion-label>
     <h2>
       <ion-text>{{product.name}}</ion-text>
-      <ion-icon name="information-circle" color="dark"></ion-icon>
+      <ion-icon name="information-circle" color="dark" (click)="psaudo.focus()"></ion-icon>
+      <button #psaudo style="position: absolute" class="ion-no-padding" (focus)="showBubble = true" (blur)="showBubble = false"></button>
     </h2>
     <p>מק"ט: {{product.nid}}</p>
     <h6>מחיר לק"ג | {{product.pricePerUnit | number : '1.2-2'}}</h6>
@@ -22,4 +23,9 @@
   <ion-button slot="end" color="secondary" shape="round" (click)="addToCart.emit(amount)">
     <ion-icon slot="icon-only" src="../../assets/svg/icon_cart.svg"></ion-icon>
   </ion-button>
+  <div class="info-bubble" *ngIf="showBubble">
+    {{product.description || 'לא קיים תיאור'}}
+    <div></div>
+  </div>
 </ion-item>
+
