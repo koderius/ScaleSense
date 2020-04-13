@@ -14,8 +14,7 @@ export class CustomerPage implements OnInit {
     private navCtrl: NavController,
   ) { }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   goToNewOrder() {
     this.navCtrl.navigateForward('customer/order');

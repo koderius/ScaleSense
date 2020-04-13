@@ -135,3 +135,51 @@ html[dir="ltr"] {.select-container:after {right: 0}}
     }
   }
 }
+
+
+// Alerts messages settings
+.alert-wrapper {
+  * {
+    font-size: x-large !important;
+  }
+  --background: white;
+  --max-width: 500px;
+  --width: 500px;
+  .alert-head {
+    padding: 0;
+    h2 {
+      text-align: center;
+      font-weight: bold;
+      padding: 0.5em 1em;
+      &:first-child {
+        margin: 0 !important;
+        font-size: xx-large !important;
+        color: var(--ion-color-primary);
+        background-color: var(--ion-color-light-shade);
+      }
+      &:last-child {
+        margin-top: 1em;
+      }
+    }
+  }
+  .alert-message {
+    text-align: center;
+    color: black;
+    padding-bottom: 0;
+  }
+  .alert-button-group {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 1em auto;
+    .alert-button {
+      background-color: var(--ion-color-secondary);
+      border-radius: 1em;
+      color: white;
+      min-width: 5em;
+      height: 1.5em !important;
+      span {
+        justify-content: center;
+      }
+    }
+  }
+}
