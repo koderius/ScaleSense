@@ -1,10 +1,12 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductDoc} from '../../models/Product';
+import {UnitNamePipe} from '../../pipes/unit-name.pipe';
 
 @Component({
   selector: 'app-product-to-cart',
   templateUrl: './product-to-cart.component.html',
   styleUrls: ['./product-to-cart.component.scss'],
+  providers: [UnitNamePipe]
 })
 export class ProductToCartComponent implements OnInit {
 
@@ -15,7 +17,7 @@ export class ProductToCartComponent implements OnInit {
   @Input() product: ProductDoc;
   @Output() addToCart = new EventEmitter();
 
-  constructor() { }
+  constructor(private unitPipe: UnitNamePipe) { }
 
   ngOnInit() {}
 
@@ -32,7 +34,15 @@ export class ProductToCartComponent implements OnInit {
 
   // Select input text when focusing on it
   selectInput(ev) {
-    ev.target.firstChild.select();
+    ev.target.getElementsByTagName('input')[0].select();
+  }
+
+  inputValue() {
+    return this.amount + ' ' + this.unitPipe.transform(this.product.type);
+  }
+
+  onInputChange(ev) {
+    this.amount = +ev.target.value.split(' ')[0];
   }
 
 }

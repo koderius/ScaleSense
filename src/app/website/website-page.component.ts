@@ -25,4 +25,9 @@ export class WebsitePage {
     this.navCtrl.navigateRoot('register',{queryParams: {forgotpassword: true}});
   }
 
+  login() {
+    // TODO: Real login
+    this.navCtrl.navigateRoot('customer');
+  }
+
 }

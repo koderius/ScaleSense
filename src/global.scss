@@ -53,9 +53,6 @@ input[type=number] {
 .page-container {
   max-width: 1000px;
   margin: auto;
-  //display: flex;
-  //justify-content: center;
-  //align-items: center;
 }
 .page-container > * {margin: auto}
 
@@ -96,6 +93,7 @@ ion-searchbar:focus-within > ion-icon {
   display: none;
 }
 
+// Select box
 html[dir="rtl"] {.select-container:after {left: 0}}
 html[dir="ltr"] {.select-container:after {right: 0}}
 .select-container {

@@ -36,7 +36,7 @@ export const checkPayment = functions.https.onCall((data, context) => {});
 
 
 /**
- * The function get an order ID and send it to the supplier.
+ * The function gets an order ID and send it to the supplier.
  * The process of sending is just updating the order status from DRAFT (0) to SENT (10). This will grant the supplier the option to see the order.
  * In order to do so, the function recognizes the user who committed the call, finds his business ID, and then finds the order inside the business.
  * Only draft orders can be send!
