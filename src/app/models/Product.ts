@@ -9,7 +9,7 @@ export interface ProductDoc {
   sid: string;
 
   /** Catalog number */
-  nid: number;
+  nid: string;
 
   /** ProductDoc's name */
   name: string;
@@ -39,7 +39,7 @@ export interface ProductDoc {
   tara?: number;
 
   /** General price (if no other price was specified) - per unit or per weight? */
-  pricePerUnit?: number;
+  price?: number;
 
   /** Time of creation */
   created?: Date;

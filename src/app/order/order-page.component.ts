@@ -6,7 +6,6 @@ import {Order} from '../models/Order';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
-import {BusinessDoc} from '../models/Business';
 
 @Component({
   selector: 'app-order',
@@ -48,6 +47,7 @@ export class OrderPage implements OnInit {
   timeFocus: boolean;
   supplyDate: Date;
   supplyTime: Date;
+  now = new Date().toISOString().slice(0,10); // Today's date as yyyy-mm-dd
 
   constructor(
     private activeRoute: ActivatedRoute,
@@ -100,15 +100,6 @@ export class OrderPage implements OnInit {
     }
   }
 
-
-  /** Load all the products of the supplier.
-   * In new order - after choosing supplier.
-   * On editing - when choosing to add new products */
-  loadSupplierProducts() {
-    this.supplierProducts = this.productsService.loadAllProductsOfSupplier(this.order.sid);
-  }
-
-
   findProductDetails(id: string) {
     return this.productsService.getProductDetails(id);
   }
@@ -154,14 +145,22 @@ export class OrderPage implements OnInit {
 
 
   loadAllSuppliers() {
-    // TODO: Load from server
     this.showAllSuppliers = true;
   }
 
   /** Get supplier details */
   getSelectedSupplier() {
-    return this.suppliersService.getSupplierById(this.selectedSupplier);
+    return this.suppliersService.getSupplierById(this.order.sid);
   }
+
+  /** Load all the products of the supplier.
+   * In new order - after choosing supplier.
+   * On editing - when choosing to add new products */
+  async loadSupplierProducts() {
+    this.supplierProducts = [];
+    this.supplierProducts = await this.productsService.loadAllProductsOfSupplier(this.order.sid);
+  }
+
 
   backToMain() {
     this.navCtrl.navigateRoot('customer');

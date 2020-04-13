@@ -9,13 +9,13 @@
       <button #psaudo style="position: absolute" class="ion-no-padding" (focus)="showBubble = true" (blur)="showBubble = false"></button>
     </h2>
     <p>מק"ט: {{product.nid}}</p>
-    <h6>מחיר לק"ג | {{product.pricePerUnit | number : '1.2-2'}}</h6>
+    <h6>מחיר לק"ג | {{product.price | number : '1.2-2'}}</h6>
   </ion-label>
   <div class="item-amount">
     <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount + 1">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
-    <ion-input type="number" [(ngModel)]="amount" (ionFocus)="selectInput($event)"></ion-input>
+    <ion-input type="number" [(ngModel)]="amount" (ionFocus)="selectInput($event)" (keyup.enter)="addToCart.emit(amount)"></ion-input>
     <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount - 1">
       <ion-icon slot="icon-only" name="remove"></ion-icon>
     </ion-button>

@@ -73,7 +73,7 @@
           <app-product-to-cart *ngFor="let product of (filteredSupplierProducts || supplierProducts)"
                                [product]="product"
                                [amount]="order.getProductById(product.id) ? order.getProductById(product.id).amount : 0"
-                               (addToCart)="order.setProductAmount(product.id, $event, product.pricePerUnit)"
+                               (addToCart)="order.setProductAmount(product.id, $event, product.price)"
           ></app-product-to-cart>
 
         </ion-list>
@@ -159,7 +159,7 @@
           <p>בחירת תאריך אספקה:</p>
 <!--          <ion-input readonly [value]="supplyDate | date : 'dd/MM/yy' || 'תאריך'" ><ion-icon name="caret-down"></ion-icon></ion-input>-->
 <!--          <ion-input readonly value="שעה" (ionFocus)="timeFocus = true" *ngIf="!timeFocus && !supplyTime"><ion-icon name="caret-down"></ion-icon></ion-input>-->
-          <ion-input placeholder="תאריך" [(ngModel)]="supplyDate" (ionFocus)="dateFocus = true" (ionBlur)="dateFocus = false" [type]="dateFocus || supplyDate ? 'date' : 'text'"></ion-input>
+          <ion-input placeholder="תאריך" [min]="now" [(ngModel)]="supplyDate" (ionFocus)="dateFocus = true" (ionBlur)="dateFocus = false" [type]="dateFocus || supplyDate ? 'date' : 'text'"></ion-input>
           <ion-input placeholder="שעה" [(ngModel)]="supplyTime" (ionFocus)="timeFocus = true" (ionBlur)="timeFocus = false" [type]="timeFocus || supplyTime ? 'time' : 'text'"></ion-input>
         </div>
         <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}"></ion-textarea>

@@ -21,9 +21,14 @@ export class SuppliersService {
   constructor() {
 
     // Get all the suppliers of the current customer (sorted by name)
-    this.mySuppliersRef.orderBy('name').onSnapshot(snapshot => {
-      this._mySuppliers = snapshot.docs.map((d)=>d.data() as BusinessDoc);
-    })
+    try {
+      this.mySuppliersRef.orderBy('name').onSnapshot(snapshot => {
+        this._mySuppliers = snapshot.docs.map((d)=>d.data() as BusinessDoc);
+      })
+    }
+    catch (e) {
+      console.error(e);
+    }
 
   }
 
@@ -59,11 +64,16 @@ export class SuppliersService {
       const queryResults = [];
 
       // Query products by name and category
-      const p1 = this.mySuppliersRef.parent.collection('myproducts').where('name','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
-      const p2 = this.mySuppliersRef.parent.collection('myproducts').where('category','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
+      try {
+        const p1 = this.mySuppliersRef.parent.collection('myproducts').where('name','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
+        const p2 = this.mySuppliersRef.parent.collection('myproducts').where('category','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
+        await Promise.all([p1,p2]);
+      }
+      catch (e) {
+        console.error(e);
+      }
 
       // After querying done, add the suppliers ID to the results
-      await Promise.all([p1,p2]);
       queryResults.forEach((doc: DocumentSnapshot)=>{
         const sid = (doc.data() as ProductDoc).sid;
         if(!results.some((s)=>s.id == sid))

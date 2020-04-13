@@ -1,64 +1,66 @@
 import { Injectable } from '@angular/core';
 import {ProductDoc} from '../models/Product';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
+import CollectionReference = firebase.firestore.CollectionReference;
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
 
+  // TODO: Get customer ID from service
+  readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
+
   private _loadedProducts: Map<string, ProductDoc> = new Map<string, ProductDoc>();
 
   constructor() { }
 
-  loadAllProductsOfSupplier(sid: string) : ProductDoc[] {
-    //TODO: MOCK - Load products from server
-    const products = [
-      {
-        id: '#1',
-        nid: 123456789,
-        name: 'בננות',
-        unitWeight: 0.5,
-        pricePerUnit: 1.5,
-        image: 'https://cdn.mos.cms.futurecdn.net/42E9as7NaTaAi4A6JcuFwG-320-80.jpg'
-      },
-      {
-        id: '#2',
-        nid: 123456789,
-        name: 'עגבניות שרי',
-        unitWeight: 0.5,
-        pricePerUnit: 1.5,
-        image: 'https://befreshcorp.net/wp-content/uploads/2017/07/product-packshot-CherryTtomatoes-558x600.jpg'
-      },
-      {
-        id: '#3',
-        nid: 123456789,
-        name: 'מלוואח',
-        unitWeight: 0.5,
-        pricePerUnit: 1.5,
-        image: 'https://img.mako.co.il/2014/01/22/IMG_6234_c.jpg'
-      }
-    ];
+  /** The reference to the firestore collection where the list of products is stored */
+  get myProductsRef() : CollectionReference {
+    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('myproducts');
+  }
 
-    // Add products to the local loaded products list
-    products.forEach((p)=>this._loadedProducts.set(p.id, p));
 
-    return products;
+  /** Load and get all products of a given supplier ID (SID) */
+  async loadAllProductsOfSupplier(sid: string) : Promise<ProductDoc[]> {
+
+    // Get all products that belong to the given supplier
+    const res = await this.myProductsRef.where('sid','==',sid).get();
+
+    // Return the products data, and save them in the list of loaded products
+    return res.docs.map((doc)=>{
+      const data = doc.data() as ProductDoc;
+      this._loadedProducts.set(doc.id, data);
+      return data;
+    });
 
   }
 
 
   /** Get details of products according to their IDs. Load from local app session, or from server. can load up to 10 products per call */
-  loadProductsDetails(ids: string[]) : ProductDoc[] {
+  async loadProductsDetails(ids: string[]) : Promise<ProductDoc[]> {
 
     // Make sure only 10 IDs
     ids = ids.slice(0,10);
 
-    // Remove IDs of products that already loaded
-    ids.filter((id)=>!this._loadedProducts.has(id));
+    const products: ProductDoc[] = [];
 
-    // TODO: Load from server and add to map
+    // Add the products that have been already loaded to the results list, and remove them from the IDs list
+    ids.filter((id)=>{
+      if(this._loadedProducts.has(id)) {
+        products.push(this._loadedProducts.get(id));
+        return false;
+      }
+      else
+        return true;
+    });
 
-    return
+    // Load the remaining IDs from the server
+    const res = await this.myProductsRef.where('id','in',ids).get();
+    products.push(...res.docs.map((doc)=>doc.data() as ProductDoc));
+
+    return products;
 
   }
 

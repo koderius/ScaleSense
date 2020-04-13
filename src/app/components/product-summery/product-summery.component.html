@@ -16,13 +16,13 @@
       <h6>{{productDetails.name}}</h6>
     </ion-col>
     <ion-col>
-      <h6>{{productOrder.pricePerUnit || productDetails.pricePerUnit | number : '1.2-2'}} ש"ח</h6>
+      <h6>{{productOrder.pricePerUnit || productDetails.price | number : '1.2-2'}} ש"ח</h6>
     </ion-col>
     <ion-col>
       <h6>{{productOrder.amount | number : '1.0-3'}} ק"ג</h6>
     </ion-col>
     <ion-col>
-      <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.pricePerUnit) | number : '1.2-2'}} ש"ח</h6>
+      <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.price) | number : '1.2-2'}} ש"ח</h6>
     </ion-col>
     <ion-col [size]="withComments ? 1 : 2" *ngIf="isEdit">
       <div>
