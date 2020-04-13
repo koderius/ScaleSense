@@ -75,7 +75,14 @@ export interface OrderDoc {
 
 export class Order {
 
-  constructor(private _props: OrderDoc) {}
+  private _supplyDate: string; // yyyy-mm-dd
+  private _supplyHour: string; // hh:mm
+
+  constructor(private _props: OrderDoc) {
+
+    this._props.status = OrderStatus.DRAFT;
+
+  }
 
   get id() {
     return this._props.id;
@@ -133,6 +140,30 @@ export class Order {
     return sum;
   }
 
+  get status() {
+    return this._props.status;
+  }
+
+  get supplyTime() {
+    return this._props.supplyTime;
+  }
+
+  set supplyDate(date: string) {
+    this._supplyDate = date;
+    this.mergeDateAndHour();
+  }
+
+  set supplyHour(time: string) {
+    this._supplyHour = time;
+    this.mergeDateAndHour();
+  }
+
+  private mergeDateAndHour() {
+    if(this._supplyDate && this._supplyHour)
+      this._props.supplyTime = new Date(this._supplyDate + ' ' + this._supplyHour);
+    else
+      this._props.supplyTime = null;
+  }
 
   getDocument() : OrderDoc {
     return JSON.parse(JSON.stringify(this._props));

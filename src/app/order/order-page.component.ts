@@ -6,6 +6,7 @@ import {Order} from '../models/Order';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
+import {AlertsService} from '../services/alerts.service';
 
 @Component({
   selector: 'app-order',
@@ -55,6 +56,7 @@ export class OrderPage implements OnInit {
     public suppliersService: SuppliersService,
     private ordersService: OrdersService,
     private productsService: ProductsService,
+    private alerts: AlertsService,
   ) {}
 
   /** Whether in mode of creating new order (with wizard) */
@@ -68,7 +70,7 @@ export class OrderPage implements OnInit {
       return (this.isEdit ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.id;
   }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     // Get the order ID from the URL, or a new order
     const urlSnapshot = this.activeRoute.snapshot;
@@ -76,7 +78,7 @@ export class OrderPage implements OnInit {
 
     // Create new order and go to step 1 (choosing supplier)
     if(orderId == 'new') {
-      this.order = this.ordersService.createNewOrder();
+      this.order = await this.ordersService.createNewOrder();
       this.wizardStep = 1;
     }
     // Or, get the order details and check whether its edit mode (or only preview)
@@ -186,8 +188,10 @@ export class OrderPage implements OnInit {
     }
   }
 
-  saveOrder() {
-    // TODO: Save as a draft
+  async saveOrder() {
+    this.alerts.loaderStart('שומר הזמנה...');
+    await this.ordersService.saveOrder(this.order);
+    this.alerts.loaderStop();
   }
 
   sendOrder() {

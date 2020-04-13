@@ -1,5 +1,17 @@
 import {ProductOrder} from './Order';
 
+export enum ProductType {
+
+  /** Default - the unit weight is not relevant */
+  BY_WEIGHT = 0,
+
+  /** For these, unitWeight should be set */
+  BOX = 1,
+  BLOCK = 2,
+  UNIT = 3,
+
+}
+
 export interface ProductDoc {
 
   /** Server ID */
@@ -27,7 +39,7 @@ export interface ProductDoc {
   category?: string;
 
   /** ProductDoc type (?) */
-  type?: string;
+  type?: ProductType;
 
   /** Weight of unit (?) */
   unitWeight: number;
@@ -38,7 +50,7 @@ export interface ProductDoc {
   /** The weight of the packing */
   tara?: number;
 
-  /** General price (if no other price was specified) - per unit or per weight? */
+  /** General price (if no other price was specified) */
   price?: number;
 
   /** Time of creation */
