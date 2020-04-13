@@ -18,6 +18,9 @@ export class OrderPage implements OnInit {
   /** The order to show/edit/create */
   order: Order;
 
+  /** The JSON of the order as it was when the page loaded - to check changes */
+  originalOrder: string;
+
   /** In creation of new order - the step of creation */
   wizardStep: 1 | 2 | 3;
 
@@ -90,6 +93,14 @@ export class OrderPage implements OnInit {
       }
     }
 
+    // Keep the original order to check changes
+    this.originalOrder = JSON.stringify(this.order);
+
+  }
+
+
+  orderHasChanged(): boolean {
+    return this.originalOrder != JSON.stringify(this.order);
   }
 
 
@@ -189,14 +200,34 @@ export class OrderPage implements OnInit {
   }
 
   async saveOrder() {
+
+    // Save draft on server
     this.alerts.loaderStart('שומר הזמנה...');
     await this.ordersService.saveOrder(this.order);
     this.alerts.loaderStop();
+
+    // Update the original order for checking further changes
+    this.originalOrder = JSON.stringify(this.order);
+
   }
 
-  sendOrder() {
-    // TODO: Send the order
-    this.orderSent = true;
+  async sendOrder() {
+
+    if(!this.order.supplyTime) {
+      alert('יש למלא תאריך הזמנה');
+      return;
+    }
+
+    // First, save the order
+    this.alerts.loaderStart('שולח הזמנה לספק...');
+    if(await this.ordersService.saveOrder(this.order)) {
+
+      if(await this.ordersService.sendOrder(this.order.id))
+        this.orderSent = true;
+
+    }
+    this.alerts.loaderStop();
+
   }
 
   cancelOrder() {

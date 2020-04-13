@@ -4,6 +4,7 @@ import {ProductsService} from './products.service';
 import {formatNumber} from '@angular/common';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
+import 'firebase/functions';
 import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
 
@@ -67,8 +68,14 @@ export class OrdersService {
   }
 
 
-  sendOrder(orderId: string) {
-    // TODO: Cloud function
+  async sendOrder(orderId: string) : Promise<boolean> {
+    const sendOrder = firebase.functions().httpsCallable('sendOrder');
+    try {
+      return (await sendOrder(orderId)).data;
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
 

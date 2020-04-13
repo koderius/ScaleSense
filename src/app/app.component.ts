@@ -6,6 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {firebaseConfig} from './FirebaseConfig';
 import * as firebase from 'firebase/app';
 import 'firebase/analytics';
+import 'firebase/auth';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,12 @@ export class AppComponent {
 
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
+
+    // TODO: Delete this. Test user
+    firebase.auth().onAuthStateChanged((user)=>{
+      if(!user)
+        firebase.auth().signInWithEmailAndPassword('mestroti@gmail.com','123456');
+    })
 
   }
 }

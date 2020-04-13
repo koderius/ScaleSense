@@ -13,8 +13,13 @@ export class CloseOrderGuard implements CanDeactivate<OrderPage> {
     nextState?: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree
   {
 
-    alert('TO DO: Guard');
-    return true;
+    if(component.orderHasChanged()) {
+      // TODO: Ask quiting without saving
+      alert('TO-DO: Ask quiting without saving');
+      return false;
+    }
+    else
+      return true;
 
   }
   

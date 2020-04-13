@@ -33,3 +33,45 @@ export const registerCustomerFirstStep = functions.https.onCall(async (data) => 
 
 /** Check payment and enable / disable user */
 export const checkPayment = functions.https.onCall((data, context) => {});
+
+
+/**
+ * The function get an order ID and send it to the supplier.
+ * The process of sending is just updating the order status from DRAFT (0) to SENT (10). This will grant the supplier the option to see the order.
+ * In order to do so, the function recognizes the user who committed the call, finds his business ID, and then finds the order inside the business.
+ * Only draft orders can be send!
+ */
+export const sendOrder = functions.https.onCall(async (orderId: string, context) => {
+
+  const uid: string = context.auth ? context.auth.uid : '';
+
+  if(uid && orderId) {
+
+    return (await admin.firestore().runTransaction(async transaction => {
+
+      // Get the business of the user who committed the call
+      const sender = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
+
+      if(sender && sender.bid) {
+
+        // Get the order data
+        const orderRef = admin.firestore().collection('customers').doc(sender.bid).collection('myorders').doc(orderId);
+        const order = (await transaction.get(orderRef)).data();
+
+        // If the order is a draft, it is possible to send it
+        if(order && !order.status) {
+          transaction.update(orderRef, {status: 10});
+          return true;
+        }
+
+      }
+
+      return false;
+
+    }));
+
+  }
+
+  return await false;
+
+});
