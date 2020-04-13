@@ -5,6 +5,9 @@ export interface ProductDoc {
   /** Server ID */
   id: string;
 
+  /** The ID of the supplier it belongs to */
+  sid: string;
+
   /** Catalog number */
   nid: number;
 

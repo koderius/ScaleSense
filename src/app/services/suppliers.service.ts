@@ -1,58 +1,79 @@
 import { Injectable } from '@angular/core';
+import {BusinessDoc} from '../models/Business';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
+import CollectionReference = firebase.firestore.CollectionReference;
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+import {ProductDoc} from '../models/Product';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SuppliersService {
 
-  // TODO: MOCK
-  private _mySuppliers = [
-    {
-      id: '1',
-      name: 'moshe',
-      logo: '',
-    },
-    {
-      id: '2',
-      name: 'jud',
-      logo: '',
-    },
-    {
-      id: '3',
-      name: 'dror',
-      logo: '',
-    },
-    {
-      id: '4',
-      name: 'kobi',
-      logo: '',
-    },
-    {
-      id: '5',
-      name: 'ruti',
-      logo: '',
-    },
-    {
-      id: '6',
-      name: 'deb',
-      logo: '',
-    },
-    {
-      id: '7',
-      name: 'dabeshet',
-      logo: '',
-    }
-  ];
+  // TODO: Get customer ID from service
+  readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
 
-  constructor() { }
+  /** List of all the suppliers that belong to the current customer. Continually updated from the server */
+  private _mySuppliers: BusinessDoc[] = [];
 
+
+  constructor() {
+
+    // Get all the suppliers of the current customer (sorted by name)
+    this.mySuppliersRef.orderBy('name').onSnapshot(snapshot => {
+      this._mySuppliers = snapshot.docs.map((d)=>d.data() as BusinessDoc);
+    })
+
+  }
+
+
+  /** The reference to the firestore collection where the list of suppliers is stored */
+  get mySuppliersRef() : CollectionReference {
+    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('mysuppliers');
+  }
+
+
+  /** Get the list of all the suppliers */
   get mySuppliers() {
     return this._mySuppliers.slice();
   }
 
-  getSupplierById(sid: string) {
-    // TODO: Check the server
-    return {sid: sid, name: 'משה שיווק השקמה בע"מ'};
+
+  /** Get supplier from the list by his ID */
+  getSupplierById(id: string) : BusinessDoc | null {
+    return this._mySuppliers.find((s)=>s.id == id);
+  }
+
+
+  /** Query suppliers by their name, or by their products name/category */
+  async querySuppliers(q: string) : Promise<BusinessDoc[]> {
+
+    q = q.toLowerCase();
+
+    // First, add the suppliers by their name to the results
+    const results = this._mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
+
+    if(q.length >= 3) {
+
+      const queryResults = [];
+
+      // Query products by name and category
+      const p1 = this.mySuppliersRef.parent.collection('myproducts').where('name','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
+      const p2 = this.mySuppliersRef.parent.collection('myproducts').where('category','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
+
+      // After querying done, add the suppliers ID to the results
+      await Promise.all([p1,p2]);
+      queryResults.forEach((doc: DocumentSnapshot)=>{
+        const sid = (doc.data() as ProductDoc).sid;
+        if(!results.some((s)=>s.id == sid))
+          results.push(this.getSupplierById(sid));
+      });
+
+    }
+
+    return results;
+
   }
 
 }

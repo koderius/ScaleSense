@@ -15,31 +15,31 @@
       <ion-text *ngIf="!selectedSupplier">רשימת ספקים</ion-text>
       <select [(ngModel)]="selectedSupplier">
         <option></option>
-        <option *ngFor="let supplier of mySuppliers" [value]="supplier.id">{{supplier.name}}</option>
+        <option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</option>
       </select>
     </div>
 
     <div class="suppliers-header" *ngIf="suppliersSearchResults.length">תוצאות החיפוש</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplier of suppliersSearchResults" (click)="selectedSupplier = supplier.id" [ngClass]="selectedSupplier == supplier.id ? 'selected' : ''">
-        <ion-img [src]="supplier.logo || '../../assets/defaults/default_logo.png'"></ion-img>
-        <ion-text>{{supplier.name}}</ion-text>
+      <div class="supplier-box" *ngFor="let supplierId of suppliersSearchResults" (click)="selectedSupplier = supplierId" [ngClass]="selectedSupplier == supplierId ? 'selected' : ''">
+        <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
+        <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
     </div>
 
-    <div class="suppliers-header" *ngIf="getCommonSearches()">חיפושים שכיחים</div>
+    <div class="suppliers-header" *ngIf="commonSuppliers.length">חיפושים שכיחים</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplier of getCommonSearches()" (click)="selectedSupplier = supplier.id" [ngClass]="selectedSupplier == supplier.id ? 'selected' : ''">
-        <ion-img [src]="supplier.logo || '../../assets/defaults/default_logo.png'"></ion-img>
-        <ion-text>{{supplier.name}}</ion-text>
+      <div class="supplier-box" *ngFor="let supplierId of commonSuppliers" (click)="selectedSupplier = supplierId" [ngClass]="selectedSupplier == supplierId ? 'selected' : ''">
+        <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
+        <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
     </div>
 
-    <div class="suppliers-header" *ngIf="showAllSuppliers">כל הספקים</div>
-    <div class="suppliers-boxes" *ngIf="showAllSuppliers">
-      <div class="supplier-box" *ngFor="let supplier of mySuppliers" (click)="selectedSupplier = supplier.id" [ngClass]="selectedSupplier == supplier.id ? 'selected' : ''">
-        <ion-img [src]="supplier.logo || '../../assets/defaults/default_logo.png'"></ion-img>
-        <ion-text>{{supplier.name}}</ion-text>
+    <div class="suppliers-header" *ngIf="allSuppliers.length">כל הספקים</div>
+    <div class="suppliers-boxes">
+      <div class="supplier-box" *ngFor="let supplierId of allSuppliers" (click)="selectedSupplier = supplierId" [ngClass]="selectedSupplier == supplierId ? 'selected' : ''">
+        <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
+        <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
     </div>
 
@@ -50,7 +50,7 @@
       </ion-button>
     </ion-row>
 
-    <ion-button size="large" color="medium" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!selectedSupplier" (click)="chooseSupplier()">המשך הזמנה</ion-button>
+    <ion-button size="large" [color]="selectedSupplier ? 'primary' : 'medium'" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!selectedSupplier" (click)="chooseSupplier()">המשך הזמנה</ion-button>
 
   </div>
 

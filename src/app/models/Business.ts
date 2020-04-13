@@ -4,8 +4,9 @@ export type BusinessSide = 'c' | 's';
 
 export interface BusinessDoc {
 
-  bid: string;
+  id: string;
   name: string;
+  logo: string;
 
   /** Contact data from the manager (?) */
   email: string;
