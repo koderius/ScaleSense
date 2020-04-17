@@ -60,10 +60,13 @@ export interface OrderDoc {
   comment?: string;
 
   /** Time of supply */
-  supplyTime?: Date;
+  supplyTime?: number;
 
-  /** Time of creation */
-  created?: Date;
+  /** Time of creation (according to client time) */
+  created?: number;
+
+  /** Time of last update on server (according to server time) */
+  modified?: number;
 
   /** List of changes */
   changes?: OrderChange[];
@@ -71,16 +74,25 @@ export interface OrderDoc {
   /** Order status */
   status?: OrderStatus;
 
+  /** Number of invoice */
+  invoice?: string;
+
+  /** Draft / non-draft - For server (querying) use only */
+  draft?: boolean;
+
 }
 
 export class Order {
 
-  private _supplyDate: string; // yyyy-mm-dd
-  private _supplyHour: string; // hh:mm
-
   constructor(private _props: OrderDoc) {
 
-    this._props.status = OrderStatus.DRAFT;
+    // Set creation time (client time) - for new order
+    if(!this._props.created)
+      this._props.created = Date.now();
+
+    // Set as draft - for new order
+    if(!this._props.status)
+      this._props.status = OrderStatus.DRAFT;
 
   }
 
@@ -144,26 +156,23 @@ export class Order {
     return this._props.status;
   }
 
+  get created() {
+    return this._props.created;
+  }
+
+  get modified() {
+    return this._props.modified;
+  }
+
   get supplyTime() {
     return this._props.supplyTime;
   }
 
-  set supplyDate(date: string) {
-    this._supplyDate = date;
-    this.mergeDateAndHour();
+  set supplyTime(date: number) {
+    this._props.supplyTime = date;
   }
 
-  set supplyHour(time: string) {
-    this._supplyHour = time;
-    this.mergeDateAndHour();
-  }
 
-  private mergeDateAndHour() {
-    if(this._supplyDate && this._supplyHour)
-      this._props.supplyTime = new Date(this._supplyDate + ' ' + this._supplyHour);
-    else
-      this._props.supplyTime = null;
-  }
 
   getDocument() : OrderDoc {
     return JSON.parse(JSON.stringify(this._props));

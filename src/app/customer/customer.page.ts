@@ -21,11 +21,15 @@ export class CustomerPage implements OnInit {
   }
 
   goToEditOrder() {
-
+    this.navCtrl.navigateForward('customer/orders-list?mode=edit');
   }
 
   goToOrdersStatus() {
+    this.navCtrl.navigateForward('customer/orders-list');
+  }
 
+  goToReceiveOrder() {
+    this.navCtrl.navigateForward('customer/orders-list?mode=receive');
   }
 
 }

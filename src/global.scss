@@ -29,6 +29,9 @@
 @import url('https://fonts.googleapis.com/earlyaccess/opensanshebrew.css');
 @import url('https://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css');
 
+// Import angular material styles
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
 // The app's background
 ion-content {--background: url('/assets/background.png') top/100% 100% no-repeat}
 
@@ -78,6 +81,7 @@ ion-searchbar {
   .searchbar-input {
     height: 3.5em !important;
     border-radius: 1.75em !important;
+    border: solid var(--ion-color-medium) 1px !important;
   }
 }
 ion-searchbar > ion-icon {

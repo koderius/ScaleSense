@@ -1,0 +1,94 @@
+<ion-header>
+  <app-header [pageTitle]="pageTitle"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="search-section">
+      <ion-searchbar placeholder="הקלד שם ספק | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()" [disabled]="fromDate">
+        <ion-icon src="../../assets/svg/search.svg"></ion-icon>
+      </ion-searchbar>
+      <p class="ion-text-center">
+        <ion-text color="primary">איתור לפי תאריך ביצוע הזמנה:</ion-text>
+      </p>
+      <div id="dates" *ngIf="pageMode != 'drafts'">
+        <p>בין התאריכים</p>
+        <mat-form-field>
+          <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" readonly>
+          <mat-datepicker-toggle matSuffix [for]="fromPicker">
+            <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
+        <p>ל-</p>
+        <mat-form-field>
+          <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" [min]="fromDate" [disabled]="!fromDate" readonly (dateChange)="searchOrders()">
+          <mat-datepicker-toggle matSuffix [for]="toPicker">
+            <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
+          </mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
+        <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null" *ngIf="fromDate">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <div id="table-section">
+
+      <ion-grid>
+
+        <div style="display: flex" *ngIf="isSearching">
+          <ion-spinner style="margin: auto" color="primary"></ion-spinner>
+        </div>
+
+        <div *ngIf="!isSearching && !orders.length">
+          <h4 class="ion-text-center">
+            <ion-text color="medium">- לא נמצאו מסמכים -</ion-text>
+          </h4>
+        </div>
+
+        <ion-row *ngIf="orders.length">
+          <ion-col size="1"></ion-col>
+          <ion-col>{{pageMode == 'drafts' ? 'תאריך ביצוע' : 'תאריך אספקה'}}</ion-col>
+          <ion-col>מס. הזמנה</ion-col>
+          <ion-col>ספק</ion-col>
+          <ion-col *ngIf="pageMode != 'drafts'">סטטוס</ion-col>
+          <ion-col></ion-col>
+          <ion-col *ngIf="pageMode == 'drafts'"></ion-col>
+        </ion-row>
+
+        <ion-row *ngFor="let order of orders">
+          <ion-col size="1">
+            <ion-button class="small-circle-btn" shape="round" fill="clear" color="secondary" (click)="xClicked()" *ngIf="pageMode != 'drafts'">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col>{{(pageMode == 'drafts' ? (order.modified || order.created) : order.supplyTime) | date : 'dd/MM/yyyy'}}</ion-col>
+          <ion-col>{{order.id}}</ion-col>
+          <ion-col>
+            <ion-img [src]="getSupplier(order.sid).logo" class="ion-margin-end"></ion-img>
+            <ion-text>{{getSupplier(order.sid).name}}</ion-text>
+          </ion-col>
+          <ion-col *ngIf="pageMode != 'drafts'">{{order.status | orderStatusText}}</ion-col>
+          <ion-col>
+            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)">{{actionBtnTitle}}</ion-button>
+          </ion-col>
+          <ion-col *ngIf="pageMode == 'drafts'">
+            <ion-button color="dark" fill="outline" shape="round" (click)="deleteDraft(order.id)">מחיקה</ion-button>
+          </ion-col>
+        </ion-row>
+
+      </ion-grid>
+
+    </div>
+
+    <ion-row>
+      <ion-button shape="round" strong="true" (click)="goBack()" id="back-btn">חזרה למסך הראשי</ion-button>
+    </ion-row>
+
+  </div>
+
+</ion-content>

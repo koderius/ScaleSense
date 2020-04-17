@@ -1,4 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {NavController} from '@ionic/angular';
 
 @Component({
   selector: 'app-header',
@@ -11,8 +12,14 @@ export class HeaderComponent implements OnInit {
 
   @Input() pageTitle;
 
-  constructor() { }
+  constructor(
+    private navCtrl: NavController,
+  ) { }
 
   ngOnInit() {}
+
+  goToDrafts() {
+    this.navCtrl.navigateForward('customer/orders-list?mode=drafts');
+  }
 
 }

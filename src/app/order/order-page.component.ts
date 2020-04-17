@@ -49,8 +49,8 @@ export class OrderPage implements OnInit {
   /** Date and time inputs */
   dateFocus: boolean;
   timeFocus: boolean;
-  supplyDate: Date;
-  supplyTime: Date;
+  supplyDateInput: Date;
+  supplyHourInput: string;
   now = new Date().toISOString().slice(0,10); // Today's date as yyyy-mm-dd
 
   constructor(
@@ -96,11 +96,27 @@ export class OrderPage implements OnInit {
     // Keep the original order to check changes
     this.originalOrder = JSON.stringify(this.order);
 
+    // Split order's supply time into 2 inputs
+    if(this.order.supplyTime) {
+      this.supplyDateInput = new Date(this.order.supplyTime);
+      this.supplyHourInput = new Date(this.order.supplyTime).toLocaleTimeString();
+    }
+
   }
 
 
   orderHasChanged(): boolean {
     return this.originalOrder != JSON.stringify(this.order);
+  }
+
+
+  mergeDateAndTime() {
+    if(this.supplyDateInput && this.supplyHourInput) {
+      const time = new Date(this.supplyDateInput);
+      time.setHours(+this.supplyHourInput.slice(0,2));
+      time.setMinutes(+this.supplyHourInput.slice(3,5));
+      this.order.supplyTime = time.getTime();
+    }
   }
 
 

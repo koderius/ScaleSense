@@ -7,6 +7,7 @@ import {firebaseConfig} from './FirebaseConfig';
 import * as firebase from 'firebase/app';
 import 'firebase/analytics';
 import 'firebase/auth';
+import {MetadataService} from './services/metadata.service';
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ export class AppComponent {
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar
+    private statusBar: StatusBar,
+    private metadataService: MetadataService,
   ) {
     this.initializeApp();
   }

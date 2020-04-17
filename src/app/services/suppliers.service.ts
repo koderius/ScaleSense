@@ -51,13 +51,19 @@ export class SuppliersService {
   }
 
 
+  getSupplierByName(q: string) {
+    q = q.toLowerCase();
+    return this._mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
+  }
+
+
   /** Query suppliers by their name, or by their products name/category */
   async querySuppliers(q: string) : Promise<BusinessDoc[]> {
 
     q = q.toLowerCase();
 
     // First, add the suppliers by their name to the results
-    const results = this._mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
+    const results = this.getSupplierByName(q);
 
     if(q.length >= 3) {
 

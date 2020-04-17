@@ -60,7 +60,10 @@ export const sendOrder = functions.https.onCall(async (orderId: string, context)
 
         // If the order is a draft, it is possible to send it
         if(order && !order.status) {
-          transaction.update(orderRef, {status: 10});
+          transaction.update(orderRef, {
+            status: 10,
+            draft: false,
+          });
           return true;
         }
 

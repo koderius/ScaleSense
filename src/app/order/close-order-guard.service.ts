@@ -16,7 +16,8 @@ export class CloseOrderGuard implements CanDeactivate<OrderPage> {
     nextState?: RouterStateSnapshot): Promise<boolean>
   {
 
-    if(component.orderHasChanged())
+    // If the order has not been saved as a draft, or not yet sent to the supplier, alert on losing changes
+    if(component.orderHasChanged() && !component.orderSent)
       return await this.alerts.areYouSure('האם לצאת?', 'השינויים לא נשמרו.');
     else
       return true;

@@ -6,6 +6,15 @@ import {OredersWizardComponent} from './orders-wizard/oreders-wizard.component';
 import {NgSelectComponent, NgSelectModule} from 'ng-custom-select';
 import {HighlightifyPipe} from '../pipes/highlightify.pipe';
 import {UnitNamePipe} from '../pipes/unit-name.pipe';
+import {VatCalcPipe} from '../pipes/vat-calc.pipe';
+import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
+import {
+  MatDatepickerModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatNativeDateModule
+} from '@angular/material';
 
 
 
@@ -14,19 +23,33 @@ import {UnitNamePipe} from '../pipes/unit-name.pipe';
     CommonModule,
     IonicModule,
     NgSelectModule,
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+    MatIconModule,
   ],
   declarations: [
     HeaderComponent,
     OredersWizardComponent,
     HighlightifyPipe,
     UnitNamePipe,
+    VatCalcPipe,
+    OrderStatusTextPipe,
   ],
   exports: [
+    MatFormFieldModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+    MatIconModule,
     HeaderComponent,
     OredersWizardComponent,
     NgSelectComponent,
     HighlightifyPipe,
     UnitNamePipe,
-  ]
+    VatCalcPipe,
+    OrderStatusTextPipe,
+  ],
 })
 export class ComponentsModule { }
