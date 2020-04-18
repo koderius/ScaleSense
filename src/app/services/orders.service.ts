@@ -26,7 +26,7 @@ export class OrdersService {
    * If someone else already created an order with this ID and saved it, the newer order will get a new different ID.
    * This method keeps the IDs sequential (not "wasting" numbers), in case someone created a draft but has not saved it.
    * */
-  readonly TEMP_ID_SUFFIX = '*';
+  static readonly TEMP_ID_SUFFIX = '*';
 
   private _myOrders: OrderDoc[] = [];
 
@@ -147,7 +147,8 @@ export class OrdersService {
     if(!doc)
       doc = (await this.myOrdersRef.doc(id).get()).data() as OrderDoc;
 
-    return new Order(doc);
+    if(doc)
+      return new Order(doc);
 
   }
 
@@ -160,41 +161,43 @@ export class OrdersService {
 
 
   /** Save order */
-  async saveOrder(order: Order) : Promise<boolean> {
+  async saveOrder(order: Order) : Promise<Order> {
+
+    // Get order's data to save
+    const orderDoc = order.getDocument();
 
     // If the order has a temporary ID (means it has not been saved yet), set its ID again
-    if(order.id.endsWith(this.TEMP_ID_SUFFIX)) {
+    if(orderDoc.id.endsWith(OrdersService.TEMP_ID_SUFFIX)) {
 
-      const orderDoc = order.getDocument();
       orderDoc.id = await this.setNewOrderId(true);
 
       // If the new ID is different from the temporal ID (minus the temporary suffix), notify the user
-      if(orderDoc.id != order.id.slice(-1))
-        alert('שים לב: מספר ההזמנה העדכני הוא: ' + order.id);
-
-      order = new Order(orderDoc);
+      if(orderDoc.id != order.id.slice(0, -OrdersService.TEMP_ID_SUFFIX.length))
+        alert('שים לב: מספר ההזמנה העדכני הוא: ' + orderDoc.id);
 
     }
 
     try {
-      await this.myOrdersRef.doc(order.id).set({
+      await this.myOrdersRef.doc(orderDoc.id).set({
 
           // Save all properties
-          ...order.getDocument(),
+          ...orderDoc,
 
           // Update last time modified to current time
           modified: firebase.firestore.Timestamp.now().toMillis(),
 
           // Set as draft (for querying only)
-          draft: order.status == OrderStatus.DRAFT,
+          draft: orderDoc.status === OrderStatus.DRAFT,
 
         },
         {merge: true});
-      return true;
     }
     catch (e) {
       console.error(e);
     }
+
+    return new Order(orderDoc);
+
   }
 
 
@@ -254,7 +257,7 @@ export class OrdersService {
       if(fixedId)
         transaction.set(this.myOrdersMetadataRef,{lastId: newId}, {merge: true});
 
-      return newId + (fixedId ? '' : this.TEMP_ID_SUFFIX);
+      return newId + (fixedId ? '' : OrdersService.TEMP_ID_SUFFIX);
 
     });
 

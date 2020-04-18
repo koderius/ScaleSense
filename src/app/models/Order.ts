@@ -150,6 +150,10 @@ export class Order {
     }
   }
 
+  clearProducts() {
+    this._props.products.splice(0);
+  }
+
   orderTotalPrice() : number {
     let sum = 0;
     this.products.forEach((p)=>{sum += (p.pricePerUnit*p.amount)});

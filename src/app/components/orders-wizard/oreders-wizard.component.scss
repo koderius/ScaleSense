@@ -20,6 +20,7 @@
 }
 
 .circle {
+  position: relative;
   width: 5rem;
   height: 5rem;
   border-radius: 50%;
@@ -39,7 +40,7 @@
 .circle.after:before {
   content: '\2713';
   position: absolute;
-  top: 53%;
+  top: 0.5em;
 }
 .circle.current {
   font-weight: bold;

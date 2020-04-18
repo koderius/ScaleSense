@@ -86,7 +86,7 @@
             <ion-list-header class="ion-padding-horizontal">
               <ion-title>
                 <ion-text>פרטי הזמנה</ion-text>
-                <ion-text class="ion-float-end">{{order.id}}</ion-text>
+                <ion-text class="ion-float-end" [title]="newIdMsg">{{order.id}}</ion-text>
               </ion-title>
             </ion-list-header>
 
@@ -129,7 +129,7 @@
 
     <h1 class="ion-text-center" id="title-with-logo">
       <ion-text>פרטי הזמנה</ion-text>
-      <ion-text *ngIf="page == 3"> מס. {{order.id}}</ion-text>
+      <ion-text *ngIf="page == 3" [title]="newIdMsg"> מס. {{order.id}}</ion-text>
       <ion-img [src]="getSelectedSupplier().logo" style="position: absolute"></ion-img>
     </h1>
 

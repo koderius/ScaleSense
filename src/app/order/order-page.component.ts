@@ -22,6 +22,12 @@ export class OrderPage implements OnInit {
   /** The JSON of the order as it was when the page loaded - to check changes */
   originalOrder: string;
 
+  /** The key on the local storage where the data of an unsaved order is being stored */
+  readonly TEMP_DATA_KEY = 'scale-sense_TempOrderData-';
+
+  /** Auto save interval timer */
+  autoSave;
+
   /**
    *  page 1: Selecting a supplier (Drafts only)
    *  page 2: Choosing products (Drafts & edit mode only)
@@ -63,7 +69,16 @@ export class OrderPage implements OnInit {
 
   /** Whether in mode of draft (with wizard) */
   get isDraft() : boolean {
-    return this.order.status == OrderStatus.DRAFT;
+    return this.order && this.order.status == OrderStatus.DRAFT;
+  }
+
+  /** Whether the draft is new (not saved yet) */
+  get isNew() : boolean {
+    return this.order.id.endsWith(OrdersService.TEMP_ID_SUFFIX);
+  }
+
+  get newIdMsg() {
+    return this.isNew ? '* מספר הזמנה זמני (כל עוד הטיוטה טרם נשמרה)' : '';
   }
 
   /** The page title (when there is no wizard) */
@@ -78,12 +93,23 @@ export class OrderPage implements OnInit {
 
   set page(step) {
 
+    // Page 1 can be entered only in draft mode
     if(step == 1 && !this.isDraft)
       return;
+    // Changing supplier (in draft mode only) requires clearing the product list
+    if(step == 1 && this.order.products.length)
+      this.alerts.areYouSure('האם להחליף ספק?', 'החלפת הספק תביא למחיקת רשימת המוצרים הקיימת בהזמנה').then((r)=>{
+        if(r)
+          this.order.clearProducts();
+        else
+          this.page = 2;
+      });
+    // Page 2 can be entered only in edit mode (or draft)
     if(step == 2 && !this.isEdit)
       return;
+    // Page 3 can be entered only if there are products
     if(step == 3 && !this.order.products.length)
-      return;
+      step = 2;
 
     this._page = step;
 
@@ -109,21 +135,36 @@ export class OrderPage implements OnInit {
       this.page = 1;
       this.isEdit = true;
     }
-    // Or, get the order details
+    // Or, get the order details and go to summery page. Enable edit if it's a draft or requested as edit mode
     else {
-
       this.order = await this.ordersService.getOrderById(orderId);
       if(this.order) {
-
-        // Go to summery page and load only the products that are in this order
         this.page = 3;
-        this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
-
-        // Draft or edit mode
         this.isEdit = urlSnapshot.queryParams['edit'] || this.isDraft;
-
+      }
+      else {
+        this.backToMain();
+        return;
       }
     }
+
+    // Check whether the order had sudden close before, and ask whether to load it
+    if(this.isEdit) {
+      const tempAutoSave = localStorage.getItem(this.TEMP_DATA_KEY + orderId);
+      if(tempAutoSave && await this.alerts.areYouSure('האם לשחזר הזמנה שלא נשמרה?', '(הזמנה זו נסגרה באופן פתאומי ללא שמירה)', 'שחזור', 'לא, המשך')) {
+        this.order = new Order(JSON.parse(tempAutoSave));
+        this.page = 3;
+      }
+    }
+
+    // Get the details of the products that are in this order (if there are)
+    this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
+
+    // Start auto saving the order data on the local storage every 3 seconds (Only after choosing a supplier. It will be cleared when leaving the page safely - in close guard)
+    this.autoSave = setInterval(()=>{
+      if(this.order.sid)
+        localStorage.setItem(this.TEMP_DATA_KEY + orderId, JSON.stringify(this.order.getDocument()));
+    }, 3000);
 
     // Keep the original order to check changes
     this.originalOrder = JSON.stringify(this.order);
@@ -226,7 +267,7 @@ export class OrderPage implements OnInit {
 
     // Save on server
     this.alerts.loaderStart('שומר הזמנה...');
-    await this.ordersService.saveOrder(this.order);
+    this.order = await this.ordersService.saveOrder(this.order);
     this.alerts.loaderStop();
 
     // Update the original order for checking further changes

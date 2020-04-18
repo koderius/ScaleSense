@@ -57,13 +57,14 @@ export class ProductsService {
     });
 
     // Load the remaining IDs from the server
-    const res = await this.myProductsRef.where('id','in',ids).get();
-
-    res.docs.forEach((d)=>{
-      const data = d.data() as ProductDoc;
-      this._loadedProducts.set(d.id, data);
-      products.push(data);
-    });
+    if(ids.length) {
+      const res = await this.myProductsRef.where('id','in',ids).get();
+      res.docs.forEach((d)=>{
+        const data = d.data() as ProductDoc;
+        this._loadedProducts.set(d.id, data);
+        products.push(data);
+      });
+    }
 
     return products;
 
