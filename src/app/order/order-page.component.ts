@@ -22,14 +22,15 @@ export class OrderPage implements OnInit {
   /** The JSON of the order as it was when the page loaded - to check changes */
   originalOrder: string;
 
-  /** In creation of new order - the step of creation */
-  wizardStep: 1 | 2 | 3;
+  /**
+   *  page 1: Selecting a supplier (Drafts only)
+   *  page 2: Choosing products (Drafts & edit mode only)
+   *  page 3: Order summery (Drafts + edit + view)
+   * */
+  private _page: number;
 
-  /** Whether in edit mode (Not in new order) */
+  /** Whether in edit mode (editing existing order or creating/editing a draft). Fields are open to be written */
   isEdit: boolean;
-
-  /** In edit mode: show screen of adding new products (same screen as creation wizard step 2) */
-  addProductsScreen: boolean;
 
   /** Whether the order (or order changes) was sent */
   orderSent: boolean;
@@ -39,9 +40,6 @@ export class OrderPage implements OnInit {
 
   /** Whether to show all suppliers */
   showAllSuppliers: boolean;
-
-  /** Selected supplier when creating a new order */
-  selectedSupplier: string;
 
   /** The list of products of the order's supplier, and a filtered list while querying */
   supplierProducts: ProductDoc[] = [];
@@ -63,15 +61,40 @@ export class OrderPage implements OnInit {
     private alerts: AlertsService,
   ) {}
 
-  /** Whether in mode of creating new order (with wizard) */
-  get isNewOrder() : boolean {
-    return !!this.wizardStep;
+  /** Whether in mode of draft (with wizard) */
+  get isDraft() : boolean {
+    return this.order.status == OrderStatus.DRAFT;
   }
 
   /** The page title (when there is no wizard) */
   get pageTitle() : string {
-    if(!this.isNewOrder)
+    if(!this.isDraft)
       return (this.isEdit ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.id;
+  }
+
+  get page() {
+    return this._page;
+  }
+
+  set page(step) {
+
+    if(step == 1 && !this.isDraft)
+      return;
+    if(step == 2 && !this.isEdit)
+      return;
+    if(step == 3 && !this.order.products.length)
+      return;
+
+    this._page = step;
+
+    // On page no. 2, load all the products of the current supplier
+    if(this._page == 2) {
+      this.supplierProducts = [];
+      this.productsService.loadAllProductsOfSupplier(this.order.sid).then((res)=>{
+        this.supplierProducts = res;
+      });
+    }
+
   }
 
   async ngOnInit() {
@@ -83,29 +106,29 @@ export class OrderPage implements OnInit {
     // Create new order and go to step 1 (choosing supplier)
     if(orderId == 'new') {
       this.order = await this.ordersService.createNewOrder();
-      this.wizardStep = 1;
+      this.page = 1;
       this.isEdit = true;
     }
     // Or, get the order details
     else {
+
       this.order = await this.ordersService.getOrderById(orderId);
       if(this.order) {
+
+        // Go to summery page and load only the products that are in this order
+        this.page = 3;
         this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
-        // If the order is still a draft, go to the 3rd step of the wizard
-        if(this.order.status == OrderStatus.DRAFT) {
-          this.wizardStep = 3;
-          this.selectedSupplier = this.order.sid;
-          this.loadSupplierProducts();
-        }
-        // Check whether it's an edit or preview mode
-        this.isEdit = urlSnapshot.queryParams['edit'] || this.order.status == OrderStatus.DRAFT;
+
+        // Draft or edit mode
+        this.isEdit = urlSnapshot.queryParams['edit'] || this.isDraft;
+
       }
     }
 
     // Keep the original order to check changes
     this.originalOrder = JSON.stringify(this.order);
 
-    // Split order's supply time into 2 inputs
+    // Split order's supply time into 2 inputs (date & time)
     if(this.order.supplyTime) {
       this.supplyDateInput = new Date(this.order.supplyTime);
       this.supplyHourInput = new Date(this.order.supplyTime).toLocaleTimeString();
@@ -114,11 +137,13 @@ export class OrderPage implements OnInit {
   }
 
 
+  /** Check whether the order details has changed since the last save */
   orderHasChanged(): boolean {
     return this.originalOrder != JSON.stringify(this.order);
   }
 
 
+  /** Set the order supply time by combining the date & time inputs */
   mergeDateAndTime() {
     if(this.supplyDateInput && this.supplyHourInput) {
       const time = new Date(this.supplyDateInput);
@@ -129,28 +154,20 @@ export class OrderPage implements OnInit {
   }
 
 
-  /** On new order, step 1: Go to next step with the selected supplier */
-  chooseSupplier() {
-    if(this.selectedSupplier) {
-      this.order.setSupplier(this.selectedSupplier);
-      this.wizardStep = 2;
-      this.loadSupplierProducts();
-    }
-  }
-
+  /** Get product details from the service */
   findProductDetails(id: string) {
     return this.productsService.getProductDetails(id);
   }
 
 
-  // Get 5 most common search suppliers (IDs) not including those in the search results
+  /** Get 5 most common search suppliers (IDs) not including those in the search results */
   get commonSuppliers() : string[] {
     return this.suppliersService.mySuppliers.filter((s)=>!this.suppliersSearchResults.includes(s.id))
     // TODO: Get real common searches
       .slice(0,5).map((s)=>s.id);
   }
 
-  // Get all suppliers IDs except those in the search results
+  /** Get all suppliers IDs except those in the search results */
   get allSuppliers() {
     if(this.showAllSuppliers)
       return this.suppliersService.mySuppliers.map((s)=>s.id)
@@ -159,7 +176,7 @@ export class OrderPage implements OnInit {
       return [];
   }
 
-  // Search suppliers
+  /** Filter suppliers by query text */
   async searchSupplier(q: string) {
     if(!q) {
       this.suppliersSearchResults = [];
@@ -168,10 +185,19 @@ export class OrderPage implements OnInit {
     this.suppliersSearchResults = (await this.suppliersService.querySuppliers(q)).map((s)=>s.id);
   }
 
+
+  /** Get supplier's data from the service */
   getSupplierData(id: string) {
     return this.suppliersService.getSupplierById(id);
   }
 
+  /** Get supplier details */
+  getSelectedSupplier() {
+    return this.getSupplierData(this.order.sid);
+  }
+
+
+  /** Filter products list according to the text query */
   searchProduct(q: string) {
     if(!q) {
       this.filteredSupplierProducts = null;
@@ -182,21 +208,9 @@ export class OrderPage implements OnInit {
   }
 
 
+  /** Show all suppliers */
   loadAllSuppliers() {
     this.showAllSuppliers = true;
-  }
-
-  /** Get supplier details */
-  getSelectedSupplier() {
-    return this.suppliersService.getSupplierById(this.order.sid);
-  }
-
-  /** Load all the products of the supplier.
-   * In new order - after choosing supplier.
-   * On editing - when choosing to add new products */
-  async loadSupplierProducts() {
-    this.supplierProducts = [];
-    this.supplierProducts = await this.productsService.loadAllProductsOfSupplier(this.order.sid);
   }
 
 
@@ -206,22 +220,6 @@ export class OrderPage implements OnInit {
 
   editProduct() {
     alert('מה הכפתור הזה אמור לעשות?');
-  }
-
-  goToSummery() {
-    if(this.isNewOrder)
-      this.wizardStep = 3;
-    else if(this.isEdit)
-      this.addProductsScreen = false
-  }
-
-  goToAddProducts() {
-    if(this.isNewOrder)
-      this.wizardStep = 2;
-    else if(this.isEdit) {
-      this.loadSupplierProducts();
-      this.addProductsScreen = true;
-    }
   }
 
   async saveOrder() {
@@ -235,6 +233,7 @@ export class OrderPage implements OnInit {
     this.originalOrder = JSON.stringify(this.order);
 
   }
+
 
   async sendOrder() {
 

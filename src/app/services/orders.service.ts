@@ -20,6 +20,14 @@ export class OrdersService {
   // TODO: Get customer ID from service
   readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
 
+  /**
+   * When a new order is being created, it gets a temporal ID (marked with suffix).
+   * Only when the order is being saved for the first time, its ID becomes constant.
+   * If someone else already created an order with this ID and saved it, the newer order will get a new different ID.
+   * This method keeps the IDs sequential (not "wasting" numbers), in case someone created a draft but has not saved it.
+   * */
+  readonly TEMP_ID_SUFFIX = '*';
+
   private _myOrders: OrderDoc[] = [];
 
   constructor(
@@ -144,19 +152,30 @@ export class OrdersService {
   }
 
 
-  /** Create new ID and create new order object (without saving on server yet)
-   * (Maybe the ID should be created only after saving the order) */
+  /** Create new order object with temporal ID (without saving on server yet) */
   async createNewOrder() : Promise<Order> {
-
-    const newId = await this.setNewOrderId();
-
+    const newId = await this.setNewOrderId(false);
     return new Order({id: newId});
-
   }
 
 
   /** Save order */
   async saveOrder(order: Order) : Promise<boolean> {
+
+    // If the order has a temporary ID (means it has not been saved yet), set its ID again
+    if(order.id.endsWith(this.TEMP_ID_SUFFIX)) {
+
+      const orderDoc = order.getDocument();
+      orderDoc.id = await this.setNewOrderId(true);
+
+      // If the new ID is different from the temporal ID (minus the temporary suffix), notify the user
+      if(orderDoc.id != order.id.slice(-1))
+        alert('שים לב: מספר ההזמנה העדכני הוא: ' + order.id);
+
+      order = new Order(orderDoc);
+
+    }
+
     try {
       await this.myOrdersRef.doc(order.id).set({
 
@@ -209,14 +228,12 @@ export class OrdersService {
 
 
   /** Use transaction to get last order ID from the metadata, and create new ID */
-  private async setNewOrderId() : Promise<string> {
+  private async setNewOrderId(fixedId: boolean) : Promise<string> {
 
     // Get the current year's last 2 digits
     const currentYear = new Date().getFullYear().toString().slice(-2);
 
-    let newId;
-
-    await firebase.firestore().runTransaction(async (transaction)=>{
+    return await firebase.firestore().runTransaction<string>(async (transaction)=>{
 
       // Get the last order ID from customer's metadata
       const metadata = (await transaction.get(this.myOrdersMetadataRef)).data();
@@ -231,13 +248,15 @@ export class OrdersService {
         serial = +idData[1] + 1;
 
       // Format the order ID as: 'yy-{6 digit serial}'
-      newId = currentYear + '-' + (formatNumber(serial, 'en-US', OrdersService.OrderIdNumOfDigits + '.0-0').replace(/,/g,''));
+      const newId = currentYear + '-' + (formatNumber(serial, 'en-US', OrdersService.OrderIdNumOfDigits + '.0-0').replace(/,/g,''));
 
-      transaction.set(this.myOrdersMetadataRef,{lastId: newId}, {merge: true});
+      // If it's a temporal ID (i.e. for a draft that might not be saved) do not reserve this ID.
+      if(fixedId)
+        transaction.set(this.myOrdersMetadataRef,{lastId: newId}, {merge: true});
+
+      return newId + (fixedId ? '' : this.TEMP_ID_SUFFIX);
 
     });
-
-    return newId;
 
   }
 

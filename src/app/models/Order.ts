@@ -109,7 +109,7 @@ export class Order {
   }
 
   /** Supplier can be set only if there are no selected products */
-  setSupplier(sid: string) {
+  set sid(sid: string) {
     if(!this.products.length)
       this._props.sid = sid;
   }

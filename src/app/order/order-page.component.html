@@ -1,19 +1,19 @@
 <ion-header>
   <app-header [pageTitle]="pageTitle" *ngIf="order"></app-header>
-  <app-reservation-wizard [step]="wizardStep" (goToStep)="wizardStep = $event" *ngIf="wizardStep"></app-reservation-wizard>
+  <app-reservation-wizard [step]="page" (goToStep)="page = $event" *ngIf="isDraft"></app-reservation-wizard>
 </ion-header>
 
 <ion-content *ngIf="order">
 
-  <div class="page-container" *ngIf="wizardStep == 1">
+  <div class="page-container" *ngIf="page == 1">
 
     <ion-searchbar placeholder="הקלד שם ספק | פריט | קטגוריה" (ionChange)="searchSupplier($event.detail.value)">
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
     </ion-searchbar>
 
     <div class="select-container">
-      <ion-text *ngIf="!selectedSupplier">רשימת ספקים</ion-text>
-      <select [(ngModel)]="selectedSupplier">
+      <ion-text *ngIf="!order.sid">רשימת ספקים</ion-text>
+      <select [(ngModel)]="order.sid">
         <option></option>
         <option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</option>
       </select>
@@ -21,7 +21,7 @@
 
     <div class="suppliers-header" *ngIf="suppliersSearchResults.length">תוצאות החיפוש</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplierId of suppliersSearchResults" (click)="selectedSupplier = supplierId" [ngClass]="selectedSupplier == supplierId ? 'selected' : ''">
+      <div class="supplier-box" *ngFor="let supplierId of suppliersSearchResults" (click)="order.sid = supplierId" [ngClass]="order.sid == supplierId ? 'selected' : ''">
         <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
         <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
@@ -29,7 +29,7 @@
 
     <div class="suppliers-header" *ngIf="commonSuppliers.length">חיפושים שכיחים</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplierId of commonSuppliers" (click)="selectedSupplier = supplierId" [ngClass]="selectedSupplier == supplierId ? 'selected' : ''">
+      <div class="supplier-box" *ngFor="let supplierId of commonSuppliers" (click)="order.sid = supplierId" [ngClass]="order.sid == supplierId ? 'selected' : ''">
         <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
         <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
@@ -37,7 +37,7 @@
 
     <div class="suppliers-header" *ngIf="allSuppliers.length">כל הספקים</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplierId of allSuppliers" (click)="selectedSupplier = supplierId" [ngClass]="selectedSupplier == supplierId ? 'selected' : ''">
+      <div class="supplier-box" *ngFor="let supplierId of allSuppliers" (click)="order.sid = supplierId" [ngClass]="order.sid == supplierId ? 'selected' : ''">
         <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
         <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
@@ -50,12 +50,12 @@
       </ion-button>
     </ion-row>
 
-    <ion-button size="large" [color]="selectedSupplier ? 'primary' : 'medium'" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!selectedSupplier" (click)="chooseSupplier()">המשך הזמנה</ion-button>
+    <ion-button size="large" [color]="order.sid ? 'primary' : 'medium'" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!order.sid" (click)="page = 2">המשך הזמנה</ion-button>
 
   </div>
 
 
-  <div class="page-container" *ngIf="wizardStep == 2 || (isEdit && addProductsScreen)">
+  <div class="page-container" *ngIf="page == 2">
 
     <ion-searchbar placeholder="הקלד שם פריט | קטגוריה" (ionChange)="searchProduct($event.detail.value)">
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
@@ -110,11 +110,11 @@
           <p id="price-comment" *ngIf="order.products.length">המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
 
           <ion-row class="ion-padding ion-justify-content-between">
-            <ion-button shape="round" (click)="goToSummery()" [disabled]="!order.products.length" [color]="order.products.length ? 'primary' : 'dark'" style="margin: auto">
+            <ion-button shape="round" (click)="page = 3" [disabled]="!order.products.length" [color]="order.products.length ? 'primary' : 'dark'" style="margin: auto">
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
-            <ion-button *ngIf="order.products.length && isNewOrder" shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
+            <ion-button *ngIf="order.products.length && isDraft" shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
           </ion-row>
 
         </div>
@@ -125,11 +125,11 @@
   </div>
 
 
-  <div class="page-container" *ngIf="wizardStep == 3 || (!isNewOrder && !addProductsScreen)">
+  <div class="page-container" *ngIf="page == 3">
 
     <h1 class="ion-text-center" id="title-with-logo">
       <ion-text>פרטי הזמנה</ion-text>
-      <ion-text *ngIf="wizardStep == 3"> מס. {{order.id}}</ion-text>
+      <ion-text *ngIf="page == 3"> מס. {{order.id}}</ion-text>
       <ion-img [src]="getSelectedSupplier().logo" style="position: absolute"></ion-img>
     </h1>
 
@@ -141,7 +141,7 @@
                 [productDetails]="findProductDetails(product.id)"
                 [isEdit]="isEdit"
                 [withComments]="true"
-                (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? goToAddProducts() : ''"
+                (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? page = 2 : ''"
                 (editClicked)="editProduct()"
         ></app-product-summery>
 
@@ -201,17 +201,17 @@
 
       <div id="bottom-buttons">
         <ion-row>
-          <ion-button shape="round" color="dark" *ngIf="isNewOrder || isEdit" (click)="goToAddProducts()">הוספת פריטים להזמנה</ion-button>
-          <ion-button shape="round" color="dark" *ngIf="isNewOrder" (click)="saveOrder()">שמירה כטיוטה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="isDraft || isEdit" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveOrder()">שמירה כטיוטה</ion-button>
           <ion-button shape="round" color="dark" *ngIf="isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="isNewOrder || isEdit" (click)="sendOrder()">
+          <ion-button shape="round" strong="true" *ngIf="isDraft || isEdit" (click)="sendOrder()">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
-            <ion-text *ngIf="!isNewOrder">שמירת שינויים ו</ion-text>
+            <ion-text *ngIf="!isDraft">שמירת שינויים ו</ion-text>
             <ion-text>שליחת הזמנה לספק</ion-text>
           </ion-button>
-          <ion-button shape="round" *ngIf="!isNewOrder && !isEdit" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+          <ion-button shape="round" *ngIf="!isDraft && !isEdit" (click)="backToMain()">חזרה למסך הראשי</ion-button>
         </ion-row>
       </div>
     </div>
