@@ -18,8 +18,9 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {}
 
-  goToDrafts() {
-    this.navCtrl.navigateForward('customer/orders-list?mode=drafts');
+  async goToDrafts() {
+    await this.navCtrl.navigateRoot('customer');  // In case already in this page - cause to reload
+    await this.navCtrl.navigateForward('customer/orders-list?mode=drafts');
   }
 
 }

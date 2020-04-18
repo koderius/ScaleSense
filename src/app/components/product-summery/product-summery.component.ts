@@ -17,6 +17,8 @@ export class ProductSummeryComponent implements OnInit {
   @Output() editClicked = new EventEmitter();
   @Output() clearClicked = new EventEmitter();
 
+  randomSkeletonWidth = (Math.random()*100) + '%';
+
   constructor() { }
 
   ngOnInit() {}

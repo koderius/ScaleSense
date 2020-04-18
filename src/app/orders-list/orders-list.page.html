@@ -10,13 +10,13 @@
       <ion-searchbar placeholder="הקלד שם ספק | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()" [disabled]="fromDate">
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
-      <p class="ion-text-center">
+      <p class="ion-text-center" *ngIf="pageMode != 'drafts'">
         <ion-text color="primary">איתור לפי תאריך ביצוע הזמנה:</ion-text>
       </p>
       <div id="dates" *ngIf="pageMode != 'drafts'">
         <p>בין התאריכים</p>
         <mat-form-field>
-          <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" readonly>
+          <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" readonly (dateChange)="fromDate ? searchOrders() : ''">
           <mat-datepicker-toggle matSuffix [for]="fromPicker">
             <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
           </mat-datepicker-toggle>
@@ -28,9 +28,9 @@
           <mat-datepicker-toggle matSuffix [for]="toPicker">
             <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
           </mat-datepicker-toggle>
-          <mat-datepicker #toPicker></mat-datepicker>
+          <mat-datepicker #toPicker [startAt]="fromDate"></mat-datepicker>
         </mat-form-field>
-        <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null" *ngIf="fromDate">
+        <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null; searchOrders()" *ngIf="fromDate">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
       </div>

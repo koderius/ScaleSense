@@ -22,8 +22,12 @@ export type OrderChange = {
   /** Time of change */
   time: Date;
 
-  /** The products that have been changed (ID + *relative* details, e.g: amount = -2, comment = 'Some new comment', etc...) */
-  productsChanges: ProductOrder[];
+  /** Products that have been changed
+   * Product order for change in the amount of a product / number for a change in the supply time / string for a change in the comment to the supplier
+   * */
+  change?: {old: ProductOrder | number | string, new: ProductOrder | number | string};
+
+  priceChange?: {old: number, new: number};
 
 }
 
@@ -172,6 +176,9 @@ export class Order {
     this._props.supplyTime = date;
   }
 
+  get changes() {
+    return this._props.changes ? this._props.changes.slice() : [];
+  }
 
 
   getDocument() : OrderDoc {

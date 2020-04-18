@@ -7,6 +7,7 @@ import {firebaseConfig} from './FirebaseConfig';
 import * as firebase from 'firebase/app';
 import 'firebase/analytics';
 import 'firebase/auth';
+import 'firebase/firestore';
 import {MetadataService} from './services/metadata.service';
 
 @Component({
@@ -30,14 +31,19 @@ export class AppComponent {
       this.splashScreen.hide();
     });
 
+    // Initialize firebase
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
+
+    // Load metadata
+    this.metadataService.init(firebase.firestore().collection('metadata'));
 
     // TODO: Delete this. Test user
     firebase.auth().onAuthStateChanged((user)=>{
       if(!user)
         firebase.auth().signInWithEmailAndPassword('mestroti@gmail.com','123456');
-    })
+    });
 
   }
+
 }

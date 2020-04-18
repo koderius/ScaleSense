@@ -97,9 +97,10 @@
   margin: 0.5em 0;
   background-color: white;
   width: 100%;
-  padding: 3em 1em;
+  padding: 1em;
   #dates {
     width: 60%;
+    margin: auto;
     display: flex;
     align-items: center;
     p {
@@ -144,13 +145,33 @@
       }
     }
   }
+  p {
+    margin-top: 0;
+    font-weight: bold;
+    ion-text {
+      margin: 0 0.5em;
+    }
+  }
   ion-textarea {
-    width: 60%;
+    width: 70%;
+    margin: auto;
     border: solid var(--ion-color-medium) 1px;
     border-radius: 1rem;
     --padding-start: 1rem;
   }
 }
+
+#history {
+  background-color: white;
+  width: 100%;
+  margin: 0.5em 0;
+  padding: 1em;
+  h1 {
+    margin: 0 0 1em;
+    font-weight: bold;
+  }
+}
+
 
 #bottom-buttons {
   margin: 1em 0;
@@ -176,5 +197,18 @@
     padding: 2em;
     margin: 1em 0;
     line-height: 1.5;
+  }
+}
+
+h1#title-with-logo {
+  position: relative;
+  margin: 1em 0;
+  ion-img {
+    position: absolute;
+    left: 0;
+    height: 3em;
+    width: 3em;
+    bottom: 0;
+    transform: translateY(25%);
   }
 }

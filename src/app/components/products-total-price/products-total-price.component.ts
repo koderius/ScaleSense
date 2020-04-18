@@ -1,21 +1,20 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {VatCalcPipe} from '../../pipes/vat-calc.pipe';
+import {MetadataService} from '../../services/metadata.service';
 
 @Component({
   selector: 'app-products-total-price',
   templateUrl: './products-total-price.component.html',
   styleUrls: ['./products-total-price.component.scss'],
-  providers: [VatCalcPipe],
 })
 export class ProductsTotalPriceComponent implements OnInit {
 
   @Input() price: number;
   pricePlusVat: number;
 
-  constructor(private vatCalc: VatCalcPipe) {}
+  constructor() {}
 
   ngOnInit() {
-    this.pricePlusVat = this.vatCalc.transform(this.price);
+    this.pricePlusVat = this.price * MetadataService.VAT;
   }
 
 }

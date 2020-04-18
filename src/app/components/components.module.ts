@@ -6,7 +6,6 @@ import {OredersWizardComponent} from './orders-wizard/oreders-wizard.component';
 import {NgSelectComponent, NgSelectModule} from 'ng-custom-select';
 import {HighlightifyPipe} from '../pipes/highlightify.pipe';
 import {UnitNamePipe} from '../pipes/unit-name.pipe';
-import {VatCalcPipe} from '../pipes/vat-calc.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
   MatDatepickerModule,
@@ -34,7 +33,6 @@ import {
     OredersWizardComponent,
     HighlightifyPipe,
     UnitNamePipe,
-    VatCalcPipe,
     OrderStatusTextPipe,
   ],
   exports: [
@@ -48,7 +46,6 @@ import {
     NgSelectComponent,
     HighlightifyPipe,
     UnitNamePipe,
-    VatCalcPipe,
     OrderStatusTextPipe,
   ],
 })

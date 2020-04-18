@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
-import {Order} from '../models/Order';
+import {Order, OrderChange, OrderStatus, ProductOrder} from '../models/Order';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
+import {formatDate} from '@angular/common';
 
 @Component({
   selector: 'app-order',
@@ -83,13 +84,21 @@ export class OrderPage implements OnInit {
     if(orderId == 'new') {
       this.order = await this.ordersService.createNewOrder();
       this.wizardStep = 1;
+      this.isEdit = true;
     }
-    // Or, get the order details and check whether its edit mode (or only preview)
+    // Or, get the order details
     else {
-      this.order = this.ordersService.getOrderById(orderId);
+      this.order = await this.ordersService.getOrderById(orderId);
       if(this.order) {
         this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
-        this.isEdit = urlSnapshot.queryParams['edit'];
+        // If the order is still a draft, go to the 3rd step of the wizard
+        if(this.order.status == OrderStatus.DRAFT) {
+          this.wizardStep = 3;
+          this.selectedSupplier = this.order.sid;
+          this.loadSupplierProducts();
+        }
+        // Check whether it's an edit or preview mode
+        this.isEdit = urlSnapshot.queryParams['edit'] || this.order.status == OrderStatus.DRAFT;
       }
     }
 
@@ -217,7 +226,7 @@ export class OrderPage implements OnInit {
 
   async saveOrder() {
 
-    // Save draft on server
+    // Save on server
     this.alerts.loaderStart('שומר הזמנה...');
     await this.ordersService.saveOrder(this.order);
     this.alerts.loaderStop();
@@ -234,20 +243,59 @@ export class OrderPage implements OnInit {
       return;
     }
 
-    // First, save the order
-    this.alerts.loaderStart('שולח הזמנה לספק...');
-    if(await this.ordersService.saveOrder(this.order)) {
+    if(await this.alerts.areYouSure('האם לשלוח הזמנה לספק?')) {
 
-      if(await this.ordersService.sendOrder(this.order.id))
-        this.orderSent = true;
+      // First, save the order
+      this.alerts.loaderStart('שולח הזמנה לספק...');
+      if(await this.ordersService.saveOrder(this.order)) {
 
+        if(await this.ordersService.sendOrder(this.order.id))
+          this.orderSent = true;
+
+      }
+      this.alerts.loaderStop();
     }
-    this.alerts.loaderStop();
 
   }
 
   cancelOrder() {
     // TODO: Cancel
+  }
+
+
+  changeText(orderChange: OrderChange) {
+
+    const change = orderChange.change;
+
+    // Change in supply date
+    if (typeof change.new == 'number' && typeof change.old == 'number') {
+      const oldDate = formatDate(change.old, 'dd/MM/yyyy','en-US');
+      const newDate = formatDate(change.new, 'dd/MM/yyyy','en-US');
+      return `שונה תאריך האספקה מ-${oldDate} ל-${newDate}.`;
+    }
+
+    // Change in comment to the supplier
+    if (typeof change.new == 'number' && typeof change.old == 'number')
+      return  change.old
+        ? ('שונתה הערה לספק מ-"' + change.old + '" ל-"' + change.new + '"')
+        : ('הוספה הערה לספק: "' + change.new + '"');
+
+    // Change in product
+    const newAmount = (change.new as ProductOrder).amount;
+    const oldAmount = (change.old as ProductOrder).amount;
+    const productName = this.productsService.getProductDetails((change.new as ProductOrder).id);
+    let str = '';
+    if(oldAmount && !newAmount)
+      str += 'הוסר המוצר ';
+    if(!oldAmount && newAmount)
+      str += 'הוסף המוצר ';
+    if(oldAmount && newAmount)
+      str += 'שונתה כמות המוצר ';
+    str += productName + '. | ';
+    str += 'בעקבות השינוי עודכן מחיר ההזמנה מ-' + orderChange.priceChange.old + 'ש"ח ל-' + orderChange.priceChange.new + 'ש"ח.';
+
+    return str;
+
   }
 
 }

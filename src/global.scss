@@ -52,6 +52,14 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+// No clear button in inputs of type time
+input[type="time"]::-webkit-clear-button {
+  display: none;
+}
+input[type="time"]::-ms-clear {
+  display: none;
+}
+
 // Contains all main content of the page
 .page-container {
   max-width: 1000px;

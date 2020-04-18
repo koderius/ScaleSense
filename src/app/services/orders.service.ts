@@ -20,7 +20,7 @@ export class OrdersService {
   // TODO: Get customer ID from service
   readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
 
-  private _myOrders: OrderDoc[];
+  private _myOrders: OrderDoc[] = [];
 
   constructor(
     private productsService: ProductsService,
@@ -77,7 +77,7 @@ export class OrdersService {
       if(dates && dates.length == 2 && !isDraft) {
         query = null;
         dates[1].setDate(dates[1].getDate() + 1);
-        ref = ref.where('supplyTime','>=',dates[0]).where('supplyTime','<',dates[1]);
+        ref = ref.where('supplyTime','>=',dates[0].getTime()).where('supplyTime','<',dates[1].getTime());
       }
 
       // if there is a text query, search by supplier name (first get suppliers ID, and then search by their IDs)
@@ -130,10 +130,17 @@ export class OrdersService {
   }
 
 
-  getOrderById(id: string) {
-    const doc = this._myOrders.find((o)=>o.id == id);
-    if(doc)
-      return new Order(doc);
+  async getOrderById(id: string) : Promise<Order> {
+
+    // Get order from local list
+    let doc = this._myOrders.find((o)=>o.id == id);
+
+    // If not exist in local, get from server
+    if(!doc)
+      doc = (await this.myOrdersRef.doc(id).get()).data() as OrderDoc;
+
+    return new Order(doc);
+
   }
 
 
@@ -173,7 +180,7 @@ export class OrdersService {
 
 
   async deleteDraft(orderId: string) {
-    const order = this.getOrderById(orderId);
+    const order = await this.getOrderById(orderId);
     if(order && order.status == OrderStatus.DRAFT) {
       try {
         await this.myOrdersRef.doc(orderId).delete();

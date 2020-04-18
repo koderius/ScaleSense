@@ -114,7 +114,7 @@
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
-            <ion-button *ngIf="order.products.length" shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
+            <ion-button *ngIf="order.products.length && isNewOrder" shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
           </ion-row>
 
         </div>
@@ -127,9 +127,10 @@
 
   <div class="page-container" *ngIf="wizardStep == 3 || (!isNewOrder && !addProductsScreen)">
 
-    <h1 class="ion-text-center" style="margin: 1em 0">
+    <h1 class="ion-text-center" id="title-with-logo">
       <ion-text>פרטי הזמנה</ion-text>
       <ion-text *ngIf="wizardStep == 3"> מס. {{order.id}}</ion-text>
+      <ion-img [src]="getSelectedSupplier().logo" style="position: absolute"></ion-img>
     </h1>
 
     <div *ngIf="!orderSent">
@@ -138,7 +139,7 @@
                 *ngFor="let product of order.products"
                 [productOrder]="product"
                 [productDetails]="findProductDetails(product.id)"
-                [isEdit]="true"
+                [isEdit]="isEdit"
                 [withComments]="true"
                 (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? goToAddProducts() : ''"
                 (editClicked)="editProduct()"
@@ -155,11 +156,17 @@
       </ion-list>
 
       <div id="bottom-section">
-        <div id="dates">
+        <p class="ion-text-center" *ngIf="!isEdit">
+          <ion-text>ההזמנה תסופק בתאריך: </ion-text>
+          <ion-text color="primary">{{order.supplyTime | date : 'dd/MM/yyyy'}}</ion-text>
+          <ion-text> בשעה: </ion-text>
+          <ion-text color="primary">{{order.supplyTime | date : 'HH:mm'}}</ion-text>
+        </p>
+        <div id="dates" *ngIf="isEdit">
           <p>בחירת תאריך אספקה:</p>
           <div class="date-picker">
             <ion-icon name="close" (click)="order.supplyTime = null" [ngClass]="order.supplyTime ? '' : 'ion-hide'"></ion-icon>
-            <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()">
+            <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()" readonly>
             <ion-icon name="caret-down" (click)="picker.open()"></ion-icon>
             <mat-datepicker #picker></mat-datepicker>
           </div>
@@ -167,7 +174,29 @@
             <ion-icon name="caret-down"></ion-icon>
           </ion-input>
         </div>
-        <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}"></ion-textarea>
+        <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}" [disabled]="!isEdit"></ion-textarea>
+      </div>
+
+      <div id="history" *ngIf="order.changes.length">
+        <h1>
+          <ion-text color="primary" class="ion-padding">היסטוריית הזמנה</ion-text>
+        </h1>
+
+        <div>
+          <div *ngFor="let change of order.changes; let i = index">
+            <p>
+              <ion-text>{{i}}. </ion-text>
+              <ion-text>בתאריך {{change.time}}</ion-text>
+              <ion-text> בוצע שינוי ע"י </ion-text>
+              <ion-text style="font-weight: bold">{{change.by}}.</ion-text>
+            </p>
+            <p>
+              <ion-text style="font-weight: bold">- מהות השינוי: </ion-text>
+              <ion-text>{{changeText(change)}}</ion-text>
+            </p>
+          </div>
+        </div>
+
       </div>
 
       <div id="bottom-buttons">

@@ -2,8 +2,8 @@
   <ion-thumbnail slot="start">
     <ion-skeleton-text animated></ion-skeleton-text>
   </ion-thumbnail>
-  <h6>
-    <ion-skeleton-text style="width: 80%"></ion-skeleton-text>
+  <h6 style="width: 100%">
+    <ion-skeleton-text [ngStyle]="{width: randomSkeletonWidth}"></ion-skeleton-text>
   </h6>
 </ion-item>
 
@@ -19,7 +19,7 @@
       <h6>{{productOrder.pricePerUnit || productDetails.price | number : '1.2-2'}} ש"ח</h6>
     </ion-col>
     <ion-col>
-      <h6>{{productOrder.amount | number : '1.0-3'}} {{productDetails.type | unitName}}</h6>
+      <h6>{{productOrder.amount | number : '1.0-3'}} {{productDetails.type | unitName : productOrder.amount}}</h6>
     </ion-col>
     <ion-col>
       <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.price) | number : '1.2-2'}} ש"ח</h6>
@@ -35,7 +35,7 @@
       </div>
     </ion-col>
     <ion-col size="4" *ngIf="withComments">
-      <ion-input placeholder="הערות בנוגע למוצר" [(ngModel)]="productOrder.comment"></ion-input>
+      <ion-input [placeholder]="isEdit ? 'הערות בנוגע למוצר' : ''" [(ngModel)]="productOrder.comment" [readonly]="!isEdit"></ion-input>
     </ion-col>
   </ion-row>
 </ion-item>

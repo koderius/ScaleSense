@@ -8,10 +8,22 @@ import {NavController} from '@ionic/angular';
 })
 export class OredersWizardComponent implements OnInit {
 
-  @Input() step: 1 | 2 | 3 = 1;
+  _step: 1 | 2 | 3 = 1;
   @Output() goToStep = new EventEmitter();
 
+  maxStep: 1 | 2 | 3 = 1;
+
   constructor(private navCtrl: NavController) { }
+
+  get step() {
+    return this._step;
+  }
+
+  @Input() set step(num: 1|2|3) {
+    this._step = num;
+    if(this.maxStep < this._step)
+      this.maxStep = this._step;
+  }
 
   ngOnInit() {}
 
@@ -20,7 +32,7 @@ export class OredersWizardComponent implements OnInit {
   }
 
   stepClicked(step: number) {
-    if(this.step > step)
+    if(this.maxStep >= step)
       this.goToStep.emit(step);
   }
 
