@@ -59,10 +59,17 @@ export const sendOrder = functions.https.onCall(async (orderId: string, context)
         const order = (await transaction.get(orderRef)).data();
 
         // If the order is a draft, it is possible to send it
-        if(order && !order.status) {
+        if(order && order.status === 0) {
+          const time = admin.firestore.Timestamp.now().toMillis();
           transaction.update(orderRef, {
             status: 10,
             draft: false,
+            changes: admin.firestore.FieldValue.arrayUnion({
+              by: uid,
+              side: 'c',
+              time: time,
+              statusChange: {old: 0, new: 10}
+            })
           });
           return true;
         }
@@ -76,5 +83,68 @@ export const sendOrder = functions.https.onCall(async (orderId: string, context)
   }
 
   return await false;
+
+});
+
+
+/**
+ * This function is being automatically called when an order is being updated.
+ * The function ignores changes in drafts, because changes in draft has no consequences in the app.
+ * - Notice: The function works on update only - not on creation (because it's a draft) and not on deletion (only drafts can be deleted)
+ */
+export const onOrderChange = functions.firestore.document('customers/{customerId}/myorders/{orderId}').onUpdate(async (change, context) => {
+
+  // Get old and new data of the order
+  const newData = (change.after ? change.after.data() : null);
+  const oldData = (change.before ? change.before.data() : null);
+
+  if(newData && oldData) {
+
+    // The order's new status
+    const orderStatus = newData.status;
+
+    // If it's a draft, do nothing and quit the function
+    if(!orderStatus)
+      return;
+
+    // For changes in order data made directly by users
+    if(context && context.authType == 'USER' && context.auth) {
+
+      // Get the user data
+      const by = context.auth.uid;
+      const userData = (await admin.firestore().collection('users').doc(by).get()).data();
+
+      // Create an object with changes metadata (who and when)
+      const changes = {
+        by: by,
+        side: userData ? userData.side : null,
+        time: admin.firestore.Timestamp.now().toMillis(),
+      };
+
+      // const calcPrice = (products: any[])=>{
+      //   let sum = 0;
+      //   products.forEach((po)=>{
+      //     sum += (po.pricePerUnit * po.amount);
+      //   })
+      // };
+
+      // changes['supplyTimeChange'] = {old: oldData.supplyTime, new: newData.supplyTime};
+      // changes['commentToSupplierChange'] = {old: oldData.comment, new: newData.comment};
+      // changes['priceChange'] = {old: calcPrice(oldData.products), new: calcPrice(newData.supplyTime)};
+
+
+
+      // Add the changes into the changes history list of the order
+      change.after.ref.update({changes: admin.firestore.FieldValue.arrayUnion(changes)});
+
+    }
+
+    // // For status changes (made by admin through cloud functions)
+    // if(newData.status !== oldData.status) {
+    //
+    // }
+
+  }
+
 
 });

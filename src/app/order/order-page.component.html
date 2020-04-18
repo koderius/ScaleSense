@@ -192,7 +192,7 @@
             </p>
             <p>
               <ion-text style="font-weight: bold">- מהות השינוי: </ion-text>
-              <ion-text>{{changeText(change)}}</ion-text>
+<!--              <ion-text>{{changeText(change)}}</ion-text>-->
             </p>
           </div>
         </div>
@@ -201,17 +201,17 @@
 
       <div id="bottom-buttons">
         <ion-row>
-          <ion-button shape="round" color="dark" *ngIf="isDraft || isEdit" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="isEdit" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
           <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveOrder()">שמירה כטיוטה</ion-button>
-          <ion-button shape="round" color="dark" *ngIf="isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="!isDraft && isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="isDraft || isEdit" (click)="sendOrder()">
+          <ion-button shape="round" strong="true" *ngIf="isEdit" (click)="sendOrder()">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="!isDraft">שמירת שינויים ו</ion-text>
             <ion-text>שליחת הזמנה לספק</ion-text>
           </ion-button>
-          <ion-button shape="round" *ngIf="!isDraft && !isEdit" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+          <ion-button shape="round" *ngIf="!isEdit" (click)="backToMain()">חזרה למסך הראשי</ion-button>
         </ion-row>
       </div>
     </div>

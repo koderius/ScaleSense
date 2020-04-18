@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
-import {Order, OrderStatus} from '../models/Order';
 import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
+import {Order} from '../models/Order';
 
 @Component({
   selector: 'app-orders-list',

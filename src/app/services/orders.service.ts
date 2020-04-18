@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Order, OrderDoc, OrderStatus} from '../models/Order';
+import {OrderDoc, OrderStatus} from '../models/OrderI';
 import {ProductsService} from './products.service';
 import {formatNumber} from '@angular/common';
 import * as firebase from 'firebase/app';
@@ -11,6 +11,7 @@ import DocumentReference = firebase.firestore.DocumentReference;
 import Query = firebase.firestore.Query;
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
+import {Order} from '../models/Order';
 
 @Injectable({
   providedIn: 'root'

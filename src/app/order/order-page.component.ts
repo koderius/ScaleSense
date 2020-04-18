@@ -2,12 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
-import {Order, OrderChange, OrderStatus, ProductOrder} from '../models/Order';
+import {OrderStatus} from '../models/OrderI';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
-import {formatDate} from '@angular/common';
+import {Order} from '../models/Order';
 
 @Component({
   selector: 'app-order',
@@ -303,39 +303,39 @@ export class OrderPage implements OnInit {
   }
 
 
-  changeText(orderChange: OrderChange) {
-
-    const change = orderChange.change;
-
-    // Change in supply date
-    if (typeof change.new == 'number' && typeof change.old == 'number') {
-      const oldDate = formatDate(change.old, 'dd/MM/yyyy','en-US');
-      const newDate = formatDate(change.new, 'dd/MM/yyyy','en-US');
-      return `שונה תאריך האספקה מ-${oldDate} ל-${newDate}.`;
-    }
-
-    // Change in comment to the supplier
-    if (typeof change.new == 'number' && typeof change.old == 'number')
-      return  change.old
-        ? ('שונתה הערה לספק מ-"' + change.old + '" ל-"' + change.new + '"')
-        : ('הוספה הערה לספק: "' + change.new + '"');
-
-    // Change in product
-    const newAmount = (change.new as ProductOrder).amount;
-    const oldAmount = (change.old as ProductOrder).amount;
-    const productName = this.productsService.getProductDetails((change.new as ProductOrder).id);
-    let str = '';
-    if(oldAmount && !newAmount)
-      str += 'הוסר המוצר ';
-    if(!oldAmount && newAmount)
-      str += 'הוסף המוצר ';
-    if(oldAmount && newAmount)
-      str += 'שונתה כמות המוצר ';
-    str += productName + '. | ';
-    str += 'בעקבות השינוי עודכן מחיר ההזמנה מ-' + orderChange.priceChange.old + 'ש"ח ל-' + orderChange.priceChange.new + 'ש"ח.';
-
-    return str;
-
-  }
+  // changeText(orderChange: OrderChange) {
+  //
+  //   const change = orderChange.change;
+  //
+  //   // Change in supply date
+  //   if (typeof change.new == 'number' && typeof change.old == 'number') {
+  //     const oldDate = formatDate(change.old, 'dd/MM/yyyy','en-US');
+  //     const newDate = formatDate(change.new, 'dd/MM/yyyy','en-US');
+  //     return `שונה תאריך האספקה מ-${oldDate} ל-${newDate}.`;
+  //   }
+  //
+  //   // Change in comment to the supplier
+  //   if (typeof change.new == 'number' && typeof change.old == 'number')
+  //     return  change.old
+  //       ? ('שונתה הערה לספק מ-"' + change.old + '" ל-"' + change.new + '"')
+  //       : ('הוספה הערה לספק: "' + change.new + '"');
+  //
+  //   // Change in product
+  //   const newAmount = (change.new as ProductOrder).amount;
+  //   const oldAmount = (change.old as ProductOrder).amount;
+  //   const productName = this.productsService.getProductDetails((change.new as ProductOrder).id);
+  //   let str = '';
+  //   if(oldAmount && !newAmount)
+  //     str += 'הוסר המוצר ';
+  //   if(!oldAmount && newAmount)
+  //     str += 'הוסף המוצר ';
+  //   if(oldAmount && newAmount)
+  //     str += 'שונתה כמות המוצר ';
+  //   str += productName + '. | ';
+  //   str += 'בעקבות השינוי עודכן מחיר ההזמנה מ-' + orderChange.priceChange.old + 'ש"ח ל-' + orderChange.priceChange.new + 'ש"ח.';
+  //
+  //   return str;
+  //
+  // }
 
 }

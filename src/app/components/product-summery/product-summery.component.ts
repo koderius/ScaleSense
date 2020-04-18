@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ProductOrder} from '../../models/Order';
+import {ProductOrder} from '../../models/OrderI';
 import {ProductDoc} from '../../models/Product';
 
 @Component({
