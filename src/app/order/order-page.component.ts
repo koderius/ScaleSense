@@ -263,15 +263,19 @@ export class OrderPage implements OnInit {
     alert('מה הכפתור הזה אמור לעשות?');
   }
 
-  async saveOrder() {
+  async saveOrder() : Promise<boolean> {
 
     // Save on server
-    this.alerts.loaderStart('שומר הזמנה...');
-    this.order = await this.ordersService.saveOrder(this.order);
-    this.alerts.loaderStop();
+    const l = this.alerts.loaderStart('שומר הזמנה...');
+    const res = await this.ordersService.saveOrder(this.order);
+    if(res)
+      this.order = res;
+    this.alerts.loaderStop(l);
 
     // Update the original order for checking further changes
     this.originalOrder = JSON.stringify(this.order);
+
+    return !!res;
 
   }
 
@@ -286,14 +290,14 @@ export class OrderPage implements OnInit {
     if(await this.alerts.areYouSure('האם לשלוח הזמנה לספק?')) {
 
       // First, save the order
-      this.alerts.loaderStart('שולח הזמנה לספק...');
-      if(await this.ordersService.saveOrder(this.order)) {
+      const l = this.alerts.loaderStart('שולח הזמנה לספק...');
+      if(await this.saveOrder()) {
 
         if(await this.ordersService.sendOrder(this.order.id))
           this.orderSent = true;
 
       }
-      this.alerts.loaderStop();
+      this.alerts.loaderStop(l);
     }
 
   }

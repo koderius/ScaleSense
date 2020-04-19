@@ -85,10 +85,10 @@ export class OrdersListPage implements OnInit {
 
   async deleteDraft(orderId: string) {
     if(await this.alertsService.areYouSure('האם אתה בטוח?', 'אישור יביא למחיקת הטיוטה')) {
-      this.alertsService.loaderStart('מוחק טיוטה...');
+      const l = this.alertsService.loaderStart('מוחק טיוטה...');
       await this.ordersService.deleteDraft(orderId);
       this.ngOnInit();  // Reload page to reload the orders
-      this.alertsService.loaderStop();
+      this.alertsService.loaderStop(l);
     }
   }
 

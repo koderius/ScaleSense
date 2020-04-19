@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {AlertController, LoadingController} from '@ionic/angular';
 
 @Injectable({
@@ -6,8 +6,10 @@ import {AlertController, LoadingController} from '@ionic/angular';
 })
 export class AlertsService {
 
+  loaders = new Map<string,string>();
+
+  onLoader = new EventEmitter();
   isLoader: boolean;
-  loader;
 
   constructor(
     private loadCtrl: LoadingController,
@@ -19,28 +21,42 @@ export class AlertsService {
   }
 
 
-  async loaderStart(msg?: string) {
+  loaderStart(msg?: string) {
 
-    // Do not create loader, if already created
-    if(this.isLoader)
-      return;
+    const id = ''+Math.random();
+    this.loaders.set(id,msg);
 
-    this.isLoader = true;
-    this.loader = await this.loadCtrl.create({message: msg});
-    await this.loader.present();
+    if(this.loaders.size == 1) {
+      this.loadCtrl.create({
+        id: id,
+        message: msg
+      }).then((l)=>{
+        l.present();
+        if(this.loaders.size > 1)
+          this.changeMsg();
+      });
+    }
+    else
+      this.changeMsg();
 
-    // If loader has stopped before creating animation was over, stop it now
-    if(!this.isLoader)
-      await this.loaderStop();
+    return id;
 
   }
 
-  async loaderStop() {
+  private changeMsg() {
+    this.loadCtrl.getTop().then((l)=>{
+      if(l) {
+        if(this.loaders.size)
+          l.message = [...this.loaders.values()].slice(-1)[0];
+        else
+          l.dismiss();
+      }
+    })
+  }
 
-    this.isLoader = false;
-    if(this.loader)
-      await this.loader.dismiss();
-
+  loaderStop(id: string) {
+    this.loaders.delete(id);
+    this.changeMsg();
   }
 
 
