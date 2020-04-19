@@ -8,6 +8,7 @@ import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
+import {formatDate} from '@angular/common';
 
 @Component({
   selector: 'app-order',
@@ -163,8 +164,8 @@ export class OrderPage implements OnInit {
     // Get the details of the products that are in this order (if there are)
     this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
 
-    // Start auto saving the order data on the local storage every 3 seconds
-    // Save as long as changes being made since last save. clear when saving or when leaving safely through leaving guard
+    // Start auto saving the order data on the local storage every 3 seconds for backup
+    // Save as long as there are changes being made since the last save. clear the backup when saving or when leaving safely through a guard
     this.autoSave = setInterval(()=>{
       if(this.orderHasChanged())
         localStorage.setItem(this.TEMP_DATA_KEY + (this.isNew ? 'new' : this.order.id), JSON.stringify(this.order.getDocument()));
@@ -173,7 +174,7 @@ export class OrderPage implements OnInit {
     // Split order's supply time into 2 inputs (date & time)
     if(this.order.supplyTime) {
       this.supplyDateInput = new Date(this.order.supplyTime);
-      this.supplyHourInput = new Date(this.order.supplyTime).toLocaleTimeString();
+      this.supplyHourInput = formatDate(new Date(this.order.supplyTime),'HH:mm','en-US');
     }
 
   }
@@ -278,7 +279,7 @@ export class OrderPage implements OnInit {
     // Update the original order for checking further changes
     this.originalOrder = JSON.stringify(this.order);
 
-    // Clear the auto save
+    // Clear the backup auto save
     localStorage.removeItem(this.TEMP_DATA_KEY + this.order.id);
     localStorage.removeItem(this.TEMP_DATA_KEY + 'new');
 

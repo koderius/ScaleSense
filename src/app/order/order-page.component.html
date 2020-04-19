@@ -165,7 +165,7 @@
         <div id="dates" *ngIf="isEdit">
           <p>בחירת תאריך אספקה:</p>
           <div class="date-picker">
-            <ion-icon name="close" (click)="supplyDateInput = null" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
+            <ion-icon name="close" (click)="supplyDateInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
             <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()" readonly (click)="picker.open()">
             <ion-icon name="caret-down" (click)="picker.open()"></ion-icon>
             <mat-datepicker #picker></mat-datepicker>
