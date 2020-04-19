@@ -148,6 +148,9 @@ export class OrderPage implements OnInit {
       }
     }
 
+    // Keep the original order to check changes
+    this.originalOrder = JSON.stringify(this.order);
+
     // Check whether the order had sudden close before, and ask whether to load it
     if(this.isEdit) {
       const tempAutoSave = localStorage.getItem(this.TEMP_DATA_KEY + orderId);
@@ -160,14 +163,12 @@ export class OrderPage implements OnInit {
     // Get the details of the products that are in this order (if there are)
     this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
 
-    // Start auto saving the order data on the local storage every 3 seconds (Only after choosing a supplier. It will be cleared when leaving the page safely - in close guard)
+    // Start auto saving the order data on the local storage every 3 seconds
+    // Save as long as changes being made since last save. clear when saving or when leaving safely through leaving guard
     this.autoSave = setInterval(()=>{
-      if(this.order.sid)
-        localStorage.setItem(this.TEMP_DATA_KEY + orderId, JSON.stringify(this.order.getDocument()));
+      if(this.orderHasChanged())
+        localStorage.setItem(this.TEMP_DATA_KEY + (this.isNew ? 'new' : this.order.id), JSON.stringify(this.order.getDocument()));
     }, 3000);
-
-    // Keep the original order to check changes
-    this.originalOrder = JSON.stringify(this.order);
 
     // Split order's supply time into 2 inputs (date & time)
     if(this.order.supplyTime) {
@@ -192,6 +193,8 @@ export class OrderPage implements OnInit {
       time.setMinutes(+this.supplyHourInput.slice(3,5));
       this.order.supplyTime = time.getTime();
     }
+    else
+      this.order.supplyTime = null;
   }
 
 
@@ -274,6 +277,10 @@ export class OrderPage implements OnInit {
 
     // Update the original order for checking further changes
     this.originalOrder = JSON.stringify(this.order);
+
+    // Clear the auto save
+    localStorage.removeItem(this.TEMP_DATA_KEY + this.order.id);
+    localStorage.removeItem(this.TEMP_DATA_KEY + 'new');
 
     return !!res;
 

@@ -23,27 +23,27 @@ export class AlertsService {
 
   loaderStart(msg?: string) {
 
+    // Add message to list
     const id = ''+Math.random();
     this.loaders.set(id,msg);
 
+    // If it's the only one, create new loader with this message
     if(this.loaders.size == 1) {
-      this.loadCtrl.create({
-        id: id,
-        message: msg
-      }).then((l)=>{
-        l.present();
-        if(this.loaders.size > 1)
-          this.changeMsg();
+      this.loadCtrl.create({id: id,})
+        .then((l)=>{
+          l.present();
+          this.setLoaderMsg();
       });
     }
     else
-      this.changeMsg();
+      this.setLoaderMsg();
 
     return id;
 
   }
 
-  private changeMsg() {
+  // Set the message to the last message, or dismiss the loader if there are no messages
+  private setLoaderMsg() {
     this.loadCtrl.getTop().then((l)=>{
       if(l) {
         if(this.loaders.size)
@@ -56,7 +56,7 @@ export class AlertsService {
 
   loaderStop(id: string) {
     this.loaders.delete(id);
-    this.changeMsg();
+    this.setLoaderMsg();
   }
 
 
