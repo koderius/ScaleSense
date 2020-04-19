@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import {OrderChange, OrderDoc, ProductOrder} from '../../src/app/models/OrderI';
 
 admin.initializeApp();
 
@@ -57,7 +58,7 @@ export const sendOrder = functions.https.onCall(async (orderId: string, context)
       if(sender && sender.bid) {
 
         // Get the order data
-        const orderRef = admin.firestore().collection('customers').doc(sender.bid).collection('myorders').doc(orderId);
+        const orderRef = admin.firestore().collection('customers').doc(sender.bid).collection('my_orders').doc(orderId);
         const order = (await transaction.get(orderRef)).data();
 
         // If the order is a draft, it is possible to send it
@@ -105,13 +106,15 @@ export const sendOrder = functions.https.onCall(async (orderId: string, context)
  * The function ignores changes in drafts, because changes in draft has no consequences in the app.
  * - Notice: The function works on update only - not on creation (because it's a draft) and not on deletion (only drafts can be deleted)
  */
-export const onOrderUpdate = functions.firestore.document('customers/{customerId}/myorders/{orderId}').onUpdate(async (change, context) => {
+export const onOrderUpdate = functions.firestore.document('customers/{customerId}/my_orders/{orderId}').onUpdate(async (change, context) => {
 
   // Get old and new data of the order
-  const newData = (change.after ? change.after.data() : null);
-  const oldData = (change.before ? change.before.data() : null);
+  const newData = (change.after ? change.after.data() : null) as OrderDoc;
+  const oldData = (change.before ? change.before.data() : null) as OrderDoc;
 
   if(newData && oldData && context) {
+
+    console.log('has new & old data');
 
     // The order's new status
     const orderStatus = newData.status;
@@ -120,8 +123,12 @@ export const onOrderUpdate = functions.firestore.document('customers/{customerId
     if(!orderStatus)
       return;
 
+    console.log('has status');
+
     // For changes in order data made directly by users
     if(context.auth && context.authType == 'USER') {
+
+      console.log('by user');
 
       admin.firestore().runTransaction(async (transaction)=>{
 
@@ -131,7 +138,7 @@ export const onOrderUpdate = functions.firestore.document('customers/{customerId
         const side = userData ? userData.side : null;
 
         // Create a changes report object (who and when)
-        const changes = {
+        const changes: OrderChange = {
           by: uid,
           side: side,
           time: admin.firestore.Timestamp.now().toMillis(),
@@ -139,46 +146,46 @@ export const onOrderUpdate = functions.firestore.document('customers/{customerId
 
         // Check changes in general order details
         if(oldData.supplyTime != newData.supplyTime)
-          changes['supplyTimeChange'] = {old: oldData.supplyTime, new: newData.supplyTime};
+          changes.supplyTimeChange = {old: oldData.supplyTime || NaN, new: newData.supplyTime || NaN};
         if(oldData.comment != newData.comment)
-          changes['commentToSupplierChange'] = {old: oldData.comment, new: newData.comment};
+          changes.commentToSupplierChange = {old: oldData.comment || '', new: newData.comment || ''};
 
         // Check changes in products list
-        changes['productsChanges'] = [];
-        const productsChanges = changes['productsChanges'];
+        changes.productsChanges = [];
 
         // Get a list of all products IDs
         const allProducts = new Set<string>();
-        [newData.products || [], oldData.products || []].forEach((p)=>{allProducts.add(p.id)});
+        [...(newData.products || []), ...(oldData.products || [])].forEach((p)=>{allProducts.add(p.id)});
 
         // Check differences between each product
         allProducts.forEach((id)=>{
 
-          const oldProduct = oldData.products.find((p)=>p.id == id);
-          const newProduct = newData.products.find((p)=>p.id == id);
+          const oldProduct = (oldData.products || []).find((p)=>p.id == id);
+          const newProduct = (newData.products || []).find((p)=>p.id == id);
 
           // If there are differences, add the old version and the new version
-          if(JSON.stringify(oldProduct || {}) != JSON.stringify(newProduct || {}))
-            productsChanges.push({old: oldProduct || {}, new: newProduct || {}});
+          if(JSON.stringify(oldProduct || {}) != JSON.stringify(newProduct || {}) && changes.productsChanges)
+            changes.productsChanges.push({old: oldProduct || null, new: newProduct || null});
 
         });
 
         // Update the price if there are changes in the products list
-        if(changes['productsChanges'] && changes['productsChanges'].length) {
-          const calcPrice = (products: any[])=>{
+        if(changes.productsChanges && changes.productsChanges.length) {
+          const calcPrice = (products: ProductOrder[])=>{
             let sum = 0;
             products.forEach((po)=>{
-              sum += (po.pricePerUnit * po.amount);
-            })
+              sum += ((po.pricePerUnit || 0) * (po.amount || 0));
+            });
+            return sum;
           };
-          changes['priceChange'] = {old: calcPrice(oldData.products || []), new: calcPrice(newData.products || [])};
+          changes.priceChange = {old: calcPrice(oldData.products || []), new: calcPrice(newData.products || [])};
         }
 
         // Add the changes into the changes history list of the order
         await transaction.update(change.after.ref, {changes: admin.firestore.FieldValue.arrayUnion(changes)});
 
         const customerId = context.params ? context.params.customerId : null;
-        const supplierId = newData.sid;
+        const supplierId = newData.sid || '';
 
         // If the changes were made by the customer, add a notification to the supplier, and v.v.
         const ref = side == 'c'

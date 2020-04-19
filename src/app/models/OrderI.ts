@@ -27,11 +27,14 @@ export type OrderChange = {
   /** Time of change */
   time: number;
 
+  /** The ID of the order that these changes belongs to - for notifications */
+  orderId?: string;
+
   /** Changes in the order */
 
   statusChange?: {old: number, new: number};
 
-  productsChanges?: {old: ProductOrder, new: ProductOrder}[];
+  productsChanges?: {old: ProductOrder | null, new: ProductOrder | null}[];
 
   supplyTimeChange?: {old: number, new: number};
 

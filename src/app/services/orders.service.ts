@@ -51,7 +51,7 @@ export class OrdersService {
 
   /** The reference to the firestore collection where the list of orders is stored */
   get myOrdersRef() : CollectionReference {
-    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('myorders');
+    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('my_orders');
   }
 
   get myOrdersMetadataRef() : DocumentReference {
