@@ -2,16 +2,16 @@ import {BusinessSide} from './Business';
 
 export type ProductOrder = {
 
-  /** The productOrder ID */
+  /** The product ID */
   id: string;
 
   /** The amount to order */
   amount?: number;
 
-  /** ProductDoc's comment (if there is) */
+  /** Product's comment (if there is) */
   comment?: string;
 
-  /** ProductDoc's unit price. If not specified, the price is the default price as defined in the productOrder itself */
+  /** Product's unit price. If not specified, the price is the default price as defined in the productOrder itself */
   pricePerUnit?: number;
 
 }
@@ -64,8 +64,14 @@ export enum OrderStatus {
 
 export interface OrderDoc {
 
-  /** Order ID (yy-serial)*/
-  id: string;
+  /** Server ID */
+  id?: string;
+
+  /** Order serial number (yy-serial)*/
+  serial?: string;
+
+  /** Customer ID */
+  cid?: string;
 
   /** Supplier ID */
   sid?: string;

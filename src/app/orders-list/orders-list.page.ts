@@ -105,7 +105,7 @@ export class OrdersListPage implements OnInit {
     this.isSearching = true;
     this.orders = await this.ordersService.getMyOrders(
       this.pageMode == 'drafts',
-      byDate ? null : this.query,
+      this.query,
       byDate ? [this.fromDate, this.toDate] : null,
       page == 1 ? this.orders.slice(-1)[0] : null,
       page == -1 ? this.orders[0] : null,

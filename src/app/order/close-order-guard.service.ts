@@ -30,9 +30,8 @@ export class CloseOrderGuard implements CanDeactivate<OrderPage> {
 
     // If can leave the page, stop auto saving and remove the temporal order data
     if(canLeave) {
+      component.updateChanges();
       clearInterval(component.autoSave);
-      localStorage.removeItem(component.TEMP_DATA_KEY + component.order.id);
-      localStorage.removeItem(component.TEMP_DATA_KEY + 'new'); // <- in case was new
     }
 
     return canLeave;

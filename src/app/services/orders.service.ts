@@ -6,12 +6,11 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/functions';
 import {SuppliersService} from './suppliers.service';
+import {Order} from '../models/Order';
 import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
-import Query = firebase.firestore.Query;
-import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
-import {Order} from '../models/Order';
+import Query = firebase.firestore.Query;
 
 @Injectable({
   providedIn: 'root'
@@ -27,31 +26,24 @@ export class OrdersService {
    * If someone else already created an order with this ID and saved it, the newer order will get a new different ID.
    * This method keeps the IDs sequential (not "wasting" numbers), in case someone created a draft but has not saved it.
    * */
-  static readonly TEMP_ID_SUFFIX = '*';
+  static readonly TEMP_SERIAL_SUFFIX = '*';
 
+  ordersRef = firebase.firestore().collection('orders');
+
+  /** The reference to the firestore collection where the list of orders is stored */
   private _myOrders: OrderDoc[] = [];
 
   constructor(
     private productsService: ProductsService,
     private suppliersService: SuppliersService,
-  ) {
+  ) {}
 
-    // Subscribe list of orders
-    try {
-      const unsubscribe = this.myOrdersRef.onSnapshot((snapshot)=>{
-        this._myOrders = snapshot.docs.map((d)=>d.data() as OrderDoc);
-      })
-    }
-    catch (e) {
-      console.error(e);
-    }
-
+  get myOrders() : Query {
+    return this.ordersRef.where('cid','==',this.CUSTOMER_ID);
   }
 
-
-  /** The reference to the firestore collection where the list of orders is stored */
-  get myOrdersRef() : CollectionReference {
-    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('my_orders');
+  get myDrafts() : CollectionReference {
+    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('my_drafts');
   }
 
   get myOrdersMetadataRef() : DocumentReference {
@@ -62,27 +54,27 @@ export class OrdersService {
   /** Get all my orders, or filtered by query. for more than 10 results use pagination */
   async getMyOrders(isDraft: boolean, query: string = '', dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
 
-    let ref : DocumentReference | Query;
+    // Get the drafts collection or the orders collection
+    const baseRef: CollectionReference | Query = isDraft ? this.myDrafts : this.myOrders;
 
-    // If it's a number, search by invoice number
+    let ref;
+
+    // If it's a number, search by invoice number (only one result)
     if(query && +query)
-      ref = this.myOrdersRef.where('invoice', '==', query).where('draft','==',isDraft);
+      ref = baseRef.where('invoice', '==', query);
 
-    // If it's in order ID format, search by order ID (later check that the draft property is fit)
-    let byId = false;
-    if(query && OrdersService.CheckOrderIdFormat(query)) {
-      ref = this.myOrdersRef.doc(query);
-      byId = true;
-    }
+    // If it's in order serial format, search by order serial (only one result)
+    if(query && OrdersService.CheckOrderIdFormat(query))
+      ref = baseRef.where('serial','==', query);
 
     // For other strings or no query, there might be more than 1 results
     if(!ref) {
 
-      // Sort by time and by ID, and check draft/non-draft
+      // Sort by time and by serial, and check draft/non-draft
       const sortBy = isDraft ? 'modified' : 'supplyTime';
-      ref = this.myOrdersRef.orderBy(sortBy).orderBy('id').where('draft','==',isDraft);
+      ref = baseRef.orderBy(sortBy);   //.orderBy('serial');
 
-      // For querying by dates (instead of query by text)
+      // For querying by dates (not for drafts)
       if(dates && dates.length == 2 && !isDraft) {
         query = null;
         dates[1].setDate(dates[1].getDate() + 1);
@@ -113,21 +105,8 @@ export class OrdersService {
     try {
 
       // Get results
-      const res : DocumentSnapshot | QuerySnapshot = await ref.get();
-
-      // For document by ID, return its data, if it is fit to the draft query
-      if(byId && res instanceof DocumentSnapshot) {
-        if(!res.exists)
-          return [];
-        const data = res.data() as OrderDoc;
-        if(data.draft)
-          this._myOrders = [data];
-      }
-
-      if(!byId && res instanceof QuerySnapshot) {
-        // For other queries, return the documents data
-        this._myOrders = res.docs.map((d)=>d.data() as OrderDoc);
-      }
+      const res : QuerySnapshot = await ref.get();
+      this._myOrders = res.docs.map((d)=>d.data() as OrderDoc);
 
       return this._myOrders.map((o)=>new Order(o));
 
@@ -139,14 +118,16 @@ export class OrdersService {
   }
 
 
-  async getOrderById(id: string) : Promise<Order> {
+  async getOrderById(id: string, isDraft?: boolean) : Promise<Order> {
 
     // Get order from local list
     let doc = this._myOrders.find((o)=>o.id == id);
 
     // If not exist in local, get from server
-    if(!doc)
-      doc = (await this.myOrdersRef.doc(id).get()).data() as OrderDoc;
+    if(!doc) {
+      const col = isDraft ? this.myDrafts : this.ordersRef;
+      doc = (await col.doc(id).get()).data() as OrderDoc;
+    }
 
     if(doc)
       return new Order(doc);
@@ -154,59 +135,24 @@ export class OrdersService {
   }
 
 
-  /** Create new order object with temporal ID (without saving on server yet) */
+  /** Create new order object with temporal serial and no ID (without saving on server yet) */
   async createNewOrder() : Promise<Order> {
-    const newId = await this.setNewOrderId(false);
-    return new Order({id: newId});
-  }
-
-
-  /** Save order */
-  async saveOrder(order: Order) : Promise<Order> {
-
-    // Get order's data to save
-    const orderDoc = order.getDocument();
-
-    // If the order has a temporary ID (means it has not been saved yet), set its ID again
-    if(orderDoc.id.endsWith(OrdersService.TEMP_ID_SUFFIX)) {
-
-      orderDoc.id = await this.setNewOrderId(true);
-
-      // If the new ID is different from the temporal ID (minus the temporary suffix), notify the user
-      if(orderDoc.id != order.id.slice(0, -OrdersService.TEMP_ID_SUFFIX.length))
-        alert('שים לב: מספר ההזמנה העדכני הוא: ' + orderDoc.id);
-
-    }
-
     try {
-      await this.myOrdersRef.doc(orderDoc.id).set({
-
-          // Save all properties
-          ...orderDoc,
-
-          // Update last time modified to current time
-          modified: firebase.firestore.Timestamp.now().toMillis(),
-
-          // Set as draft (for querying only)
-          draft: orderDoc.status === OrderStatus.DRAFT,
-
-        },
-        {merge: true});
+      const metadata = (await this.myOrdersMetadataRef.get()).data();
+      const tempSerial = OrdersService.createNewSerial(metadata ? metadata['lastSerial'] : '', true);
+      return new Order({serial: tempSerial});
     }
     catch (e) {
       console.error(e);
     }
-
-    return new Order(orderDoc);
-
   }
 
 
   async deleteDraft(orderId: string) {
-    const order = await this.getOrderById(orderId);
-    if(order && order.status == OrderStatus.DRAFT) {
+    const order = await this.getOrderById(orderId, true);
+    if(order) {
       try {
-        await this.myOrdersRef.doc(orderId).delete();
+        await this.myDrafts.doc(orderId).delete();
       }
       catch (e) {
         console.error(e);
@@ -215,10 +161,15 @@ export class OrdersService {
   }
 
 
-  async sendOrder(orderId: string) : Promise<boolean> {
-    const sendOrder = firebase.functions().httpsCallable('sendOrder');
+  async updateOrder(order: Order) : Promise<boolean> {
+    const updateOrder = firebase.functions().httpsCallable('updateOrder');
     try {
-      return (await sendOrder(orderId)).data;
+
+      if(order.status == OrderStatus.DRAFT)
+        this.deleteDraft(order.id);
+
+      return (await updateOrder(order.getDocument())).data;
+
     }
     catch (e) {
       console.error(e);
@@ -232,42 +183,65 @@ export class OrdersService {
 
 
   /** Use transaction to get last order ID from the metadata, and create new ID */
-  private async setNewOrderId(fixedId: boolean) : Promise<string> {
+  async saveDraft(order: Order) : Promise<Order> {
 
-    // Get the current year's last 2 digits
-    const currentYear = new Date().getFullYear().toString().slice(-2);
+    const orderDoc = order.getDocument();
 
-    return await firebase.firestore().runTransaction<string>(async (transaction)=>{
+    return await firebase.firestore().runTransaction<Order>(async (transaction)=> {
 
-      // Get the last order ID from customer's metadata
-      const metadata = (await transaction.get(this.myOrdersMetadataRef)).data();
-      const lastId = (metadata && metadata['lastId']) ? metadata['lastId'] : '';
+      // For new order (no ID) create new ID and new serial
+      if (!orderDoc.id) {
 
-      // Get the year [0] and the inner year serial number [1]
-      const idData = lastId.split('-');
+        // Get the last order serial from customer's metadata, and create new serial
+        const metadata = (await transaction.get(this.myOrdersMetadataRef)).data();
+        orderDoc.serial = OrdersService.createNewSerial(metadata ? metadata['lastSerial'] : '');
 
-      // If the last order was in the same year, use its serial +1. If this order is the first of this year (or first at all), the serial is 1
-      let serial = 1;
-      if(idData[0] == currentYear)
-        serial = +idData[1] + 1;
+        // Reserve the new serial number, so the next ones will be the following numbers
+        transaction.set(this.myOrdersMetadataRef, {lastSerial: orderDoc.serial}, {merge: true});
 
-      // Format the order ID as: 'yy-{6 digit serial}'
-      const newId = currentYear + '-' + (formatNumber(serial, 'en-US', OrdersService.OrderIdNumOfDigits + '.0-0').replace(/,/g,''));
+        // If the new serial is different from the temporal serial (minus the temporary suffix), notify the user
+        if (orderDoc.serial != order.serial.slice(0, -OrdersService.TEMP_SERIAL_SUFFIX.length))
+          alert('שים לב: מספר ההזמנה העדכני הוא: ' + orderDoc.serial);
 
-      // If it's a temporal ID (i.e. for a draft that might not be saved) do not reserve this ID.
-      if(fixedId)
-        transaction.set(this.myOrdersMetadataRef,{lastId: newId}, {merge: true});
+        // Create new ID
+        const newRef = this.myDrafts.doc();
+        orderDoc.id = newRef.id;
 
-      return newId + (fixedId ? '' : OrdersService.TEMP_ID_SUFFIX);
+      }
+
+      // Save the order in drafts collection
+      orderDoc.modified = firebase.firestore.Timestamp.now().toMillis();
+      transaction.set(this.myDrafts.doc(orderDoc.id), orderDoc);
+
+      return new Order(orderDoc);
 
     });
 
   }
 
-  /** Number of digits after '-' in order ID */
-  static readonly OrderIdNumOfDigits = 6;
+  private static createNewSerial(lastSerial: string, isTemp?: boolean) : string {
 
-  /** Check whether a string is in order ID format */
+    // Get the current year's last 2 digits
+    const currentYear = new Date().getFullYear().toString().slice(-2);
+
+    // Get the year [0] and the inner year serial number [1]
+    const serialData = (lastSerial || '').split('-');
+
+    // If the last order was in the same year, use its serial +1. If this order is the first of this year (or first at all), the serial is 1
+    let serial = 1;
+    if(serialData[0] == currentYear)
+      serial = +serialData[1] + 1;
+
+    // Format the order serial as: 'yy-{6 digit serial}'
+    const newSerial = currentYear + '-' + (formatNumber(serial, 'en-US', OrdersService.OrderSerialNumOfDigits + '.0-0').replace(/,/g,''));
+    return newSerial + (isTemp ? OrdersService.TEMP_SERIAL_SUFFIX : '');
+
+  }
+
+  /** Number of digits after '-' in order serial */
+  static readonly OrderSerialNumOfDigits = 6;
+
+  /** Check whether a string is in order serial format */
   static CheckOrderIdFormat(str: string) : boolean {
 
     const split = str.split('-');
@@ -277,7 +251,7 @@ export class OrdersService {
     if(split[0].length != 2 || isNaN(+split[0]))
       return false;
 
-    if(split[1].length != OrdersService.OrderIdNumOfDigits || isNaN(+split[1]))
+    if(split[1].length < OrdersService.OrderSerialNumOfDigits || isNaN(+split[1]))
       return false;
 
     return true;

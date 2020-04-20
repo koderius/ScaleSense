@@ -86,7 +86,7 @@
             <ion-list-header class="ion-padding-horizontal">
               <ion-title>
                 <ion-text>פרטי הזמנה</ion-text>
-                <ion-text class="ion-float-end" [title]="newIdMsg">{{order.id}}</ion-text>
+                <ion-text class="ion-float-end" [title]="newSerialMsg">{{order.serial}}</ion-text>
               </ion-title>
             </ion-list-header>
 
@@ -114,7 +114,7 @@
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
-            <ion-button *ngIf="order.products.length && isDraft" shape="round" (click)="saveOrder()">שמירת טיוטה</ion-button>
+            <ion-button *ngIf="order.products.length && isDraft" shape="round" (click)="saveDraft()">שמירת טיוטה</ion-button>
           </ion-row>
 
         </div>
@@ -129,7 +129,7 @@
 
     <h1 class="ion-text-center" id="title-with-logo">
       <ion-text>פרטי הזמנה</ion-text>
-      <ion-text *ngIf="page == 3" [title]="newIdMsg"> מס. {{order.id}}</ion-text>
+      <ion-text *ngIf="page == 3" [title]="newSerialMsg"> מס. {{order.serial}}</ion-text>
       <ion-img [src]="getSelectedSupplier().logo" style="position: absolute"></ion-img>
     </h1>
 
@@ -202,7 +202,7 @@
       <div id="bottom-buttons">
         <ion-row>
           <ion-button shape="round" color="dark" *ngIf="isEdit" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
-          <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveOrder()">שמירה כטיוטה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveDraft()">שמירה כטיוטה</ion-button>
           <ion-button shape="round" color="dark" *ngIf="!isDraft && isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>

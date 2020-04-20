@@ -18,6 +18,10 @@ export class Order {
     return this._props.id;
   }
 
+  get serial() {
+    return this._props.serial;
+  }
+
   get sid() {
     return this._props.sid;
   }

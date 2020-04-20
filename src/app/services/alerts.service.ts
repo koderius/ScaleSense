@@ -7,8 +7,6 @@ import {AlertController, LoadingController} from '@ionic/angular';
 export class AlertsService {
 
   loaders = new Map<string,string>();
-
-  onLoader = new EventEmitter();
   isLoader: boolean;
 
   constructor(

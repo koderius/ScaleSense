@@ -75,17 +75,17 @@ export class OrderPage implements OnInit {
 
   /** Whether the draft is new (not saved yet) */
   get isNew() : boolean {
-    return this.order.id.endsWith(OrdersService.TEMP_ID_SUFFIX);
+    return !this.order.id;
   }
 
-  get newIdMsg() {
+  get newSerialMsg() {
     return this.isNew ? '* מספר הזמנה זמני (כל עוד הטיוטה טרם נשמרה)' : '';
   }
 
   /** The page title (when there is no wizard) */
   get pageTitle() : string {
     if(!this.isDraft)
-      return (this.isEdit ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.id;
+      return (this.isEdit ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.serial;
   }
 
   get page() {
@@ -168,7 +168,7 @@ export class OrderPage implements OnInit {
     // Save as long as there are changes being made since the last save. clear the backup when saving or when leaving safely through a guard
     this.autoSave = setInterval(()=>{
       if(this.orderHasChanged())
-        localStorage.setItem(this.TEMP_DATA_KEY + (this.isNew ? 'new' : this.order.id), JSON.stringify(this.order.getDocument()));
+        localStorage.setItem(this.TEMP_DATA_KEY + (this.order.id || 'new'), JSON.stringify(this.order.getDocument()));
     }, 3000);
 
     // Split order's supply time into 2 inputs (date & time)
@@ -183,6 +183,14 @@ export class OrderPage implements OnInit {
   /** Check whether the order details has changed since the last save */
   orderHasChanged(): boolean {
     return this.originalOrder != JSON.stringify(this.order);
+  }
+
+  updateChanges() {
+    // Update the original order for checking further changes
+    this.originalOrder = JSON.stringify(this.order);
+    // Clear the backup auto save
+    localStorage.removeItem(this.TEMP_DATA_KEY + this.order.id);
+    localStorage.removeItem(this.TEMP_DATA_KEY + 'new');
   }
 
 
@@ -267,23 +275,19 @@ export class OrderPage implements OnInit {
     alert('מה הכפתור הזה אמור לעשות?');
   }
 
-  async saveOrder() : Promise<boolean> {
+  async saveDraft() : Promise<boolean> {
 
-    // Save on server
-    const l = this.alerts.loaderStart('שומר הזמנה...');
-    const res = await this.ordersService.saveOrder(this.order);
-    if(res)
-      this.order = res;
-    this.alerts.loaderStop(l);
-
-    // Update the original order for checking further changes
-    this.originalOrder = JSON.stringify(this.order);
-
-    // Clear the backup auto save
-    localStorage.removeItem(this.TEMP_DATA_KEY + this.order.id);
-    localStorage.removeItem(this.TEMP_DATA_KEY + 'new');
-
-    return !!res;
+    // Save draft on server
+    if(this.order.status == OrderStatus.DRAFT) {
+      const l = this.alerts.loaderStart('שומר טיוטה...');
+      const res = await this.ordersService.saveDraft(this.order);
+      this.alerts.loaderStop(l);
+      if(res) {
+        this.order = res;
+        this.updateChanges();
+      }
+      return !!res;
+    }
 
   }
 
@@ -295,17 +299,18 @@ export class OrderPage implements OnInit {
       return;
     }
 
-    if(await this.alerts.areYouSure('האם לשלוח הזמנה לספק?')) {
+    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח לספק עדכון הזמנה?')) {
 
-      // First, save the order
-      const l = this.alerts.loaderStart('שולח הזמנה לספק...');
-      if(await this.saveOrder()) {
-
-        if(await this.ordersService.sendOrder(this.order.id))
+      const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה לספק...' : 'מעדכן הזמנה...');
+      if(await this.ordersService.updateOrder(this.order)) {
+        this.updateChanges();
+        if(this.order.status == OrderStatus.DRAFT)
           this.orderSent = true;
-
+        else
+          alert('עדכון נשלח לספק');
       }
       this.alerts.loaderStop(l);
+
     }
 
   }
