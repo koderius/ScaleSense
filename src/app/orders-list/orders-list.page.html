@@ -7,7 +7,7 @@
   <div class="page-container">
 
     <div id="search-section">
-      <ion-searchbar placeholder="הקלד שם ספק | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()" [disabled]="fromDate">
+      <ion-searchbar placeholder="הקלד שם ספק | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()">
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
       <p class="ion-text-center" *ngIf="pageMode != 'drafts'">

@@ -14,6 +14,8 @@ import {
   MatInputModule,
   MatNativeDateModule
 } from '@angular/material';
+import {UserNamePipe} from '../pipes/user-name.pipe';
+import {OrderChangePipe} from '../pipes/order-change.pipe';
 
 
 
@@ -34,6 +36,8 @@ import {
     HighlightifyPipe,
     UnitNamePipe,
     OrderStatusTextPipe,
+    UserNamePipe,
+    OrderChangePipe,
   ],
   exports: [
     MatFormFieldModule,
@@ -47,6 +51,8 @@ import {
     HighlightifyPipe,
     UnitNamePipe,
     OrderStatusTextPipe,
+    UserNamePipe,
+    OrderChangePipe,
   ],
 })
 export class ComponentsModule { }

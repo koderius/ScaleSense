@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, CanDeactivate} from '@angular/router';
-import {OrderPage} from './order-page.component';
+import {OrderPage} from './order.page';
 import {AlertsService} from '../services/alerts.service';
 
 @Injectable({

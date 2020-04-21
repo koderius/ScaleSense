@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { OrderPage } from './order-page.component';
+import { OrderPage } from './order.page';
 import {CloseOrderGuard} from './close-order-guard.service';
 
 const routes: Routes = [

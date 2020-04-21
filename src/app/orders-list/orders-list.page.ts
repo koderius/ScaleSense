@@ -33,14 +33,18 @@ export class OrdersListPage implements OnInit {
   async ngOnInit() {
 
     // Get the page mode (type of list) from the URL query parameter 'mode'. Default is 'view'
-    const modeParam = this.activatedRoute.snapshot.queryParams['mode'] || '';
-    if(['view','edit','drafts','receive'].includes(modeParam))
-      this.pageMode = modeParam;
-    else
-      this.pageMode = 'view';
+    this.activatedRoute.queryParams.subscribe((params)=>{
 
-    // Get all 10 first orders
-    this.searchOrders();
+      const modeParam = params['mode'] || '';
+      if(['view','edit','drafts','receive'].includes(modeParam))
+        this.pageMode = modeParam;
+      else
+        this.pageMode = 'view';
+
+      // Get all 10 first orders
+      this.searchOrders();
+
+    });
 
   }
 
@@ -69,7 +73,8 @@ export class OrdersListPage implements OnInit {
 
   actionClicked(orderId: string) {
     switch (this.pageMode) {
-      case 'view': case 'drafts': this.navCtrl.navigateForward('customer/order/'+orderId); break;
+      case 'view': this.navCtrl.navigateForward('customer/order/'+orderId); break;
+      case 'drafts': this.navCtrl.navigateForward('customer/order/'+orderId+'?draft=true'); break;
       case 'edit': this.navCtrl.navigateForward('customer/order/'+orderId+'?edit=true'); break;
       case 'receive': break; //TODO
     }
@@ -103,7 +108,7 @@ export class OrdersListPage implements OnInit {
     const byDate = this.fromDate && this.toDate;
 
     this.isSearching = true;
-    this.orders = await this.ordersService.getMyOrders(
+    this.orders = await this.ordersService.queryOrders(
       this.pageMode == 'drafts',
       this.query,
       byDate ? [this.fromDate, this.toDate] : null,

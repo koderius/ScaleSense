@@ -27,6 +27,8 @@ export type OrderChange = {
   /** Time of change */
   time: number;
 
+  data?: string;
+
   /** The ID of the order that these changes belongs to - for notifications */
   orderId?: string;
 
@@ -99,8 +101,5 @@ export interface OrderDoc {
 
   /** Number of invoice */
   invoice?: string;
-
-  /** Draft / non-draft - For server (querying) use only */
-  draft?: boolean;
 
 }

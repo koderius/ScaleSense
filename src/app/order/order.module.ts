@@ -6,7 +6,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { orderPageRoutingModule } from './order-routing.module';
 
-import { OrderPage } from './order-page.component';
+import { OrderPage } from './order.page';
 import {ComponentsModule} from '../components/components.module';
 import {ProductToCartComponent} from '../components/product-to-cart/product-to-cart.component';
 import {ProductSummeryComponent} from '../components/product-summery/product-summery.component';

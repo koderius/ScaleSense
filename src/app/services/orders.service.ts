@@ -51,8 +51,15 @@ export class OrdersService {
   }
 
 
-  /** Get all my orders, or filtered by query. for more than 10 results use pagination */
-  async getMyOrders(isDraft: boolean, query: string = '', dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
+  /**
+   * Get all my orders, or filtered by query.
+   * Can be filtered by:
+   * - serial number (single result) - if the query text is a number,
+   * - invoice number (single result) - if the query text fits the serial number formay (yy-serial),
+   * - supplier's name (multiple results) - if the query text is non-numeric & non-serial format string, *limited to up to 10 different suppliers fits to the query
+   * - date range (multiple results) - inclusive,
+   * for more than 10 results use pagination */
+  async queryOrders(isDraft: boolean, query: string = '', dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
 
     // Get the drafts collection or the orders collection
     const baseRef: CollectionReference | Query = isDraft ? this.myDrafts : this.myOrders;
@@ -61,11 +68,11 @@ export class OrdersService {
 
     // If it's a number, search by invoice number (only one result)
     if(query && +query)
-      ref = baseRef.where('invoice', '==', query);
+      ref = baseRef.where('invoice', '==', query).limit(1);
 
     // If it's in order serial format, search by order serial (only one result)
     if(query && OrdersService.CheckOrderIdFormat(query))
-      ref = baseRef.where('serial','==', query);
+      ref = baseRef.where('serial','==', query).limit(1);
 
     // For other strings or no query, there might be more than 1 results
     if(!ref) {
@@ -76,7 +83,6 @@ export class OrdersService {
 
       // For querying by dates (not for drafts)
       if(dates && dates.length == 2 && !isDraft) {
-        query = null;
         dates[1].setDate(dates[1].getDate() + 1);
         ref = ref.where('supplyTime','>=',dates[0].getTime()).where('supplyTime','<',dates[1].getTime());
       }
@@ -118,7 +124,7 @@ export class OrdersService {
   }
 
 
-  async getOrderById(id: string, isDraft?: boolean) : Promise<Order> {
+  async getOrderById(id: string, isDraft: boolean) : Promise<Order> {
 
     // Get order from local list
     let doc = this._myOrders.find((o)=>o.id == id);
@@ -130,12 +136,12 @@ export class OrdersService {
     }
 
     if(doc)
-      return new Order(doc);
+      return await new Order(doc);
 
   }
 
 
-  /** Create new order object with temporal serial and no ID (without saving on server yet) */
+  /** Create new order object with temporal serial number and no ID (without saving on server yet) */
   async createNewOrder() : Promise<Order> {
     try {
       const metadata = (await this.myOrdersMetadataRef.get()).data();
@@ -149,26 +155,30 @@ export class OrdersService {
 
 
   async deleteDraft(orderId: string) {
-    const order = await this.getOrderById(orderId, true);
-    if(order) {
-      try {
-        await this.myDrafts.doc(orderId).delete();
-      }
-      catch (e) {
-        console.error(e);
+    if(orderId) {
+      const order = await this.getOrderById(orderId, true);
+      if(order) {
+        try {
+          await this.myDrafts.doc(orderId).delete();
+        }
+        catch (e) {
+          console.error(e);
+        }
       }
     }
   }
 
 
   async updateOrder(order: Order) : Promise<boolean> {
-    const updateOrder = firebase.functions().httpsCallable('updateOrder');
+    const updateOrder = firebase.functions().httpsCallable('orderUpdate');
     try {
 
-      if(order.status == OrderStatus.DRAFT)
+      const res = (await updateOrder(order.getDocument())).data;
+
+      if(res && order.status == OrderStatus.DRAFT)
         this.deleteDraft(order.id);
 
-      return (await updateOrder(order.getDocument())).data;
+      return res;
 
     }
     catch (e) {
@@ -204,8 +214,7 @@ export class OrdersService {
           alert('שים לב: מספר ההזמנה העדכני הוא: ' + orderDoc.serial);
 
         // Create new ID
-        const newRef = this.myDrafts.doc();
-        orderDoc.id = newRef.id;
+        orderDoc.id = this.myDrafts.doc().id;
 
       }
 

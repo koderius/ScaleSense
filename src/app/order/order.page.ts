@@ -12,8 +12,8 @@ import {formatDate} from '@angular/common';
 
 @Component({
   selector: 'app-order',
-  templateUrl: './order-page.component.html',
-  styleUrls: ['./order-page.component.scss'],
+  templateUrl: './order.page.html',
+  styleUrls: ['./order.page.scss'],
 })
 export class OrderPage implements OnInit {
 
@@ -138,7 +138,7 @@ export class OrderPage implements OnInit {
     }
     // Or, get the order details and go to summery page. Enable edit if it's a draft or requested as edit mode
     else {
-      this.order = await this.ordersService.getOrderById(orderId);
+      this.order = await this.ordersService.getOrderById(orderId, urlSnapshot.queryParams['draft']);
       if(this.order) {
         this.page = 3;
         this.isEdit = urlSnapshot.queryParams['edit'] || this.isDraft;
@@ -159,6 +159,8 @@ export class OrderPage implements OnInit {
         this.order = new Order(JSON.parse(tempAutoSave));
         this.page = 3;
       }
+      else
+        this.updateChanges();
     }
 
     // Get the details of the products that are in this order (if there are)

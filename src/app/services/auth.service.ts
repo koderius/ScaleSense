@@ -6,10 +6,14 @@ import 'firebase/functions';
 import {FirebaseError, User, UserInfo} from 'firebase';
 import UserCredential = firebase.auth.UserCredential;
 import {ActivatedRoute} from '@angular/router';
+import {BusinessSide} from '../models/Business';
 
 
 /** User's app data. It extends the basic firebase user info */
 export interface UserDoc extends UserInfo {
+
+  bid?: string;
+  side?: BusinessSide;
 
 }
 
@@ -261,8 +265,9 @@ export class AuthService {
 
   /** Get some user's document data */
   async getUserDoc(uid: string) : Promise<UserDoc> {
-    if(this._user && uid == this._user.uid)
+    if(this._user && uid == this._user.uid) {
       return this.currentUser;
+    }
     else
       return (await this.userProfileDoc(uid).get()).data() as UserDoc;
   }

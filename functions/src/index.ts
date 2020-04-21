@@ -37,6 +37,82 @@ export const checkPayment = functions.https.onCall((data, context) => {});
 
 
 
+export const orderUpdate = functions.https.onCall(async (order: OrderDoc, context) => {
+
+  return await admin.firestore().runTransaction(async (transaction)=>{
+
+    // Get the user data, and his business belonging
+    const uid = context.auth ? context.auth.uid : '';
+    const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
+    const side = userData ? userData.side : '';
+    const bid = userData ? userData.bid : '';
+
+    // TODO: Check permissions of this user
+
+    // New document that contains all the fields that are allowed to be change
+    let updatedOrder: OrderDoc = {
+      products: order.products,
+      supplyTime: order.supplyTime,
+      comment: order.comment,
+      invoice: order.invoice,
+    };
+
+    // Save those fields as JSON for the changes list
+    const currentVersion = JSON.stringify(updatedOrder);
+
+    // For draft being sent for the first time, all fields are allowed to be set
+    if(order.status === 0) {
+
+      // Create draft new ID: (1) might not have ID if hasn't saved before (2) Security: prevent sending an order as draft more than once
+      order.id = admin.firestore().collection('').id;
+
+      // Take all fields
+      updatedOrder = order;
+
+      updatedOrder.created = updatedOrder.modified;     // Update the creation time to be the time of sending (instead of time of creating the draft)
+      updatedOrder.cid = bid;                           // Update the customer ID (according to the user who commit the function's call)
+      updatedOrder.status = 10;                         // Change the status from 'DRAFT' (0) to 'SENT' (10)
+
+    }
+
+    // Set time of modification
+    const timestamp = admin.firestore.Timestamp.now().toMillis();
+    updatedOrder.modified = timestamp;
+
+    // Create a changes report object (who and when)
+    const changes: OrderChange = {
+      by: uid,
+      side: side,
+      time: timestamp,
+      data: currentVersion,
+    };
+
+    // Save all fields, add the current changes to the versions list
+    const orderRef = admin.firestore().collection('orders').doc(order.id || '');
+    await transaction.set(orderRef, {
+      ...updatedOrder,
+      changes: admin.firestore.FieldValue.arrayUnion(changes)
+    },
+      {merge: true});
+
+    // If the changes were made by the customer, add a notification to the supplier, and v.v.
+    const ref = side == 'c'
+      ? admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_notifications')
+      : admin.firestore().collection('customers').doc(order.cid || '').collection('my_notifications');
+
+    // Send notification with change data + order ID
+    await transaction.create(ref.doc(), {
+      ...changes,
+      orderId: order.id,
+    });
+
+    return true;
+
+  });
+
+});
+
+
 /**
  * Update order data.
  * It compares the changes between the old and the new version of the order, adds them to the order's history (changes) list and sends a notification to the other side
