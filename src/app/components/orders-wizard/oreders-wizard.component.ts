@@ -32,4 +32,8 @@ export class OredersWizardComponent implements OnInit {
       this.goToStep.emit(step);
   }
 
+  backToMain() {
+    this.navCtrl.navigateRoot('customer');
+  }
+
 }
