@@ -88,6 +88,13 @@ export class OrderPage implements OnInit {
       return (this.isEdit ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.serial;
   }
 
+  get pageTitleComment() : string {
+    if(this.order.status == OrderStatus.CANCELED_BY_SUPPLIER || this.order.status == OrderStatus.CANCELED_BY_CUSTOMER)
+      return 'מבוטלת';
+    if(this.order.status == OrderStatus.CLOSED)
+      return 'סגורה';
+  }
+
   get page() {
     return this._page;
   }
@@ -141,7 +148,7 @@ export class OrderPage implements OnInit {
       this.order = await this.ordersService.getOrderById(orderId, urlSnapshot.queryParams['draft']);
       if(this.order) {
         this.page = 3;
-        this.isEdit = urlSnapshot.queryParams['edit'] || this.isDraft;
+        this.isEdit = (urlSnapshot.queryParams['edit'] || this.isDraft) && this.order.status < OrderStatus.CANNOT_BE_EDIT_FROM_HERE;
       }
       else {
         this.backToMain();
@@ -331,7 +338,7 @@ export class OrderPage implements OnInit {
       const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה לספק...' : 'מעדכן הזמנה...');
       const res = await this.ordersService.updateOrder(this.order);
       if(res) {
-        this.order = res;
+        this.order.changes.push(res);
         this.updateChanges();
         if(this.order.status == OrderStatus.DRAFT)
           this.orderSent = true;
@@ -344,8 +351,14 @@ export class OrderPage implements OnInit {
 
   }
 
-  cancelOrder() {
-    // TODO: Cancel
+  async cancelOrder() {
+    const l = this.alerts.loaderStart('מבטל הזמנה...');
+    const change = await this.ordersService.cancelOrder(this.order.id);
+    this.alerts.loaderStop(l);
+    if(change) {
+      this.order.changes.push(change);
+      alert('ההזמנה בוטלה.');
+    }
   }
 
 }

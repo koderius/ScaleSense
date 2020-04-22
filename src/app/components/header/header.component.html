@@ -46,5 +46,5 @@
 </ion-row>
 
 <div id="sub-header" *ngIf="pageTitle">
-  <h1>{{pageTitle}}</h1>
+  <h1>{{pageTitle}}<i id="comment" *ngIf="comment"> - <ion-text color="danger">{{comment}}</ion-text></i></h1>
 </div>

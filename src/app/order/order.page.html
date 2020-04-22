@@ -1,5 +1,5 @@
 <ion-header>
-  <app-header [pageTitle]="pageTitle" *ngIf="order"></app-header>
+  <app-header [pageTitle]="pageTitle" [comment]="pageTitleComment" *ngIf="order"></app-header>
   <app-reservation-wizard [step]="page" (goToStep)="page = $event" *ngIf="isDraft"></app-reservation-wizard>
 </ion-header>
 

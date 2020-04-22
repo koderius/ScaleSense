@@ -128,6 +128,12 @@ export const cancelOrder = functions.https.onCall(async (orderId, context) => {
 
   return await admin.firestore().runTransaction<OrderChange | null>(async transaction => {
 
+    const orderRef = admin.firestore().collection('orders').doc(orderId);
+
+    // Cannot cancel an order that is already canceled or closed
+    if((await transaction.get(orderRef)).get('status') > 40)
+      return null;
+
     // Get the user data, and his business belonging
     const uid = context.auth ? context.auth.uid : '';
     const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
@@ -136,7 +142,6 @@ export const cancelOrder = functions.https.onCall(async (orderId, context) => {
 
     // TODO: Check permissions of this user
 
-    const orderRef = admin.firestore().collection('orders').doc(orderId);
     const cid = (await transaction.get(orderRef)).get('cid');
     const sid = (await transaction.get(orderRef)).get('sid');
 

@@ -170,7 +170,7 @@ export class OrdersService {
   }
 
 
-  async updateOrder(order: Order) : Promise<Order> {
+  async updateOrder(order: Order) : Promise<OrderChange> {
 
     const updateOrder = firebase.functions().httpsCallable('orderUpdate');
 
@@ -183,13 +183,11 @@ export class OrdersService {
       const res = (await updateOrder(order.getDocument())).data as OrderChange;
 
       if(res) {
-        order.changes.push(res);
         // Delete the draft if it was draft
         if(order.status == OrderStatus.DRAFT)
           this.deleteDraft(order.id);
+        return res;
       }
-
-      return order;
 
     }
     catch (e) {
@@ -198,8 +196,17 @@ export class OrdersService {
   }
 
 
-  cancelOrder(orderId: string) {
-    // TODO: Cloud function
+  /** Cancel order by its ID */
+  async cancelOrder(orderId: string) : Promise<OrderChange> {
+    const cancelOrder = firebase.functions().httpsCallable('cancelOrder');
+    try {
+      const res = (await cancelOrder(orderId)).data as OrderChange;
+      if(res)
+        return res;
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
 

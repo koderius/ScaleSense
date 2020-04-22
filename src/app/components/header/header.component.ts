@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {NavController} from '@ionic/angular';
+import {OrderStatus} from '../../models/OrderI';
 
 @Component({
   selector: 'app-header',
@@ -11,6 +12,7 @@ export class HeaderComponent implements OnInit {
   readonly DEFAULT_LOGO = '../../assets/defaults/default_logo.png';
 
   @Input() pageTitle;
+  @Input() comment: OrderStatus;
 
   constructor(
     private navCtrl: NavController,
