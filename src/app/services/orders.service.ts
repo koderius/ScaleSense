@@ -98,11 +98,11 @@ export class OrdersService {
           return [];
       }
 
-      // For pagination, start after the last (next page), or end before the first (previous page)
+      // For pagination, start after the last (next page), or end before the first (previous page) // TODO: if order by serial, add serial to startAfter and endBefore
       if(lastDoc && !firstDoc)
-        ref = ref.startAfter(lastDoc[sortBy], lastDoc.id);
+        ref = ref.startAfter(lastDoc[sortBy]);
       if(firstDoc && !lastDoc)
-        ref = ref.endBefore(firstDoc[sortBy], firstDoc.id).limitToLast(10);
+        ref = ref.endBefore(firstDoc[sortBy]).limitToLast(10);
       else
         ref = ref.limit(10);
 
@@ -119,6 +119,7 @@ export class OrdersService {
     }
     catch (e) {
       console.error(e);
+      return [];
     }
 
   }

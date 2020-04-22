@@ -22,6 +22,8 @@ export class OrdersListPage implements OnInit {
 
   isSearching: boolean;
 
+  page: number = 1;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private ordersService: OrdersService,
@@ -89,12 +91,24 @@ export class OrdersListPage implements OnInit {
   }
 
   async deleteDraft(orderId: string) {
+
+    // Delete from server
     if(await this.alertsService.areYouSure('האם אתה בטוח?', 'אישור יביא למחיקת הטיוטה')) {
       const l = this.alertsService.loaderStart('מוחק טיוטה...');
       await this.ordersService.deleteDraft(orderId);
-      this.ngOnInit();  // Reload page to reload the orders
+
+      // If this is the last result in this page, go to previous page
+      if(this.orders.length == 1)
+        this.searchOrders(-1);
+
+      // Delete from current list
+      const idx = this.orders.findIndex((o)=>o.id == orderId);
+      if(idx > -1)
+        this.orders.splice(idx,1);
+
       this.alertsService.loaderStop(l);
     }
+
   }
 
   /**
@@ -108,15 +122,40 @@ export class OrdersListPage implements OnInit {
     const byDate = this.fromDate && this.toDate;
 
     this.isSearching = true;
-    this.orders = await this.ordersService.queryOrders(
+    const res = await this.ordersService.queryOrders(
       this.pageMode == 'drafts',
       this.query,
       byDate ? [this.fromDate, this.toDate] : null,
       page == 1 ? this.orders.slice(-1)[0] : null,
       page == -1 ? this.orders[0] : null,
     );
-    if(!this.orders)
-      this.orders = [];
+
+    // New search
+    if(page === 0)
+      this.page = 1;
+
+    // Get results and set the page number
+    if(res.length) {
+      this.orders = res;
+      if(page == 1)
+        this.page++;
+      if(page == -1 && this.page > 1)
+        this.page--;
+    }
+
+    // In case there are no results:
+    if(!res.length) {
+      // - for new search - show empty list
+      if(page === 0)
+        this.orders = [];
+      // - for previous page - stay with same results, make sure it's the first page
+      if(page == -1)
+        this.page = 1;
+      // - for next page - stay with same results, if it's the first page, don't show the pagination (because there are no more results)
+      if(page == 1 && this.page == 1)
+        this.page = 0;
+    }
+
     this.isSearching = false;
   }
 
