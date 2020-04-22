@@ -75,7 +75,7 @@ export class OrderChangeReportComponent implements OnInit {
           const oldProduct = this.old.products.find((product)=>p.id == product.id);
           const currentProduct = this.current.products.find((product)=>p.id == product.id);
 
-          if(JSON.stringify(oldProduct) != JSON.stringify(currentProduct))
+          if(!currentProduct || !oldProduct || currentProduct.amount != oldProduct.amount || currentProduct.pricePerUnit != oldProduct.pricePerUnit || currentProduct.comment != oldProduct.comment)
             this.productChanges.push({old: oldProduct, current: currentProduct});
 
           productsIds.add(p.id);
@@ -90,6 +90,11 @@ export class OrderChangeReportComponent implements OnInit {
   getProductName(productId: string) {
     const p = this.productService.getProductDetails(productId);
     return p ? p.name : '';
+  }
+
+  getProductUnit(productId: string) {
+    const p = this.productService.getProductDetails(productId);
+    return p ? p.type : null;
   }
 
 }

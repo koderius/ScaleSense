@@ -27,10 +27,6 @@ export class OredersWizardComponent implements OnInit {
 
   ngOnInit() {}
 
-  backToMain() {
-    this.navCtrl.navigateRoot('customer');
-  }
-
   stepClicked(step: number) {
     if(this.maxStep >= step)
       this.goToStep.emit(step);

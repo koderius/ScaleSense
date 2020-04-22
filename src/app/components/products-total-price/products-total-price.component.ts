@@ -1,20 +1,14 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {MetadataService} from '../../services/metadata.service';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-products-total-price',
   templateUrl: './products-total-price.component.html',
   styleUrls: ['./products-total-price.component.scss'],
 })
-export class ProductsTotalPriceComponent implements OnInit {
+export class ProductsTotalPriceComponent {
 
   @Input() price: number;
-  pricePlusVat: number;
 
   constructor() {}
-
-  ngOnInit() {
-    this.pricePlusVat = this.price * MetadataService.VAT;
-  }
 
 }

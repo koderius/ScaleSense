@@ -18,8 +18,12 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {}
 
-  async goToDrafts() {
-    await this.navCtrl.navigateForward('customer/orders-list?mode=drafts');
+  goToDrafts() {
+    this.navCtrl.navigateForward('customer/orders-list?mode=drafts');
+  }
+
+  backToMain() {
+    this.navCtrl.navigateRoot('customer');
   }
 
 }

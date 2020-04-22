@@ -39,7 +39,7 @@ export const checkPayment = functions.https.onCall((data, context) => {});
 
 export const orderUpdate = functions.https.onCall(async (order: OrderDoc, context) => {
 
-  return await admin.firestore().runTransaction(async (transaction)=>{
+  return await admin.firestore().runTransaction<OrderChange>(async (transaction)=>{
 
     // Get the user data, and his business belonging
     const uid = context.auth ? context.auth.uid : '';
@@ -112,7 +112,7 @@ export const orderUpdate = functions.https.onCall(async (order: OrderDoc, contex
       orderId: order.id,
     });
 
-    return true;
+    return changes;
 
   });
 

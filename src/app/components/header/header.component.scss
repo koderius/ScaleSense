@@ -76,3 +76,9 @@ $content-max-width: 1200px;
     user-select: none;
   }
 }
+
+#back-btn {
+  position: absolute;
+  left: calc((100% - 500px)/2 - 15em);
+  bottom: 1em;
+}

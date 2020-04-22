@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OrderDoc, OrderStatus} from '../models/OrderI';
+import {OrderChange, OrderDoc, OrderStatus} from '../models/OrderI';
 import {ProductsService} from './products.service';
 import {formatNumber} from '@angular/common';
 import * as firebase from 'firebase/app';
@@ -179,10 +179,14 @@ export class OrdersService {
 
     try {
 
-      const res = (await updateOrder(order.getDocument())).data;
+      const res = (await updateOrder(order.getDocument())).data as OrderChange;
 
-      if(res && order.status == OrderStatus.DRAFT)
-        this.deleteDraft(order.id);
+      if(res) {
+        order.changes.push(res);
+        // Delete the draft if it was draft
+        if(order.status == OrderStatus.DRAFT)
+          this.deleteDraft(order.id);
+      }
 
       return order;
 

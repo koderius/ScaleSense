@@ -11,9 +11,9 @@
     <p>מק"ט: {{product.nid}}</p>
     <h6>
       <ion-text>מחיר ל</ion-text>
-      <ion-text>{{product.type | unitName : 1}}</ion-text>
+      <ion-text>{{null | unitAmount : product.type}}</ion-text>
       <ion-text> | </ion-text>
-      <ion-text>{{product.price | number : '1.2-2'}}</ion-text>
+      <ion-text>{{product.price | price}}</ion-text>
     </h6>
   </ion-label>
   <div class="item-amount">

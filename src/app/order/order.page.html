@@ -177,7 +177,7 @@
         <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}" [disabled]="!isEdit"></ion-textarea>
       </div>
 
-      <div id="history" *ngIf="order.changes.length">
+      <div id="history" *ngIf="!isEdit && order.changes.length">
         <h1>
           <ion-text color="primary" class="ion-padding">היסטוריית הזמנה</ion-text>
         </h1>

@@ -5,7 +5,7 @@ import {HeaderComponent} from './header/header.component';
 import {OredersWizardComponent} from './orders-wizard/oreders-wizard.component';
 import {NgSelectComponent, NgSelectModule} from 'ng-custom-select';
 import {HighlightifyPipe} from '../pipes/highlightify.pipe';
-import {UnitNamePipe} from '../pipes/unit-name.pipe';
+import {UnitAmountPipe} from '../pipes/unit-name.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
   MatDatepickerModule,
@@ -15,7 +15,7 @@ import {
   MatNativeDateModule
 } from '@angular/material';
 import {UserNamePipe} from '../pipes/user-name.pipe';
-import {OrderChangePipe} from '../pipes/order-change.pipe';
+import {PricePipe} from '../pipes/price.pipe';
 
 
 
@@ -34,10 +34,10 @@ import {OrderChangePipe} from '../pipes/order-change.pipe';
     HeaderComponent,
     OredersWizardComponent,
     HighlightifyPipe,
-    UnitNamePipe,
+    UnitAmountPipe,
     OrderStatusTextPipe,
     UserNamePipe,
-    OrderChangePipe,
+    PricePipe,
   ],
   exports: [
     MatFormFieldModule,
@@ -49,10 +49,10 @@ import {OrderChangePipe} from '../pipes/order-change.pipe';
     OredersWizardComponent,
     NgSelectComponent,
     HighlightifyPipe,
-    UnitNamePipe,
+    UnitAmountPipe,
     OrderStatusTextPipe,
     UserNamePipe,
-    OrderChangePipe,
+    PricePipe,
   ],
 })
 export class ComponentsModule { }
