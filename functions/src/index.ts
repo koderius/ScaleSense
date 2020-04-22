@@ -119,116 +119,61 @@ export const orderUpdate = functions.https.onCall(async (order: OrderDoc, contex
 });
 
 
-// /**
-//  * Update order data.
-//  * It compares the changes between the old and the new version of the order, adds them to the order's history (changes) list and sends a notification to the other side
-//  * * If the order is a draft, it's status changed to 'sent' and it's added to the order list (no other changes are being compared)
-//  * Notification with the changes being made is sent to the other side (customer or supplier)
-//  */
-// export const updateOrder = functions.https.onCall(async (newData: OrderDoc, context) => {
-//
-//   if(newData && newData.id && context && context.auth && context.auth.uid) {
-//
-//     return await admin.firestore().runTransaction<boolean>(async (transaction)=>{
-//
-//       // Get the user data, and his business belonging
-//       const uid = context.auth ? context.auth.uid : '';
-//       const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
-//       const side = userData ? userData.side : '';
-//       const bid = userData ? userData.bid : '';
-//
-//       // TODO: Check permissions of this user
-//
-//       const orderRef = admin.firestore().collection('orders').doc(newData.id || '');
-//
-//       const timestamp = admin.firestore.Timestamp.now().toMillis();
-//
-//       // Create a changes report object (who and when)
-//       const changes: OrderChange = {
-//         by: uid,
-//         side: side,
-//         time: timestamp,
-//       };
-//
-//       // For draft - change to status to sent
-//       if(newData.status === 0) {
-//         newData.cid = bid;
-//         newData.status = 10;
-//         changes.statusChange = {old: 0, new: 10};
-//       }
-//
-//       // For opened order - check changes between old data and new data
-//       else {
-//
-//         // Get old data of the order
-//         const oldData = (await transaction.get(orderRef)).data() as OrderDoc;
-//
-//         // Check changes in general order details
-//         if(oldData.status != newData.status)
-//           changes.statusChange = {old: oldData.status || 0, new: newData.status || 0};
-//         if(oldData.supplyTime != newData.supplyTime)
-//           changes.supplyTimeChange = {old: oldData.supplyTime || NaN, new: newData.supplyTime || NaN};
-//         if(oldData.comment != newData.comment)
-//           changes.commentToSupplierChange = {old: oldData.comment || '', new: newData.comment || ''};
-//
-//         // Check changes in products list
-//         changes.productsChanges = [];
-//
-//         // Get a list of all products IDs
-//         const allProducts = new Set<string>();
-//         [...(newData.products || []), ...(oldData.products || [])].forEach((p)=>{allProducts.add(p.id)});
-//
-//         // Check differences between each product
-//         allProducts.forEach((id)=>{
-//
-//           const oldProduct = (oldData.products || []).find((p)=>p.id == id);
-//           const newProduct = (newData.products || []).find((p)=>p.id == id);
-//
-//           // If there are differences, add the old version and the new version
-//           if(!newProduct || !oldProduct || newProduct.amount != oldProduct.amount || newProduct.pricePerUnit != oldProduct.pricePerUnit || newProduct.comment != oldProduct.comment)
-//             (changes.productsChanges || []).push({old: oldProduct || null, new: newProduct || null});
-//
-//         });
-//
-//         // Update the price if there are changes in the products list
-//         if(changes.productsChanges && changes.productsChanges.length) {
-//           const calcPrice = (products: ProductOrder[])=>{
-//             let sum = 0;
-//             products.forEach((po)=>{
-//               sum += ((po.pricePerUnit || 0) * (po.amount || 0));
-//             });
-//             return sum;
-//           };
-//           changes.priceChange = {old: calcPrice(oldData.products || []), new: calcPrice(newData.products || [])};
-//         }
-//
-//       }
-//
-//
-//       // TODO: Can be more secured by saving only the allowed fields:
-//       // Save the new data with the changes list
-//       await transaction.set(orderRef, {
-//         ...newData,
-//         changes: admin.firestore.FieldValue.arrayUnion(changes),
-//         modified: timestamp,
-//       }, {merge: true});
-//
-//       // If the changes were made by the customer, add a notification to the supplier, and v.v.
-//       const ref = side == 'c'
-//         ? admin.firestore().collection('suppliers').doc(newData.sid || '').collection('my_notifications')
-//         : admin.firestore().collection('customers').doc(newData.cid || '').collection('my_notifications');
-//
-//       await transaction.set(ref.doc(), {
-//         ...changes,
-//         orderId: newData.id,
-//       });
-//
-//       return true;
-//
-//     });
-//
-//   }
-//
-//   return false;
-//
-// });
+/**
+ * Cancel an order according to the given ID.
+ * Order can be cancel by both customer or supplier.
+ * The function check that the user is under the business that the order belongs to, and that the user has permission to cancel orders
+ */
+export const cancelOrder = functions.https.onCall(async (orderId, context) => {
+
+  return await admin.firestore().runTransaction<OrderChange | null>(async transaction => {
+
+    // Get the user data, and his business belonging
+    const uid = context.auth ? context.auth.uid : '';
+    const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
+    const side = userData ? userData.side : '';
+    const bid = userData ? userData.bid : '';
+
+    // TODO: Check permissions of this user
+
+    const orderRef = admin.firestore().collection('orders').doc(orderId);
+    const cid = (await transaction.get(orderRef)).get('cid');
+    const sid = (await transaction.get(orderRef)).get('sid');
+
+    // Check order is connected to the business of the user
+    if((side == 'c' ? cid : sid) == bid) {
+
+      // Create a changes report object
+      const changes: OrderChange = {
+        by: uid,
+        side: side,
+        time: admin.firestore.Timestamp.now().toMillis(),
+        status: 40 + (side == 's' ? 1 : 2),
+      };
+
+      // Set the order with the new status, and add the change report
+      transaction.update(orderRef,{
+        status: changes.status,
+        changes: admin.firestore.FieldValue.arrayUnion(changes),
+      });
+
+      // If the changes were made by the customer, add a notification to the supplier, and v.v.
+      const ref = side == 'c'
+        ? admin.firestore().collection('suppliers').doc(sid || '').collection('my_notifications')
+        : admin.firestore().collection('customers').doc(cid || '').collection('my_notifications');
+
+      // Send notification with change data + order ID
+      await transaction.create(ref.doc(), {
+        ...changes,
+        orderId: orderId,
+      });
+
+      return changes;
+
+    }
+
+    return null;
+
+  })
+
+});
