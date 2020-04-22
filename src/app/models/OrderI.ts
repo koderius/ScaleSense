@@ -27,6 +27,8 @@ export type OrderChange = {
   /** Time of change */
   time: number;
 
+  status: OrderStatus;
+
   data?: string;
 
   /** The ID of the order that these changes belongs to - for notifications */
@@ -34,15 +36,15 @@ export type OrderChange = {
 
   /** Changes in the order */
 
-  statusChange?: {old: number, new: number};
-
-  productsChanges?: {old: ProductOrder | null, new: ProductOrder | null}[];
-
-  supplyTimeChange?: {old: number, new: number};
-
-  commentToSupplierChange?: {old: string, new: string};
-
-  priceChange?: {old: number, new: number};
+  // statusChange?: {old: number, new: number};
+  //
+  // productsChanges?: {old: ProductOrder | null, new: ProductOrder | null}[];
+  //
+  // supplyTimeChange?: {old: number, new: number};
+  //
+  // commentToSupplierChange?: {old: string, new: string};
+  //
+  // priceChange?: {old: number, new: number};
 
 }
 

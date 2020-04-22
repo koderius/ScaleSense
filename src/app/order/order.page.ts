@@ -304,7 +304,9 @@ export class OrderPage implements OnInit {
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח לספק עדכון הזמנה?')) {
 
       const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה לספק...' : 'מעדכן הזמנה...');
-      if(await this.ordersService.updateOrder(this.order)) {
+      const res = await this.ordersService.updateOrder(this.order);
+      if(res) {
+        this.order = res;
         this.updateChanges();
         if(this.order.status == OrderStatus.DRAFT)
           this.orderSent = true;

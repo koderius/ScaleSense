@@ -11,6 +11,7 @@ import {ComponentsModule} from '../components/components.module';
 import {ProductToCartComponent} from '../components/product-to-cart/product-to-cart.component';
 import {ProductSummeryComponent} from '../components/product-summery/product-summery.component';
 import {ProductsTotalPriceComponent} from '../components/products-total-price/products-total-price.component';
+import {OrderChangeReportComponent} from '../components/order-change-report/order-change-report.component';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import {ProductsTotalPriceComponent} from '../components/products-total-price/pr
     ProductToCartComponent,
     ProductSummeryComponent,
     ProductsTotalPriceComponent,
+    OrderChangeReportComponent,
   ]
 })
 export class OrderPageModule {}

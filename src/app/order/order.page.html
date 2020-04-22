@@ -182,21 +182,13 @@
           <ion-text color="primary" class="ion-padding">היסטוריית הזמנה</ion-text>
         </h1>
 
-<!--        <ol>-->
-<!--          <li *ngFor="let change of order.changes">-->
-<!--            <div [innerHTML]="change | orderChange | async"></div>-->
-<!--            <p>-->
-<!--              <ion-text>{{i+1}}. </ion-text>-->
-<!--              <ion-text>בתאריך {{change.time | date : 'dd/MM/yyyy'}}</ion-text>-->
-<!--              <ion-text> בוצע שינוי ע"י </ion-text>-->
-<!--              <ion-text style="font-weight: bold">{{change.by | userName | async}}.</ion-text>-->
-<!--            </p>-->
-<!--            <p>-->
-<!--              <ion-text style="font-weight: bold">- מהות השינוי: </ion-text>-->
-<!--&lt;!&ndash;              <ion-text>{{changeText(change)}}</ion-text>&ndash;&gt;-->
-<!--            </p>-->
-<!--          </li>-->
-<!--        </ol>-->
+        <ol>
+          <li *ngFor="let change of order.changes; let i = index">
+            <app-order-change-report [change]="change"
+                                     [previousChangeData]="i > 0 ? order.changes[i-1].data : null">
+            </app-order-change-report>
+          </li>
+        </ol>
 
       </div>
 

@@ -146,7 +146,7 @@ export class OrdersService {
     try {
       const metadata = (await this.myOrdersMetadataRef.get()).data();
       const tempSerial = OrdersService.createNewSerial(metadata ? metadata['lastSerial'] : '', true);
-      return new Order({serial: tempSerial});
+      return new Order({serial: tempSerial, created: Date.now()});
     }
     catch (e) {
       console.error(e);
@@ -169,8 +169,14 @@ export class OrdersService {
   }
 
 
-  async updateOrder(order: Order) : Promise<boolean> {
+  async updateOrder(order: Order) : Promise<Order> {
+
     const updateOrder = firebase.functions().httpsCallable('orderUpdate');
+
+    // If it's new order, save it as draft first
+    if(!order.id)
+      order = await this.saveDraft(order);
+
     try {
 
       const res = (await updateOrder(order.getDocument())).data;
@@ -178,7 +184,7 @@ export class OrdersService {
       if(res && order.status == OrderStatus.DRAFT)
         this.deleteDraft(order.id);
 
-      return res;
+      return order;
 
     }
     catch (e) {

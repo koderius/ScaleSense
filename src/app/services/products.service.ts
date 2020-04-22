@@ -43,7 +43,7 @@ export class ProductsService {
   async loadProductsDetails(ids: string[]) : Promise<void> {
 
     // Don't load again products that have already been loaded
-    ids.filter((id)=>{
+    ids = ids.filter((id)=>{
       if(this._loadedProducts.has(id))
         return false;
       else {
@@ -53,13 +53,13 @@ export class ProductsService {
     });
 
     // Get first 10 IDs that need to be loaded (firestore limitation of query by IDs)
-    const tenIds = ids.splice(10);
+    const tenIds = ids.splice(0,10);
 
     // If there are more than 10 IDs, upload the remaining
     if(ids.length)
       this.loadProductsDetails(ids);
 
-    // Load the remaining IDs from the server
+    //Load the remaining IDs from the server
     if(tenIds.length) {
 
       // Query one or multiple (up to 10)
@@ -76,8 +76,10 @@ export class ProductsService {
 
   }
 
-  getProductDetails(id: string) {
-    return this.loadProductsDetails([id]);
+  getProductDetails(id: string, load?: boolean) {
+    if(!this._loadedProducts.has(id))
+      this.loadProductsDetails([id]);
+    return this._loadedProducts.get(id);
   }
 
 }
