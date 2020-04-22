@@ -273,8 +273,23 @@ export class OrderPage implements OnInit {
     this.navCtrl.navigateRoot('customer');
   }
 
-  editProduct() {
-    alert('מה הכפתור הזה אמור לעשות?');
+  selectProductInput(productId: string) {
+
+    setTimeout(()=>{
+
+      // Get the index of the product in the shown products list
+      const productIdx = (this.filteredSupplierProducts || this.supplierProducts).findIndex((p)=>p.id == productId);
+
+      // Get the product element, and select its input
+      const product = document.getElementsByTagName('app-product-to-cart')[productIdx];
+      product.getElementsByTagName('input')[0].select();
+
+    }, this.page == 2 ? 0 : 500);
+
+    if(this.page !== 2)
+      this.page = 2;
+
+
   }
 
   async saveDraft() : Promise<boolean> {

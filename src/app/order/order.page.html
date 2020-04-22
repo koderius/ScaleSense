@@ -96,7 +96,7 @@
                                    [productDetails]="findProductDetails(product.id)"
                                    [isEdit]="true"
                                    (clearClicked)="order.setProductAmount(product.id, 0, null)"
-                                   (editClicked)="editProduct()"
+                                   (editClicked)="selectProductInput(product.id)"
               ></app-product-summery>
 
               <app-products-total-price [price]="order.orderTotalPrice()"></app-products-total-price>
@@ -142,7 +142,7 @@
                 [isEdit]="isEdit"
                 [withComments]="true"
                 (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? page = 2 : ''"
-                (editClicked)="editProduct()"
+                (editClicked)="selectProductInput(product.id)"
         ></app-product-summery>
 
         <ion-item lines="none" *ngIf="order.products.length">
