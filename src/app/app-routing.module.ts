@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import {appEnterGuard} from './app-enter-guard.service';
 
 const routes: Routes = [
 
@@ -12,7 +13,9 @@ const routes: Routes = [
   /** Customer main page. The customer app is under the customer routing */
   {
     path: 'customer',
-    loadChildren: () => import('./customer/customer.module').then( m => m.CustomerPageModule)
+    loadChildren: () => import('./customer/customer.module').then( m => m.CustomerPageModule),
+    canActivateChild: [appEnterGuard],
+    data: {side: 'c'}
   },
 ];
 

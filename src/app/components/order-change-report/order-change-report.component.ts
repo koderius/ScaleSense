@@ -35,12 +35,11 @@ export class OrderChangeReportComponent implements OnInit {
 
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
 
     // Get the user name if on the same side, or a generic name of the other side
-    // this.user = this.authService.currentUser.side == change.side ? await this.authService.getUserDoc(change.by) : null;
-    // this.userName = user ? `<b>${user.displayName}</b>` : (this.authService.currentUser.side == 'c' ? 'הלקוח' : 'הספק');
-    this.userName = 'הספק'; // TODO
+    const user = this.authService.currentUser.side == this.change.side ? (await this.authService.getUserDoc(this.change.by)) : null;
+    this.userName = user ? `<b>${user.displayName}</b>` : (this.authService.currentUser.side == 'c' ? 'הלקוח' : 'הספק');
 
     switch (this.change.status) {
       case OrderStatus.SENT: this.action = 'ההזמנה נשלחה ע"י'; break;

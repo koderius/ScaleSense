@@ -92,11 +92,12 @@ export class AuthService {
           this.myDocSubscription = this.userProfileDoc(user.uid).onSnapshot(snapshot => {
             const data = snapshot.data() as UserDoc;
             if(data) {
-              // On the first document snapshot, update the UI that the user is ready
-              if(!this._currentUserDoc)
-                this.onUserReady.emit(user);
-              // Update user document anyway
+              // Update user document
+              const first = !this._currentUserDoc;
               this._currentUserDoc = data;
+              // On the first document snapshot, update the UI that the user is ready
+              if(first)
+                this.onUserReady.emit(user);
             }
           });
         }
@@ -133,7 +134,8 @@ export class AuthService {
 
   /** Get the current user document (null if no signed in user or the user is not verified or the document is not exist/ready) */
   get currentUser(): UserDoc | null {
-    return this._user && this._user.emailVerified && this._currentUserDoc ? {...this._currentUserDoc} : null;
+    return this._user && (this._user.emailVerified || true) && this._currentUserDoc ? {...this._currentUserDoc} : null;
+    //                               TODO: delete this ^
   }
 
 

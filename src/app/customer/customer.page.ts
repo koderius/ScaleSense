@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {NavController} from '@ionic/angular';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-customer',
@@ -12,7 +13,16 @@ export class CustomerPage implements OnInit {
 
   constructor(
     private navCtrl: NavController,
-  ) { }
+    private authService: AuthService,
+  ) {
+
+    // TODO: Delete this. Test user
+    this.authService.onUserReady.subscribe((user)=>{
+      if(!user)
+        this.authService.signInWithEmail('mestroti@gmail.com','123456');
+    })
+
+  }
 
   ngOnInit() {}
 

@@ -2,7 +2,8 @@
 
   <p id="header">
     <i dir="ltr"><ion-text color="dark">{{change.time | date : 'dd/MM/yyyy HH:mm'}}</ion-text></i>
-    <ion-text>: {{action}} {{userName}}. </ion-text>
+    <ion-text>: {{action}} </ion-text>
+    <ion-text [innerHTML]="userName"></ion-text>.
     <a *ngIf="hasDetails" (click)="showMore = !showMore">{{showMore ? 'הסתר פרטים' : 'הצג פרטים'}}</a>
   </p>
 
