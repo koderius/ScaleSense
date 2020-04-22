@@ -312,7 +312,17 @@ export class OrderPage implements OnInit {
   async sendOrder() {
 
     if(!this.order.supplyTime) {
-      alert('יש למלא תאריך הזמנה');
+      alert('יש למלא תאריך הזמנה.');
+      return;
+    }
+
+    if(this.order.supplyTime <= Date.now()) {
+      alert('לא ניתן להזין זמן אספקה שכבר עבר.');
+      return;
+    }
+
+    if(!this.order.products.length) {
+      alert('לא נבחרו מוצרים.');
       return;
     }
 
