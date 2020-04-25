@@ -28,7 +28,9 @@ export class OrdersService {
    * */
   static readonly TEMP_SERIAL_SUFFIX = '*';
 
-  ordersRef = firebase.firestore().collection('orders');
+  readonly ordersRef = firebase.firestore().collection('orders');
+
+  readonly updateOrderCloudFunction = firebase.functions().httpsCallable('updateOrder');
 
   /** The reference to the firestore collection where the list of orders is stored */
   private _myOrders: OrderDoc[] = [];
@@ -172,15 +174,13 @@ export class OrdersService {
 
   async updateOrder(order: Order) : Promise<OrderChange> {
 
-    const updateOrder = firebase.functions().httpsCallable('orderUpdate');
-
     // If it's new order, save it as draft first
     if(!order.id)
       order = await this.saveDraft(order);
 
     try {
 
-      const res = (await updateOrder(order.getDocument())).data as OrderChange;
+      const res = (await this.updateOrderCloudFunction(order.getDocument())).data as OrderChange;
 
       if(res) {
         // Delete the draft if it was draft
@@ -197,16 +197,17 @@ export class OrdersService {
 
 
   /** Cancel order by its ID */
-  async cancelOrder(orderId: string) : Promise<OrderChange> {
-    const cancelOrder = firebase.functions().httpsCallable('cancelOrder');
+  async changeOrderStatus(orderId: string, status: OrderStatus) : Promise<OrderChange> {
+
     try {
-      const res = (await cancelOrder(orderId)).data as OrderChange;
+      const res = (await this.updateOrderCloudFunction({id: orderId, status: status})).data as OrderChange;
       if(res)
         return res;
     }
     catch (e) {
       console.error(e);
     }
+
   }
 
 

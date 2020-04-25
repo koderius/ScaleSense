@@ -2,13 +2,15 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
-import {OrderStatus} from '../models/OrderI';
+import {OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
+import * as _ from 'lodash';
+import {Objects} from '../utilities/objects';
 
 @Component({
   selector: 'app-order',
@@ -21,7 +23,7 @@ export class OrderPage implements OnInit {
   order: Order;
 
   /** The JSON of the order as it was when the page loaded - to check changes */
-  originalOrder: string;
+  originalOrder: OrderDoc;
 
   /** The key on the local storage where the data of an unsaved order is being stored */
   readonly TEMP_DATA_KEY = 'scale-sense_TempOrderData-';
@@ -156,9 +158,6 @@ export class OrderPage implements OnInit {
       }
     }
 
-    // Keep the original order to check changes
-    this.originalOrder = JSON.stringify(this.order);
-
     // Check whether the order had sudden close before, and ask whether to load it
     if(this.isEdit) {
       const tempAutoSave = localStorage.getItem(this.TEMP_DATA_KEY + orderId);
@@ -170,8 +169,11 @@ export class OrderPage implements OnInit {
         this.updateChanges();
     }
 
+    // Keep the original order to check changes
+    this.originalOrder = this.order.getDocument();
+
     // Get the details of the products that are in this order (if there are)
-    this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));   //TODO: This will load only the first 10 - do pagination
+    this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));
 
     // Start auto saving the order data on the local storage every 3 seconds for backup
     // Save as long as there are changes being made since the last save. clear the backup when saving or when leaving safely through a guard
@@ -191,12 +193,15 @@ export class OrderPage implements OnInit {
 
   /** Check whether the order details has changed since the last save */
   orderHasChanged(): boolean {
-    return this.originalOrder != JSON.stringify(this.order);
+    const orderDoc = this.order.getDocument();
+    this.sortProductsByName(orderDoc.products);
+    this.sortProductsByName(this.originalOrder.products);
+    return !Objects.IsEqual(JSON.parse(JSON.stringify(orderDoc)), JSON.parse(JSON.stringify(this.originalOrder)));
   }
 
   updateChanges() {
     // Update the original order for checking further changes
-    this.originalOrder = JSON.stringify(this.order);
+    this.originalOrder = this.order.getDocument();
     // Clear the backup auto save
     localStorage.removeItem(this.TEMP_DATA_KEY + this.order.id);
     localStorage.removeItem(this.TEMP_DATA_KEY + 'new');
@@ -299,6 +304,25 @@ export class OrderPage implements OnInit {
 
   }
 
+  /** Sort by name (if names are equal sort by ID, just for having a constant order) */
+  sortProductsByName(products: ProductOrder[]) {
+    return products.sort((a, b)=>{
+      const p1 = this.productsService.getProductDetails(a.id);
+      const p2 = this.productsService.getProductDetails(b.id);
+      if(p1.name > p2.name)
+        return 1;
+      if(p1.name < p2.name)
+        return -1;
+      else {
+        if(p1.id > p2.id)
+          return 1;
+        if(p1.id < p2.id)
+          return -1;
+        return 0;
+      }
+    });
+  }
+
   async saveDraft() : Promise<boolean> {
 
     // Save draft on server
@@ -353,7 +377,7 @@ export class OrderPage implements OnInit {
 
   async cancelOrder() {
     const l = this.alerts.loaderStart('מבטל הזמנה...');
-    const change = await this.ordersService.cancelOrder(this.order.id);
+    const change = await this.ordersService.changeOrderStatus(this.order.id, OrderStatus.CANCELED_BY_CUSTOMER);
     this.alerts.loaderStop(l);
     if(change) {
       this.order.changes.push(change);

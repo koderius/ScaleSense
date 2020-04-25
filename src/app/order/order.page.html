@@ -91,7 +91,7 @@
             </ion-list-header>
 
             <div *ngIf="order.products.length">
-              <app-product-summery *ngFor="let product of order.products"
+              <app-product-summery *ngFor="let product of sortProductsByName(order.products)"
                                    [productOrder]="product"
                                    [productDetails]="findProductDetails(product.id)"
                                    [isEdit]="true"
@@ -136,7 +136,7 @@
     <div *ngIf="!orderSent">
       <ion-list id="order-list">
         <app-product-summery
-                *ngFor="let product of order.products"
+                *ngFor="let product of sortProductsByName(order.products)"
                 [productOrder]="product"
                 [productDetails]="findProductDetails(product.id)"
                 [isEdit]="isEdit"
@@ -199,7 +199,7 @@
           <ion-button shape="round" color="dark" *ngIf="!isDraft && isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="isEdit" (click)="sendOrder()">
+          <ion-button shape="round" strong="true" *ngIf="isEdit" (click)="sendOrder()" [disabled]="!orderHasChanged()">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="!isDraft">שמירת שינויים ו</ion-text>
             <ion-text>שליחת הזמנה לספק</ion-text>

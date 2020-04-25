@@ -41,7 +41,7 @@ export class Order {
   }
 
   get products(): ProductOrder[] {
-    return this._props.products ? this._props.products.slice() : [];
+    return this._props.products ? this._props.products : [];
   }
 
   getProductById(id: string): ProductOrder {

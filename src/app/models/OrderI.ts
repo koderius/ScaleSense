@@ -27,7 +27,7 @@ export type OrderChange = {
   /** Time of change */
   time: number;
 
-  status: OrderStatus;
+  status?: OrderStatus;
 
   data?: string;
 
