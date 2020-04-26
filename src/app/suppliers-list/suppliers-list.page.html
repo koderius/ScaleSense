@@ -47,9 +47,9 @@
             <ion-img [src]="supplier.logo" class="ion-margin-end"></ion-img>
             <ion-text>{{supplier.name}}</ion-text>
           </ion-col>
-          <ion-col>{{supplier.nid}}</ion-col>
-          <ion-col>{{supplier.contactName}}</ion-col>
-          <ion-col>{{supplier.phoneNumber}}</ion-col>
+          <ion-col>{{supplier.nid | number : '3.0-0'}}</ion-col>
+          <ion-col>{{(supplier.contacts && supplier.contacts[0]) ? supplier.contacts[0].name : ''}}</ion-col>
+          <ion-col>{{(supplier.contacts && supplier.contacts[0]) ? supplier.contacts[0].phone : ''}}</ion-col>
           <ion-col size="1">
             <ion-button fill="clear" color="dark" (click)="navService.goToEditSupplier(supplier.id)">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>

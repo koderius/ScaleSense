@@ -4,36 +4,26 @@ export type BusinessSide = 'c' | 's';
 
 export interface BusinessDoc {
 
-  id: string;
-  name: string;
-  logo: string;
+  id?: string;
   nid?: number;
+  name?: string;
 
-  /** Contact data from the manager (?) */
-  contactName: string;
-  email: string;
-  phoneNumber: string;
-  email2?: string;
-  phoneNumber2?: string;
-
-  /** Additional business details */
-  address: string;
+  logo?: string;
+  address?: string;
   businessPhone?: string;
   fax?: string;
   companyId?: string;
   accountancyEmail?: string;
 
-}
+  contacts?: ContactInfo[];
 
-export interface CustomerDoc extends BusinessDoc {
-
-  /** List of suppliers */
-  mySuppliers: string[];
+  created?: number;
+  modified?: number;
 
 }
 
-export interface SupplierDoc extends BusinessDoc {
-
-
-
+export type ContactInfo = {
+  name?: string;
+  email?: string;
+  phone?: string;
 }

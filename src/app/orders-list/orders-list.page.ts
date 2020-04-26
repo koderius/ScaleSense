@@ -1,7 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
-import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
@@ -13,7 +12,9 @@ import {NavigationService} from '../services/navigation.service';
   templateUrl: './orders-list.page.html',
   styleUrls: ['./orders-list.page.scss'],
 })
-export class OrdersListPage implements OnInit {
+export class OrdersListPage implements OnInit, OnDestroy {
+
+  paramsSubscription;
 
   OrderStatus = OrderStatus;
 
@@ -39,7 +40,7 @@ export class OrdersListPage implements OnInit {
   async ngOnInit() {
 
     // Get the page mode (type of list) from the URL query parameter 'mode'. Default is 'view'
-    this.activatedRoute.queryParams.subscribe((params)=>{
+    this.paramsSubscription = this.activatedRoute.queryParams.subscribe((params)=>{
 
       const modeParam = params['mode'] || '';
       if(['view','edit','drafts','receive'].includes(modeParam))
@@ -52,6 +53,10 @@ export class OrdersListPage implements OnInit {
 
     });
 
+  }
+
+  ngOnDestroy() {
+    this.paramsSubscription();
   }
 
   goBack() {

@@ -30,6 +30,9 @@ export class SuppliersService {
 
   }
 
+  get suppliersMetadata() {
+    return this.businessService.businessDocRef.collection('metadata').doc('suppliers');
+  }
 
   /** The reference to the firestore collection where the list of suppliers is stored */
   get mySuppliersRef() : CollectionReference {
@@ -45,7 +48,7 @@ export class SuppliersService {
 
   /** Get supplier from the list by his ID */
   getSupplierById(id: string) : BusinessDoc | null {
-    return this._mySuppliers.find((s)=>s.id == id);
+    return {...this._mySuppliers.find((s)=>s.id == id)};
   }
 
 
@@ -97,6 +100,26 @@ export class SuppliersService {
     catch (e) {
       console.error(e);
     }
+  }
+
+  async saveSupplierDoc(supplierDoc: BusinessDoc) {
+
+    try {
+      await firebase.firestore().runTransaction(async transaction =>{
+        // TODO: Make rules
+        const serial = (await transaction.get(this.suppliersMetadata)).get('numOfSuppliers') || 0;
+        supplierDoc.nid = serial + 1;
+        if(!supplierDoc.id)
+          supplierDoc.id = this.mySuppliersRef.doc().id;
+        await transaction.set(this.mySuppliersRef.doc(supplierDoc.id), supplierDoc, {merge: true});
+        transaction.set(this.suppliersMetadata, {'numOfSuppliers': firebase.firestore.FieldValue.increment(1)}, {merge: true});
+
+      });
+    }
+    catch (e) {
+      console.error(e);
+    }
+
   }
 
 }

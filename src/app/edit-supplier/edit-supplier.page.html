@@ -1,9 +1,142 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>editSupplier</ion-title>
-  </ion-toolbar>
+  <app-header [pageTitle]="pageTitle"></app-header>
 </ion-header>
 
 <ion-content>
+
+  <div class="page-container" *ngIf="supplier">
+
+    <div id="forms">
+
+      <div class="form">
+        <p class="form-title">פרטי ספק</p>
+        <div class="inputs">
+
+          <ion-row class="input-div">
+            <ion-col size="3" required>מספר ספק</ion-col>
+            <ion-col>
+              <ion-input disabled [value]="(supplier.nid || temporalSerial) | number : '3.0-0'"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div">
+            <ion-col size="3" required>שם הספק</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.name"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div">
+            <ion-col size="3" required>תמונה</ion-col>
+            <ion-col style="padding: 0; display: flex; align-items: center">
+              <ion-button shape="round" color="secondary" (click)="fileInput.click()">העלאת תמונה</ion-button>
+              <input class="ion-hide" type="file" #fileInput>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div">
+            <ion-col size="3" required>ח.פ</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.companyId" type="number"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div">
+            <ion-col size="3">כתובת</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.address"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div">
+            <ion-col size="3">מספר טלפון</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.businessPhone" type="tel"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div">
+            <ion-col size="3">מספר פקס</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.fax" type="tel"></ion-input>
+            </ion-col>
+          </ion-row>
+
+        </div>
+      </div>
+
+      <div class="form">
+        <p class="form-title">פרטי איש קשר</p>
+        <div class="inputs">
+
+          <ion-row class="input-div" *ngIf="supplier.contacts[0]">
+            <ion-col size="3" required>איש קשר</ion-col>
+            <ion-col>
+              <ion-input [ngModel]="supplier.contacts[0].name"></ion-input>
+            </ion-col>
+            <ion-col size="1" style="padding: 0">
+              <ion-fab-button size="small" (click)="supplier.contacts.push({})" [disabled]="supplier.contacts.length > 1 || !(supplier.contacts[0].name && (supplier.contacts[0].phone || supplier.contacts[0].email))" title="איש קשר נוסף">
+                <ion-icon name="add"></ion-icon>
+              </ion-fab-button>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div" *ngIf="supplier.contacts[0]">
+            <ion-col size="3" required>נייד</ion-col>
+            <ion-col>
+              <ion-input [ngModel]="supplier.contacts[0].phone" type="tel"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div" *ngIf="supplier.contacts[0]">
+            <ion-col size="3" required>דוא"ל</ion-col>
+            <ion-col>
+              <ion-input [ngModel]="supplier.contacts[0].email" type="email"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div" *ngIf="supplier.contacts[1]">
+            <ion-col size="3">איש קשר נוסף</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.contacts[1].name"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div" *ngIf="supplier.contacts[1]">
+            <ion-col size="3">נייד</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.contacts[1].phone" type="tel"></ion-input>
+            </ion-col>
+          </ion-row>
+
+          <ion-row class="input-div" *ngIf="supplier.contacts[1]">
+            <ion-col size="3">דוא"ל</ion-col>
+            <ion-col>
+              <ion-input [(ngModel)]="supplier.contacts[1].email" type="email"></ion-input>
+            </ion-col>
+          </ion-row>
+
+        </div>
+      </div>
+
+    </div>
+
+    <ion-row id="bottom-section">
+      <ion-col>
+        <p *ngIf="supplier.created">
+          <ion-text>תאריך הקמה: </ion-text>
+          <ion-text>{{supplier.created}}</ion-text>
+        </p>
+        <p *ngIf="supplier.modified">
+          <ion-text>תאריך עדכון: </ion-text>
+          <ion-text>{{supplier.modified}}</ion-text>
+        </p>
+      </ion-col>
+      <ion-col>
+        <ion-button shape="round" class="ion-float-end" (click)="save()">שמירת נתונים</ion-button>
+      </ion-col>
+    </ion-row>
+
+  </div>
 
 </ion-content>

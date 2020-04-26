@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
-import {BusinessDoc, SupplierDoc} from '../models/Business';
+import {BusinessDoc} from '../models/Business';
 import {AlertsService} from '../services/alerts.service';
 
 @Component({
@@ -32,7 +32,7 @@ export class SuppliersListPage implements OnInit {
 
   }
 
-  async deleteSupplier(supplier: SupplierDoc) {
+  async deleteSupplier(supplier: BusinessDoc) {
     if (await this.alerts.areYouSure('האם למחוק את הספק ' + supplier.name + '?')) {
       const l = this.alerts.loaderStart('מוחק ספק...');
       await this.suppliersService.deleteSupplier(supplier.id);
