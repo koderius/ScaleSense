@@ -47,4 +47,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('settings/suppliers-list');
   }
 
+  goToEditSupplier(supplierId: string) {
+    this.navCtrl.navigateForward('settings/edit-supplier/' + supplierId)
+  }
+
 }

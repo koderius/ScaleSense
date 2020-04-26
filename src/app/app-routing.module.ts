@@ -34,10 +34,6 @@ const routes: Routes = [
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
     canActivateChild: [AppEnterGuard],
   },
-  {
-    path: 'edit-supplier',
-    loadChildren: () => import('./edit-supplier/edit-supplier.module').then( m => m.EditSupplierPageModule)
-  },
 
 ];
 

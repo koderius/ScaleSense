@@ -13,7 +13,7 @@
       </ion-searchbar>
 
       <div>
-        <ion-button shape="round" color="secondary" strong="true">
+        <ion-button shape="round" color="secondary" strong="true" (click)="navService.goToEditSupplier('new')">
           <ion-icon slot="start" name="add"></ion-icon>
           <ion-text>הקמת ספק חדש</ion-text>
         </ion-button>
@@ -51,12 +51,12 @@
           <ion-col>{{supplier.contactName}}</ion-col>
           <ion-col>{{supplier.phoneNumber}}</ion-col>
           <ion-col size="1">
-            <ion-button fill="clear" color="dark">
+            <ion-button fill="clear" color="dark" (click)="navService.goToEditSupplier(supplier.id)">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
             </ion-button>
           </ion-col>
           <ion-col size="1">
-            <ion-button class="small-circle-btn" fill="clear" color="secondary">
+            <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="deleteSupplier(supplier)">
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-col>

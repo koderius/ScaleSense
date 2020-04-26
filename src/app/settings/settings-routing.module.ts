@@ -15,6 +15,12 @@ const routes: Routes = [
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
+  {
+    path: 'edit-supplier',
+    loadChildren: () => import('../edit-supplier/edit-supplier.module').then( m => m.EditSupplierPageModule),
+    canActivateChild: [AppEnterGuard],
+    data: {side: 'c'}
+  },
 ];
 
 @NgModule({

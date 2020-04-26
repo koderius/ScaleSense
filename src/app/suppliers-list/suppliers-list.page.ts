@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
-import {BusinessDoc} from '../models/Business';
+import {BusinessDoc, SupplierDoc} from '../models/Business';
+import {AlertsService} from '../services/alerts.service';
 
 @Component({
   selector: 'app-suppliers-list',
@@ -15,6 +16,7 @@ export class SuppliersListPage implements OnInit {
   constructor(
     public suppliersService: SuppliersService,
     public navService: NavigationService,
+    private alerts: AlertsService,
   ) { }
 
   ngOnInit() {}
@@ -28,6 +30,14 @@ export class SuppliersListPage implements OnInit {
     else
       this.filteredSuppliers = null;
 
+  }
+
+  async deleteSupplier(supplier: SupplierDoc) {
+    if (await this.alerts.areYouSure('האם למחוק את הספק ' + supplier.name + '?')) {
+      const l = this.alerts.loaderStart('מוחק ספק...');
+      await this.suppliersService.deleteSupplier(supplier.id);
+      this.alerts.loaderStop(l);
+    }
   }
 
 }

@@ -90,4 +90,13 @@ export class SuppliersService {
 
   }
 
+  async deleteSupplier(id: string) {
+    try {
+      await this.mySuppliersRef.doc(id).delete();
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
 }
