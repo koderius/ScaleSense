@@ -43,4 +43,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('settings');
   }
 
+  goToSuppliersList() {
+    this.navCtrl.navigateForward('settings/suppliers-list');
+  }
+
 }

@@ -7,8 +7,10 @@ export interface BusinessDoc {
   id: string;
   name: string;
   logo: string;
+  nid?: number;
 
   /** Contact data from the manager (?) */
+  contactName: string;
   email: string;
   phoneNumber: string;
   email2?: string;
@@ -20,11 +22,6 @@ export interface BusinessDoc {
   fax?: string;
   companyId?: string;
   accountancyEmail?: string;
-
-  /** BusinessDoc user's IDs by roles */
-  admin: string[];        // Suppose to be only one, but in case of...
-  managers: string[];
-  workers: string[];
 
 }
 

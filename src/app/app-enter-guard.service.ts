@@ -8,7 +8,7 @@ import {AuthService} from './services/auth.service';
 @Injectable({
   providedIn: 'root'
 })
-export class appEnterGuard implements CanActivateChild {
+export class AppEnterGuard implements CanActivateChild {
 
   constructor(private authService: AuthService) {}
 

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import {appEnterGuard} from './app-enter-guard.service';
+import {AppEnterGuard} from './app-enter-guard.service';
 
 const routes: Routes = [
 
@@ -13,26 +13,30 @@ const routes: Routes = [
   {
     path: 'customer',
     loadChildren: () => import('./customer/customer.module').then( m => m.CustomerPageModule),
-    canActivateChild: [appEnterGuard],
+    canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
 
   {
     path: 'order',
     loadChildren: () => import('./order/order.module').then(m => m.OrderPageModule),
-    canActivateChild: [appEnterGuard],
+    canActivateChild: [AppEnterGuard],
   },
 
   {
     path: 'orders-list',
     loadChildren: () => import('./orders-list/orders-list.module').then( m => m.OrdersListPageModule),
-    canActivateChild: [appEnterGuard],
+    canActivateChild: [AppEnterGuard],
   },
 
   {
     path: 'settings',
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
-    canActivateChild: [appEnterGuard],
+    canActivateChild: [AppEnterGuard],
+  },
+  {
+    path: 'edit-supplier',
+    loadChildren: () => import('./edit-supplier/edit-supplier.module').then( m => m.EditSupplierPageModule)
   },
 
 ];

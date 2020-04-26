@@ -20,7 +20,7 @@
           <ion-button color="secondary" shape="round">החל</ion-button>
         </div>
 
-        <div class="item">
+        <div class="item" (click)="navService.goToSuppliersList()">
           <p>עריכת ספקים</p>
         </div>
 
@@ -67,7 +67,7 @@
     </div>
 
     <ion-row>
-      <ion-button shape="round" (click)="goBack()" style="margin: auto">חזרה למסך ראשי</ion-button>
+      <ion-button shape="round" (click)="navService.goToMain()" style="margin: auto">חזרה למסך ראשי</ion-button>
     </ion-row>
 
   </div>

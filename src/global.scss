@@ -69,8 +69,8 @@ input[type="time"]::-ms-clear {
 
 // An only icon button. Icon is orange, with dark rounded border
 .small-circle-btn {
-  height: 1.7em;
-  width: 1.7em;
+  height: 1.7em !important;
+  width: 1.7em !important;
   margin: 0;
   --padding-end: 0;
   --padding-start: 0;
@@ -87,7 +87,7 @@ ion-searchbar {
   --box-shadow: none !important;
   --icon-color: transparent !important;
   .searchbar-input {
-    height: 3.5em !important;
+    height: 3em !important;
     border-radius: 1.75em !important;
     border: solid var(--ion-color-medium) 1px !important;
   }
@@ -97,8 +97,8 @@ ion-searchbar > ion-icon {
   z-index: 1;
   left: 0;
   padding-left: 2em;
-  width: 2em;
-  height: 2em;
+  width: 1.5em;
+  height: 1.5em;
 }
 ion-searchbar:focus-within > ion-icon {
   height: 0;
@@ -143,6 +143,37 @@ html[dir="ltr"] {.select-container:after {right: 0}}
       cursor: pointer;
       color: var(--ion-color-medium);
     }
+  }
+}
+
+
+ion-grid.app-table {
+  ion-row > ion-col {
+    display: flex;
+    align-items: center;
+    &:first-child {
+      justify-content: center;
+      ion-button {
+        height: 1.5em;
+        width: 1.5em;
+      }
+    }
+    ion-img {
+      height: 1.5em;
+      width: 1.5em;
+      object-fit: cover;
+      border: solid var(--ion-color-medium) 1px;
+      padding: 1px;
+    }
+    ion-button {
+      height: 2em;
+    }
+  }
+
+  ion-row:first-child {
+    color: var(--ion-color-primary);
+    font-weight: bold;
+    border-bottom: solid black 3px;
   }
 }
 

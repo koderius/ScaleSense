@@ -25,34 +25,6 @@
   padding: 2em;
 }
 
-ion-row > ion-col {
-  display: flex;
-  align-items: center;
-  &:first-child {
-    justify-content: center;
-    ion-button {
-      height: 1.5em;
-      width: 1.5em;
-    }
-  }
-  ion-img {
-    height: 1.5em;
-    width: 1.5em;
-    object-fit: cover;
-    border: solid var(--ion-color-medium) 1px;
-    padding: 1px;
-  }
-  ion-button {
-    height: 2em;
-  }
-}
-
-ion-row:first-child {
-  color: var(--ion-color-primary);
-  font-weight: bold;
-  border-bottom: solid black 3px;
-}
-
 
 #back-btn {
   margin: 1em auto;

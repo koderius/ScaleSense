@@ -1,0 +1,76 @@
+<ion-header>
+  <app-header pageTitle="רשימת ספקים"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="upper-section">
+
+      <ion-searchbar placeholder="הקלד שם ספק" (ionChange)="search($event.detail.value)">
+        <ion-icon src="../../assets/svg/search.svg"></ion-icon>
+      </ion-searchbar>
+
+      <div>
+        <ion-button shape="round" color="secondary" strong="true">
+          <ion-icon slot="start" name="add"></ion-icon>
+          <ion-text>הקמת ספק חדש</ion-text>
+        </ion-button>
+        <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize">טעינת קובץ Excel</ion-button>
+      </div>
+
+    </div>
+
+    <div id="table-section">
+
+      <ion-grid class="app-table">
+
+        <div *ngIf="!suppliersService.mySuppliers.length">
+          <h4 class="ion-text-center">
+            <ion-text color="medium">- לא קיימים ספקים -</ion-text>
+          </h4>
+        </div>
+
+        <ion-row *ngIf="suppliersService.mySuppliers.length">
+          <ion-col size="1"></ion-col>
+          <ion-col>שם הספק</ion-col>
+          <ion-col>מס. ספק</ion-col>
+          <ion-col>איש קשר</ion-col>
+          <ion-col>טלפון</ion-col>
+          <ion-col size="3"></ion-col>
+        </ion-row>
+
+        <ion-row *ngFor="let supplier of filteredSuppliers || suppliersService.mySuppliers">
+          <ion-col size="1"></ion-col>
+          <ion-col>
+            <ion-img [src]="supplier.logo" class="ion-margin-end"></ion-img>
+            <ion-text>{{supplier.name}}</ion-text>
+          </ion-col>
+          <ion-col>{{supplier.nid}}</ion-col>
+          <ion-col>{{supplier.contactName}}</ion-col>
+          <ion-col>{{supplier.phoneNumber}}</ion-col>
+          <ion-col size="1">
+            <ion-button fill="clear" color="dark">
+              <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col size="1">
+            <ion-button class="small-circle-btn" fill="clear" color="secondary">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col size="1"></ion-col>
+        </ion-row>
+
+      </ion-grid>
+
+    </div>
+
+    <ion-row>
+      <ion-button shape="round" strong="true" style="margin: 1em auto" (click)="navService.goToMain()">חזרה למסך הראשי</ion-button>
+    </ion-row>
+
+  </div>
+
+</ion-content>

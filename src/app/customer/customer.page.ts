@@ -27,7 +27,7 @@ export class CustomerPage implements OnInit {
   ngOnInit() {}
 
   goToNewOrder() {
-    this.navService.goToOrder('');
+    this.navService.goToOrder('new');
   }
 
   goToEditOrder() {

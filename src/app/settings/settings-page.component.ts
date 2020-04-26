@@ -16,16 +16,12 @@ export class SettingsPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private navService: NavigationService,
+    public navService: NavigationService,
   ) {
     this.side = this.authService.currentUser.side;
   }
 
   ngOnInit() {
-  }
-
-  goBack() {
-    this.navService.goToMain();
   }
 
 }
