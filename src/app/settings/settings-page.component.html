@@ -1,0 +1,75 @@
+<ion-header>
+  <app-header pageTitle="הגדרות"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="menu-container">
+
+      <div id="list">
+
+        <div class="item">
+          <p>הגדרת שפה</p>
+          <div class="select-container">
+            <select>
+              <option>עברית</option>
+            </select>
+          </div>
+          <ion-button color="secondary" shape="round">החל</ion-button>
+        </div>
+
+        <div class="item">
+          <p>עריכת ספקים</p>
+        </div>
+
+        <div class="item">
+          <p>עריכת מוצרים</p>
+        </div>
+
+        <div class="item">
+          <p>עריכת קטגוריות</p>
+        </div>
+
+        <div class="item">
+          <p>הרשאות גישה</p>
+        </div>
+
+        <div class="item">
+          <p>הגדרות ציוד</p>
+        </div>
+
+        <div class="item">
+          <ion-item lines="none" (click)="generalOpen = !generalOpen">
+            <p>הגדרות כלליות</p>
+            <ion-button slot="end" fill="clear" color="dark" shape="round">
+              <ion-icon slot="icon-only" [name]="generalOpen ? 'caret-down-sharp' : 'caret-back-sharp'"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </div>
+
+        <ion-list *ngIf="generalOpen">
+          <ion-item>
+            <p>הגדרות שליחת דוא"ל</p>
+          </ion-item>
+          <ion-item>
+            <p>הגדרות שליחת SMS</p>
+          </ion-item>
+          <ion-item lines="none">
+            <p>עריכת פרטי {{side == 'c' ? 'לקוח' : 'ספק'}}</p>
+          </ion-item>
+        </ion-list>
+
+      </div>
+
+
+    </div>
+
+    <ion-row>
+      <ion-button shape="round" (click)="goBack()" style="margin: auto">חזרה למסך ראשי</ion-button>
+    </ion-row>
+
+  </div>
+
+</ion-content>

@@ -6,6 +6,7 @@ import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {OrderStatus} from '../models/OrderI';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-orders-list',
@@ -30,9 +31,9 @@ export class OrdersListPage implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private ordersService: OrdersService,
-    private navCtrl: NavController,
     private supplierService: SuppliersService,
     private alertsService: AlertsService,
+    private navService: NavigationService,
   ) {}
 
   async ngOnInit() {
@@ -54,7 +55,7 @@ export class OrdersListPage implements OnInit {
   }
 
   goBack() {
-    this.navCtrl.navigateRoot('customer');
+    this.navService.goToMain();
   }
 
 
@@ -78,9 +79,9 @@ export class OrdersListPage implements OnInit {
 
   actionClicked(orderId: string) {
     switch (this.pageMode) {
-      case 'view': this.navCtrl.navigateForward('/order/'+orderId); break;
-      case 'drafts': this.navCtrl.navigateForward('/order/'+orderId+'?draft=true'); break;
-      case 'edit': this.navCtrl.navigateForward('/order/'+orderId+'?edit=true'); break;
+      case 'drafts': this.navService.goToDraft(orderId); break;
+      case 'view': this.navService.goToOrder(orderId); break;
+      case 'edit': this.navService.goToOrder(orderId, true); break;
       case 'receive': break; //TODO
     }
   }

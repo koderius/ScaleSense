@@ -30,8 +30,8 @@ const routes: Routes = [
   },
 
   {
-    path: 'settings-menu',
-    loadChildren: () => import('./settings-menu/settings-menu.module').then( m => m.SettingsMenuPageModule),
+    path: 'settings',
+    loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
     canActivateChild: [appEnterGuard],
   },
 

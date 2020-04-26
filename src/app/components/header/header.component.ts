@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {NavController} from '@ionic/angular';
 import {OrderStatus} from '../../models/OrderI';
+import {AuthService} from '../../services/auth.service';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-header',
@@ -15,17 +16,22 @@ export class HeaderComponent implements OnInit {
   @Input() comment: OrderStatus;
 
   constructor(
-    private navCtrl: NavController,
+    private authService: AuthService,
+    private navService: NavigationService,
   ) { }
 
   ngOnInit() {}
 
   goToDrafts() {
-    this.navCtrl.navigateForward('customer/orders-list?mode=drafts');
+    this.navService.goToDraftsList();
   }
 
   backToMain() {
-    this.navCtrl.navigateRoot('customer');
+    this.navService.goToMain();
+  }
+
+  goToSettings() {
+    this.navService.goToSettings();
   }
 
 }

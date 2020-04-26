@@ -11,6 +11,7 @@ import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
 import {AuthService} from '../services/auth.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-order',
@@ -63,12 +64,12 @@ export class OrderPage implements OnInit {
 
   constructor(
     private activeRoute: ActivatedRoute,
-    private navCtrl: NavController,
     public suppliersService: SuppliersService,
     private ordersService: OrdersService,
     private productsService: ProductsService,
     private alerts: AlertsService,
     private authService: AuthService,
+    private navService: NavigationService,
   ) {}
 
   /** Whether in mode of draft (with wizard) */
@@ -283,7 +284,7 @@ export class OrderPage implements OnInit {
 
 
   backToMain() {
-    this.navCtrl.navigateRoot(this.authService.currentUser.side == 'c' ? 'customer' : 'supplier');
+    this.navService.goToMain();
   }
 
   selectProductInput(productId: string) {

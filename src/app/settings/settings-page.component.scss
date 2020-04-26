@@ -1,0 +1,54 @@
+#menu-container {
+  background-color: white;
+  margin: 3em 0 1em;
+  padding: 3em;
+}
+
+#list {
+  width: fit-content;
+  margin: auto;
+}
+
+.item {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  p {
+    font-weight: bold;
+  }
+  &:not(:first-child) > p {
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  &:last-of-type {
+    width: 100%;
+    ion-item {
+      --padding-start: 0;
+      cursor: pointer;
+      ion-button {
+        --ripple-color: transparent;
+      }
+    }
+  }
+}
+
+ion-list > ion-item {
+  width: 100%;
+  font-weight: bold;
+  color: var(--ion-color-secondary);
+  p {
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.select-container {
+  width: 10em;
+  border: solid var(--ion-color-dark) 1px;
+  margin: 0 1em;
+}

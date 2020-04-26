@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {NavController} from '@ionic/angular';
 import {AuthService} from '../services/auth.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-customer',
@@ -12,8 +12,8 @@ export class CustomerPage implements OnInit {
   notifications = [1,2,3,4,5];
 
   constructor(
-    private navCtrl: NavController,
     private authService: AuthService,
+    private navService: NavigationService,
   ) {
 
     // TODO: Delete this. Test user
@@ -27,19 +27,19 @@ export class CustomerPage implements OnInit {
   ngOnInit() {}
 
   goToNewOrder() {
-    this.navCtrl.navigateForward('/order');
+    this.navService.goToOrder('');
   }
 
   goToEditOrder() {
-    this.navCtrl.navigateForward('/orders-list?mode=edit');
+    this.navService.goToOrdersList(true);
   }
 
   goToOrdersStatus() {
-    this.navCtrl.navigateForward('/orders-list');
+    this.navService.goToOrdersList();
   }
 
   goToReceiveOrder() {
-    this.navCtrl.navigateForward('/orders-list?mode=receive');
+    this.navService.goToReceiveList();
   }
 
 }
