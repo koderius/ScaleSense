@@ -46,6 +46,12 @@ export class SuppliersService {
   }
 
 
+  /** Load supplier by ID once (in case subscription has not started yet) */
+  async loadSupplier(id: string) : Promise<BusinessDoc> {
+    return (await this.mySuppliersRef.doc(id).get()).data();
+  }
+
+
   /** Get supplier from the list by his ID */
   getSupplierById(id: string) : BusinessDoc | null {
     return {...this._mySuppliers.find((s)=>s.id == id)};

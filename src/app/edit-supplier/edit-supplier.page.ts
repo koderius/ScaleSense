@@ -20,7 +20,7 @@ export class EditSupplierPage implements OnInit {
     private alerts: AlertsService,
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     // Create new supplier document or get existed one, according to the ID in the URL
     const id = this.activatedRoute.snapshot.params['id'];
@@ -28,7 +28,7 @@ export class EditSupplierPage implements OnInit {
       this.supplier = {};
     }
     else {
-      this.supplier = this.suppliersService.getSupplierById(id);
+      this.supplier = await this.suppliersService.loadSupplier(id);
     }
 
     // Set one empty contact info, if no contact exist
