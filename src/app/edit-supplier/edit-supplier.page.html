@@ -125,11 +125,11 @@
       <ion-col>
         <p *ngIf="supplier.created">
           <ion-text>תאריך הקמה: </ion-text>
-          <ion-text>{{supplier.created}}</ion-text>
+          <ion-text>{{supplier.created | date : 'dd/MM/yyyy'}}</ion-text>
         </p>
         <p *ngIf="supplier.modified">
           <ion-text>תאריך עדכון: </ion-text>
-          <ion-text>{{supplier.modified}}</ion-text>
+          <ion-text>{{supplier.modified | date : 'dd/MM/yyyy'}}</ion-text>
         </p>
       </ion-col>
       <ion-col>

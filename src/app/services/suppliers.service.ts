@@ -115,10 +115,16 @@ export class SuppliersService {
         // TODO: Make rules
         const serial = (await transaction.get(this.suppliersMetadata)).get('numOfSuppliers') || 0;
         supplierDoc.nid = serial + 1;
-        if(!supplierDoc.id)
+
+        if(!supplierDoc.id) {
           supplierDoc.id = this.mySuppliersRef.doc().id;
+          supplierDoc.created = Date.now();
+        }
+
+        supplierDoc.modified = Date.now();
         await transaction.set(this.mySuppliersRef.doc(supplierDoc.id), supplierDoc, {merge: true});
-        transaction.set(this.suppliersMetadata, {'numOfSuppliers': firebase.firestore.FieldValue.increment(1)}, {merge: true});
+
+        transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(1)}, {merge: true});
 
       });
     }

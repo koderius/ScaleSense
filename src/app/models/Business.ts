@@ -1,4 +1,3 @@
-
 /** Customer or supplier */
 export type BusinessSide = 'c' | 's';
 
@@ -17,8 +16,8 @@ export interface BusinessDoc {
 
   contacts?: ContactInfo[];
 
-  created?: number;
-  modified?: number;
+  created?;
+  modified?;
 
 }
 

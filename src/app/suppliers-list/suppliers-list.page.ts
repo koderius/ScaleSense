@@ -33,7 +33,7 @@ export class SuppliersListPage implements OnInit {
   }
 
   async deleteSupplier(supplier: BusinessDoc) {
-    if (await this.alerts.areYouSure('האם למחוק את הספק ' + supplier.name + '?')) {
+    if (await this.alerts.areYouSure('האם למחוק את הספק "' + supplier.name + '"?')) {
       const l = this.alerts.loaderStart('מוחק ספק...');
       await this.suppliersService.deleteSupplier(supplier.id);
       this.alerts.loaderStop(l);
