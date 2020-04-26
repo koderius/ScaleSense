@@ -9,7 +9,6 @@ import {ProductDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
-import * as _ from 'lodash';
 import {Objects} from '../utilities/objects';
 
 @Component({
@@ -378,12 +377,15 @@ export class OrderPage implements OnInit {
   }
 
   async cancelOrder() {
-    const l = this.alerts.loaderStart('מבטל הזמנה...');
-    const change = await this.ordersService.changeOrderStatus(this.order.id, OrderStatus.CANCELED_BY_CUSTOMER);
-    this.alerts.loaderStop(l);
-    if(change) {
-      this.order.changes.push(change);
-      alert('ההזמנה בוטלה.');
+    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לבטל את ההזמנה?' : 'הספק יקבל עדכון על הביטול')) {
+      const l = this.alerts.loaderStart('מבטל הזמנה...');
+      const change = await this.ordersService.changeOrderStatus(this.order.id, OrderStatus.CANCELED_BY_CUSTOMER);
+      this.alerts.loaderStop(l);
+      if (change) {
+        this.order.changes.push(change);
+        this.isEdit = false;
+        alert('ההזמנה בוטלה.');
+      }
     }
   }
 

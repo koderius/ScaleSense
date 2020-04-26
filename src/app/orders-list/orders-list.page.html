@@ -72,7 +72,7 @@
             <ion-img [src]="getSupplier(order.sid).logo" class="ion-margin-end"></ion-img>
             <ion-text>{{getSupplier(order.sid).name}}</ion-text>
           </ion-col>
-          <ion-col *ngIf="pageMode != 'drafts'">{{order.status | orderStatusText}}</ion-col>
+          <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status > OrderStatus.CANNOT_BE_EDIT_FROM_HERE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
           <ion-col>
             <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)">{{actionBtnTitle}}</ion-button>
           </ion-col>

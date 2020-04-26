@@ -5,6 +5,7 @@ import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
+import {OrderStatus} from '../models/OrderI';
 
 @Component({
   selector: 'app-orders-list',
@@ -12,6 +13,8 @@ import {Order} from '../models/Order';
   styleUrls: ['./orders-list.page.scss'],
 })
 export class OrdersListPage implements OnInit {
+
+  OrderStatus = OrderStatus;
 
   pageMode : 'view' | 'edit' | 'drafts' | 'receive';
   orders: Order[] = [];
