@@ -309,16 +309,18 @@ export class OrderPage implements OnInit {
     return products.sort((a, b)=>{
       const p1 = this.productsService.getProductDetails(a.id);
       const p2 = this.productsService.getProductDetails(b.id);
-      if(p1.name > p2.name)
-        return 1;
-      if(p1.name < p2.name)
-        return -1;
-      else {
-        if(p1.id > p2.id)
+      if(p1 && p2) {
+        if(p1.name > p2.name)
           return 1;
-        if(p1.id < p2.id)
+        if(p1.name < p2.name)
           return -1;
-        return 0;
+        else {
+          if(p1.id > p2.id)
+            return 1;
+          if(p1.id < p2.id)
+            return -1;
+          return 0;
+        }
       }
     });
   }

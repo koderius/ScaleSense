@@ -11,14 +11,13 @@ import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
+import {BusinessService} from './business.service';
+import {AuthService} from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrdersService {
-
-  // TODO: Get customer ID from service
-  readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
 
   /**
    * When a new order is being created, it gets a temporal ID (marked with suffix).
@@ -36,20 +35,22 @@ export class OrdersService {
   private _myOrders: OrderDoc[] = [];
 
   constructor(
+    private authService: AuthService,
     private productsService: ProductsService,
     private suppliersService: SuppliersService,
+    private businessService: BusinessService,
   ) {}
 
   get myOrders() : Query {
-    return this.ordersRef.where('cid','==',this.CUSTOMER_ID);
+    return this.ordersRef.where(this.authService.currentUser.side + 'id','==',this.authService.currentUser.bid);
   }
 
   get myDrafts() : CollectionReference {
-    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('my_drafts');
+    return this.businessService.businessDocRef.collection('my_drafts');
   }
 
   get myOrdersMetadataRef() : DocumentReference {
-    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('metadata').doc('orders');
+    return this.businessService.businessDocRef.collection('metadata').doc('orders');
   }
 
 

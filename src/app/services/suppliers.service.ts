@@ -1,24 +1,22 @@
 import { Injectable } from '@angular/core';
 import {BusinessDoc} from '../models/Business';
-import * as firebase from 'firebase/app';
-import 'firebase/firestore';
-import CollectionReference = firebase.firestore.CollectionReference;
-import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {ProductDoc} from '../models/Product';
+import {BusinessService} from './business.service';
+import CollectionReference = firebase.firestore.CollectionReference;
+import * as firebase from 'firebase';
+import 'firebase/firestore';
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 
 @Injectable({
   providedIn: 'root'
 })
 export class SuppliersService {
 
-  // TODO: Get customer ID from service
-  readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
-
   /** List of all the suppliers that belong to the current customer. Continually updated from the server */
   private _mySuppliers: BusinessDoc[] = [];
 
 
-  constructor() {
+  constructor(private businessService: BusinessService) {
 
     // Get all the suppliers of the current customer (sorted by name)
     try {
@@ -35,7 +33,7 @@ export class SuppliersService {
 
   /** The reference to the firestore collection where the list of suppliers is stored */
   get mySuppliersRef() : CollectionReference {
-    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('mysuppliers');
+    return this.businessService.businessDocRef.collection('mysuppliers');
   }
 
 

@@ -4,22 +4,20 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+import {BusinessService} from './business.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
 
-  // TODO: Get customer ID from service
-  readonly CUSTOMER_ID = 'JktH9OOE44MVfTGbLOB4';
-
   private _loadedProducts: Map<string, ProductDoc> = new Map<string, ProductDoc>();
 
-  constructor() {}
+  constructor(private businessService: BusinessService) {}
 
   /** The reference to the firestore collection where the list of products is stored */
   get myProductsRef() : CollectionReference {
-    return firebase.firestore().collection('customers').doc(this.CUSTOMER_ID).collection('myproducts');
+    return this.businessService.businessDocRef.collection('myproducts');
   }
 
 
