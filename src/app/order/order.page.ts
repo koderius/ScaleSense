@@ -305,7 +305,7 @@ export class OrderPage implements OnInit {
 
   /** Sort by name (if names are equal sort by ID, just for having a constant order) */
   sortProductsByName(products: ProductOrder[]) {
-    return products.sort((a, b)=>{
+    return (products || []).sort((a, b)=>{
       const p1 = this.productsService.getProductDetails(a.id);
       const p2 = this.productsService.getProductDetails(b.id);
       if(p1 && p2) {
@@ -383,7 +383,7 @@ export class OrderPage implements OnInit {
       this.alerts.loaderStop(l);
       if (change) {
         this.order.changes.push(change);
-        this.isEdit = false;
+        this.ngOnInit();
         alert('ההזמנה בוטלה.');
       }
     }

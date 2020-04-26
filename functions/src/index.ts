@@ -38,151 +38,151 @@ export const checkPayment = functions.https.onCall((data, context) => {});
 
 
 
-export const orderUpdate = functions.https.onCall(async (order: OrderDoc, context) => {
-
-  return await admin.firestore().runTransaction<OrderChange>(async (transaction)=>{
-
-    // Get the user data, and his business belonging
-    const uid = context.auth ? context.auth.uid : '';
-    const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
-    const side = userData ? userData.side : '';
-    const bid = userData ? userData.bid : '';
-
-    // TODO: Check permissions of this user
-
-    // New document that contains all the fields that are allowed to be change
-    let updatedOrder: OrderDoc = {
-      products: order.products,
-      supplyTime: order.supplyTime,
-      comment: order.comment || '',
-      invoice: order.invoice || '',
-    };
-
-    // Save those fields as JSON for the changes list
-    const changesData = JSON.stringify(updatedOrder);
-
-    const timestamp = admin.firestore.Timestamp.now().toMillis();
-
-    // For draft being sent for the first time, all fields are allowed to be set
-    if(order.status === 0) {
-
-      // Create draft new ID: (1) might not have ID if hasn't saved before (2) Security: prevent sending an order as draft more than once
-      order.id = admin.firestore().collection('orders').doc().id;
-
-      // Take all fields
-      updatedOrder = order;
-
-      updatedOrder.created = timestamp;                 // Update the creation time to be the time of sending (instead of time of creating the draft)
-      updatedOrder.cid = bid;                           // Update the customer ID (according to the user who commit the function's call)
-      updatedOrder.status = 10;                         // Change the status from 'DRAFT' (0) to 'SENT' (10)
-
-    }
-
-    // For opened order, set the status as changed by customer or by supplier
-    else
-      updatedOrder.status = 20 + (side == 's' ? 1 : 2);
-
-    // Set time of modification
-    updatedOrder.modified = timestamp;
-
-    // Create a changes report object (who and when)
-    const changes: OrderChange = {
-      by: uid,
-      side: side,
-      time: timestamp,
-      status: updatedOrder.status,
-      data: changesData,
-    };
-
-    // Save all fields, add the current changes to the versions list
-    const orderRef = admin.firestore().collection('orders').doc(order.id || '');
-    await transaction.set(orderRef, {
-      ...updatedOrder,
-      changes: admin.firestore.FieldValue.arrayUnion(changes)
-    },
-      {merge: true});
-
-    // If the changes were made by the customer, add a notification to the supplier, and v.v.
-    const ref = side == 'c'
-      ? admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_notifications')
-      : admin.firestore().collection('customers').doc(order.cid || '').collection('my_notifications');
-
-    // Send notification with change data + order ID
-    await transaction.create(ref.doc(), {
-      ...changes,
-      orderId: order.id,
-    });
-
-    return changes;
-
-  });
-
-});
-
-
-/**
- * Cancel an order according to the given ID.
- * Order can be cancel by both customer or supplier.
- * The function check that the user is under the business that the order belongs to, and that the user has permission to cancel orders
- */
-export const cancelOrder = functions.https.onCall(async (orderId, context) => {
-
-  return await admin.firestore().runTransaction<OrderChange | null>(async transaction => {
-
-    const orderRef = admin.firestore().collection('orders').doc(orderId);
-
-    // Cannot cancel an order that is already canceled or closed
-    if((await transaction.get(orderRef)).get('status') > 40)
-      return null;
-
-    // Get the user data, and his business belonging
-    const uid = context.auth ? context.auth.uid : '';
-    const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
-    const side = userData ? userData.side : '';
-    const bid = userData ? userData.bid : '';
-
-    // TODO: Check permissions of this user
-
-    const cid = (await transaction.get(orderRef)).get('cid');
-    const sid = (await transaction.get(orderRef)).get('sid');
-
-    // Check order is connected to the business of the user
-    if((side == 'c' ? cid : sid) == bid) {
-
-      // Create a changes report object
-      const changes: OrderChange = {
-        by: uid,
-        side: side,
-        time: admin.firestore.Timestamp.now().toMillis(),
-        status: 40 + (side == 's' ? 1 : 2),
-      };
-
-      // Set the order with the new status, and add the change report
-      transaction.update(orderRef,{
-        status: changes.status,
-        changes: admin.firestore.FieldValue.arrayUnion(changes),
-      });
-
-      // If the changes were made by the customer, add a notification to the supplier, and v.v.
-      const ref = side == 'c'
-        ? admin.firestore().collection('suppliers').doc(sid || '').collection('my_notifications')
-        : admin.firestore().collection('customers').doc(cid || '').collection('my_notifications');
-
-      // Send notification with change data + order ID
-      await transaction.create(ref.doc(), {
-        ...changes,
-        orderId: orderId,
-      });
-
-      return changes;
-
-    }
-
-    return null;
-
-  })
-
-});
+// export const orderUpdate = functions.https.onCall(async (order: OrderDoc, context) => {
+//
+//   return await admin.firestore().runTransaction<OrderChange>(async (transaction)=>{
+//
+//     // Get the user data, and his business belonging
+//     const uid = context.auth ? context.auth.uid : '';
+//     const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
+//     const side = userData ? userData.side : '';
+//     const bid = userData ? userData.bid : '';
+//
+//     // TODO: Check permissions of this user
+//
+//     // New document that contains all the fields that are allowed to be change
+//     let updatedOrder: OrderDoc = {
+//       products: order.products,
+//       supplyTime: order.supplyTime,
+//       comment: order.comment || '',
+//       invoice: order.invoice || '',
+//     };
+//
+//     // Save those fields as JSON for the changes list
+//     const changesData = JSON.stringify(updatedOrder);
+//
+//     const timestamp = admin.firestore.Timestamp.now().toMillis();
+//
+//     // For draft being sent for the first time, all fields are allowed to be set
+//     if(order.status === 0) {
+//
+//       // Create draft new ID: (1) might not have ID if hasn't saved before (2) Security: prevent sending an order as draft more than once
+//       order.id = admin.firestore().collection('orders').doc().id;
+//
+//       // Take all fields
+//       updatedOrder = order;
+//
+//       updatedOrder.created = timestamp;                 // Update the creation time to be the time of sending (instead of time of creating the draft)
+//       updatedOrder.cid = bid;                           // Update the customer ID (according to the user who commit the function's call)
+//       updatedOrder.status = 10;                         // Change the status from 'DRAFT' (0) to 'SENT' (10)
+//
+//     }
+//
+//     // For opened order, set the status as changed by customer or by supplier
+//     else
+//       updatedOrder.status = 20 + (side == 's' ? 1 : 2);
+//
+//     // Set time of modification
+//     updatedOrder.modified = timestamp;
+//
+//     // Create a changes report object (who and when)
+//     const changes: OrderChange = {
+//       by: uid,
+//       side: side,
+//       time: timestamp,
+//       status: updatedOrder.status,
+//       data: changesData,
+//     };
+//
+//     // Save all fields, add the current changes to the versions list
+//     const orderRef = admin.firestore().collection('orders').doc(order.id || '');
+//     await transaction.set(orderRef, {
+//       ...updatedOrder,
+//       changes: admin.firestore.FieldValue.arrayUnion(changes)
+//     },
+//       {merge: true});
+//
+//     // If the changes were made by the customer, add a notification to the supplier, and v.v.
+//     const ref = side == 'c'
+//       ? admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_notifications')
+//       : admin.firestore().collection('customers').doc(order.cid || '').collection('my_notifications');
+//
+//     // Send notification with change data + order ID
+//     await transaction.create(ref.doc(), {
+//       ...changes,
+//       orderId: order.id,
+//     });
+//
+//     return changes;
+//
+//   });
+//
+// });
+//
+//
+// /**
+//  * Cancel an order according to the given ID.
+//  * Order can be cancel by both customer or supplier.
+//  * The function check that the user is under the business that the order belongs to, and that the user has permission to cancel orders
+//  */
+// export const cancelOrder = functions.https.onCall(async (orderId, context) => {
+//
+//   return await admin.firestore().runTransaction<OrderChange | null>(async transaction => {
+//
+//     const orderRef = admin.firestore().collection('orders').doc(orderId);
+//
+//     // Cannot cancel an order that is already canceled or closed
+//     if((await transaction.get(orderRef)).get('status') > 40)
+//       return null;
+//
+//     // Get the user data, and his business belonging
+//     const uid = context.auth ? context.auth.uid : '';
+//     const userData = (await transaction.get(admin.firestore().collection('users').doc(uid))).data();
+//     const side = userData ? userData.side : '';
+//     const bid = userData ? userData.bid : '';
+//
+//     // TODO: Check permissions of this user
+//
+//     const cid = (await transaction.get(orderRef)).get('cid');
+//     const sid = (await transaction.get(orderRef)).get('sid');
+//
+//     // Check order is connected to the business of the user
+//     if((side == 'c' ? cid : sid) == bid) {
+//
+//       // Create a changes report object
+//       const changes: OrderChange = {
+//         by: uid,
+//         side: side,
+//         time: admin.firestore.Timestamp.now().toMillis(),
+//         status: 40 + (side == 's' ? 1 : 2),
+//       };
+//
+//       // Set the order with the new status, and add the change report
+//       transaction.update(orderRef,{
+//         status: changes.status,
+//         changes: admin.firestore.FieldValue.arrayUnion(changes),
+//       });
+//
+//       // If the changes were made by the customer, add a notification to the supplier, and v.v.
+//       const ref = side == 'c'
+//         ? admin.firestore().collection('suppliers').doc(sid || '').collection('my_notifications')
+//         : admin.firestore().collection('customers').doc(cid || '').collection('my_notifications');
+//
+//       // Send notification with change data + order ID
+//       await transaction.create(ref.doc(), {
+//         ...changes,
+//         orderId: orderId,
+//       });
+//
+//       return changes;
+//
+//     }
+//
+//     return null;
+//
+//   })
+//
+// });
 
 export const updateOrder = functions.https.onCall(async (order: OrderDoc, context) => {
 
@@ -235,8 +235,8 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       // TODO: Who can close the order?
 
       // Get the customer ID and the supplier ID
-      const cid = (await transaction.get(orderRef)).get('cid') || bid;
-      const sid = (await transaction.get(orderRef)).get('sid');
+      const cid = orderSnapshot.get('cid') || bid;
+      const sid = orderSnapshot.get('sid');
 
       // Check that the user ID is under the customer/supplier
       if((side == 'c' ? cid : sid) != bid)

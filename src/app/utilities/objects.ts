@@ -4,7 +4,7 @@ export class Objects {
 
     Object.getOwnPropertyNames(obj).forEach((p)=>{
       const value = obj[p];
-      if(typeof value == 'object')
+      if(value && typeof value == 'object')
         Objects.ClearFalse(value);
       if(valuesToClear.includes(value))
         delete obj[p];
@@ -30,7 +30,7 @@ export class Objects {
       const propName = aProps[i];
 
       // If the property is an object, deep check if these objects are equal
-      if(typeof a[propName] == 'object' && typeof b[propName] == 'object') {
+      if(a[propName] && b[propName] && typeof a[propName] == 'object' && typeof b[propName] == 'object') {
         if (!Objects.IsEqual(a[propName], b[propName], clearValues))
           return false;
       }
