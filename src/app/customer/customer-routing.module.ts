@@ -8,14 +8,6 @@ const routes: Routes = [
     path: '',
     component: CustomerPage
   },
-  {
-    path: 'order',
-    loadChildren: () => import('../order/order.module').then(m => m.OrderPageModule)
-  },
-  {
-    path: 'orders-list',
-    loadChildren: () => import('../orders-list/orders-list.module').then( m => m.OrdersListPageModule)
-  },
 ];
 
 @NgModule({

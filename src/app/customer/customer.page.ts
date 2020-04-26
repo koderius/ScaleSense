@@ -27,19 +27,19 @@ export class CustomerPage implements OnInit {
   ngOnInit() {}
 
   goToNewOrder() {
-    this.navCtrl.navigateForward('customer/order');
+    this.navCtrl.navigateForward('/order');
   }
 
   goToEditOrder() {
-    this.navCtrl.navigateForward('customer/orders-list?mode=edit');
+    this.navCtrl.navigateForward('/orders-list?mode=edit');
   }
 
   goToOrdersStatus() {
-    this.navCtrl.navigateForward('customer/orders-list');
+    this.navCtrl.navigateForward('/orders-list');
   }
 
   goToReceiveOrder() {
-    this.navCtrl.navigateForward('customer/orders-list?mode=receive');
+    this.navCtrl.navigateForward('/orders-list?mode=receive');
   }
 
 }

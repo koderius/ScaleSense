@@ -10,13 +10,31 @@ const routes: Routes = [
     loadChildren: () => import('./website/website.module').then(m => m.WebsitePageModule)
   },
 
-  /** Customer main page. The customer app is under the customer routing */
   {
     path: 'customer',
     loadChildren: () => import('./customer/customer.module').then( m => m.CustomerPageModule),
     canActivateChild: [appEnterGuard],
     data: {side: 'c'}
   },
+
+  {
+    path: 'order',
+    loadChildren: () => import('./order/order.module').then(m => m.OrderPageModule),
+    canActivateChild: [appEnterGuard],
+  },
+
+  {
+    path: 'orders-list',
+    loadChildren: () => import('./orders-list/orders-list.module').then( m => m.OrdersListPageModule),
+    canActivateChild: [appEnterGuard],
+  },
+
+  {
+    path: 'settings-menu',
+    loadChildren: () => import('./settings-menu/settings-menu.module').then( m => m.SettingsMenuPageModule),
+    canActivateChild: [appEnterGuard],
+  },
+
 ];
 
 @NgModule({

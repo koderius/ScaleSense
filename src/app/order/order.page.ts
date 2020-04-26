@@ -10,6 +10,7 @@ import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-order',
@@ -67,6 +68,7 @@ export class OrderPage implements OnInit {
     private ordersService: OrdersService,
     private productsService: ProductsService,
     private alerts: AlertsService,
+    private authService: AuthService,
   ) {}
 
   /** Whether in mode of draft (with wizard) */
@@ -139,7 +141,7 @@ export class OrderPage implements OnInit {
     const orderId = urlSnapshot.params['id'];
 
     // Create new order and go to step 1 (choosing supplier)
-    if(orderId == 'new') {
+    if(orderId == 'new' && this.authService.currentUser.side == 'c') {
       this.order = await this.ordersService.createNewOrder();
       this.page = 1;
       this.isEdit = true;
@@ -281,7 +283,7 @@ export class OrderPage implements OnInit {
 
 
   backToMain() {
-    this.navCtrl.navigateRoot('customer');
+    this.navCtrl.navigateRoot(this.authService.currentUser.side == 'c' ? 'customer' : 'supplier');
   }
 
   selectProductInput(productId: string) {

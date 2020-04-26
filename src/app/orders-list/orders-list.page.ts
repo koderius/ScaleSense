@@ -78,9 +78,9 @@ export class OrdersListPage implements OnInit {
 
   actionClicked(orderId: string) {
     switch (this.pageMode) {
-      case 'view': this.navCtrl.navigateForward('customer/order/'+orderId); break;
-      case 'drafts': this.navCtrl.navigateForward('customer/order/'+orderId+'?draft=true'); break;
-      case 'edit': this.navCtrl.navigateForward('customer/order/'+orderId+'?edit=true'); break;
+      case 'view': this.navCtrl.navigateForward('/order/'+orderId); break;
+      case 'drafts': this.navCtrl.navigateForward('/order/'+orderId+'?draft=true'); break;
+      case 'edit': this.navCtrl.navigateForward('/order/'+orderId+'?edit=true'); break;
       case 'receive': break; //TODO
     }
   }
