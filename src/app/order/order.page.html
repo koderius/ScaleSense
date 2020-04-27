@@ -11,12 +11,10 @@
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
     </ion-searchbar>
 
-    <div class="select-container">
-      <ion-text *ngIf="!order.sid">רשימת ספקים</ion-text>
-      <select [(ngModel)]="order.sid">
-        <option></option>
-        <option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</option>
-      </select>
+    <div style="width: 40%" class="select-box">
+      <ion-select [(ngModel)]="order.sid" interface="popover" placeholder="רשימת ספקים" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
+        <ion-select-option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</ion-select-option>
+      </ion-select>
     </div>
 
     <div class="suppliers-header" *ngIf="suppliersSearchResults.length">תוצאות החיפוש</div>

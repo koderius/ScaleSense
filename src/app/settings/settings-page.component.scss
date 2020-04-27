@@ -47,8 +47,11 @@ ion-list > ion-item {
   }
 }
 
-.select-container {
+.select-box {
   width: 10em;
   border: solid var(--ion-color-dark) 1px;
   margin: 0 1em;
+  ion-select {
+    height: 2em;
+  }
 }

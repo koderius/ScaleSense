@@ -105,47 +105,46 @@ ion-searchbar:focus-within > ion-icon {
   display: none;
 }
 
-// Select box
-html[dir="rtl"] {.select-container:after {left: 0}}
-html[dir="ltr"] {.select-container:after {right: 0}}
-.select-container {
-  border-radius: 1em;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  position: relative;
-  &:after {
-    position: absolute;
-    content: "▼";
-    color: var(--ion-color-dark);
-    padding: 0 1em;
-    transform: scaleX(1.5);
-    pointer-events: none;
-  }
-  ion-text {
-    position: absolute;
-    padding: 0 1em;
-    color: var(--ion-color-medium);
-    user-select: none;
-    pointer-events: none;
-  }
-  select {
-    display: block;
-    margin: auto;
-    width: calc(100% - 2em);
-    height: 2em;
-    background-color: transparent;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    option:first-child {
-      cursor: pointer;
-      color: var(--ion-color-medium);
-    }
-  }
-}
-
+//// Select box
+//html[dir="rtl"] {.select-container:after {left: 0}}
+//html[dir="ltr"] {.select-container:after {right: 0}}
+//.select-container {
+//  border-radius: 1em;
+//  background-color: white;
+//  display: flex;
+//  align-items: center;
+//  position: relative;
+//  &:after {
+//    position: absolute;
+//    content: "▼";
+//    color: var(--ion-color-dark);
+//    padding: 0 1em;
+//    transform: scaleX(1.5);
+//    pointer-events: none;
+//  }
+//  ion-text {
+//    position: absolute;
+//    padding: 0 1em;
+//    color: var(--ion-color-medium);
+//    user-select: none;
+//    pointer-events: none;
+//  }
+//  select {
+//    display: block;
+//    margin: auto;
+//    width: calc(100% - 2em);
+//    height: 2em;
+//    background-color: transparent;
+//    border: none;
+//    outline: none;
+//    cursor: pointer;
+//    appearance: none;
+//    option:first-child {
+//      cursor: pointer;
+//      color: var(--ion-color-medium);
+//    }
+//  }
+//}
 
 ion-grid.app-table {
   ion-row > ion-col {
@@ -222,5 +221,35 @@ ion-grid.app-table {
         justify-content: center;
       }
     }
+  }
+}
+
+// Ion select inside a div.select-box
+.select-box {
+  border-radius: 2em;
+  background-color: white;
+  padding: 0 1em;
+  ion-select {
+    display: flex;
+    justify-content: flex-end;
+    &:after {
+      content: "▼";
+      position: absolute;
+      color: var(--ion-color-dark);
+      transform: scaleX(1.5);
+      pointer-events: none;
+    }
+  }
+}
+// A class for the ion-select popover. the custom width is defined by the width of the ion-select through appSelectPopover directive
+.select-popover {
+  --width: var(--custom-popover-width);
+  --box-shadow: none;
+  ion-radio {
+    opacity: 0;
+  }
+  ion-list {
+    padding: 0;
+    border: solid var(--ion-color-light) 1px;
   }
 }

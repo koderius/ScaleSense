@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {AuthService} from './auth.service';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
 

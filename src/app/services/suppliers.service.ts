@@ -3,7 +3,7 @@ import {BusinessDoc} from '../models/Business';
 import {ProductDoc} from '../models/Product';
 import {BusinessService} from './business.service';
 import CollectionReference = firebase.firestore.CollectionReference;
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {FilesService} from './files.service';
@@ -103,9 +103,10 @@ export class SuppliersService {
 
   }
 
-  // Delete the supplier, and reduce the number of supplier in the metadata
+  /** Delete the supplier, and reduce the number of supplier in the metadata */
   async deleteSupplier(id: string) {
     try {
+      this.filesService.deleteFile(id);
       return await firebase.firestore().runTransaction(async (transaction)=>{
         transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(-1)}, {merge: true});
         transaction.delete(this.mySuppliersRef.doc(id));
@@ -116,6 +117,8 @@ export class SuppliersService {
     }
   }
 
+
+  /** Upload supplier data, and upload its logo */
   async saveSupplierDoc(supplierDoc: BusinessDoc, fileToUpload?: File, deleteLogo?: boolean) {
 
     // If new, create ID and stamp creation time
@@ -123,7 +126,6 @@ export class SuppliersService {
       supplierDoc.id = this.mySuppliersRef.doc().id;
       supplierDoc.created = Date.now();
     }
-
 
     // Upload or delete logo image
     try {

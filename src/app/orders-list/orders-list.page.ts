@@ -56,7 +56,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.paramsSubscription();
+    this.paramsSubscription.unsubscribe();
   }
 
   goBack() {

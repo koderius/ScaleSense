@@ -16,6 +16,7 @@ import {
 } from '@angular/material';
 import {UserNamePipe} from '../pipes/user-name.pipe';
 import {PricePipe} from '../pipes/price.pipe';
+import {SelectPopoverDirective} from '../directives/select-popover.directive';
 
 
 
@@ -38,6 +39,7 @@ import {PricePipe} from '../pipes/price.pipe';
     OrderStatusTextPipe,
     UserNamePipe,
     PricePipe,
+    SelectPopoverDirective,
   ],
   exports: [
     MatFormFieldModule,
@@ -53,6 +55,7 @@ import {PricePipe} from '../pipes/price.pipe';
     OrderStatusTextPipe,
     UserNamePipe,
     PricePipe,
+    SelectPopoverDirective,
   ],
 })
 export class ComponentsModule { }
