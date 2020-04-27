@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {OrderChange, OrderDoc, OrderStatus, ProductOrder} from '../../models/OrderI';
 import {AuthService} from '../../services/auth.service';
 import {ProductsService} from '../../services/products.service';
+import {ProductDoc} from '../../models/Product';
 
 @Component({
   selector: 'app-order-change-report',
@@ -22,6 +23,7 @@ export class OrderChangeReportComponent implements OnInit {
   currentPrice: number = 0;
 
   productChanges: {old: ProductOrder, current: ProductOrder}[] = [];
+  productsData: ProductDoc[] = [];
 
   lines: string[] = [];
 
@@ -82,17 +84,19 @@ export class OrderChangeReportComponent implements OnInit {
         }
       });
 
+      this.productsData = await this.productService.loadProductsByIds([...productsIds.values()]);
+
     }
 
   }
 
   getProductName(productId: string) {
-    const p = this.productService.getProductDetails(productId);
+    const p = this.productsData.find((p)=>p.id == productId);
     return p ? p.name : '';
   }
 
   getProductUnit(productId: string) {
-    const p = this.productService.getProductDetails(productId);
+    const p = this.productsData.find((p)=>p.id == productId);
     return p ? p.type : null;
   }
 

@@ -1,0 +1,23 @@
+#upper-section {
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3em 3em 1em 2em;
+  margin: 1em 0 1px;
+  ion-searchbar {
+    width: 40% !important;
+  }
+  ion-button {
+    margin: 0.5em;
+  }
+}
+
+#table-section {
+  background-color: white;
+  padding: 1em 2em;
+  .select-box {
+    width: 40%;
+    margin: auto;
+  }
+}

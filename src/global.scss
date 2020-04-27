@@ -226,6 +226,7 @@ ion-grid.app-table {
 
 // Ion select inside a div.select-box
 .select-box {
+  border: solid var(--ion-color-medium) 1px;
   border-radius: 2em;
   background-color: white;
   padding: 0 1em;
@@ -252,6 +253,6 @@ ion-grid.app-table {
   }
   ion-list {
     padding: 0;
-    border: solid var(--ion-color-light) 1px;
+    border: solid var(--ion-color-medium) 1px;
   }
 }

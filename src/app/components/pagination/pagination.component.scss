@@ -1,0 +1,11 @@
+#pages-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ion-button {
+    --ripple-color: transparent;
+    --background-hover: transparent;
+    --color-hover: rgba(var(--ion-color-primary-rgb),0.5);
+    --color-activated: rgba(var(--ion-color-primary-rgb),0.5);
+  }
+}

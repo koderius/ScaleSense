@@ -21,6 +21,11 @@ const routes: Routes = [
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
+  {
+    path: 'products-list',
+    loadChildren: () => import('../products-list/products-list.module').then( m => m.ProductsListPageModule),
+    canActivateChild: [AppEnterGuard],
+  },
 ];
 
 @NgModule({

@@ -27,7 +27,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
   isSearching: boolean;
 
-  page: number = 1;
+  numOfNewResults: number;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -126,7 +126,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
    * page = 1 - next page
    * page = -1 - previous page
    * */
-  async searchOrders(page: -1 | 0 | 1 = 0) {
+  async searchOrders(movePage: -1 | 0 | 1 = 0) {
 
     const byDate = this.fromDate && this.toDate;
 
@@ -135,35 +135,19 @@ export class OrdersListPage implements OnInit, OnDestroy {
       this.pageMode == 'drafts',
       this.query,
       byDate ? [this.fromDate, this.toDate] : null,
-      page == 1 ? this.orders.slice(-1)[0] : null,
-      page == -1 ? this.orders[0] : null,
+      movePage == 1 ? this.orders.slice(-1)[0] : null,
+      movePage == -1 ? this.orders[0] : null,
     );
 
-    // New search
-    if(page === 0)
-      this.page = 1;
+    this.numOfNewResults = res.length;
 
     // Get results and set the page number
-    if(res.length) {
+    if(this.numOfNewResults)
       this.orders = res;
-      if(page == 1)
-        this.page++;
-      if(page == -1 && this.page > 1)
-        this.page--;
-    }
 
-    // In case there are no results:
-    if(!res.length) {
-      // - for new search - show empty list
-      if(page === 0)
-        this.orders = [];
-      // - for previous page - stay with same results, make sure it's the first page
-      if(page == -1)
-        this.page = 1;
-      // - for next page - stay with same results, if it's the first page, don't show the pagination (because there are no more results)
-      if(page == 1 && this.page == 1)
-        this.page = 0;
-    }
+    // In case there are no results, and it was not by moving forward, clear the list
+    else if(movePage != 1)
+      this.orders = [];
 
     this.isSearching = false;
   }

@@ -1,0 +1,84 @@
+<ion-header>
+  <app-header pageTitle="מוצרים"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="upper-section">
+
+      <ion-searchbar placeholder="הקלד שם מוצר" [(ngModel)]="q" (ionChange)="search()">
+        <ion-icon src="../../assets/svg/search.svg"></ion-icon>
+      </ion-searchbar>
+
+      <div>
+        <ion-button shape="round" color="secondary" strong="true">
+          <ion-icon slot="start" name="add"></ion-icon>
+          <ion-text>הוספת מוצר</ion-text>
+        </ion-button>
+        <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize">טעינת קובץ Excel</ion-button>
+      </div>
+
+    </div>
+
+    <div id="table-section">
+
+      <div class="select-box">
+        <ion-select [(ngModel)]="sid" interface="popover" placeholder="סינון לפי ספק" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover (ionChange)="search()">
+          <ion-select-option [value]="undefined"></ion-select-option>
+          <ion-select-option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</ion-select-option>
+        </ion-select>
+      </div>
+
+      <ion-grid class="app-table">
+
+        <div style="display: flex" *ngIf="isSearching">
+          <ion-spinner style="margin: auto" color="primary"></ion-spinner>
+        </div>
+
+        <div *ngIf="!isSearching && !productsList.length">
+          <h4 class="ion-text-center">
+            <ion-text color="medium">- לא קיימים מוצרים -</ion-text>
+          </h4>
+        </div>
+
+        <ion-row *ngIf="productsList.length">
+          <ion-col size="1.5"></ion-col>
+          <ion-col size="3">שם המוצר</ion-col>
+          <ion-col>מק"ט</ion-col>
+          <ion-col>מחיר</ion-col>
+          <ion-col></ion-col>
+          <ion-col></ion-col>
+        </ion-row>
+
+        <ion-row *ngFor="let product of productsList">
+          <ion-col size="1.5">
+            <ion-thumbnail>
+              <img [src]="product.image">
+            </ion-thumbnail>
+          </ion-col>
+          <ion-col size="3"><b><ion-text color="primary">{{product.name}}</ion-text></b></ion-col>
+          <ion-col>{{product.catalogNumC}}</ion-col>
+          <ion-col>{{product.price | price}} / {{null | unitAmount : product.type}}</ion-col>
+          <ion-col>
+            <ion-button fill="outline" color="dark" shape="round">עריכת מוצר</ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button fill="outline" color="dark" shape="round">תמחור לקוחות</ion-button>
+          </ion-col>
+        </ion-row>
+
+      </ion-grid>
+
+    </div>
+
+    <app-pagination
+            [numOfResults]="numOfNewResults"
+            (onForward)="search(1)"
+            (onBack)="search(-1)"
+    ></app-pagination>
+
+  </div>
+
+</ion-content>

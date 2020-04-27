@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {NavController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
 import {OrdersService} from '../services/orders.service';
@@ -174,8 +173,8 @@ export class OrderPage implements OnInit {
     // Keep the original order to check changes
     this.originalOrder = this.order.getDocument();
 
-    // Get the details of the products that are in this order (if there are)
-    this.productsService.loadProductsDetails(this.order.products.map((p)=>p.id));
+    // Load only the products that are in this order (if there are)
+    this.supplierProducts = await this.productsService.loadProductsByIds(this.order.products.map((p)=>p.id));
 
     // Start auto saving the order data on the local storage every 3 seconds for backup
     // Save as long as there are changes being made since the last save. clear the backup when saving or when leaving safely through a guard
@@ -201,6 +200,7 @@ export class OrderPage implements OnInit {
     return !Objects.IsEqual(JSON.parse(JSON.stringify(orderDoc)), JSON.parse(JSON.stringify(this.originalOrder)));
   }
 
+  /** After changes have been saved (or decided not to be save when leaving the page) */
   updateChanges() {
     // Update the original order for checking further changes
     this.originalOrder = this.order.getDocument();
@@ -210,7 +210,7 @@ export class OrderPage implements OnInit {
   }
 
 
-  /** Set the order supply time by combining the date & time inputs */
+  /** Set the order supply time by combining both the date & time inputs */
   mergeDateAndTime() {
     if(this.supplyDateInput && this.supplyHourInput) {
       const time = new Date(this.supplyDateInput);
@@ -223,9 +223,9 @@ export class OrderPage implements OnInit {
   }
 
 
-  /** Get product details from the service */
+  /** Get product details by its ID */
   findProductDetails(id: string) {
-    return this.productsService.getProductDetails(id);
+    return this.supplierProducts.find((p)=>p.id == id);
   }
 
 
@@ -236,6 +236,7 @@ export class OrderPage implements OnInit {
       .slice(0,5).map((s)=>s.id);
   }
 
+
   /** Get all suppliers IDs except those in the search results */
   get allSuppliers() {
     if(this.showAllSuppliers)
@@ -244,6 +245,7 @@ export class OrderPage implements OnInit {
     else
       return [];
   }
+
 
   /** Filter suppliers by query text */
   async searchSupplier(q: string) {
@@ -260,7 +262,8 @@ export class OrderPage implements OnInit {
     return this.suppliersService.getSupplierById(id);
   }
 
-  /** Get supplier details */
+
+  /** Get selected supplier details from service */
   getSelectedSupplier() {
     return this.getSupplierData(this.order.sid);
   }
@@ -287,6 +290,8 @@ export class OrderPage implements OnInit {
     this.navService.goToMain();
   }
 
+
+  /** Focus on some product's amount input */
   selectProductInput(productId: string) {
 
     setTimeout(()=>{
@@ -306,11 +311,15 @@ export class OrderPage implements OnInit {
 
   }
 
-  /** Sort by name (if names are equal sort by ID, just for having a constant order) */
+  /**
+   * Sort by name (if names are equal sort by ID, just for having a constant order). Two reasons:
+   * 1. Presenting the sorted products
+   * 2. Having a constant order when comparing to products lists
+   * */
   sortProductsByName(products: ProductOrder[]) {
     return (products || []).sort((a, b)=>{
-      const p1 = this.productsService.getProductDetails(a.id);
-      const p2 = this.productsService.getProductDetails(b.id);
+      const p1 = this.findProductDetails(a.id);
+      const p2 = this.findProductDetails(b.id);
       if(p1 && p2) {
         if(p1.name > p2.name)
           return 1;
@@ -327,6 +336,8 @@ export class OrderPage implements OnInit {
     });
   }
 
+
+  /** Save draft on server (creation or update) */
   async saveDraft() : Promise<boolean> {
 
     // Save draft on server
@@ -344,6 +355,7 @@ export class OrderPage implements OnInit {
   }
 
 
+  /** Send the order to the supplier (first time or with changes) */
   async sendOrder() {
 
     if(!this.order.supplyTime) {
@@ -379,6 +391,8 @@ export class OrderPage implements OnInit {
 
   }
 
+
+  /** Cancel the order (after it was sent) */
   async cancelOrder() {
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לבטל את ההזמנה?' : 'הספק יקבל עדכון על הביטול')) {
       const l = this.alerts.loaderStart('מבטל הזמנה...');

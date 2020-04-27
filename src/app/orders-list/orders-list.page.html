@@ -85,15 +85,11 @@
 
     </div>
 
-    <ion-row id="pages-btns" *ngIf="page > 1 || (page == 1 && orders.length == 10)" dir="ltr">
-      <ion-button fill="clear" (click)="searchOrders(-1)" title="הקודם">
-        <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
-      </ion-button>
-      <ion-text>{{page}}</ion-text>
-      <ion-button fill="clear" (click)="searchOrders(1)" title="הבא">
-        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
-      </ion-button>
-    </ion-row>
+    <app-pagination
+            [numOfResults]="numOfNewResults"
+            (onForward)="searchOrders(1)"
+            (onBack)="searchOrders(-1)"
+    ></app-pagination>
 
     <ion-row>
       <ion-button shape="round" strong="true" (click)="goBack()" id="back-btn">חזרה למסך הראשי</ion-button>

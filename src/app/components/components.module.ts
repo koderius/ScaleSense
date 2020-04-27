@@ -17,6 +17,7 @@ import {
 import {UserNamePipe} from '../pipes/user-name.pipe';
 import {PricePipe} from '../pipes/price.pipe';
 import {SelectPopoverDirective} from '../directives/select-popover.directive';
+import {PaginationComponent} from './pagination/pagination.component';
 
 
 
@@ -40,6 +41,7 @@ import {SelectPopoverDirective} from '../directives/select-popover.directive';
     UserNamePipe,
     PricePipe,
     SelectPopoverDirective,
+    PaginationComponent,
   ],
   exports: [
     MatFormFieldModule,
@@ -56,6 +58,7 @@ import {SelectPopoverDirective} from '../directives/select-popover.directive';
     UserNamePipe,
     PricePipe,
     SelectPopoverDirective,
+    PaginationComponent,
   ],
 })
 export class ComponentsModule { }

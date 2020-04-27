@@ -22,7 +22,7 @@ export class UnitAmountPipe implements PipeTransform {
     }
 
     // Return the amount + the name of the unit. if null - only the name of the unit
-    return amount !== null ? (formatNumber(amount, 'en-US', '1.0-3') + ' ' + unitName) : '';
+    return amount !== null ? (formatNumber(amount, 'en-US', '1.0-3') + ' ' + unitName) : unitName;
 
   }
 

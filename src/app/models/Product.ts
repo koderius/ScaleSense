@@ -21,7 +21,8 @@ export interface ProductDoc {
   sid: string;
 
   /** Catalog number */
-  nid: string;
+  catalogNumC: string;
+  catalogNumS: string;
 
   /** ProductDoc's name */
   name: string;

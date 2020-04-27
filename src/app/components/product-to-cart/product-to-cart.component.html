@@ -8,7 +8,7 @@
       <ion-icon name="information-circle" color="dark" (click)="psaudo.focus()"></ion-icon>
       <button #psaudo style="position: absolute" class="ion-no-padding" (focus)="showBubble = true" (blur)="showBubble = false"></button>
     </h2>
-    <p>מק"ט: {{product.nid}}</p>
+    <p>מק"ט: {{product.catalogNumC}}</p>
     <h6>
       <ion-text>מחיר ל</ion-text>
       <ion-text>{{null | unitAmount : product.type}}</ion-text>
