@@ -6,6 +6,7 @@ import CollectionReference = firebase.firestore.CollectionReference;
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+import {FilesService} from './files.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,10 @@ export class SuppliersService {
   private _mySuppliers: BusinessDoc[] = [];
 
 
-  constructor(private businessService: BusinessService) {
+  constructor(
+    private businessService: BusinessService,
+    private filesService: FilesService,
+  ) {
 
     // Get all the suppliers of the current customer (sorted by name)
     try {
@@ -99,27 +103,52 @@ export class SuppliersService {
 
   }
 
+  // Delete the supplier, and reduce the number of supplier in the metadata
   async deleteSupplier(id: string) {
     try {
-      await this.mySuppliersRef.doc(id).delete();
+      return await firebase.firestore().runTransaction(async (transaction)=>{
+        transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(-1)}, {merge: true});
+        transaction.delete(this.mySuppliersRef.doc(id));
+      });
     }
     catch (e) {
       console.error(e);
     }
   }
 
-  async saveSupplierDoc(supplierDoc: BusinessDoc) {
+  async saveSupplierDoc(supplierDoc: BusinessDoc, fileToUpload?: File, deleteLogo?: boolean) {
 
+    // If new, create ID and stamp creation time
+    if(!supplierDoc.id) {
+      supplierDoc.id = this.mySuppliersRef.doc().id;
+      supplierDoc.created = Date.now();
+    }
+
+
+    // Upload or delete logo image
+    try {
+
+      // If logo should be deleted, delete it from the server, and delete the supplier's logo field
+      if(deleteLogo) {
+        this.filesService.deleteFile(supplierDoc.id);
+        delete supplierDoc.logo;
+      }
+
+      // If there is a file to upload
+      if(fileToUpload)
+        supplierDoc.logo = await this.filesService.uploadFile(fileToUpload, supplierDoc.id);
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    // Save the supplier with an updated serial number
     try {
       await firebase.firestore().runTransaction(async transaction =>{
         // TODO: Make rules
         const serial = (await transaction.get(this.suppliersMetadata)).get('numOfSuppliers') || 0;
         supplierDoc.nid = serial + 1;
-
-        if(!supplierDoc.id) {
-          supplierDoc.id = this.mySuppliersRef.doc().id;
-          supplierDoc.created = Date.now();
-        }
 
         supplierDoc.modified = Date.now();
         await transaction.set(this.mySuppliersRef.doc(supplierDoc.id), supplierDoc, {merge: true});

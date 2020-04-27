@@ -1,5 +1,7 @@
 {
   "name": "ScaleSense",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

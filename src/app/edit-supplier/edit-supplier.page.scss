@@ -58,3 +58,14 @@
     --padding-end: 3em;
   }
 }
+
+ion-thumbnail {
+  width: fit-content;
+  img {
+    width: auto;
+    object-fit: contain;
+  }
+  & + ion-button {
+    margin: 0 1em;
+  }
+}

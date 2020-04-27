@@ -29,8 +29,14 @@
           <ion-row class="input-div">
             <ion-col size="3" required>תמונה</ion-col>
             <ion-col style="padding: 0; display: flex; align-items: center">
-              <ion-button shape="round" color="secondary" (click)="fileInput.click()">העלאת תמונה</ion-button>
-              <input class="ion-hide" type="file" #fileInput>
+              <ion-button shape="round" color="secondary" (click)="fileInput.click()" *ngIf="!logoPreview">העלאת תמונה</ion-button>
+              <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])">
+              <ion-thumbnail *ngIf="logoPreview">
+                <img [src]="logoPreview">
+              </ion-thumbnail>
+              <ion-button fill="clear" color="secondary" *ngIf="logoPreview" class="small-circle-btn" (click)="clearLogo()">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+              </ion-button>
             </ion-col>
           </ion-row>
 
