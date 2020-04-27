@@ -242,6 +242,8 @@ ion-grid.app-table {
   }
 }
 // A class for the ion-select popover. the custom width is defined by the width of the ion-select through appSelectPopover directive
+// The ion-select in the app should be like this:
+// <ion-select interface="popover" placeholder="Some placeholder (must)" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
 .select-popover {
   --width: var(--custom-popover-width);
   --box-shadow: none;
