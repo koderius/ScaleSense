@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductDoc} from '../../models/Product';
-import {UnitAmountPipe} from '../../pipes/unit-name.pipe';
+import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
 
 @Component({
   selector: 'app-product-to-cart',

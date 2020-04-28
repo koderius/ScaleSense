@@ -27,14 +27,19 @@
           </ion-row>
 
           <ion-row class="input-div">
-            <ion-col size="3" required>תמונה</ion-col>
-            <ion-col style="padding: 0; display: flex; align-items: center">
-              <ion-button shape="round" color="secondary" (click)="fileInput.click()" *ngIf="!logoPreview">העלאת תמונה</ion-button>
+            <ion-col size="3" required>לוגו</ion-col>
+            <ion-col style="padding: 0" *ngIf="!logoPreview">
+              <ion-button shape="round" color="secondary" (click)="fileInput.click()">העלאת תמונה</ion-button>
               <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])">
-              <ion-thumbnail *ngIf="logoPreview">
+              <ion-button fill="clear" color="dark" class="ion-float-end" (click)="enterLink()">
+                <ion-icon name="link" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-col>
+            <ion-col style="padding: 0; display: flex; justify-content: space-between; align-items: center;" *ngIf="logoPreview">
+              <ion-thumbnail>
                 <img [src]="logoPreview">
               </ion-thumbnail>
-              <ion-button fill="clear" color="secondary" *ngIf="logoPreview" class="small-circle-btn" (click)="clearLogo()">
+              <ion-button fill="clear" color="secondary" class="small-circle-btn" (click)="clearLogo()">
                 <ion-icon slot="icon-only" name="close"></ion-icon>
               </ion-button>
             </ion-col>

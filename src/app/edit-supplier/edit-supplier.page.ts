@@ -65,6 +65,11 @@ export class EditSupplierPage implements OnInit {
   clearLogo() {
     this.logoPreview = null;
     this.tempLogo = null;
+    this.supplier.logo = null;
+  }
+
+  async enterLink() {
+    this.supplier.logo = this.logoPreview = await this.alerts.inputAlert('', 'הדבק קישור לתמונה');
   }
 
 
@@ -88,7 +93,7 @@ export class EditSupplierPage implements OnInit {
 
     // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
     const l = this.alerts.loaderStart('שומר פרטי ספק...');
-    await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo, (this.supplier.logo && !this.logoPreview));
+    await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo);
     this.alerts.loaderStop(l);
 
   }

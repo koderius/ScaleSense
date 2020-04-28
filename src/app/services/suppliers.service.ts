@@ -119,7 +119,7 @@ export class SuppliersService {
 
 
   /** Upload supplier data, and upload its logo */
-  async saveSupplierDoc(supplierDoc: BusinessDoc, fileToUpload?: File, deleteLogo?: boolean) {
+  async saveSupplierDoc(supplierDoc: BusinessDoc, logoFile?: File) {
 
     // If new, create ID and stamp creation time
     if(!supplierDoc.id) {
@@ -130,15 +130,13 @@ export class SuppliersService {
     // Upload or delete logo image
     try {
 
-      // If logo should be deleted, delete it from the server, and delete the supplier's logo field
-      if(deleteLogo) {
+      // If there is no logo, delete the file (if exists)
+      if(!supplierDoc.logo)
         this.filesService.deleteFile(supplierDoc.id);
-        delete supplierDoc.logo;
-      }
 
-      // If there is a file to upload
-      if(fileToUpload)
-        supplierDoc.logo = await this.filesService.uploadFile(fileToUpload, supplierDoc.id);
+      // Upload the temp file (if there is) and get its URL
+      if(logoFile)
+        supplierDoc.logo = await this.filesService.uploadFile(logoFile, supplierDoc.id);
 
     }
     catch (e) {

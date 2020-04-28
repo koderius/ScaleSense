@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
 import {SuppliersService} from '../services/suppliers.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-products-list',
@@ -22,6 +23,7 @@ export class ProductsListPage implements OnInit {
   constructor(
     private productsService: ProductsService,
     public suppliersService: SuppliersService,
+    public navService: NavigationService,
   ) { }
 
   ngOnInit() {

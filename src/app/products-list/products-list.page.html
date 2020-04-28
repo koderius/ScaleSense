@@ -13,7 +13,7 @@
       </ion-searchbar>
 
       <div>
-        <ion-button shape="round" color="secondary" strong="true">
+        <ion-button shape="round" color="secondary" strong="true" (click)="navService.goToEditProduct('new')">
           <ion-icon slot="start" name="add"></ion-icon>
           <ion-text>הוספת מוצר</ion-text>
         </ion-button>
@@ -62,7 +62,7 @@
           <ion-col>{{product.catalogNumC}}</ion-col>
           <ion-col>{{product.price | price}} / {{null | unitAmount : product.type}}</ion-col>
           <ion-col>
-            <ion-button fill="outline" color="dark" shape="round">עריכת מוצר</ion-button>
+            <ion-button fill="outline" color="dark" shape="round" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
           </ion-col>
           <ion-col>
             <ion-button fill="outline" color="dark" shape="round">תמחור לקוחות</ion-button>

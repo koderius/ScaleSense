@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { SettingsPage } from './settings-page.component';
-import {AppEnterGuard} from '../app-enter-guard.service';
 
 const routes: Routes = [
   {
@@ -12,19 +10,20 @@ const routes: Routes = [
   {
     path: 'suppliers-list',
     loadChildren: () => import('../suppliers-list/suppliers-list.module').then( m => m.SuppliersListPageModule),
-    canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
   {
     path: 'edit-supplier',
     loadChildren: () => import('../edit-supplier/edit-supplier.module').then( m => m.EditSupplierPageModule),
-    canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
   {
     path: 'products-list',
     loadChildren: () => import('../products-list/products-list.module').then( m => m.ProductsListPageModule),
-    canActivateChild: [AppEnterGuard],
+  },
+  {
+    path: 'edit-product',
+    loadChildren: () => import('../edit-product/edit-product.module').then( m => m.EditProductPageModule),
   },
 ];
 

@@ -1,5 +1,3 @@
-import {ProductOrder} from './OrderI';
-
 export enum ProductType {
 
   /** Default - the unit weight is not relevant */
@@ -15,17 +13,17 @@ export enum ProductType {
 export interface ProductDoc {
 
   /** Server ID */
-  id: string;
+  id?: string;
 
   /** The ID of the supplier it belongs to */
-  sid: string;
+  sid?: string;
 
   /** Catalog number */
-  catalogNumC: string;
-  catalogNumS: string;
+  catalogNumC?: string;
+  catalogNumS?: string;
 
   /** ProductDoc's name */
-  name: string;
+  name?: string;
 
   /** Barcode */
   barcode?: number;
@@ -43,7 +41,7 @@ export interface ProductDoc {
   type?: ProductType;
 
   /** Weight of unit (?) */
-  unitWeight: number;
+  unitWeight?: number;
 
   /** Minimum for order (by units or weight?) */
   orderMin?: number;
@@ -55,11 +53,9 @@ export interface ProductDoc {
   price?: number;
 
   /** Time of creation */
-  created?: Date;
+  created?: number;
 
   /** Time of updating */
-  updated?: Date;
+  modified?: number;
 
 }
-
-export interface Product extends ProductDoc, ProductOrder {}

@@ -5,13 +5,17 @@ import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {BusinessService} from './business.service';
+import {FilesService} from './files.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
 
-  constructor(private businessService: BusinessService) {}
+  constructor(
+    private businessService: BusinessService,
+    private filesService: FilesService,
+  ) {}
 
   /** The reference to the firestore collection where the list of products is stored */
   get myProductsRef() : CollectionReference {
@@ -90,6 +94,40 @@ export class ProductsService {
 
     const res = await ref.get();
     return res.docs.map((d)=>d.data() as ProductDoc);
+
+  }
+
+  async saveProduct(product: ProductDoc, imageFile?: File) {
+
+    // If new, create ID and stamp creation time
+    if(!product.id) {
+      product.id = this.myProductsRef.doc().id;
+      product.created = Date.now();
+    }
+
+    // Upload or delete product image
+    try {
+
+      // If there is no logo, delete the file (if exists)
+      if(!product.image)
+        this.filesService.deleteFile(product.id);
+
+      // Upload the temp file (if there is) and get its URL
+      if(imageFile)
+        product.image = await this.filesService.uploadFile(imageFile, product.id);
+
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+    try {
+      product.modified = Date.now();
+      await this.myProductsRef.doc(product.id).set(product, {merge: true});
+    }
+    catch (e) {
+      console.error(e);
+    }
 
   }
 

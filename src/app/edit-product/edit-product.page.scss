@@ -1,0 +1,19 @@
+@import "../edit-supplier/edit-supplier.page.scss";
+
+.form {
+  width: 100% !important;
+}
+
+.select-box {
+  border: none !important;
+  padding: 0 !important;
+  ion-select {
+    border-bottom: solid black 1px;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+}
+
+.inputs > ion-col {
+  padding: 0;
+}

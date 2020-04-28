@@ -5,7 +5,7 @@ import {HeaderComponent} from './header/header.component';
 import {OredersWizardComponent} from './orders-wizard/oreders-wizard.component';
 import {NgSelectComponent, NgSelectModule} from 'ng-custom-select';
 import {HighlightifyPipe} from '../pipes/highlightify.pipe';
-import {UnitAmountPipe} from '../pipes/unit-name.pipe';
+import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
   MatDatepickerModule,

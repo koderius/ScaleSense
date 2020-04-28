@@ -87,4 +87,26 @@ export class AlertsService {
     return res.role == 'yes';
   }
 
+  async inputAlert(msg: string, placeholder?: string) : Promise<string> {
+
+    const alert = await this.alertCtrl.create({
+      subHeader: msg,
+      inputs: [{
+        placeholder: placeholder,
+      }],
+      buttons: [
+        {
+          text: 'אישור',
+        },
+        {
+          text: 'ביטול',
+          role: 'cancel',
+        }
+      ],
+    });
+    alert.present();
+    const res = await alert.onDidDismiss();
+    return res.data.values[0];
+  }
+
 }
