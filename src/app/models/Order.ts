@@ -54,7 +54,8 @@ export class Order {
       if (product) {
         product.amount = newAmount;
         product.pricePerUnit = pricePerUnit;
-      } else {
+      }
+      else {
         if (!this._props.products)
           this._props.products = [];
         this._props.products.push({id: id, amount: newAmount, pricePerUnit: pricePerUnit});
@@ -63,6 +64,8 @@ export class Order {
       const idx = this.products.findIndex((p) => p.id == id);
       if (idx > -1)
         this._props.products.splice(idx, 1);
+      if(!this._props.products.length)
+        delete this._props.products;
     }
   }
 

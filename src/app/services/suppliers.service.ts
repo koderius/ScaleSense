@@ -7,6 +7,8 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {FilesService} from './files.service';
+import {ProductsService} from './products.service';
+import {Dictionary} from '../utilities/dictionary';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +22,7 @@ export class SuppliersService {
   constructor(
     private businessService: BusinessService,
     private filesService: FilesService,
+    private productsService: ProductsService,
   ) {
 
     // Get all the suppliers of the current customer (sorted by name)
@@ -40,7 +43,7 @@ export class SuppliersService {
 
   /** The reference to the firestore collection where the list of suppliers is stored */
   get mySuppliersRef() : CollectionReference {
-    return this.businessService.businessDocRef.collection('mysuppliers');
+    return this.businessService.businessDocRef.collection('my_suppliers');
   }
 
 
@@ -80,10 +83,18 @@ export class SuppliersService {
 
       const queryResults = [];
 
-      // Query products by name and category
+      // Query products by name and category, and collect the results of both queries
       try {
-        const p1 = this.mySuppliersRef.parent.collection('myproducts').where('name','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
-        const p2 = this.mySuppliersRef.parent.collection('myproducts').where('category','>=',q).get().then((res)=>{queryResults.push(...res.docs)});
+        const p1 = this.productsService.myProductsRef
+          .where('name','>=',q)
+          .where('name','<',Dictionary.queryByString(q)).get().then((res)=>{
+          queryResults.push(...res.docs);
+        });
+        const p2 = this.productsService.myProductsRef
+          .where('category','>=',q)
+          .where('category','<',Dictionary.queryByString(q)).get().then((res)=>{
+          queryResults.push(...res.docs)
+        });
         await Promise.all([p1,p2]);
       }
       catch (e) {

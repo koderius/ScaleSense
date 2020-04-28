@@ -3,6 +3,7 @@ import {ProductsService} from '../services/products.service';
 import {ProductDoc} from '../models/Product';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-products-list',
@@ -24,6 +25,7 @@ export class ProductsListPage implements OnInit {
     private productsService: ProductsService,
     public suppliersService: SuppliersService,
     public navService: NavigationService,
+    public authService: AuthService,
   ) { }
 
   ngOnInit() {

@@ -96,7 +96,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   }
 
   xClicked() {
-    alert('מה הכפתור הזה עושה? אי אפשר פשוט למחוק הזמנה קיימת שכבר נשלחה');
+    alert('מה הכפתור הזה עושה? בעקרון לא אמור להיות אפשרי למחוק הזמנה קיימת');
   }
 
   async deleteDraft(orderId: string) {

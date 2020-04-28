@@ -6,6 +6,7 @@ import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {BusinessService} from './business.service';
 import {FilesService} from './files.service';
+import {Dictionary} from '../utilities/dictionary';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class ProductsService {
 
   /** The reference to the firestore collection where the list of products is stored */
   get myProductsRef() : CollectionReference {
-    return this.businessService.businessDocRef.collection('myproducts');
+    return this.businessService.businessDocRef.collection('my_products');
   }
 
 
@@ -71,11 +72,8 @@ export class ProductsService {
     let ref = this.myProductsRef.orderBy('name');
 
     // Filter by name
-    if(q) {
-      const lastLetter = q.slice(-1);                                                           // Get last letter
-      const to = q.slice(0, -1) + lastLetter + 1;                                               // Remove the last letter and replace it with the next letter
-      ref = ref.where('name','>=',q).where('name', '<', to);     // e.g: if query was "bla" search every name between "bla" (inclusive) and "blb" (exclusive)
-    }
+    if(q)
+      ref = ref.where('name','>=',q).where('name', '<', Dictionary.queryByString(q));
 
     // Filter by supplier ID
     if(supplierId)
