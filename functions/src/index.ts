@@ -38,6 +38,40 @@ export const checkPayment = functions.https.onCall((data, context) => {});
 
 
 
+export const onSupplierUpdate = functions.firestore.document('customers/{customerId}/my_suppliers/{sid}').onWrite((change, context)=>{
+
+
+
+});
+
+
+export const offerSpecialPrice = functions.https.onCall((data: {productId: string, customerId: string, price: number}, context) => {
+
+  if(data && context && context.auth) {
+
+    admin.firestore().runTransaction(async transaction => {
+
+      // Get the supplier ID according to the user who called the function
+      const sid = (await transaction.get(admin.firestore().collection('users').doc(context.auth.uid))).get('bid');
+
+      // Get the private customer data for the requested product
+      const customerProductRef = admin.firestore().collection('customers').doc(data.customerId).collection('my_products').doc(data.productId);
+      const productSid = (await transaction.get(customerProductRef)).get('sid');
+
+      // Check the user is the supplier who owned this product
+      if(productSid != sid)
+        throw new HttpsError('permission-denied', 'The supplier does not own this product');
+
+      // Set a special price in the customer private data of this product
+      transaction.update(customerProductRef, {price: data.price});
+
+    });
+
+  }
+
+});
+
+
 // export const orderUpdate = functions.https.onCall(async (order: OrderDoc, context) => {
 //
 //   return await admin.firestore().runTransaction<OrderChange>(async (transaction)=>{

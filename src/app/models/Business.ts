@@ -1,12 +1,15 @@
 /** Customer or supplier */
 export type BusinessSide = 'c' | 's';
 
+
+/** Business (i.e. customer or supplier) data */
 export interface BusinessDoc {
 
+  /** Server ID */
   id?: string;
-  nid?: number;
-  name?: string;
 
+  /** Business data */
+  name?: string;
   logo?: string;
   address?: string;
   businessPhone?: string;
@@ -14,10 +17,24 @@ export interface BusinessDoc {
   companyId?: string;
   accountancyEmail?: string;
 
+  /** Time created and edited */
+  created?: number;
+  modified?: number;
+
+}
+
+/** Contains also the private data that each customer has for his supplier */
+export interface SupplierDoc extends BusinessDoc {
+
+  /** Supplier's serial number */
+  nid?: number;
+
+  /** Number of orders made to this supplier. used for finding the most common suppliers */
+  numOfOrders?: number;
+
+  /** List of contacts for this supplier */
   contacts?: ContactInfo[];
 
-  created?;
-  modified?;
 
 }
 
@@ -26,3 +43,4 @@ export type ContactInfo = {
   email?: string;
   phone?: string;
 }
+

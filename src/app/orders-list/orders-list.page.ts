@@ -24,6 +24,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   query: string = '';
   fromDate: Date;
   toDate: Date;
+  showPast: boolean;        //TODO: Check box for this
 
   isSearching: boolean;
 
@@ -126,7 +127,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
    * page = 1 - next page
    * page = -1 - previous page
    * */
-  async searchOrders(movePage: -1 | 0 | 1 = 0) {
+  async searchOrders(movePage: number = 0) {
 
     const byDate = this.fromDate && this.toDate;
 
@@ -134,7 +135,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
     const res = await this.ordersService.queryOrders(
       this.pageMode == 'drafts',
       this.query,
-      byDate ? [this.fromDate, this.toDate] : null,
+      byDate ? [this.fromDate, this.toDate] : (this.showPast ? null : [new Date()]),
       movePage == 1 ? this.orders.slice(-1)[0] : null,
       movePage == -1 ? this.orders[0] : null,
     );

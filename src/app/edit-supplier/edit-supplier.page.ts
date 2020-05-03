@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {BusinessDoc} from '../models/Business';
+import {BusinessDoc, SupplierDoc} from '../models/Business';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
@@ -12,7 +12,7 @@ import {FilesService} from '../services/files.service';
 })
 export class EditSupplierPage implements OnInit {
 
-  supplier: BusinessDoc;
+  supplier: SupplierDoc;
   originalSupplier: string;
 
   logoPreview: string;

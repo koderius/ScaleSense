@@ -1,9 +1,13 @@
 import {BusinessSide} from './Business';
+import {ProductDoc} from './Product';
 
 export type ProductOrder = {
 
   /** The product ID */
   id: string;
+
+  /** The product's properties, as they were when the order has approved (or other status?) */
+  productDoc?: ProductDoc;
 
   /** The amount to order */
   amount?: number;
@@ -11,7 +15,7 @@ export type ProductOrder = {
   /** Product's comment (if there is) */
   comment?: string;
 
-  /** Product's unit price. If not specified, the price is the default price as defined in the productOrder itself */
+  /** Product's unit price */
   pricePerUnit?: number;
 
 }

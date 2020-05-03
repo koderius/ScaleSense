@@ -32,6 +32,10 @@
 // Import angular material styles
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
+body {
+  font-family: 'Open Sans Hebrew', serif;
+}
+
 // The app's background
 ion-content {--background: url('/assets/background.png') top/100% 100% no-repeat}
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {BusinessDoc} from '../models/Business';
-import {ProductDoc} from '../models/Product';
+import {SupplierDoc} from '../models/Business';
+import {ProductCustomer} from '../models/Product';
 import {BusinessService} from './business.service';
 import CollectionReference = firebase.firestore.CollectionReference;
 import * as firebase from 'firebase/app';
@@ -13,10 +13,13 @@ import {Dictionary} from '../utilities/dictionary';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ *  Suppliers service - For use of customers
+ * */
 export class SuppliersService {
 
   /** List of all the suppliers that belong to the current customer. Continually updated from the server */
-  private _mySuppliers: BusinessDoc[] = [];
+  private _mySuppliers: SupplierDoc[] = [];
 
 
   constructor(
@@ -28,7 +31,7 @@ export class SuppliersService {
     // Get all the suppliers of the current customer (sorted by name)
     try {
       this.mySuppliersRef.orderBy('name').onSnapshot(snapshot => {
-        this._mySuppliers = snapshot.docs.map((d)=>d.data() as BusinessDoc);
+        this._mySuppliers = snapshot.docs.map((d)=>d.data() as SupplierDoc);
       })
     }
     catch (e) {
@@ -54,13 +57,13 @@ export class SuppliersService {
 
 
   /** Load supplier by ID once (in case subscription has not started yet) */
-  async loadSupplier(id: string) : Promise<BusinessDoc> {
+  async loadSupplier(id: string) : Promise<SupplierDoc> {
     return (await this.mySuppliersRef.doc(id).get()).data();
   }
 
 
   /** Get supplier from the list by his ID */
-  getSupplierById(id: string) : BusinessDoc | null {
+  getSupplierById(id: string) : SupplierDoc | null {
     return {...this._mySuppliers.find((s)=>s.id == id)};
   }
 
@@ -72,7 +75,7 @@ export class SuppliersService {
 
 
   /** Query suppliers by their name, or by their products name/category */
-  async querySuppliers(q: string) : Promise<BusinessDoc[]> {
+  async querySuppliers(q: string) : Promise<SupplierDoc[]> {
 
     q = q.toLowerCase();
 
@@ -103,7 +106,7 @@ export class SuppliersService {
 
       // After querying done, add the suppliers ID to the results
       queryResults.forEach((doc: DocumentSnapshot)=>{
-        const sid = (doc.data() as ProductDoc).sid;
+        const sid = (doc.data() as ProductCustomer).sid;
         if(!results.some((s)=>s.id == sid))
           results.push(this.getSupplierById(sid));
       });
@@ -130,7 +133,7 @@ export class SuppliersService {
 
 
   /** Upload supplier data, and upload its logo */
-  async saveSupplierDoc(supplierDoc: BusinessDoc, logoFile?: File) {
+  async saveSupplierDoc(supplierDoc: SupplierDoc, logoFile?: File) {
 
     // If new, create ID and stamp creation time
     if(!supplierDoc.id) {

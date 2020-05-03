@@ -58,7 +58,7 @@ export class OrdersService {
    * Get all my orders, or filtered by query.
    * Can be filtered by:
    * - serial number (single result) - if the query text is a number,
-   * - invoice number (single result) - if the query text fits the serial number formay (yy-serial),
+   * - invoice number (single result) - if the query text fits the serial number format (yy-serial),
    * - supplier's name (multiple results) - if the query text is non-numeric & non-serial format string, *limited to up to 10 different suppliers fits to the query
    * - date range (multiple results) - inclusive,
    * for more than 10 results use pagination */
@@ -80,17 +80,19 @@ export class OrdersService {
     // For other strings or no query, there might be more than 1 results
     if(!ref) {
 
-      // Sort by time and by serial, and check draft/non-draft
-      const sortBy = isDraft ? 'modified' : 'supplyTime';
-      ref = baseRef.orderBy(sortBy);   //.orderBy('serial');
+      // Sort by supply time and by serial number
+      ref = baseRef.orderBy('supplyTime').orderBy('serial');
 
-      // For querying by dates (not for drafts)
-      if(dates && dates.length == 2 && !isDraft) {
-        dates[1].setDate(dates[1].getDate() + 1);
-        ref = ref.where('supplyTime','>=',dates[0].getTime()).where('supplyTime','<',dates[1].getTime());
+      // For querying by dates (not for drafts), add date filter
+      if(dates && !isDraft) {
+        ref = ref.where('supplyTime','>=',dates[0].getTime());    // from date (inclusive)
+        if(dates[1]) {
+          dates[1].setDate(dates[1].getDate() + 1);
+          ref = ref.where('supplyTime','<',dates[1].getTime());   // to date (exclusive)
+        }
       }
 
-      // if there is a text query, search by supplier name (first get suppliers ID, and then search by their IDs)
+      // if there is a text query, filter by supplier name (first get suppliers ID, and then search by their IDs)
       if(query) {
         const suppliers = this.suppliersService.getSupplierByName(query);
         if(suppliers.length > 0 && suppliers.length <= 10) {
@@ -101,11 +103,11 @@ export class OrdersService {
           return [];
       }
 
-      // For pagination, start after the last (next page), or end before the first (previous page) // TODO: if order by serial, add serial to startAfter and endBefore
+      // For pagination, start after the last (next page), or end before the first (previous page)
       if(lastDoc && !firstDoc)
-        ref = ref.startAfter(lastDoc[sortBy]);
+        ref = ref.startAfter(lastDoc['supplyTime'], lastDoc['serial']);
       if(firstDoc && !lastDoc)
-        ref = ref.endBefore(firstDoc[sortBy]).limitToLast(10);
+        ref = ref.endBefore(firstDoc['supplyTime'], lastDoc['serial']).limitToLast(10);
       else
         ref = ref.limit(10);
 

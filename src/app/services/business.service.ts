@@ -30,6 +30,10 @@ export class BusinessService {
       return null;
   }
 
+  get myBid() {
+    return this.businessDocRef.id;
+  }
+
   constructor(private authService: AuthService) {}
 
 }

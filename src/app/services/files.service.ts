@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/storage';
-import {AuthService} from './auth.service';
 import Reference = firebase.storage.Reference;
 
 @Injectable({
@@ -10,12 +9,11 @@ import Reference = firebase.storage.Reference;
 export class FilesService {
 
   constructor(
-    private authService: AuthService,
   ) { }
 
-  /** All the files will be stored in a directory named after the business ID */
+  /** All the files will be stored in the directory "images" */
   get storageRef() {
-    return firebase.storage().ref(this.authService.currentUser.bid);
+    return firebase.storage().ref('images');
   }
 
   async uploadFile(file: File, objectId: string) : Promise<string> {
@@ -48,7 +46,10 @@ export class FilesService {
     else
       ref = this.storageRef.child(idOrUrl);
 
-    await ref.delete();
+    try {
+      await ref.delete();
+    }
+    catch (e) {}
 
   }
 
