@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductOrder} from '../../models/OrderI';
-import {ProductDoc} from '../../models/Product';
+import {ProductPublicDoc} from '../../models/Product';
 
 @Component({
   selector: 'app-product-summery',
@@ -10,7 +10,7 @@ import {ProductDoc} from '../../models/Product';
 export class ProductSummeryComponent implements OnInit {
 
   @Input() productOrder: ProductOrder;
-  @Input() productDetails: ProductDoc;
+  @Input() productDetails: ProductPublicDoc;
   @Input() isEdit: boolean;
   @Input() withComments: boolean;
 

@@ -159,7 +159,7 @@
             <ion-col size="4" required>קטגוריה</ion-col>
             <ion-col>
               <div class="select-box">
-                <ion-select [(ngModel)]="myProductData.category" interface="popover" placeholder="בחר קטגוריה" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
+                <ion-select [(ngModel)]="product.category" interface="popover" placeholder="בחר קטגוריה" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
                   <ion-select-option></ion-select-option>
                 </ion-select>
               </div>
@@ -169,7 +169,7 @@
           <ion-row class="input-div">
             <ion-col size="4">אפיצות מחיר</ion-col>
             <ion-col style="display: flex">
-              <ion-input type="number" [(ngModel)]="myProductData.priceTolerance"></ion-input>
+              <ion-input type="number" [(ngModel)]="product.priceTolerance"></ion-input>
               <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
             </ion-col>
           </ion-row>
@@ -177,7 +177,7 @@
           <ion-row class="input-div">
             <ion-col size="4">אפיצות משקל</ion-col>
             <ion-col style="display: flex">
-              <ion-input type="number" [(ngModel)]="myProductData.weightTolerance"></ion-input>
+              <ion-input type="number" [(ngModel)]="product.weightTolerance"></ion-input>
               <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
             </ion-col>
           </ion-row>
@@ -185,7 +185,7 @@
           <ion-row class="input-div">
             <ion-col size="4" required>מק"ט (משתמש)</ion-col>
             <ion-col>
-              <ion-input type="number" [(ngModel)]="myProductData.catalogNumC"></ion-input>
+              <ion-input type="number" [(ngModel)]="product.catalogNumC"></ion-input>
             </ion-col>
           </ion-row>
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ProductsService} from '../services/products.service';
-import {ProductCustomer, ProductDoc} from '../models/Product';
+import {FullProductDoc} from '../models/Product';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {AuthService} from '../services/auth.service';
@@ -10,7 +10,7 @@ import {AuthService} from '../services/auth.service';
   templateUrl: './products-list.page.html',
   styleUrls: ['./products-list.page.scss'],
 })
-export class ProductsListPage implements OnInit {
+export class ProductsListPage {
 
   q: string = '';
   sid: string;
@@ -26,15 +26,11 @@ export class ProductsListPage implements OnInit {
     public authService: AuthService,
   ) { }
 
-  get productsList() : ProductDoc[] {
+  get productsList() : FullProductDoc[] {
     return this.productsService.loadedProducts;
   }
 
-  getMyProductData(id: string) : ProductCustomer {
-    return this.productsService.loadedMyProducts.find((p)=>p.id == id) || {};
-  }
-
-  ngOnInit() {
+  ionViewDidEnter() {
     this.search();
   }
 
@@ -49,7 +45,7 @@ export class ProductsListPage implements OnInit {
     this.isSearching = true;
 
     // Get results
-    const res = await this.productsService.loadProductByName(
+    const res = await this.productsService.queryMyProducts(
       this.q,
       this.sid,
       movePage == 1 ? this.productsList.slice(-1)[0].name : null,

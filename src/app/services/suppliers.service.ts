@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {SupplierDoc} from '../models/Business';
-import {ProductCustomer} from '../models/Product';
+import {ProductCustomerDoc} from '../models/Product';
 import {BusinessService} from './business.service';
 import CollectionReference = firebase.firestore.CollectionReference;
 import * as firebase from 'firebase/app';
@@ -106,7 +106,7 @@ export class SuppliersService {
 
       // After querying done, add the suppliers ID to the results
       queryResults.forEach((doc: DocumentSnapshot)=>{
-        const sid = (doc.data() as ProductCustomer).sid;
+        const sid = (doc.data() as ProductCustomerDoc).sid;
         if(!results.some((s)=>s.id == sid))
           results.push(this.getSupplierById(sid));
       });
@@ -175,6 +175,12 @@ export class SuppliersService {
       console.error(e);
     }
 
+  }
+
+
+  /** Increase the search counter of this supplier by 1 */
+  increaseSupplierSearch(sid: string) {
+    this.mySuppliersRef.doc(sid).update({numOfOrders: firebase.firestore.FieldValue.increment(1)});
   }
 
 }

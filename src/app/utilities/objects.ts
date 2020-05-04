@@ -1,11 +1,11 @@
 export class Objects {
 
-  static ClearFalse(obj: object) {
+  static ClearFalsy(obj: object) {
 
     Object.getOwnPropertyNames(obj).forEach((p)=>{
       const value = obj[p];
       if(value && typeof value == 'object')
-        Objects.ClearFalse(value);
+        Objects.ClearFalsy(value);
       if(!value)
         delete obj[p];
     })
@@ -19,8 +19,8 @@ export class Objects {
     const bProps = Object.keys(b);
 
     // Clear undefined fields
-    Objects.ClearFalse(a);
-    Objects.ClearFalse(b);
+    Objects.ClearFalsy(a);
+    Objects.ClearFalsy(b);
 
     if (aProps.length != bProps.length)
       return false;

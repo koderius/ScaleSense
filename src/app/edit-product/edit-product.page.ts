@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ProductCustomer, ProductDoc, ProductType} from '../models/Product';
+import {FullProductDoc, ProductType} from '../models/Product';
 import {ActivatedRoute} from '@angular/router';
 import {ProductsService} from '../services/products.service';
 import {FilesService} from '../services/files.service';
@@ -14,8 +14,7 @@ import {AlertsService} from '../services/alerts.service';
 })
 export class EditProductPage implements OnInit {
 
-  product: ProductDoc;
-  myProductData: ProductCustomer;
+  product: FullProductDoc;
 
   logoPreview: string;
   tempLogo: File;
@@ -38,18 +37,19 @@ export class EditProductPage implements OnInit {
 
   async ngOnInit() {
 
+    // Get ID from URL. if 'new', start new empty product, else, get the product data by the ID
     const id = this.activatedRoute.snapshot.params['id'];
     if(id == 'new') {
       this.product = {};
-      this.myProductData = {};
     }
     else {
-      this.myProductData = (await this.productsService.myProductsRef.doc(id).get()).data() as ProductCustomer;
-      this.product = (await this.productsService.allProductsRef.doc(id).get()).data() as ProductDoc;
+      this.product = await this.productsService.loadProductById(id);
     }
 
+    // If no tara weight, it means that the tara included
     this.taraIncluded = !this.product.tara;
 
+    // Show the product image
     this.logoPreview = this.product.image;
 
   }
@@ -81,7 +81,7 @@ export class EditProductPage implements OnInit {
 
     // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
     const l = this.alerts.loaderStart('שומר פרטי מוצר...');
-    await this.productsService.saveProduct(this.product, this.myProductData, this.tempLogo);
+    await this.productsService.saveProduct(this.product, this.tempLogo);
     this.alerts.loaderStop(l);
 
   }
@@ -89,7 +89,7 @@ export class EditProductPage implements OnInit {
 
   checkFields() : boolean {
 
-    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.myProductData.catalogNumC || !this.product.image || !this.product.barcode || !this.product.price || this.myProductData.category) {
+    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.catalogNumC || !this.product.image || !this.product.barcode || !this.product.price || this.product.category) {
       alert('יש למלא את כל השדות המסומנים בכוכבית');
       return false;
     }

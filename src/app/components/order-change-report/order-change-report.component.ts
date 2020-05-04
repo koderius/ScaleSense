@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {OrderChange, OrderDoc, OrderStatus, ProductOrder} from '../../models/OrderI';
 import {AuthService} from '../../services/auth.service';
 import {ProductsService} from '../../services/products.service';
-import {ProductDoc} from '../../models/Product';
+import {ProductPublicDoc} from '../../models/Product';
 
 @Component({
   selector: 'app-order-change-report',
@@ -23,7 +23,7 @@ export class OrderChangeReportComponent implements OnInit {
   currentPrice: number = 0;
 
   productChanges: {old: ProductOrder, current: ProductOrder}[] = [];
-  productsData: ProductDoc[] = [];
+  productsData: ProductPublicDoc[] = [];
 
   lines: string[] = [];
 

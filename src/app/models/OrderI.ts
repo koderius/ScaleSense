@@ -1,5 +1,5 @@
 import {BusinessSide} from './Business';
-import {ProductDoc} from './Product';
+import {ProductPublicDoc} from './Product';
 
 export type ProductOrder = {
 
@@ -7,7 +7,7 @@ export type ProductOrder = {
   id: string;
 
   /** The product's properties, as they were when the order has approved (or other status?) */
-  productDoc?: ProductDoc;
+  productDoc?: ProductPublicDoc;
 
   /** The amount to order */
   amount?: number;

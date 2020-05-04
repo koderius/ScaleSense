@@ -4,7 +4,7 @@ import {SuppliersService} from '../services/suppliers.service';
 import {OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
-import {ProductDoc} from '../models/Product';
+import {ProductCustomerDoc, ProductPublicDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
@@ -51,8 +51,8 @@ export class OrderPage implements OnInit {
   showAllSuppliers: boolean;
 
   /** The list of products of the order's supplier, and a filtered list while querying */
-  supplierProducts: ProductDoc[] = [];
-  filteredSupplierProducts: ProductDoc[] = null;
+  supplierProducts: ProductPublicDoc[] = [];
+  filteredSupplierProducts: ProductPublicDoc[] = null;
 
   /** Date and time inputs */
   dateFocus: boolean;
@@ -126,7 +126,7 @@ export class OrderPage implements OnInit {
 
     // On page no. 2, load all the products of the current supplier
     if(this._page == 2) {
-      this.supplierProducts = [];
+      this.supplierProducts = [];     // (Clear before to avoid flashing in the meanwhile)
       this.productsService.loadAllProductsOfSupplier(this.order.sid).then((res)=>{
         this.supplierProducts = res;
       });
@@ -232,8 +232,10 @@ export class OrderPage implements OnInit {
   /** Get 5 most common search suppliers (IDs) not including those in the search results */
   get commonSuppliers() : string[] {
     return this.suppliersService.mySuppliers.filter((s)=>!this.suppliersSearchResults.includes(s.id))
-    // TODO: Get real common searches
-      .slice(0,5).map((s)=>s.id);
+      .filter((s)=>!!s.numOfOrders)
+      .sort((a, b) => b.numOfOrders - a.numOfOrders)
+      .slice(0,5)
+      .map((s)=>s.id);
   }
 
 

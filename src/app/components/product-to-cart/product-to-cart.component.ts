@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ProductDoc} from '../../models/Product';
+import {ProductPublicDoc} from '../../models/Product';
 import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
 
 @Component({
@@ -14,7 +14,7 @@ export class ProductToCartComponent implements OnInit {
 
   showBubble: boolean;
 
-  @Input() product: ProductDoc;
+  @Input() product: ProductPublicDoc;
   @Output() addToCart = new EventEmitter();
 
   constructor(private unitPipe: UnitAmountPipe) { }

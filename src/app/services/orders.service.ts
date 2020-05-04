@@ -80,8 +80,11 @@ export class OrdersService {
     // For other strings or no query, there might be more than 1 results
     if(!ref) {
 
-      // Sort by supply time and by serial number
-      ref = baseRef.orderBy('supplyTime').orderBy('serial');
+      // Sort by supply time and by serial number, or by modification time for drafts
+      if(isDraft)
+        ref = baseRef.orderBy('modified');
+      else
+        ref = baseRef.orderBy('supplyTime').orderBy('serial');
 
       // For querying by dates (not for drafts), add date filter
       if(dates && !isDraft) {
@@ -105,9 +108,9 @@ export class OrdersService {
 
       // For pagination, start after the last (next page), or end before the first (previous page)
       if(lastDoc && !firstDoc)
-        ref = ref.startAfter(lastDoc['supplyTime'], lastDoc['serial']);
+        ref = ref.startAfter(isDraft ? lastDoc.modified : [lastDoc.supplyTime, lastDoc.serial]);
       if(firstDoc && !lastDoc)
-        ref = ref.endBefore(firstDoc['supplyTime'], lastDoc['serial']).limitToLast(10);
+        ref = ref.endBefore(isDraft ? lastDoc.modified : [lastDoc.supplyTime, lastDoc.serial]).limitToLast(10);
       else
         ref = ref.limit(10);
 
@@ -147,7 +150,7 @@ export class OrdersService {
   }
 
 
-  /** Create new order object with temporal serial number and no ID (without saving on server yet) */
+  /** Create new order object (draft) with temporal serial number and no ID (without saving on server yet) */
   async createNewOrder() : Promise<Order> {
     try {
       const metadata = (await this.myOrdersMetadataRef.get()).data();
@@ -237,6 +240,9 @@ export class OrdersService {
 
         // Create new ID
         orderDoc.id = this.myDrafts.doc().id;
+
+        // Increase number of searches for this supplier
+        this.suppliersService.increaseSupplierSearch(order.sid);
 
       }
 
