@@ -19,11 +19,11 @@
         </ion-button>
       </div>
 
-      <h3 *ngIf="!categories.length" class="ion-text-center">
+      <h3 *ngIf="!categories || !categories.length" class="ion-text-center">
         <ion-text color="medium">לא קיימות קטגוריות</ion-text>
       </h3>
 
-      <div id="grid">
+      <div id="grid" *ngIf="categories">
 
         <ion-item lines="none" *ngFor="let category of categories; let i = index">
           <ion-checkbox slot="start" [(ngModel)]="category.checked" color="dark" (ionChange)="onCategoryChanged(category)"></ion-checkbox>

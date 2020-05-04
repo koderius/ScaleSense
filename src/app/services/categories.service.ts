@@ -9,18 +9,18 @@ import {ProductCategory} from '../models/Product';
 })
 export class CategoriesService {
 
-  private _allCategories: ProductCategory[] = [];
+  private _allCategories: ProductCategory[];
 
   get categoriesRef() {
     return firebase.firestore().collection('customers').doc(this.businessService.myBid).collection('my_categories');
   }
 
   get allCategories() {
-    return this._allCategories.slice();
+    return this._allCategories ? this._allCategories.slice() : null;
   }
 
   get categoriesToShow() {
-    return this._allCategories.filter((c)=>c.checked);
+    return this._allCategories ? this._allCategories.filter((c)=>c.checked) : [];
   }
 
   constructor(

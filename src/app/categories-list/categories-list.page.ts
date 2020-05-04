@@ -21,7 +21,15 @@ export class CategoriesListPage implements OnInit {
   ) { }
 
   ngOnInit() {
+
     this.categories = this.categoriesService.allCategories;
+
+    // If has not loaded yet, retry in 1 second
+    if(!this.categories)
+      setTimeout(()=>{
+        this.ngOnInit();
+      }, 1000)
+
   }
 
   async addCategory() {
