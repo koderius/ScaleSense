@@ -59,4 +59,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('settings/edit-product/' + productId);
   }
 
+  goToCategoriesList() {
+    this.navCtrl.navigateForward('settings/categories-list');
+  }
+
 }

@@ -203,12 +203,17 @@ export class OrdersService {
 
 
   /** Cancel order by its ID */
-  async changeOrderStatus(orderId: string, status: OrderStatus) : Promise<OrderChange> {
+  async changeOrderStatus(order: Order, status: OrderStatus) : Promise<OrderChange> {
+
+    const orderDoc = order.getDocument();
+    orderDoc.status = status;
 
     try {
-      const res = (await this.updateOrderCloudFunction({id: orderId, status: status})).data as OrderChange;
-      if(res)
+      const res = (await this.updateOrderCloudFunction(orderDoc)).data as OrderChange;
+      if(res) {
+        order.status = status;
         return res;
+      }
     }
     catch (e) {
       console.error(e);

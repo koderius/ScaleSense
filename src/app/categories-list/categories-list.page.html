@@ -1,0 +1,49 @@
+<ion-header>
+  <app-header pageTitle="קטגוריות"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="container">
+
+      <div id="header">
+        <p>
+          <b>קטגוריות | </b>
+          <ion-text>סמן\הסר קטגוריה כדי להציג או להסיר מתצוגה במערכת</ion-text>
+        </p>
+        <ion-button color="dark" shape="round" (click)="addCategory()">
+          <ion-icon slot="start" name="add"></ion-icon>
+          <ion-text>הוספת קטגוריה</ion-text>
+        </ion-button>
+      </div>
+
+      <h3 *ngIf="!categories.length" class="ion-text-center">
+        <ion-text color="medium">לא קיימות קטגוריות</ion-text>
+      </h3>
+
+      <div id="grid">
+
+        <ion-item lines="none" *ngFor="let category of categories; let i = index">
+          <ion-checkbox slot="start" [(ngModel)]="category.checked" color="dark" (ionChange)="onCategoryChanged(category)"></ion-checkbox>
+          <ion-label [title]="category.title">{{category.title}}</ion-label>
+          <ion-button fill="clear" color="secondary" slot="end" class="small-circle-btn" (click)="removeCategory(i, category)">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+          <ion-button fill="clear" color="secondary" slot="end" (click)="editCategoryTitle(category)">
+            <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+      </div>
+
+    </div>
+
+    <ion-row style="margin: 1em 0; display: flex; justify-content: flex-end">
+      <ion-button shape="round" (click)="saveChanges()">שמירת נתונים</ion-button>
+    </ion-row>
+
+  </div>
+
+</ion-content>

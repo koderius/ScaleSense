@@ -174,3 +174,10 @@ export enum ProductType {
   UNIT = 3,
 
 }
+
+
+export type ProductCategory = {
+  id: string,
+  title: string;
+  checked: boolean;
+}

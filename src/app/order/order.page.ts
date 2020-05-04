@@ -104,6 +104,10 @@ export class OrderPage implements OnInit {
 
   set page(step) {
 
+    // Cannot go to other steps after order was sent
+    if(this.orderSent)
+      return;
+
     // Page 1 can be entered only in draft mode
     if(step == 1 && !this.isDraft)
       return;
@@ -380,7 +384,6 @@ export class OrderPage implements OnInit {
       const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה לספק...' : 'מעדכן הזמנה...');
       const res = await this.ordersService.updateOrder(this.order);
       if(res) {
-        this.order.changes.push(res);
         this.updateChanges();
         if(this.order.status == OrderStatus.DRAFT)
           this.orderSent = true;
@@ -398,12 +401,11 @@ export class OrderPage implements OnInit {
   async cancelOrder() {
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לבטל את ההזמנה?' : 'הספק יקבל עדכון על הביטול')) {
       const l = this.alerts.loaderStart('מבטל הזמנה...');
-      const change = await this.ordersService.changeOrderStatus(this.order.id, OrderStatus.CANCELED_BY_CUSTOMER);
+      const change = await this.ordersService.changeOrderStatus(this.order, OrderStatus.CANCELED_BY_CUSTOMER);
       this.alerts.loaderStop(l);
       if (change) {
-        this.order.changes.push(change);
-        this.ngOnInit();
         alert('ההזמנה בוטלה.');
+        this.ngOnInit();
       }
     }
   }

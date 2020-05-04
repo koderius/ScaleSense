@@ -18,7 +18,7 @@ export class UnitAmountPipe implements PipeTransform {
       case ProductType.BY_WEIGHT: unitName = 'ק"ג'; break;
       case ProductType.BOX: unitName = p ? 'ארגזים' : 'ארגז'; break;
       case ProductType.BLOCK: unitName = p ? 'בלוקים' : 'בלוק'; break;
-      case ProductType.UNIT: default: unitName = p ? 'יחידות' : 'יחידה'; break;
+      case ProductType.UNIT: unitName = p ? 'יחידות' : 'יחידה'; break;
     }
 
     // Return the amount + the name of the unit. if null - only the name of the unit

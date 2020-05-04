@@ -85,6 +85,10 @@ export class Order {
     return this._props.status;
   }
 
+  set status(status: OrderStatus) {
+    this._props.status = status;
+  }
+
   get created() {
     return this._props.created;
   }

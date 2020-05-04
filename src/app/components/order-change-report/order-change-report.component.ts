@@ -25,8 +25,6 @@ export class OrderChangeReportComponent implements OnInit {
   productChanges: {old: ProductOrder, current: ProductOrder}[] = [];
   productsData: ProductPublicDoc[] = [];
 
-  lines: string[] = [];
-
   hasDetails: boolean;
   showMore: boolean;
 
@@ -84,7 +82,7 @@ export class OrderChangeReportComponent implements OnInit {
         }
       });
 
-      this.productsData = await this.productService.loadProductsByIds([...productsIds.values()]);
+      this.productsData = await this.productService.loadProductsByIds(...productsIds.values());
 
     }
 

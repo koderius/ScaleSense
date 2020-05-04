@@ -6,6 +6,7 @@ import {FilesService} from '../services/files.service';
 import {SuppliersService} from '../services/suppliers.service';
 import {Enum} from '../utilities/enum';
 import {AlertsService} from '../services/alerts.service';
+import {CategoriesService} from '../services/categories.service';
 
 @Component({
   selector: 'app-edit-product',
@@ -28,6 +29,7 @@ export class EditProductPage implements OnInit {
     private productsService: ProductsService,
     public suppliersService: SuppliersService,
     private alerts: AlertsService,
+    public categoriesService: CategoriesService,
   ) { }
 
   get pageTitle() {
@@ -89,7 +91,7 @@ export class EditProductPage implements OnInit {
 
   checkFields() : boolean {
 
-    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.catalogNumC || !this.product.image || !this.product.barcode || !this.product.price || this.product.category) {
+    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.catalogNumC || !this.product.image || !this.product.barcode || !this.product.price || !this.product.category) {
       alert('יש למלא את כל השדות המסומנים בכוכבית');
       return false;
     }

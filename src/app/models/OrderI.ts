@@ -1,13 +1,12 @@
 import {BusinessSide} from './Business';
-import {ProductPublicDoc} from './Product';
 
 export type ProductOrder = {
 
   /** The product ID */
-  id: string;
+  id?: string;
 
-  /** The product's properties, as they were when the order has approved (or other status?) */
-  productDoc?: ProductPublicDoc;
+  /** The product's properties, as they were when the order has finally approved (JSON) */
+  productDocSnapshot?: string;
 
   /** The amount to order */
   amount?: number;
@@ -31,44 +30,37 @@ export type OrderChange = {
   /** Time of change */
   time: number;
 
+  /** The status of the order */
   status?: OrderStatus;
 
+  /** The changeable details of the order (JSON) */
   data?: string;
 
   /** The ID of the order that these changes belongs to - for notifications */
   orderId?: string;
 
-  /** Changes in the order */
-
-  // statusChange?: {old: number, new: number};
-  //
-  // productsChanges?: {old: ProductOrder | null, new: ProductOrder | null}[];
-  //
-  // supplyTimeChange?: {old: number, new: number};
-  //
-  // commentToSupplierChange?: {old: string, new: string};
-  //
-  // priceChange?: {old: number, new: number};
-
 }
 
 export enum OrderStatus {
 
-  DRAFT = 0,
+  DRAFT = 0,                // As long as the order is in the drafts collection, visible only to the customer
 
-  SENT = 10,
-  OPENED = 11,
-  APPROVED = 12,
+  SENT = 10,                // After the order has been sent by the customer at the first time. The order is created in the orders collection
+  OPENED = 11,              // The supplier send a status change after he opened the order (only status changes)
+  APPROVED = 12,            // Initial approve by the supplier. details can be changed
+  ON_THE_WAY = 13,          // Final approve by the supplier. details can be changed
 
+  CHANGED = 20,             // The customer or the supplier made some changes in the order
   CHANGED_BY_SUPPLIER = 21,
   CHANGED_BY_CUSTOMER = 22,
 
-  CANNOT_BE_EDIT_FROM_HERE = 40,
+  CANNOT_BE_EDIT_FROM_HERE = 39,    // After the order has been canceled or close. no one can update it anymore
 
+  CANCELED = 40,            // The order has been canceled by the customer or by the supplier
   CANCELED_BY_SUPPLIER = 41,
   CANCELED_BY_CUSTOMER = 42,
 
-  CLOSED = 100,
+  CLOSED = 100,             // The order was closed by the customer
 
 }
 

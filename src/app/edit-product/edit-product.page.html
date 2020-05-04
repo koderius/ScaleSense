@@ -101,8 +101,9 @@
           <ion-row class="input-div" *ngIf="!taraIncluded">
             <ion-col size="4" required>משקל אריזה</ion-col>
             <ion-col>
-              <div class="select-box">
+              <div style="display: flex">
                 <ion-input type="number" [(ngModel)]="product.tara"></ion-input>
+                <ion-text class="ion-text-end" style="border-bottom: solid black 1px">ק"ג</ion-text>
               </div>
             </ion-col>
           </ion-row>
@@ -160,7 +161,8 @@
             <ion-col>
               <div class="select-box">
                 <ion-select [(ngModel)]="product.category" interface="popover" placeholder="בחר קטגוריה" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
-                  <ion-select-option></ion-select-option>
+                  <ion-select-option [value]="''"></ion-select-option>
+                  <ion-select-option *ngFor="let c of categoriesService.categoriesToShow" [value]="c.title">{{c.title}}</ion-select-option>
                 </ion-select>
               </div>
             </ion-col>

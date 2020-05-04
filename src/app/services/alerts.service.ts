@@ -87,12 +87,13 @@ export class AlertsService {
     return res.role == 'yes';
   }
 
-  async inputAlert(msg: string, placeholder?: string) : Promise<string> {
+  async inputAlert(msg: string, placeholder?: string, value?: string) : Promise<string> {
 
     const alert = await this.alertCtrl.create({
       subHeader: msg,
       inputs: [{
         placeholder: placeholder,
+        value: value,
       }],
       buttons: [
         {
