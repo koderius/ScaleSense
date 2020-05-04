@@ -43,7 +43,7 @@ export class EditProductPage implements OnInit {
       this.product = {};
     }
     else {
-      this.product = await this.productsService.loadProductById(id);
+      this.product = (await this.productsService.loadProductsByIds(id))[0];
     }
 
     // If no tara weight, it means that the tara included

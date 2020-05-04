@@ -112,19 +112,28 @@ export class ProductsService {
   }
 
 
-  async loadProductById(id: string) : Promise<FullProductDoc> {
+  async loadProductsByIds(...ids: string[]) : Promise<FullProductDoc[]> {
 
-    // Get product
-    let product = this.loadedProducts.find((p)=>p.id == id);
+    const promises = ids.map(async (id)=>{
 
-    // If has not loaded yet, load from server
-    if(!product)
-      product = ProductFactory.MergeProduct(
-        (await this.allProductsRef.doc(id).get()).data(),
-        (await this.myProductsRef.doc(id).get()).data()
-      );
+      // Check if already loaded
+      let product = this.loadedProducts.find((p)=>p.id == id);
 
-    return product;
+      // If has not loaded yet, load from server
+      if(!product)
+        product = ProductFactory.MergeProduct(
+          (await this.allProductsRef.doc(id).get()).data(),
+          (await this.myProductsRef.doc(id).get()).data()
+        );
+
+      return product;
+
+    });
+
+    this.loadedProducts = await Promise.all(promises);
+
+    return this.loadedProducts;
+
   }
 
 

@@ -174,7 +174,7 @@ export class OrderPage implements OnInit {
     this.originalOrder = this.order.getDocument();
 
     // Load only the products that are in this order (if there are)
-    this.supplierProducts = await this.productsService.loadProductsByIds(this.order.products.map((p)=>p.id));
+    this.supplierProducts = await this.productsService.loadProductsByIds(...this.order.products.map((p)=>p.id));
 
     // Start auto saving the order data on the local storage every 3 seconds for backup
     // Save as long as there are changes being made since the last save. clear the backup when saving or when leaving safely through a guard
