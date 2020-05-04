@@ -4,7 +4,7 @@ import {SuppliersService} from '../services/suppliers.service';
 import {OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
-import {ProductCustomerDoc, ProductPublicDoc} from '../models/Product';
+import {FullProductDoc} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
@@ -51,8 +51,8 @@ export class OrderPage implements OnInit {
   showAllSuppliers: boolean;
 
   /** The list of products of the order's supplier, and a filtered list while querying */
-  supplierProducts: ProductPublicDoc[] = [];
-  filteredSupplierProducts: ProductPublicDoc[] = null;
+  supplierProducts: FullProductDoc[] = [];
+  filteredSupplierProducts: FullProductDoc[] = null;
 
   /** Date and time inputs */
   dateFocus: boolean;
