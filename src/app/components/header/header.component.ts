@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {OrderStatus} from '../../models/OrderI';
 import {NavigationService} from '../../services/navigation.service';
+import {BusinessService} from '../../services/business.service';
 
 @Component({
   selector: 'app-header',
@@ -16,9 +17,15 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private navService: NavigationService,
+    private businessService: BusinessService,
   ) { }
 
   ngOnInit() {}
+
+  get logo() {
+    const doc = this.businessService.businessDoc;
+    return doc ? doc.logo : this.DEFAULT_LOGO;
+  }
 
   goToDrafts() {
     this.navService.goToDraftsList();

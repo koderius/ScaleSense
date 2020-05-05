@@ -1,0 +1,16 @@
+@import "../customer/customer.page.scss";
+
+.page-container:first-child {
+  margin: 4em auto;
+}
+
+.circle-btn {
+  border-width: 0 !important;
+  margin: 1em 2em !important;
+  transform: none;
+}
+
+.buttons-row {
+  display: flex;
+  justify-content: center;
+}

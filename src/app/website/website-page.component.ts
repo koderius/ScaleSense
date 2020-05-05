@@ -32,8 +32,10 @@ export class WebsitePage {
   // Get credentials from email & password, and go to app domain
   login() {
     this.authService.createSignInCredential(this.email, this.password);
-    this.navCtrl.navigateRoot('customer');
+    const homePage = (this.enterAs == 'c' ? 'customer' : 'supplier');
+    this.navCtrl.navigateRoot(homePage);
     // TODO: Change app domain
+    // window.open('https://APP-DOMAIN.com/' + homePage);
   }
 
 }

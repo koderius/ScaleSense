@@ -18,6 +18,13 @@ const routes: Routes = [
   },
 
   {
+    path: 'supplier',
+    loadChildren: () => import('./supplier/supplier.module').then( m => m.SupplierPageModule),
+    canActivateChild: [AppEnterGuard],
+    data: {side: 's'}
+  },
+
+  {
     path: 'order',
     loadChildren: () => import('./order/order.module').then(m => m.OrderPageModule),
     canActivateChild: [AppEnterGuard],

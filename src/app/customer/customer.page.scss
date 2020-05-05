@@ -38,10 +38,10 @@
     font-size: 1.6em;
   }
 }
-.circle-btn.first {
+.circle-btn.primary {
   background-image: radial-gradient(var(--ion-color-primary-tint), var(--ion-color-primary-shade));
 }
-.circle-btn.second {
+.circle-btn.dark {
   background-image: radial-gradient(var(--ion-color-dark-tint), var(--ion-color-dark-shade));
 }
 

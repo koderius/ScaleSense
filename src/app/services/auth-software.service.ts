@@ -53,6 +53,7 @@ export class AuthSoftwareService {
         // Sign in the user with the credentials
         try {
           await this.auth.signInWithCredential(cred);
+          return;
         }
         catch (e) {
           console.error(e);
@@ -61,7 +62,7 @@ export class AuthSoftwareService {
       }
 
       // Get current user
-      this._user = this.auth.currentUser;
+      this._user = user;
 
       console.log('current user:', this._user);
 
