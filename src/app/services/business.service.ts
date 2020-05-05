@@ -5,6 +5,10 @@ import CollectionReference = firebase.firestore.CollectionReference;
 import {AuthSoftwareService} from './auth-software.service';
 import {BusinessDoc} from '../models/Business';
 
+/**
+ * This service loads the business (customer or supplier) document according to the user data, and keep subscribing for changes in the document
+ */
+
 @Injectable({
   providedIn: 'root'
 })

@@ -3,6 +3,11 @@ import * as firebase from 'firebase/app';
 import 'firebase/storage';
 import Reference = firebase.storage.Reference;
 
+/**
+ * This service is in charge of uploading files to the server's storage and deleting them.
+ * After an image file was uploaded, there is no need to download it, but using it's URL to show it.
+ */
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,10 +21,11 @@ export class FilesService {
     return firebase.storage().ref('images');
   }
 
-  async uploadFile(file: File, objectId: string) : Promise<string> {
+  /** Upload a file and get it's URL */
+  async uploadFile(file: File, fileName: string) : Promise<string> {
 
     // Store the file under its Object's ID
-    const ref = this.storageRef.child(objectId);
+    const ref = this.storageRef.child(fileName);
 
     // Upload the file and return the download URL
     try {
@@ -34,6 +40,7 @@ export class FilesService {
   }
 
 
+  /** Delete file by its URL or by its name */
   async deleteFile(idOrUrl: string) {
 
     let ref: Reference;
@@ -54,6 +61,7 @@ export class FilesService {
   }
 
 
+  /** Read file for preview */
   static ReadFile(file: File) : Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

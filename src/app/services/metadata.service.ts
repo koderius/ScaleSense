@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
 
+/**
+ * This service gets the metadata reference when the app starts, and is in charge of loading the app's metadata
+ *  */
+
 @Injectable({
   providedIn: 'root'
 })

@@ -5,6 +5,14 @@ import {User} from 'firebase';
 import AuthCredential = firebase.auth.AuthCredential;
 import {UserDoc} from '../models/UserDoc';
 
+/**
+ * This service is one part of the authentication system, which is in charge of the user connection.
+ * The second part, which is in charge of registration, is part of the website.
+ * This service gets the user's credentials from the browser local storage (saved there by the website) and sign in the user.
+ * After the user signed in, it loads the user document from the database and keep subscribing it for changes.
+ * Once the user document has loaded, the app pages are allowed to be activated.
+ */
+
 @Injectable({
   providedIn: 'root'
 })

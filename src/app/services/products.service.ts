@@ -7,6 +7,15 @@ import {BusinessService} from './business.service';
 import {Dictionary} from '../utilities/dictionary';
 import {FilesService} from './files.service';
 
+
+/**
+ * This service is in charge of loading and saving products data by both customers and suppliers.
+ * Suppliers get and save their products in a public collection where all products data is stored.
+ * Each customers has, in addition, a private products sub-collection, where all his private preferences for each product are stored.
+ * Hence, customer reading and writing product's data has a dual job:
+ * reading from both resources (public and private) and merge the data, and writing into both resources after splitting the data.
+ */
+
 @Injectable({
   providedIn: 'root'
 })

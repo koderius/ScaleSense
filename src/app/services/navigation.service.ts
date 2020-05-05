@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import {NavController} from '@ionic/angular';
 import {AuthSoftwareService} from './auth-software.service';
 
+/**
+ * Navigation utility. Contains commands to navigate to all app's routes
+ */
+
 @Injectable({
   providedIn: 'root'
 })

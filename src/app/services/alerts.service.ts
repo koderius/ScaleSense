@@ -1,6 +1,10 @@
 import {Injectable} from '@angular/core';
 import {AlertController, LoadingController} from '@ionic/angular';
 
+/**
+ * This is a UI service for alerts, prompts and loaders
+ */
+
 @Injectable({
   providedIn: 'root'
 })

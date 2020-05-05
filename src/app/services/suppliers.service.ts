@@ -14,7 +14,9 @@ import {Dictionary} from '../utilities/dictionary';
   providedIn: 'root'
 })
 /**
- *  Suppliers service - For use of customers
+ *  Suppliers service - For use of customers only
+ *  In charge of loading the customer's list of suppliers and keep subscribing them for changes.
+ *  Includes suppliers management (CRUD) and querying
  * */
 export class SuppliersService {
 
