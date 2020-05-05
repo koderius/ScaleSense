@@ -109,6 +109,16 @@ ion-searchbar:focus-within > ion-icon {
   display: none;
 }
 
+// Checkbox style
+ion-checkbox {
+  --background: transparent;
+  --background-checked: transparent;
+  --checkmark-color: var(--ion-color-dark);
+  --border-color-checked: var(--ion-color-dark);
+  --checkmark-width: 4px;
+  --border-radius: 3px;
+}
+
 //// Select box
 //html[dir="rtl"] {.select-container:after {left: 0}}
 //html[dir="ltr"] {.select-container:after {right: 0}}

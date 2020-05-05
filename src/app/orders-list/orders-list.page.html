@@ -33,6 +33,11 @@
         <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null; searchOrders()" *ngIf="fromDate">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
+        <ion-item lines="none" [disabled]="fromDate">
+          <ion-checkbox slot="start" [(ngModel)]="showPast" (ionChange)="searchOrders()"></ion-checkbox>
+          <ion-label>הצג הזמנות שעברו</ion-label>
+          <ion-button slot="end" class="ion-hide"></ion-button>
+        </ion-item>
       </div>
     </div>
 

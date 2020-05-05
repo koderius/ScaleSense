@@ -24,7 +24,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   query: string = '';
   fromDate: Date;
   toDate: Date;
-  showPast: boolean;        //TODO: Check box for this
+  showPast: boolean;
 
   isSearching: boolean;
 
