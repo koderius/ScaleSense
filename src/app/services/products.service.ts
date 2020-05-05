@@ -4,14 +4,15 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
 import {BusinessService} from './business.service';
-import {FilesService} from './files.service';
 import {Dictionary} from '../utilities/dictionary';
-import {Objects} from '../utilities/objects';
+import {FilesService} from './files.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductsService {
+
+  static readonly PUBLIC_PRODUCT_CID_VALUE = 'G';
 
   /** List of products data */
   loadedProducts: FullProductDoc[] = [];
@@ -23,10 +24,9 @@ export class ProductsService {
 
 
   /** The reference to the firestore collection where the list of products private data is stored */
-  get myProductsRef() : CollectionReference {
+  get customerProductsRef() : CollectionReference {
     return this.businessService.businessDocRef.collection('my_products');
   }
-
 
   /** A reference to the collection of all the products data */
   get allProductsRef() {
@@ -34,73 +34,66 @@ export class ProductsService {
   }
 
 
-  /** Load and get ALL products of a given supplier ID (SID) */
-  async loadAllProductsOfSupplier(sid: string) : Promise<ProductPublicDoc[]> {
+  /**
+   * Query products by name, limit to 10 results + pagination
+   * For suppliers, query from their products collection - can filter by customer belonging
+   * For customers, query from their products private data collection, load the corresponding public data, and merge them - can filter by supplier
+   * */
+  async queryMyProducts(q?: string, bid?: string, startAfterName?: string, endBeforeName?: string) : Promise<FullProductDoc[]> {
 
-    // Get all products that belong to the given supplier, that the current customer can see (i.e. cid == customer ID / null)
-    const res = await this.allProductsRef
-      .where('sid', '==', sid)
-      .where('cid', 'in', [this.businessService.myBid, ''])
-      .orderBy('name')
-      .get();
+    // Suppliers search according to their products list. Customers search according to their list of products private data
+    const collection = this.businessService.side == 's' ? this.allProductsRef : this.customerProductsRef;
 
-    // Load the customer private data for each product and merge them
-    const promises = res.docs.map(async (doc)=>{
-      const publicData = doc.data() as ProductPublicDoc;
-      const privateData = (await this.myProductsRef.doc(doc.id).get()).data() as ProductCustomerDoc;
-      return ProductFactory.MergeProduct(publicData, privateData);
-    });
+    // Sort products by name
+    let ref = collection.orderBy('name');
 
-    // Get the full products data
-    this.loadedProducts = await Promise.all(promises);
+    // For suppliers, query only the products they own
+    if(this.businessService.side == 's')
+      ref = ref.where('sid', '==', this.businessService.myBid);
 
-    return this.loadedProducts;
-
-  }
-
-
-  /** From the user's list of products: Query products by name, can be filtered also by supplier ID. Each call will return the first 10 results, sorted by name, allowing pagination */
-  async queryMyProducts(q: string, sid?: string, startAfterName?: string, endBeforeName?: string) : Promise<ProductCustomerDoc[]> {
-
-    // Get products from all suppliers
-    let ref = this.myProductsRef.orderBy('name');
-
-    // Filter by supplier
-    if(sid)
-      ref = ref.where('sid', '==', sid);
-
-    // Filter by name
+    // May filter by name
     if(q)
       ref = ref.where('name', '>=', q).where('name', '<', Dictionary.queryByString(q));
 
-    // For pagination, start after given value
+    // May filter by other side ID
+    const side = this.businessService.side == 'c' ? 'sid' : 'cid';
+    if(bid)
+      ref = ref.where(side, '==', bid);
+
+    // Pagination
     if(startAfterName)
       ref = ref.startAfter(startAfterName);
-
-    // For pagination, start before given value (limit to 10 from the end)
     if(endBeforeName)
       ref = ref.endBefore(endBeforeName).limitToLast(10);
-    // Limit to 10 (normal), for all other queries
     else
       ref = ref.limit(10);
 
+    // Get results
     try {
-
       const res = await ref.get();
 
       // If *next page* brought no results, ignore the search
       if(startAfterName && res.empty)
         return null;
 
-      // Load also the products public data and merge them
-      const promises = res.docs.map(async (doc)=>{
-        const privateData = doc.data() as ProductCustomerDoc;
-        const publicData = (await this.allProductsRef.doc(doc.id).get()).data() as ProductPublicDoc;
-        return ProductFactory.MergeProduct(publicData, privateData);
-      });
+      // For suppliers, get the public data only
+      if(this.businessService.side == 's')
+        this.loadedProducts = res.docs.map((d)=>d.data() as ProductPublicDoc);
 
-      // Get the full products data
-      this.loadedProducts = await Promise.all(promises);
+      // For customers, merge their private data with the public data
+      else {
+
+        // Load also the products public data and merge them
+        const promises = res.docs.map(async (doc)=>{
+          const privateData = doc.data() as ProductCustomerDoc;
+          const publicData = (await this.allProductsRef.doc(doc.id).get()).data() as ProductPublicDoc;
+          return ProductFactory.MergeProduct(publicData, privateData);
+        });
+
+        // Get the full products data
+        this.loadedProducts = await Promise.all(promises);
+
+      }
 
       return this.loadedProducts;
 
@@ -112,6 +105,32 @@ export class ProductsService {
   }
 
 
+  /** Load and get ALL products of a given supplier ID (SID) - for customers only */
+  async loadAllProductsOfSupplier(sid: string) : Promise<ProductPublicDoc[]> {
+
+    // Get all products that belong to the given supplier, that the current customer can see (i.e. cid == customer ID / public)
+    const res = await this.allProductsRef
+      .where('sid', '==', sid)
+      .where('cid', 'in', [this.businessService.myBid, ProductsService.PUBLIC_PRODUCT_CID_VALUE])
+      .orderBy('name')
+      .get();
+
+    // Load the customer private data for each product and merge them
+    const promises = res.docs.map(async (doc)=>{
+      const publicData = doc.data() as ProductPublicDoc;
+      const privateData = (await this.customerProductsRef.doc(doc.id).get()).data() as ProductCustomerDoc;
+      return ProductFactory.MergeProduct(publicData, privateData);
+    });
+
+    // Get the full products data
+    this.loadedProducts = await Promise.all(promises);
+
+    return this.loadedProducts;
+
+  }
+
+
+  /** Load specific products according to a list of IDs */
   async loadProductsByIds(...ids: string[]) : Promise<FullProductDoc[]> {
 
     const promises = ids.map(async (id)=>{
@@ -120,11 +139,15 @@ export class ProductsService {
       let product = this.loadedProducts.find((p)=>p.id == id);
 
       // If has not loaded yet, load from server
-      if(!product)
-        product = ProductFactory.MergeProduct(
-          (await this.allProductsRef.doc(id).get()).data(),
-          (await this.myProductsRef.doc(id).get()).data()
-        );
+      if(!product) {
+
+        product = (await this.allProductsRef.doc(id).get()).data();
+
+        // For customers, merge it with the customer private data
+        if(this.businessService.side == 'c')
+          product = ProductFactory.MergeProduct(product, (await this.customerProductsRef.doc(id).get()).data());
+
+      }
 
       return product;
 
@@ -137,30 +160,39 @@ export class ProductsService {
   }
 
 
-  // /** Load products only by IDs (from any supplier, as long as firestore rules allow) */
-  // async loadProductsByIds(ids: string[]) : Promise<ProductPublicDoc[]> {
-  //
-  //   try {
-  //
-  //     // When getting all IDs done, return their data
-  //     const promises = await Promise.all(ids.map((id)=>this.allProductsRef.doc(id).get()));
-  //     this.loadedProducts = promises.map((doc)=>doc.data() as ProductPublicDoc);
-  //
-  //     return this.loadedProducts;
-  //
-  //   }
-  //   catch (e) {
-  //     console.error(e);
-  //   }
-  // }
+  /** Save product private data and public data - by customers only */
+  async saveCustomerProduct(product: FullProductDoc, imageFile?: File) {
+
+    // Split the document into public data and private data
+    const splitProduct = ProductFactory.SplitProduct(product);
+
+    // Set the customer ID in the public part
+    product.cid = this.businessService.myBid;
+
+    // Save the public data
+    // TODO: When the customer cannot edit the public data anymore?
+    await this.saveProductPublicData(product, imageFile);
+
+    // Set update time
+    splitProduct.private.customerModified = Date.now();
+
+    // Save the private data
+    try {
+      await this.customerProductsRef.doc(product.id).set(splitProduct.private, {merge: true});
+    }
+    catch (e) {
+      console.error(e);
+    }
+
+  }
 
 
-  /** Save product */
-  async saveProduct(product: FullProductDoc, imageFile?: File) {
+  /** Save product public data - by suppliers and customers */
+  async saveProductPublicData(product: ProductPublicDoc, imageFile?: File) {
 
     // If new, create ID and stamp creation time
     if(!product.id) {
-      product.id = this.myProductsRef.doc().id;
+      product.id = this.allProductsRef.doc().id;
       product.created = Date.now();
     }
 
@@ -180,23 +212,12 @@ export class ProductsService {
       console.error(e);
     }
 
-    // Set the customer ID
-    product.cid = this.businessService.myBid;
-
     // Set update time
-    product.modified = product.customerModified = Date.now();
+    product.modified = Date.now();
 
-    // Split the document into public data and private data
-    const splitProduct = ProductFactory.SplitProduct(product);
-
+    // Save the public product's data
     try {
-
-      // TODO: When the customer cannot edit the public data anymore?
-
-      // Save the public product's data and the private data
-      await this.allProductsRef.doc(product.id).set(splitProduct.public, {merge: true});
-      await this.myProductsRef.doc(product.id).set(splitProduct.private, {merge: true});
-
+      await this.allProductsRef.doc(product.id).set(product, {merge: true});
     }
     catch (e) {
       console.error(e);

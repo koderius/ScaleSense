@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {ProductsService} from '../services/products.service';
 import {FullProductDoc} from '../models/Product';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
-import {AuthSoftwareService} from '../services/auth-software.service';
+import {BusinessDoc} from '../models/Business';
+import {BusinessService} from '../services/business.service';
 
 @Component({
   selector: 'app-products-list',
@@ -12,8 +13,10 @@ import {AuthSoftwareService} from '../services/auth-software.service';
 })
 export class ProductsListPage {
 
+  businessList: BusinessDoc[] = [];
+
   q: string = '';
-  sid: string;
+  bid: string;
 
   numOfNewResults: number;
 
@@ -23,7 +26,7 @@ export class ProductsListPage {
     private productsService: ProductsService,
     public suppliersService: SuppliersService,
     public navService: NavigationService,
-    public authService: AuthSoftwareService,
+    public businessService: BusinessService,
   ) { }
 
   get productsList() : FullProductDoc[] {
@@ -31,7 +34,12 @@ export class ProductsListPage {
   }
 
   ionViewDidEnter() {
+
+    // For customers, allow filter by supplier. for supplier allow filter by customer - TODO
+    this.businessList = this.businessService.side == 'c' ? this.suppliersService.mySuppliers : [];
+
     this.search();
+
   }
 
   /**
@@ -47,7 +55,7 @@ export class ProductsListPage {
     // Get results
     const res = await this.productsService.queryMyProducts(
       this.q,
-      this.sid,
+      this.bid,
       movePage == 1 ? this.productsList.slice(-1)[0].name : null,
       movePage == -1 ? this.productsList[0].name : null,
     );

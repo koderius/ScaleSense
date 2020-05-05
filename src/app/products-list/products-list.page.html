@@ -24,10 +24,10 @@
 
     <div id="table-section">
 
-      <div class="select-box">
-        <ion-select [(ngModel)]="sid" interface="popover" placeholder="סינון לפי ספק" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover (ionChange)="search()">
+      <div class="select-box" *ngIf="businessService.side == 'c'">
+        <ion-select [(ngModel)]="bid" interface="popover" placeholder="סינון לפי ספק" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover (ionChange)="search()">
           <ion-select-option [value]="undefined"></ion-select-option>
-          <ion-select-option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</ion-select-option>
+          <ion-select-option *ngFor="let business of businessList" [value]="business.id">{{business.name}}</ion-select-option>
         </ion-select>
       </div>
 
@@ -65,7 +65,7 @@
             <ion-button fill="outline" color="dark" shape="round" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
           </ion-col>
           <ion-col>
-            <ion-button fill="outline" color="dark" shape="round" *ngIf="authService.currentUser.side == 's'">תמחור לקוחות</ion-button>
+            <ion-button fill="outline" color="dark" shape="round" *ngIf="businessService.side == 's'">תמחור לקוחות</ion-button>
           </ion-col>
         </ion-row>
 

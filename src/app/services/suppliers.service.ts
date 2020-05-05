@@ -28,6 +28,10 @@ export class SuppliersService {
     private productsService: ProductsService,
   ) {
 
+    // For customers only
+    if(this.businessService.side != 'c')
+      return;
+
     // Get all the suppliers of the current customer (sorted by name)
     try {
       this.mySuppliersRef.orderBy('name').onSnapshot(snapshot => {
@@ -88,12 +92,12 @@ export class SuppliersService {
 
       // Query products by name and category, and collect the results of both queries
       try {
-        const p1 = this.productsService.myProductsRef
+        const p1 = this.productsService.customerProductsRef
           .where('name','>=',q)
           .where('name','<',Dictionary.queryByString(q)).get().then((res)=>{
           queryResults.push(...res.docs);
         });
-        const p2 = this.productsService.myProductsRef
+        const p2 = this.productsService.customerProductsRef
           .where('category','>=',q)
           .where('category','<',Dictionary.queryByString(q)).get().then((res)=>{
           queryResults.push(...res.docs)

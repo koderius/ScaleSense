@@ -83,7 +83,7 @@ export class EditProductPage implements OnInit {
 
     // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
     const l = this.alerts.loaderStart('שומר פרטי מוצר...');
-    await this.productsService.saveProduct(this.product, this.tempLogo);
+    await this.productsService.saveCustomerProduct(this.product, this.tempLogo);
     this.alerts.loaderStop(l);
 
   }
