@@ -7,6 +7,7 @@ import {SuppliersService} from '../services/suppliers.service';
 import {Enum} from '../utilities/enum';
 import {AlertsService} from '../services/alerts.service';
 import {CategoriesService} from '../services/categories.service';
+import {BusinessService} from '../services/business.service';
 
 @Component({
   selector: 'app-edit-product',
@@ -30,6 +31,7 @@ export class EditProductPage implements OnInit {
     public suppliersService: SuppliersService,
     private alerts: AlertsService,
     public categoriesService: CategoriesService,
+    public businessService: BusinessService,
   ) { }
 
   get pageTitle() {
@@ -81,9 +83,14 @@ export class EditProductPage implements OnInit {
     if(!this.checkFields())
       return;
 
-    // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
+    // Save the product (different methods for supplier and customer) - including upload the image file
     const l = this.alerts.loaderStart('שומר פרטי מוצר...');
-    await this.productsService.saveCustomerProduct(this.product, this.tempLogo);
+
+    if(this.businessService.side == 'c')
+      await this.productsService.saveCustomerProduct(this.product, this.tempLogo);
+    else
+      await this.productsService.saveProductPublicData(this.product, this.tempLogo);
+
     this.alerts.loaderStop(l);
 
   }
@@ -91,7 +98,12 @@ export class EditProductPage implements OnInit {
 
   checkFields() : boolean {
 
-    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.catalogNumC || !this.product.image || !this.product.barcode || !this.product.price || !this.product.category) {
+    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.image || !this.product.barcode || !this.product.price) {
+      alert('יש למלא את כל השדות המסומנים בכוכבית');
+      return false;
+    }
+
+    if(this.businessService.side == 'c' && (!this.product.catalogNumC || !this.product.category)) {
       alert('יש למלא את כל השדות המסומנים בכוכבית');
       return false;
     }

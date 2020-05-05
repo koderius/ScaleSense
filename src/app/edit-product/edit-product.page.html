@@ -14,7 +14,7 @@
 
         <ion-col>
 
-          <ion-row class="input-div">
+          <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4" required>ספק</ion-col>
             <ion-col>
               <div class="select-box">
@@ -25,7 +25,7 @@
             </ion-col>
           </ion-row>
 
-          <ion-row class="input-div">
+          <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">מספר ספק</ion-col>
             <ion-col>
               <ion-input [value]="suppliersService.getSupplierById(product.sid).nid" placeholder="אוטומטי" readonly></ion-input>
@@ -156,40 +156,44 @@
 
         <ion-col>
 
-          <ion-row class="input-div">
-            <ion-col size="4" required>קטגוריה</ion-col>
-            <ion-col>
-              <div class="select-box">
-                <ion-select [(ngModel)]="product.category" interface="popover" placeholder="בחר קטגוריה" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
-                  <ion-select-option [value]="''"></ion-select-option>
-                  <ion-select-option *ngFor="let c of categoriesService.categoriesToShow" [value]="c.title">{{c.title}}</ion-select-option>
-                </ion-select>
-              </div>
-            </ion-col>
-          </ion-row>
+          <div *ngIf="businessService.side == 'c'">
 
-          <ion-row class="input-div">
-            <ion-col size="4">אפיצות מחיר</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" [(ngModel)]="product.priceTolerance"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
-            </ion-col>
-          </ion-row>
+            <ion-row class="input-div">
+              <ion-col size="4" required>קטגוריה</ion-col>
+              <ion-col>
+                <div class="select-box">
+                  <ion-select [(ngModel)]="product.category" interface="popover" placeholder="בחר קטגוריה" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
+                    <ion-select-option [value]="''"></ion-select-option>
+                    <ion-select-option *ngFor="let c of categoriesService.categoriesToShow" [value]="c.title">{{c.title}}</ion-select-option>
+                  </ion-select>
+                </div>
+              </ion-col>
+            </ion-row>
 
-          <ion-row class="input-div">
-            <ion-col size="4">אפיצות משקל</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" [(ngModel)]="product.weightTolerance"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
-            </ion-col>
-          </ion-row>
+            <ion-row class="input-div">
+              <ion-col size="4">אפיצות מחיר</ion-col>
+              <ion-col style="display: flex">
+                <ion-input type="number" [(ngModel)]="product.priceTolerance"></ion-input>
+                <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
+              </ion-col>
+            </ion-row>
 
-          <ion-row class="input-div">
-            <ion-col size="4" required>מק"ט (משתמש)</ion-col>
-            <ion-col>
-              <ion-input type="number" [(ngModel)]="product.catalogNumC"></ion-input>
-            </ion-col>
-          </ion-row>
+            <ion-row class="input-div">
+              <ion-col size="4">אפיצות משקל</ion-col>
+              <ion-col style="display: flex">
+                <ion-input type="number" [(ngModel)]="product.weightTolerance"></ion-input>
+                <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
+              </ion-col>
+            </ion-row>
+
+            <ion-row class="input-div">
+              <ion-col size="4" required>מק"ט (משתמש)</ion-col>
+              <ion-col>
+                <ion-input type="number" [(ngModel)]="product.catalogNumC"></ion-input>
+              </ion-col>
+            </ion-row>
+
+          </div>
 
         </ion-col>
 
