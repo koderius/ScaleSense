@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild} from '@angular/router';
 import {BusinessSide} from './models/Business';
-import {AuthService} from './services/auth.service';
+import {AuthSoftwareService} from './services/auth-software.service';
 
 /** Guards for entering the customer and the supplier app */
 
@@ -10,7 +10,7 @@ import {AuthService} from './services/auth.service';
 })
 export class AppEnterGuard implements CanActivateChild {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthSoftwareService) {}
 
   async canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 

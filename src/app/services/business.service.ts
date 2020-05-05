@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {AuthService} from './auth.service';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
+import {AuthSoftwareService} from './auth-software.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +34,6 @@ export class BusinessService {
     return this.businessDocRef.id;
   }
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthSoftwareService) {}
 
 }

@@ -12,7 +12,7 @@ import DocumentReference = firebase.firestore.DocumentReference;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
 import {BusinessService} from './business.service';
-import {AuthService} from './auth.service';
+import {AuthSoftwareService} from './auth-software.service';
 
 @Injectable({
   providedIn: 'root'
@@ -35,7 +35,7 @@ export class OrdersService {
   private _myOrders: OrderDoc[] = [];
 
   constructor(
-    private authService: AuthService,
+    private authService: AuthSoftwareService,
     private productsService: ProductsService,
     private suppliersService: SuppliersService,
     private businessService: BusinessService,

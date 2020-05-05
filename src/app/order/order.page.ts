@@ -9,8 +9,8 @@ import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
-import {AuthService} from '../services/auth.service';
 import {NavigationService} from '../services/navigation.service';
+import {AuthSoftwareService} from '../services/auth-software.service';
 
 @Component({
   selector: 'app-order',
@@ -67,7 +67,7 @@ export class OrderPage implements OnInit {
     private ordersService: OrdersService,
     private productsService: ProductsService,
     private alerts: AlertsService,
-    private authService: AuthService,
+    private authService: AuthSoftwareService,
     private navService: NavigationService,
   ) {}
 

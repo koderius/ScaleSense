@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {OrderStatus} from '../../models/OrderI';
-import {AuthService} from '../../services/auth.service';
 import {NavigationService} from '../../services/navigation.service';
 
 @Component({
@@ -16,7 +15,6 @@ export class HeaderComponent implements OnInit {
   @Input() comment: OrderStatus;
 
   constructor(
-    private authService: AuthService,
     private navService: NavigationService,
   ) { }
 

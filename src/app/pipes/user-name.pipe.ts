@@ -1,12 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {AuthService} from '../services/auth.service';
+import {AuthSoftwareService} from '../services/auth-software.service';
 
 @Pipe({
   name: 'userName'
 })
 export class UserNamePipe implements PipeTransform {
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthSoftwareService) {}
 
   async transform(uid: any, ...args: any[]) : Promise<any>{
 

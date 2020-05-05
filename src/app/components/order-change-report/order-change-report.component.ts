@@ -1,8 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {OrderChange, OrderDoc, OrderStatus, ProductOrder} from '../../models/OrderI';
-import {AuthService} from '../../services/auth.service';
 import {ProductsService} from '../../services/products.service';
 import {ProductPublicDoc} from '../../models/Product';
+import {AuthSoftwareService} from '../../services/auth-software.service';
 
 @Component({
   selector: 'app-order-change-report',
@@ -30,7 +30,7 @@ export class OrderChangeReportComponent implements OnInit {
 
 
   constructor(
-    private authService: AuthService,
+    private authService: AuthSoftwareService,
     private productService: ProductsService,
 
   ) {}

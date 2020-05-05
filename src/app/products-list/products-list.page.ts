@@ -3,7 +3,7 @@ import {ProductsService} from '../services/products.service';
 import {FullProductDoc} from '../models/Product';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
-import {AuthService} from '../services/auth.service';
+import {AuthSoftwareService} from '../services/auth-software.service';
 
 @Component({
   selector: 'app-products-list',
@@ -23,7 +23,7 @@ export class ProductsListPage {
     private productsService: ProductsService,
     public suppliersService: SuppliersService,
     public navService: NavigationService,
-    public authService: AuthService,
+    public authService: AuthSoftwareService,
   ) { }
 
   get productsList() : FullProductDoc[] {

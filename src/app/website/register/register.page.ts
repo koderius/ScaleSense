@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {AuthService} from '../../services/auth.service';
+import {AuthWebsiteService} from '../auth-website.service';
 import {NavController} from '@ionic/angular';
 import {UserDoc} from '../../models/UserDoc';
 
@@ -45,7 +45,7 @@ export class RegisterPage implements OnInit {
 
 
   constructor(
-    private authService: AuthService,
+    private authService: AuthWebsiteService,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
     ) {}

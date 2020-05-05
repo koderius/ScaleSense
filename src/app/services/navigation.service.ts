@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {NavController} from '@ionic/angular';
-import {AuthService} from './auth.service';
+import {AuthSoftwareService} from './auth-software.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ export class NavigationService {
 
   constructor(
     private navCtrl: NavController,
-    private authService: AuthService,
+    private authService: AuthSoftwareService,
   ) {}
 
 

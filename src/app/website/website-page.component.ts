@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {AuthService} from '../services/auth.service';
+import {AuthWebsiteService} from './auth-website.service';
 import {BusinessSide} from '../models/Business';
 import {NavController} from '@ionic/angular';
 
@@ -12,8 +12,11 @@ export class WebsitePage {
 
   enterAs: BusinessSide;
 
+  email: string;
+  password: string;
+
   constructor(
-    private authService: AuthService,
+    private authService: AuthWebsiteService,
     private navCtrl: NavController,
   ) {}
 
@@ -25,9 +28,12 @@ export class WebsitePage {
     this.navCtrl.navigateRoot('register',{queryParams: {forgotpassword: true}});
   }
 
+
+  // Get credentials from email & password, and go to app domain
   login() {
-    // TODO: Real login
+    this.authService.createSignInCredential(this.email, this.password);
     this.navCtrl.navigateRoot('customer');
+    // TODO: Change app domain
   }
 
 }

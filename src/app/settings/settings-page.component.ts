@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {AuthService} from '../services/auth.service';
 import {BusinessSide} from '../models/Business';
 import {NavigationService} from '../services/navigation.service';
+import {AuthSoftwareService} from '../services/auth-software.service';
 
 @Component({
   selector: 'app-settings-menu',
@@ -15,7 +15,7 @@ export class SettingsPage implements OnInit {
   generalOpen: boolean;
 
   constructor(
-    private authService: AuthService,
+    private authService: AuthSoftwareService,
     public navService: NavigationService,
   ) {
     this.side = this.authService.currentUser.side;
