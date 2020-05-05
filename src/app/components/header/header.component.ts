@@ -22,6 +22,10 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit() {}
 
+  get side() {
+    return this.businessService.side;
+  }
+
   get logo() {
     const doc = this.businessService.businessDoc;
     return doc ? doc.logo : this.DEFAULT_LOGO;

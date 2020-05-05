@@ -37,6 +37,10 @@ export class BusinessService {
     return this.businessDocRef.id;
   }
 
+  get side() {
+    return this.authService.currentUser.side;
+  }
+
   get businessDoc() : BusinessDoc {
     return this._businessDoc;
   }

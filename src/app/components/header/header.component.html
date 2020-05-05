@@ -26,7 +26,7 @@
       <ion-icon slot="start" src="../../assets/svg/icon_office.svg"></ion-icon>
       <ion-text>משרד ראשי</ion-text>
     </ion-button>
-    <ion-button fill="clear" (click)="goToDrafts()">
+    <ion-button fill="clear" (click)="goToDrafts()" *ngIf="side == 'c'">
       <ion-icon slot="start" src="../../assets/svg/icon_drafts.svg"></ion-icon>
       <ion-text>טיוטות</ion-text>
     </ion-button>

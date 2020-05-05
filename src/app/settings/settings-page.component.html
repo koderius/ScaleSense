@@ -20,7 +20,7 @@
           <ion-button color="secondary" shape="round">החל</ion-button>
         </div>
 
-        <div class="item" (click)="navService.goToSuppliersList()">
+        <div class="item" (click)="navService.goToSuppliersList()" *ngIf="side == 'c'">
           <p>עריכת ספקים</p>
         </div>
 
@@ -28,7 +28,7 @@
           <p>עריכת מוצרים</p>
         </div>
 
-        <div class="item" (click)="navService.goToCategoriesList()">
+        <div class="item" (click)="navService.goToCategoriesList()" *ngIf="side == 'c'">
           <p>עריכת קטגוריות</p>
         </div>
 
@@ -57,7 +57,7 @@
             <p>הגדרות שליחת SMS</p>
           </ion-item>
           <ion-item lines="none">
-            <p>עריכת פרטי {{side == 'c' ? 'לקוח' : 'ספק'}}</p>
+            <p>עריכת פרטי עסק</p>
           </ion-item>
         </ion-list>
 
