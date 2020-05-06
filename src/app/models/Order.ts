@@ -113,6 +113,23 @@ export class Order {
     return this._props.changes ? this._props.changes.slice() : [];
   }
 
+  get boxes() {
+    return this._props.boxes;
+  }
+
+  set boxes(num: number) {
+    if(num >= 0)
+      this._props.boxes = num;
+  }
+
+  get invoice() {
+    return this._props.invoice;
+  }
+
+  set invoice(num: string) {
+    this._props.invoice = ''+num;
+  }
+
 
   getDocument(): OrderDoc {
     return JSON.parse(JSON.stringify(this._props));

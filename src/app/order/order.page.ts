@@ -11,6 +11,7 @@ import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
+import {IonInput} from '@ionic/angular';
 
 @Component({
   selector: 'app-order',
@@ -60,6 +61,7 @@ export class OrderPage implements OnInit {
   supplyDateInput: Date;
   supplyHourInput: string;
   now = new Date().toISOString().slice(0,10); // Today's date as yyyy-mm-dd
+  supplierEditDate: boolean;
 
   constructor(
     private activeRoute: ActivatedRoute,
@@ -315,21 +317,19 @@ export class OrderPage implements OnInit {
   /** Focus on some product's amount input */
   selectProductInput(productId: string) {
 
-    setTimeout(()=>{
+    // Get the index of the product in the shown products list
+    const productIdx = (this.filteredSupplierProducts || this.supplierProducts).findIndex((p)=>p.id == productId);
 
-      // Get the index of the product in the shown products list
-      const productIdx = (this.filteredSupplierProducts || this.supplierProducts).findIndex((p)=>p.id == productId);
+    // Get the product element, and select its input
+    const product = document.getElementsByTagName('app-product-to-cart')[productIdx];
+    product.getElementsByTagName('input')[0].select();
 
-      // Get the product element, and select its input
-      const product = document.getElementsByTagName('app-product-to-cart')[productIdx];
-      product.getElementsByTagName('input')[0].select();
+  }
 
-    }, this.page == 2 ? 0 : 500);
-
-    if(this.page !== 2)
-      this.page = 2;
-
-
+  async editInput(input: IonInput) {
+    input.readonly = false;
+    await input.setFocus();
+    (await input.getInputElement()).select();
   }
 
   /**
@@ -394,6 +394,18 @@ export class OrderPage implements OnInit {
       return;
     }
 
+    if(this.businessService.side == 's' && !this.order.boxes) {
+      alert('יש למלא כמות ארגזים.');
+      return;
+    }
+
+    if(this.businessService.side == 's' && !this.order.invoice) {
+      alert('יש למלא מספר קבלה.');
+      return;
+    }
+
+    const otherSide = this.businessService.side == 'c' ? 'ספק' : 'לקוח';
+
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח לספק עדכון הזמנה?')) {
 
       const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה לספק...' : 'מעדכן הזמנה...');
@@ -416,7 +428,7 @@ export class OrderPage implements OnInit {
   async cancelOrder() {
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לבטל את ההזמנה?' : 'הספק יקבל עדכון על הביטול')) {
       const l = this.alerts.loaderStart('מבטל הזמנה...');
-      const change = await this.ordersService.changeOrderStatus(this.order, OrderStatus.CANCELED_BY_CUSTOMER);
+      const change = await this.ordersService.updateOrder(this.order, OrderStatus.CANCELED);
       this.alerts.loaderStop(l);
       if (change) {
         alert('ההזמנה בוטלה.');

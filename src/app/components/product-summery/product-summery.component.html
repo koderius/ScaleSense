@@ -19,7 +19,8 @@
       <h6>{{productOrder.pricePerUnit || productDetails.price | price}}</h6>
     </ion-col>
     <ion-col>
-      <h6>{{productOrder.amount | unitAmount : productDetails.type}}</h6>
+      <h6 *ngIf="!editAmount">{{productOrder.amount | unitAmount : productDetails.type}}</h6>
+      <ion-input [ngClass]="editAmount ? '' : 'ion-hide'" type="number" [value]="productOrder.amount" (ionChange)="onAmountChange($event)" (ionBlur)="editAmount = false" #inputA></ion-input>
     </ion-col>
     <ion-col>
       <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.price) | price}}</h6>
@@ -29,13 +30,13 @@
         <ion-button class="small-circle-btn" fill="clear" (click)="clearClicked.emit()">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="editClicked.emit()">
+        <ion-button fill="clear" (click)="onEditClicked(inputA)">
           <ion-icon slot="icon-only"src="../../assets/svg/icon_pen.svg"></ion-icon>
         </ion-button>
       </div>
     </ion-col>
     <ion-col size="4" *ngIf="showComment">
-      <ion-input [placeholder]="editComment ? 'הערות בנוגע למוצר' : 'הערות לקוח'" [(ngModel)]="productOrder.comment" [readonly]="!editComment"></ion-input>
+      <ion-input id="inputComment" [placeholder]="editComment ? 'הערות בנוגע למוצר' : 'הערות לקוח'" [(ngModel)]="productOrder.comment" [readonly]="!editComment"></ion-input>
     </ion-col>
   </ion-row>
 </ion-item>

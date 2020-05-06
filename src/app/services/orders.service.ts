@@ -180,20 +180,34 @@ export class OrdersService {
   }
 
 
-  async updateOrder(order: Order) : Promise<OrderChange> {
+  async updateOrder(order: Order, newStatus?: OrderStatus) : Promise<OrderChange> {
 
     // If it's new order, save it as draft first
     if(!order.id)
       order = await this.saveDraft(order);
 
+    // Get the order document
+    const orderDoc = order.getDocument();
+
+    // If new status requested, change the status in the document
+    if(newStatus)
+      orderDoc.status = newStatus;
+
     try {
 
-      const res = (await this.updateOrderCloudFunction(order.getDocument())).data as OrderChange;
+      // Send the order
+      const res = (await this.updateOrderCloudFunction(orderDoc)).data as OrderChange;
 
+      // On success
       if(res) {
+
+        // Get the new order status
+        order.status = res.status;
+
         // Delete the draft if it was draft
         if(order.status == OrderStatus.DRAFT)
           this.deleteDraft(order.id);
+
         return res;
       }
 
@@ -201,26 +215,6 @@ export class OrdersService {
     catch (e) {
       console.error(e);
     }
-  }
-
-
-  /** Cancel order by its ID */
-  async changeOrderStatus(order: Order, status: OrderStatus) : Promise<OrderChange> {
-
-    const orderDoc = order.getDocument();
-    orderDoc.status = status;
-
-    try {
-      const res = (await this.updateOrderCloudFunction(orderDoc)).data as OrderChange;
-      if(res) {
-        order.status = status;
-        return res;
-      }
-    }
-    catch (e) {
-      console.error(e);
-    }
-
   }
 
 

@@ -62,6 +62,32 @@ export enum OrderStatus {
 
   CLOSED = 100,             // The order was closed by the customer
 
+  // // Draft - customer only
+  // DRAFT = 0,
+  //
+  // // Sent, but has not opened by the supplier yet
+  // SENT = 10,
+  // EDITED = 11,
+  //
+  // // Opened by the supplier
+  // OPENED = 20,
+  // // Changed by customer after opened
+  // CHANGED = 21,
+  //
+  // APPROVED = 30,
+  // APPROVED_WITH_CHANGES = 31,
+  //
+  // FINAL_APPROVE = 80,
+  //
+  // //TODO: Some statuses before closing
+  //
+  // CLOSED = 100,
+  //
+  // CANCELED = 400,
+  // CANCELED_BY_CUSTOMER = 401,
+  // CANCELED_BY_SUPPLIER = 402,
+
+
 }
 
 export interface OrderDoc {
@@ -99,7 +125,10 @@ export interface OrderDoc {
   /** Order status */
   status?: OrderStatus;
 
-  /** Number of invoice */
+  /** Invoice no. */
   invoice?: string;
+
+  /** Number of boxes */
+  boxes: number;
 
 }
