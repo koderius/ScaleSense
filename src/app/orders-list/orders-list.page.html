@@ -7,7 +7,7 @@
   <div class="page-container">
 
     <div id="search-section">
-      <ion-searchbar placeholder="הקלד שם ספק | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()">
+      <ion-searchbar placeholder="הקלד שם {{side == 'c' ? 'ספק' : 'לקוח'}} | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()">
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
       <p class="ion-text-center" *ngIf="pageMode != 'drafts'">
@@ -59,7 +59,7 @@
           <ion-col size="1"></ion-col>
           <ion-col>{{pageMode == 'drafts' ? 'תאריך ביצוע' : 'תאריך אספקה'}}</ion-col>
           <ion-col>מס. הזמנה</ion-col>
-          <ion-col>ספק</ion-col>
+          <ion-col>{{side == 'c' ? 'ספק' : 'לקוח'}}</ion-col>
           <ion-col *ngIf="pageMode != 'drafts'">סטטוס</ion-col>
           <ion-col></ion-col>
           <ion-col *ngIf="pageMode == 'drafts'"></ion-col>
@@ -74,10 +74,11 @@
           <ion-col><ion-text dir="ltr">{{(pageMode == 'drafts' ? (order.modified || order.created) : order.supplyTime) | date : 'dd/MM/yyyy HH:mm'}}</ion-text></ion-col>
           <ion-col>{{order.serial}}</ion-col>
           <ion-col>
-            <ion-img [src]="getSupplier(order.sid).logo" class="ion-margin-end"></ion-img>
-            <ion-text>{{getSupplier(order.sid).name}}</ion-text>
+            <ion-img [src]="getSupplier(order.sid).logo" class="ion-margin-end" *ngIf="side == 'c'"></ion-img>
+            <ion-text *ngIf="side == 'c'">{{getSupplier(order.sid).name}}</ion-text>
+            <ion-text *ngIf="side == 's'">{{getCustomer(order.cid).name}}</ion-text>
           </ion-col>
-          <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status > OrderStatus.CANNOT_BE_EDIT_FROM_HERE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
+          <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status > OrderStatus.CANNOT_EDIT_FROM_HERE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
           <ion-col>
             <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)">{{actionBtnTitle}}</ion-button>
           </ion-col>

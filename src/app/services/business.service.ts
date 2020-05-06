@@ -3,7 +3,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
 import {AuthSoftwareService} from './auth-software.service';
-import {BusinessDoc} from '../models/Business';
+import {BusinessDoc, BusinessSide} from '../models/Business';
 
 /**
  * This service loads the business (customer or supplier) document according to the user data, and keep subscribing for changes in the document
@@ -56,6 +56,12 @@ export class BusinessService {
       this._businessDoc = snapshot.data();
     });
 
+  }
+
+  /** Get promise for a data document of any business */
+  async getBusinessDoc(side: BusinessSide, bid: string) : Promise<BusinessDoc> {
+    let ref = side == 'c' ? this.customersCollection : this.suppliersCollection;
+    return (await ref.doc(bid).get()).data();
   }
 
 }

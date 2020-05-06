@@ -13,6 +13,7 @@ import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
 import {BusinessService} from './business.service';
 import {AuthSoftwareService} from './auth-software.service';
+import {CustomersService} from './customers.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +39,7 @@ export class OrdersService {
     private authService: AuthSoftwareService,
     private productsService: ProductsService,
     private suppliersService: SuppliersService,
+    private customersService: CustomersService,
     private businessService: BusinessService,
   ) {}
 
@@ -95,11 +97,11 @@ export class OrdersService {
         }
       }
 
-      // if there is a text query, filter by supplier name (first get suppliers ID, and then search by their IDs)
+      // if there is a text query, filter by supplier/customer name (first get supplier/customer ID, and then search by their IDs)
       if(query) {
-        const suppliers = this.suppliersService.getSupplierByName(query);
-        if(suppliers.length > 0 && suppliers.length <= 10) {
-          const ids = suppliers.map((d)=>d.id);
+        const businesses = this.businessService.side == 'c' ? this.suppliersService.getSupplierByName(query) : this.customersService.getCustomerByName(query);
+        if(businesses.length > 0 && businesses.length <= 10) {
+          const ids = businesses.map((d)=>d.id);
           ref = ref.where('sid','in', ids);
         }
         else

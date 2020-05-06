@@ -54,7 +54,7 @@ export enum OrderStatus {
   CHANGED_BY_SUPPLIER = 21,
   CHANGED_BY_CUSTOMER = 22,
 
-  CANNOT_BE_EDIT_FROM_HERE = 39,    // After the order has been canceled or close. no one can update it anymore
+  CANNOT_EDIT_FROM_HERE = 39,    // After the order has been canceled or close. no one can update it anymore
 
   CANCELED = 40,            // The order has been canceled by the customer or by the supplier
   CANCELED_BY_SUPPLIER = 41,

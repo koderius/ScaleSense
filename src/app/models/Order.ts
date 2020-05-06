@@ -32,6 +32,10 @@ export class Order {
       this._props.sid = sid;
   }
 
+  get cid() {
+    return this._props.cid;
+  }
+
   get comment(): string {
     return this._props.comment;
   }

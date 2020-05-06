@@ -24,7 +24,7 @@
     <ion-col>
       <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.price) | price}}</h6>
     </ion-col>
-    <ion-col [size]="withComments ? 1 : 2" *ngIf="isEdit">
+    <ion-col [size]="showComment ? 1 : 2" *ngIf="editProduct">
       <div>
         <ion-button class="small-circle-btn" fill="clear" (click)="clearClicked.emit()">
           <ion-icon slot="icon-only" name="close"></ion-icon>
@@ -34,8 +34,8 @@
         </ion-button>
       </div>
     </ion-col>
-    <ion-col size="4" *ngIf="withComments">
-      <ion-input [placeholder]="isEdit ? 'הערות בנוגע למוצר' : ''" [(ngModel)]="productOrder.comment" [readonly]="!isEdit"></ion-input>
+    <ion-col size="4" *ngIf="showComment">
+      <ion-input [placeholder]="editComment ? 'הערות בנוגע למוצר' : 'הערות לקוח'" [(ngModel)]="productOrder.comment" [readonly]="!editComment"></ion-input>
     </ion-col>
   </ion-row>
 </ion-item>

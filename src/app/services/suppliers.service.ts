@@ -70,13 +70,13 @@ export class SuppliersService {
 
   /** Get supplier from the list by his ID */
   getSupplierById(id: string) : SupplierDoc | null {
-    return {...this._mySuppliers.find((s)=>s.id == id)};
+    return this.mySuppliers.find((s)=>s.id == id);
   }
 
 
   getSupplierByName(q: string) {
     q = q.toLowerCase();
-    return this._mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
+    return this.mySuppliers.filter((s)=>s.name.toLowerCase().startsWith(q));
   }
 
 

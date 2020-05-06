@@ -10,7 +10,7 @@ import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
 import {NavigationService} from '../services/navigation.service';
-import {AuthSoftwareService} from '../services/auth-software.service';
+import {BusinessService} from '../services/business.service';
 
 @Component({
   selector: 'app-order',
@@ -39,7 +39,7 @@ export class OrderPage implements OnInit {
   private _page: number;
 
   /** Whether in edit mode (editing existing order or creating/editing a draft). Fields are open to be written */
-  isEdit: boolean;
+  customerEditMode: boolean;
 
   /** Whether the order (or order changes) was sent */
   orderSent: boolean;
@@ -67,7 +67,7 @@ export class OrderPage implements OnInit {
     private ordersService: OrdersService,
     private productsService: ProductsService,
     private alerts: AlertsService,
-    private authService: AuthSoftwareService,
+    private businessService: BusinessService,
     private navService: NavigationService,
   ) {}
 
@@ -81,6 +81,10 @@ export class OrderPage implements OnInit {
     return !this.order.id;
   }
 
+  get supplierEditMode() {
+    return this.businessService.side == 's' && this.order.status < OrderStatus.CANNOT_EDIT_FROM_HERE;
+  }
+
   get newSerialMsg() {
     return this.isNew ? '* מספר הזמנה זמני (כל עוד הטיוטה טרם נשמרה)' : '';
   }
@@ -88,9 +92,10 @@ export class OrderPage implements OnInit {
   /** The page title (when there is no wizard) */
   get pageTitle() : string {
     if(!this.isDraft)
-      return (this.isEdit ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.serial;
+      return (this.customerEditMode ? 'עריכת הזמנה מס. ' : 'פרטי הזמנה מס. ') + this.order.serial;
   }
 
+  /** Additional comment added to the page's title in red */
   get pageTitleComment() : string {
     if(this.order.status == OrderStatus.CANCELED_BY_SUPPLIER || this.order.status == OrderStatus.CANCELED_BY_CUSTOMER)
       return 'מבוטלת';
@@ -98,15 +103,21 @@ export class OrderPage implements OnInit {
       return 'סגורה';
   }
 
+  /** Current page */
   get page() {
     return this._page;
   }
 
+  /** Change page */
   set page(step) {
 
     // Cannot go to other steps after order was sent
     if(this.orderSent)
       return;
+
+    // Suppliers can see only page 3
+    if(this.businessService.side == 's')
+      this._page = 3;
 
     // Page 1 can be entered only in draft mode
     if(step == 1 && !this.isDraft)
@@ -120,7 +131,7 @@ export class OrderPage implements OnInit {
           this.page = 2;
       });
     // Page 2 can be entered only in edit mode (or draft)
-    if(step == 2 && !this.isEdit)
+    if(step == 2 && !this.customerEditMode)
       return;
     // Page 3 can be entered only if there are products
     if(step == 3 && !this.order.products.length)
@@ -138,6 +149,7 @@ export class OrderPage implements OnInit {
 
   }
 
+  /** On page loads */
   async ngOnInit() {
 
     // Get the order ID from the URL, or a new order
@@ -145,18 +157,21 @@ export class OrderPage implements OnInit {
     const orderId = urlSnapshot.params['id'];
 
     // Create new order and go to step 1 (choosing supplier)
-    if(orderId == 'new' && this.authService.currentUser.side == 'c') {
+    if(orderId == 'new' && this.businessService.side == 'c') {
       this.order = await this.ordersService.createNewOrder();
       this.page = 1;
-      this.isEdit = true;
+      this.customerEditMode = true;
     }
-    // Or, get the order details and go to summery page. Enable edit if it's a draft or requested as edit mode
+
+    // Or, get the order details and go to summery page.
     else {
       this.order = await this.ordersService.getOrderById(orderId, urlSnapshot.queryParams['draft']);
       if(this.order) {
         this.page = 3;
-        this.isEdit = (urlSnapshot.queryParams['edit'] || this.isDraft) && this.order.status < OrderStatus.CANNOT_BE_EDIT_FROM_HERE;
+        // Enable edit if it's a draft or requested as edit mode - only for customers
+        this.customerEditMode = (urlSnapshot.queryParams['edit'] || this.isDraft) && this.order.status < OrderStatus.CANNOT_EDIT_FROM_HERE && this.businessService.side == 'c';
       }
+      // Go to main page, if order not found
       else {
         this.backToMain();
         return;
@@ -164,7 +179,7 @@ export class OrderPage implements OnInit {
     }
 
     // Check whether the order had sudden close before, and ask whether to load it
-    if(this.isEdit) {
+    if(this.customerEditMode) {
       const tempAutoSave = localStorage.getItem(this.TEMP_DATA_KEY + orderId);
       if(tempAutoSave && await this.alerts.areYouSure('האם לשחזר הזמנה שלא נשמרה?', '(הזמנה זו נסגרה באופן פתאומי ללא שמירה)', 'שחזור', 'לא, המשך')) {
         this.order = new Order(JSON.parse(tempAutoSave));
@@ -271,7 +286,7 @@ export class OrderPage implements OnInit {
 
   /** Get selected supplier details from service */
   getSelectedSupplier() {
-    return this.getSupplierData(this.order.sid);
+    return this.businessService.side == 'c' ? this.getSupplierData(this.order.sid) : this.businessService.businessDoc;
   }
 
 

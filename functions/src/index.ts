@@ -101,6 +101,8 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         order.created = changeReport.time;
         // Stamp the customer ID who created the order
         order.cid = changeReport.by.split('@')[1];
+        // Create a document for this customers in the supplier's customers list
+        transaction.set(admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_customers').doc(order.cid), {id: order.cid}, {merge: true});
       }
       else {
         // Manage statuses

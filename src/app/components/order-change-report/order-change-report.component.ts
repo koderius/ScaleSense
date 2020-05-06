@@ -39,7 +39,7 @@ export class OrderChangeReportComponent implements OnInit {
 
     // Get the user name if on the same side, or a generic name of the other side
     const user = this.authService.currentUser.side == this.change.side ? (await this.authService.getUserDoc(this.change.by)) : null;
-    this.userName = user ? `<b>${user.displayName}</b>` : (this.authService.currentUser.side == 'c' ? 'הלקוח' : 'הספק');
+    this.userName = user ? `<b>${user.displayName}</b>` : (this.change.side == 'c' ? 'הלקוח' : 'הספק');
 
     switch (this.change.status) {
       case OrderStatus.SENT: this.action = 'ההזמנה נשלחה ע"י'; break;

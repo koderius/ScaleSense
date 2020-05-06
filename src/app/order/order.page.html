@@ -92,7 +92,7 @@
               <app-product-summery *ngFor="let product of sortProductsByName(order.products)"
                                    [productOrder]="product"
                                    [productDetails]="findProductDetails(product.id)"
-                                   [isEdit]="true"
+                                   [editProduct]="true"
                                    (clearClicked)="order.setProductAmount(product.id, 0, null)"
                                    (editClicked)="selectProductInput(product.id)"
               ></app-product-summery>
@@ -137,8 +137,9 @@
                 *ngFor="let product of sortProductsByName(order.products)"
                 [productOrder]="product"
                 [productDetails]="findProductDetails(product.id)"
-                [isEdit]="isEdit"
-                [withComments]="true"
+                [editProduct]="customerEditMode || supplierEditMode"
+                [showComment]="true"
+                [editComment]="customerEditMode"
                 (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? page = 2 : ''"
                 (editClicked)="selectProductInput(product.id)"
         ></app-product-summery>
@@ -154,13 +155,13 @@
       </ion-list>
 
       <div id="bottom-section">
-        <p class="ion-text-center" *ngIf="!isEdit">
+        <p class="ion-text-center" *ngIf="!customerEditMode">
           <ion-text>ההזמנה תסופק בתאריך: </ion-text>
           <ion-text color="primary">{{order.supplyTime | date : 'dd/MM/yyyy'}}</ion-text>
           <ion-text> בשעה: </ion-text>
           <ion-text color="primary">{{order.supplyTime | date : 'HH:mm'}}</ion-text>
         </p>
-        <div id="dates" *ngIf="isEdit">
+        <div id="dates" *ngIf="customerEditMode">
           <p>בחירת תאריך אספקה:</p>
           <div class="date-picker">
             <ion-icon name="close" (click)="supplyDateInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
@@ -172,10 +173,10 @@
             <ion-icon name="caret-down"></ion-icon>
           </ion-input>
         </div>
-        <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}" [disabled]="!isEdit"></ion-textarea>
+        <ion-textarea [rows]="order.comment ? 2 : 1" placeholder="הערות כלליות לספק:" [(ngModel)]="order.comment" [ngStyle]="{fontSize : !order.comment ? '2em' : '1em'}" [disabled]="!customerEditMode"></ion-textarea>
       </div>
 
-      <div id="history" *ngIf="!isEdit && order.changes.length">
+      <div id="history" *ngIf="!customerEditMode && order.changes.length">
         <h1>
           <ion-text color="primary" class="ion-padding">היסטוריית הזמנה</ion-text>
         </h1>
@@ -192,17 +193,17 @@
 
       <div id="bottom-buttons">
         <ion-row>
-          <ion-button shape="round" color="dark" *ngIf="isEdit" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="customerEditMode" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
           <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveDraft()">שמירה כטיוטה</ion-button>
-          <ion-button shape="round" color="dark" *ngIf="!isDraft && isEdit" (click)="cancelOrder()">ביטול הזמנה</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="!isDraft && customerEditMode" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="isEdit" (click)="sendOrder()" [disabled]="!orderHasChanged()">
+          <ion-button shape="round" strong="true" *ngIf="customerEditMode" (click)="sendOrder()" [disabled]="!orderHasChanged()">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="!isDraft">שמירת שינויים ו</ion-text>
             <ion-text>שליחת הזמנה לספק</ion-text>
           </ion-button>
-          <ion-button shape="round" *ngIf="!isEdit" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+          <ion-button shape="round" *ngIf="!customerEditMode" (click)="backToMain()">חזרה למסך הראשי</ion-button>
         </ion-row>
       </div>
     </div>

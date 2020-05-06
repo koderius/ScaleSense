@@ -6,6 +6,9 @@ import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {OrderStatus} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
+import {BusinessService} from '../services/business.service';
+import {BusinessDoc} from '../models/Business';
+import {CustomersService} from '../services/customers.service';
 
 @Component({
   selector: 'app-orders-list',
@@ -34,8 +37,10 @@ export class OrdersListPage implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private ordersService: OrdersService,
     private supplierService: SuppliersService,
+    private customerService: CustomersService,
     private alertsService: AlertsService,
     private navService: NavigationService,
+    private businessService: BusinessService,
   ) {}
 
   async ngOnInit() {
@@ -65,6 +70,10 @@ export class OrdersListPage implements OnInit, OnDestroy {
   }
 
 
+  get side() {
+    return this.businessService.side;
+  }
+
   get pageTitle() {
     switch (this.pageMode) {
       case 'view': return 'סטטוס הזמנות';
@@ -93,7 +102,11 @@ export class OrdersListPage implements OnInit, OnDestroy {
   }
 
   getSupplier(sid: string) {
-    return this.supplierService.getSupplierById(sid);
+    return this.supplierService.getSupplierById(sid) || {};
+  }
+
+  getCustomer(cid: string) {
+    return this.customerService.getCustomerById(cid) || {};
   }
 
   xClicked() {

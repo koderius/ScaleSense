@@ -11,8 +11,9 @@ export class ProductSummeryComponent implements OnInit {
 
   @Input() productOrder: ProductOrder;
   @Input() productDetails: ProductPublicDoc;
-  @Input() isEdit: boolean;
-  @Input() withComments: boolean;
+  @Input() editProduct: boolean;
+  @Input() showComment: boolean;
+  @Input() editComment: boolean;
 
   @Output() editClicked = new EventEmitter();
   @Output() clearClicked = new EventEmitter();
