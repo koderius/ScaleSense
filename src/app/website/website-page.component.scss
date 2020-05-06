@@ -19,6 +19,7 @@ ion-content {
 
 #upper-container {
   margin: 0 auto;
+  padding: 0 1em;
   max-width: 40em;
   color: white;
   position: relative;
@@ -43,7 +44,8 @@ ion-content {
     font-weight: bold;
   }
   #login-buttons {
-    width: 60%;
+    min-width: 60%;
+    max-width: 24em;
     margin: auto;
     padding: 3em 0;
     display: flex;
@@ -123,7 +125,7 @@ ion-content {
 
 #more-btn {
   position: absolute;
-  top: 13%;
+  top: 10%;
   right: 20%;
   user-select: none;
   pointer-events: auto;
@@ -146,7 +148,7 @@ ion-content {
   position: relative;
   margin: auto;
   max-width: 30em;
-  padding: 20em 0 10em 0;
+  padding: 20em 1em 10em 1em;
   text-align: center;
   h1 {
     margin: 2em 0;
@@ -163,6 +165,7 @@ ion-content {
 #orange-section {
   position: relative;
   top: -2em;
+  padding: 0 1em;
   img {
     object-fit: fill;
   }
@@ -207,6 +210,7 @@ ion-content {
 #contact {
   max-width: 45em;
   margin: 0 auto 3em;
+  padding: 0 1em;
   h1 {
     text-align: center;
     font-size: 2em;
