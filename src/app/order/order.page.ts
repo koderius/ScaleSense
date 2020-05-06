@@ -404,18 +404,16 @@ export class OrderPage implements OnInit {
       return;
     }
 
-    const otherSide = this.businessService.side == 'c' ? 'ספק' : 'לקוח';
+    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה?' : 'האם לשלוח עדכון הזמנה?')) {
 
-    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח לספק עדכון הזמנה?')) {
-
-      const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה לספק...' : 'מעדכן הזמנה...');
+      const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה...' : 'מעדכן הזמנה...');
       const res = await this.ordersService.updateOrder(this.order);
       if(res) {
         this.updateChanges();
         if(this.order.status == OrderStatus.DRAFT)
           this.orderSent = true;
         else
-          alert('עדכון נשלח לספק');
+          alert('עדכון נשלח');
       }
       this.alerts.loaderStop(l);
 
@@ -426,7 +424,7 @@ export class OrderPage implements OnInit {
 
   /** Cancel the order (after it was sent) */
   async cancelOrder() {
-    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לבטל את ההזמנה?' : 'הספק יקבל עדכון על הביטול')) {
+    if(await this.alerts.areYouSure('האם לבטל את ההזמנה?')) {
       const l = this.alerts.loaderStart('מבטל הזמנה...');
       const change = await this.ordersService.updateOrder(this.order, OrderStatus.CANCELED);
       this.alerts.loaderStop(l);
