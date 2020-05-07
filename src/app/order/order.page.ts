@@ -84,7 +84,7 @@ export class OrderPage implements OnInit {
   }
 
   get supplierEditMode() {
-    return this.businessService.side == 's' && this.order.status < OrderStatus.CANNOT_EDIT_FROM_HERE;
+    return this.businessService.side == 's' && this.order.status < OrderStatus.FINAL_APPROVE;
   }
 
   get newSerialMsg() {
@@ -171,7 +171,7 @@ export class OrderPage implements OnInit {
       if(this.order) {
         this.page = 3;
         // Enable edit if it's a draft or requested as edit mode - only for customers
-        this.customerEditMode = (urlSnapshot.queryParams['edit'] || this.isDraft) && this.order.status < OrderStatus.CANNOT_EDIT_FROM_HERE && this.businessService.side == 'c';
+        this.customerEditMode = (urlSnapshot.queryParams['edit'] || this.isDraft) && this.order.status < OrderStatus.FINAL_APPROVE && this.businessService.side == 'c';
       }
       // Go to main page, if order not found
       else {
@@ -209,6 +209,8 @@ export class OrderPage implements OnInit {
       this.supplyDateInput = new Date(this.order.supplyTime);
       this.supplyHourInput = formatDate(new Date(this.order.supplyTime),'HH:mm','en-US');
     }
+
+    this.supplierSeenOrder();
 
   }
 
@@ -379,6 +381,48 @@ export class OrderPage implements OnInit {
   /** Send the order to the supplier (first time or with changes) */
   async sendOrder() {
 
+    if(!this.checkFields())
+      return;
+
+    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח עדכון הזמנה לספק?')) {
+
+      const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה...' : 'מעדכן הזמנה...');
+      const res = await this.ordersService.updateOrder(this.order);
+      if(res) {
+        this.updateChanges();
+        this.orderSent = true;
+      }
+      this.alerts.loaderStop(l);
+
+    }
+
+  }
+
+
+  async approveOrder(final?: boolean) {
+
+    if(!this.checkFields(final))
+      return;
+
+    const q = 'האם לאשר הזמנה' + (final ? ' באופן סופי?' : '?');
+
+    if(await this.alerts.areYouSure(q)) {
+
+      const l = this.alerts.loaderStart('מאשר הזמנה...');
+      const res = await this.ordersService.updateOrder(this.order, final ? OrderStatus.FINAL_APPROVE : OrderStatus.APPROVED);
+      if(res) {
+        this.updateChanges();
+        alert('עדכון נשלח ללקוח');
+      }
+      this.alerts.loaderStop(l);
+
+    }
+
+  }
+
+
+  checkFields(finalApprove?: boolean) {
+
     if(!this.order.supplyTime) {
       alert('יש למלא תאריך הזמנה.');
       return;
@@ -394,30 +438,17 @@ export class OrderPage implements OnInit {
       return;
     }
 
-    if(this.businessService.side == 's' && !this.order.boxes) {
+    if(this.businessService.side == 's' && !this.order.boxes && finalApprove) {
       alert('יש למלא כמות ארגזים.');
       return;
     }
 
-    if(this.businessService.side == 's' && !this.order.invoice) {
+    if(this.businessService.side == 's' && !this.order.invoice && finalApprove) {
       alert('יש למלא מספר קבלה.');
       return;
     }
 
-    if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה?' : 'האם לשלוח עדכון הזמנה?')) {
-
-      const l = this.alerts.loaderStart(this.order.status == OrderStatus.DRAFT ? 'שולח הזמנה...' : 'מעדכן הזמנה...');
-      const res = await this.ordersService.updateOrder(this.order);
-      if(res) {
-        this.updateChanges();
-        if(this.order.status == OrderStatus.DRAFT)
-          this.orderSent = true;
-        else
-          alert('עדכון נשלח');
-      }
-      this.alerts.loaderStop(l);
-
-    }
+    return true;
 
   }
 
@@ -433,6 +464,12 @@ export class OrderPage implements OnInit {
         this.ngOnInit();
       }
     }
+  }
+
+  /** Mark order as seen by the supplier */
+  supplierSeenOrder() {
+    if(this.businessService.side == 's' && this.order.status < OrderStatus.OPENED)
+      this.ordersService.updateOrder(this.order, OrderStatus.OPENED);
   }
 
 }

@@ -78,9 +78,9 @@
             <ion-text *ngIf="side == 'c'">{{getSupplier(order.sid).name}}</ion-text>
             <ion-text *ngIf="side == 's'">{{getCustomer(order.cid).name}}</ion-text>
           </ion-col>
-          <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status > OrderStatus.CANNOT_EDIT_FROM_HERE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
+          <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status >= OrderStatus.FINAL_APPROVE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
           <ion-col>
-            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)">{{actionBtnTitle}}</ion-button>
+            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)" [disabled]="pageMode == 'edit' && order.status >= OrderStatus.FINAL_APPROVE">{{actionBtnTitle}}</ion-button>
           </ion-col>
           <ion-col *ngIf="pageMode == 'drafts'">
             <ion-button color="dark" fill="outline" shape="round" (click)="deleteDraft(order.id)">מחיקה</ion-button>

@@ -34,37 +34,37 @@
     <div *ngFor="let product of productChanges">
       <p>
 
-        <ion-icon name="add-circle-outline" color="success" class="ion-padding-end" *ngIf="product.current && !product.old"></ion-icon>
-        <ion-icon name="remove-circle-outline" color="danger" class="ion-padding-end" *ngIf="!product.current && product.old"></ion-icon>
-        <ion-icon name="alert-circle-outline" color="warning" class="ion-padding-end" *ngIf="product.current && product.old"></ion-icon>
+        <ion-icon name="add-circle-outline" color="success" class="ion-padding-end" *ngIf="product.type == 'added'"></ion-icon>
+        <ion-icon name="remove-circle-outline" color="danger" class="ion-padding-end" *ngIf="product.type == 'removed'"></ion-icon>
+        <ion-icon name="alert-circle-outline" color="warning" class="ion-padding-end" *ngIf="product.type == 'changed'"></ion-icon>
 
-        <ion-text *ngIf="product.current && !product.old">נוסף המוצר: </ion-text>
-        <ion-text *ngIf="!product.current && product.old">הוסר המוצר: </ion-text>
-        <ion-text *ngIf="product.current && product.old">שינויים במוצר </ion-text>
-        <b>{{getProductName(product.current ? product.current.id : product.old.id)}}</b>
-        <b *ngIf="product.current && !product.old"> ({{product.current.amount | unitAmount : getProductUnit(product.current.id)}})</b>
+        <ion-text *ngIf="product.type == 'added'">נוסף המוצר: </ion-text>
+        <ion-text *ngIf="product.type == 'removed'">הוסר המוצר: </ion-text>
+        <ion-text *ngIf="product.type == 'changed'">שינויים במוצר </ion-text>
+        <b>{{getProductName(product.productId)}}</b>
+        <b *ngIf="product.type == 'added'"> ({{product.amount.new | unitAmount : getProductUnit(product.productId)}})</b>
 
-        <ion-text *ngIf="product.old && product.current">
+        <ion-text *ngIf="product.type == 'changed'">
           <ion-text>: </ion-text>
 
-          <ion-text *ngIf="product.old.amount != product.current.amount">
+          <ion-text *ngIf="product.amount">
             <ion-text>הכמות שונתה מ-</ion-text>
-            <b>{{product.old.amount | unitAmount : getProductUnit(product.old.id)}}</b>
+            <b>{{product.amount.old | unitAmount : getProductUnit(product.productId)}}</b>
             <ion-text> ל-</ion-text>
-            <b>{{product.current.amount | unitAmount : getProductUnit(product.current.id)}}. </b>
+            <b>{{product.amount.new | unitAmount : getProductUnit(product.productId)}}. </b>
           </ion-text>
 
-          <ion-text *ngIf="product.old.pricePerUnit != product.current.pricePerUnit">
+          <ion-text *ngIf="product.price">
             <ion-text>המחיר שונה מ-</ion-text>
-            <b>{{product.old.pricePerUnit | price}}</b>
+            <b>{{product.price.old | price}}</b>
             <ion-text> ל-</ion-text>
-            <b>{{product.current.pricePerUnit | price}}. </b>
+            <b>{{product.price.new | price}}. </b>
           </ion-text>
 
-          <ion-text *ngIf="product.old.comment != product.current.comment">
-            <ion-text *ngIf="product.current.comment">נערכה הערה: </ion-text>
-            <b *ngIf="product.current.comment">"{{product.current.comment}}"</b>.
-            <ion-text *ngIf="!product.current.comment">נמחקה הערה למוצר.</ion-text>
+          <ion-text *ngIf="product.comment">
+            <ion-text *ngIf="product.comment.new">נערכה הערה: </ion-text>
+            <b *ngIf="product.comment.new">"{{product.comment.new}}"</b>.
+            <ion-text *ngIf="!product.comment.new">נמחקה הערה למוצר.</ion-text>
           </ion-text>
 
         </ion-text>

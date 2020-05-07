@@ -7,13 +7,13 @@ import 'firebase/firestore';
 import 'firebase/functions';
 import {SuppliersService} from './suppliers.service';
 import {Order} from '../models/Order';
+import {BusinessService} from './business.service';
+import {AuthSoftwareService} from './auth-software.service';
+import {CustomersService} from './customers.service';
 import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
-import {BusinessService} from './business.service';
-import {AuthSoftwareService} from './auth-software.service';
-import {CustomersService} from './customers.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +30,8 @@ export class OrdersService {
 
   readonly ordersRef = firebase.firestore().collection('orders');
 
-  readonly updateOrderCloudFunction = firebase.functions().httpsCallable('updateOrder');
+  private readonly updateOrderCloudFunction = firebase.functions().httpsCallable('updateOrder');
+  private readonly changeOrderStatusCloudFunction = firebase.functions().httpsCallable('changeOrderStatus');
 
   /** The reference to the firestore collection where the list of orders is stored */
   private _myOrders: OrderDoc[] = [];
@@ -195,18 +196,21 @@ export class OrdersService {
 
     try {
 
-      // Send the order
-      const res = (await this.updateOrderCloudFunction(orderDoc)).data as OrderChange;
+      let res;
+      if(newStatus == OrderStatus.CANCELED || newStatus == OrderStatus.OPENED || newStatus == OrderStatus.CLOSED)
+        res = (await this.changeOrderStatusCloudFunction(orderDoc)).data as OrderChange;
+      else
+        res = (await this.updateOrderCloudFunction(orderDoc)).data as OrderChange;
 
       // On success
       if(res) {
 
-        // Get the new order status
-        order.status = res.status;
-
         // Delete the draft if it was draft
         if(order.status == OrderStatus.DRAFT)
           this.deleteDraft(order.id);
+
+        // Get the new order status
+        order.status = res.status;
 
         return res;
       }

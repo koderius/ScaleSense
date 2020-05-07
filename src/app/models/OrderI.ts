@@ -33,7 +33,7 @@ export type OrderChange = {
   /** The status of the order */
   status?: OrderStatus;
 
-  /** The changeable details of the order (JSON) */
+  /** JSON of order's changeable properties (for comparing changes) */
   data?: string;
 
   /** The ID of the order that these changes belongs to - for notifications */
@@ -43,50 +43,31 @@ export type OrderChange = {
 
 export enum OrderStatus {
 
-  DRAFT = 0,                // As long as the order is in the drafts collection, visible only to the customer
+  // Draft - customer only
+  DRAFT = 0,
 
-  SENT = 10,                // After the order has been sent by the customer at the first time. The order is created in the orders collection
-  OPENED = 11,              // The supplier send a status change after he opened the order (only status changes)
-  APPROVED = 12,            // Initial approve by the supplier. details can be changed
-  ON_THE_WAY = 13,          // Final approve by the supplier. details can be changed
+  // Sent, but has not opened by the supplier yet
+  SENT = 10,
+  EDITED = 11,
 
-  CHANGED = 20,             // The customer or the supplier made some changes in the order
-  CHANGED_BY_SUPPLIER = 21,
-  CHANGED_BY_CUSTOMER = 22,
+  // Opened by the supplier
+  OPENED = 20,
+  // Changed by customer after opened
+  CHANGED = 21,
 
-  CANNOT_EDIT_FROM_HERE = 39,    // After the order has been canceled or close. no one can update it anymore
+  APPROVED = 30,
+  APPROVED_WITH_CHANGES = 31,
 
-  CANCELED = 40,            // The order has been canceled by the customer or by the supplier
-  CANCELED_BY_SUPPLIER = 41,
-  CANCELED_BY_CUSTOMER = 42,
+  FINAL_APPROVE = 80,
+  FINAL_APPROVE_WITH_CHANGES = 81,
 
-  CLOSED = 100,             // The order was closed by the customer
+  //TODO: Some statuses before closing
 
-  // // Draft - customer only
-  // DRAFT = 0,
-  //
-  // // Sent, but has not opened by the supplier yet
-  // SENT = 10,
-  // EDITED = 11,
-  //
-  // // Opened by the supplier
-  // OPENED = 20,
-  // // Changed by customer after opened
-  // CHANGED = 21,
-  //
-  // APPROVED = 30,
-  // APPROVED_WITH_CHANGES = 31,
-  //
-  // FINAL_APPROVE = 80,
-  // FINAL_APPROVE_WITH_CHANGES = 81,
-  //
-  // //TODO: Some statuses before closing
-  //
-  // CLOSED = 100,
-  //
-  // CANCELED = 400,
-  // CANCELED_BY_CUSTOMER = 401,
-  // CANCELED_BY_SUPPLIER = 402,
+  CLOSED = 100,
+
+  CANCELED = 400,
+  CANCELED_BY_CUSTOMER = 401,
+  CANCELED_BY_SUPPLIER = 402,
 
 
 }

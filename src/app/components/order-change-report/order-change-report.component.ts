@@ -1,8 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {OrderChange, OrderDoc, OrderStatus, ProductOrder} from '../../models/OrderI';
+import {OrderChange, OrderDoc, OrderStatus} from '../../models/OrderI';
 import {ProductsService} from '../../services/products.service';
 import {ProductPublicDoc} from '../../models/Product';
 import {AuthSoftwareService} from '../../services/auth-software.service';
+import {ProductsChange, ProductsListUtil} from '../../utilities/productsList';
 
 @Component({
   selector: 'app-order-change-report',
@@ -22,7 +23,8 @@ export class OrderChangeReportComponent implements OnInit {
   oldPrice: number = 0;
   currentPrice: number = 0;
 
-  productChanges: {old: ProductOrder, current: ProductOrder}[] = [];
+  // productChanges: {old: ProductOrder, current: ProductOrder}[] = [];
+  productChanges: ProductsChange[] = [];
   productsData: ProductPublicDoc[] = [];
 
   hasDetails: boolean;
@@ -42,19 +44,26 @@ export class OrderChangeReportComponent implements OnInit {
     this.userName = user ? `<b>${user.displayName}</b>` : (this.change.side == 'c' ? 'הלקוח' : 'הספק');
 
     switch (this.change.status) {
-      case OrderStatus.SENT: this.action = 'ההזמנה נשלחה ע"י'; break;
-      case OrderStatus.APPROVED: this.action = 'ההזמנה אושרה ע"י'; break;
-      case OrderStatus.CLOSED: this.action = 'ההזמנה נסגרה ע"י'; break;
-      case OrderStatus.CANCELED_BY_CUSTOMER: case OrderStatus.CANCELED_BY_SUPPLIER: this.action = 'ההזמנה בוטלה ע"י'; break;
-      default: this.action = 'ההזמנה שונתה ע"י'; this.hasDetails = true;
+      case OrderStatus.SENT: this.action = 'ההזמנה נשלחה ע"י'; return;
+      case OrderStatus.EDITED: this.action = 'ההזמנה נערכה ע"י'; break;
+      case OrderStatus.OPENED: this.action = 'ההזמנה נפתחה ע"י'; return;
+      case OrderStatus.CHANGED: this.action = 'ההזמנה שונתה ע"י'; break;
+      case OrderStatus.APPROVED: case OrderStatus.APPROVED_WITH_CHANGES: this.action = 'ההזמנה אושרה ע"י'; break;
+      case OrderStatus.FINAL_APPROVE: case OrderStatus.FINAL_APPROVE_WITH_CHANGES: this.action = 'ההזמנה אושרה סופית ע"י'; break;
+      case OrderStatus.CLOSED: this.action = 'ההזמנה נסגרה ע"י'; return;
+      case OrderStatus.CANCELED_BY_CUSTOMER: case OrderStatus.CANCELED_BY_SUPPLIER: this.action = 'ההזמנה בוטלה ע"י'; return;
     }
+
+    // Read current version and previous version JSON data
+    this.current = JSON.parse(this.change.data) as OrderDoc;
+    this.old = this.previousChangeData ? JSON.parse(this.previousChangeData) : null as OrderDoc;
+
+    this.productChanges = ProductsListUtil.CompareLists(this.old.products, this.current.products);
+
+    this.hasDetails = !!(this.current.supplyTime != this.old.supplyTime || this.current.comment != this.old.comment || this.productChanges.length);
 
     // Add lines for changes details
     if(this.hasDetails) {
-
-      // Read current version and previous version JSON data
-      this.current = JSON.parse(this.change.data) as OrderDoc;
-      this.old = this.previousChangeData ? JSON.parse(this.previousChangeData) : null as OrderDoc;
 
       // Calc current price
       this.current.products.forEach((p)=>{
@@ -66,23 +75,23 @@ export class OrderChangeReportComponent implements OnInit {
         this.oldPrice += ((p.pricePerUnit || 0) * (p.amount || 0));
       });
 
-      // List all products IDs from both old and current versions and compare them
-      const productsIds = new Set<string>();
-      [...this.old.products, ...this.current.products].forEach((p)=>{
-        if(!productsIds.has(p.id)) {
+      // // List all products IDs from both old and current versions and compare them
+      // const productsIds = new Set<string>();
+      // [...this.old.products, ...this.current.products].forEach((p)=>{
+      //   if(!productsIds.has(p.id)) {
+      //
+      //     const oldProduct = this.old.products.find((product)=>p.id == product.id);
+      //     const currentProduct = this.current.products.find((product)=>p.id == product.id);
+      //
+      //     if(!currentProduct || !oldProduct || currentProduct.amount != oldProduct.amount || currentProduct.pricePerUnit != oldProduct.pricePerUnit || currentProduct.comment != oldProduct.comment)
+      //       this.productChanges.push({old: oldProduct, current: currentProduct});
+      //
+      //     productsIds.add(p.id);
+      //
+      //   }
+      // });
 
-          const oldProduct = this.old.products.find((product)=>p.id == product.id);
-          const currentProduct = this.current.products.find((product)=>p.id == product.id);
-
-          if(!currentProduct || !oldProduct || currentProduct.amount != oldProduct.amount || currentProduct.pricePerUnit != oldProduct.pricePerUnit || currentProduct.comment != oldProduct.comment)
-            this.productChanges.push({old: oldProduct, current: currentProduct});
-
-          productsIds.add(p.id);
-
-        }
-      });
-
-      this.productsData = await this.productService.loadProductsByIds(...productsIds.values());
+      this.productsData = await this.productService.loadProductsByIds(...this.productChanges.map((p)=>p.productId));
 
     }
 

@@ -199,7 +199,7 @@
         <ion-textarea rows="2"
                       [placeholder]="businessService.side == 'c' ? 'הערות כלליות לספק:' : 'אין הערות מהלקוח'"
                       [(ngModel)]="order.comment"
-                      [disabled]="!customerEditMode">
+                      [readonly]="!customerEditMode">
         </ion-textarea>
 
       </div>
@@ -223,11 +223,11 @@
         <ion-row>
           <ion-button shape="round" color="dark" *ngIf="customerEditMode" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
           <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveDraft()">שמירה כטיוטה</ion-button>
-          <ion-button shape="round" color="dark" *ngIf="supplierEditMode">אישור ראשוני</ion-button>
+          <ion-button shape="round" color="dark" *ngIf="supplierEditMode" (click)="approveOrder()">אישור ראשוני</ion-button>
           <ion-button shape="round" color="dark" *ngIf="!isDraft && (customerEditMode || supplierEditMode)" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="customerEditMode || supplierEditMode" (click)="sendOrder()" [disabled]="!orderHasChanged() && !supplierEditMode">
+          <ion-button shape="round" strong="true" *ngIf="customerEditMode || supplierEditMode" (click)="businessService.side == 'c' ? sendOrder() : approveOrder(true)">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="supplierEditMode">אישור הזמנה ושמירת שינויים</ion-text>
             <ion-text *ngIf="!isDraft && customerEditMode">שמירת שינויים ו</ion-text>
