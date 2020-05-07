@@ -78,6 +78,7 @@ export enum OrderStatus {
   // APPROVED_WITH_CHANGES = 31,
   //
   // FINAL_APPROVE = 80,
+  // FINAL_APPROVE_WITH_CHANGES = 81,
   //
   // //TODO: Some statuses before closing
   //
@@ -129,6 +130,6 @@ export interface OrderDoc {
   invoice?: string;
 
   /** Number of boxes */
-  boxes: number;
+  boxes?: number;
 
 }

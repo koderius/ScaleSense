@@ -69,7 +69,7 @@ export class OrderPage implements OnInit {
     private ordersService: OrdersService,
     private productsService: ProductsService,
     private alerts: AlertsService,
-    private businessService: BusinessService,
+    public businessService: BusinessService,
     private navService: NavigationService,
   ) {}
 
