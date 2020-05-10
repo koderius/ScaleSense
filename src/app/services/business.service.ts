@@ -45,6 +45,10 @@ export class BusinessService {
     return this.authService.currentUser.side;
   }
 
+  get otherSide() {
+    return this.side == 's' ? 'c' : 's';
+  }
+
   get businessDoc() : BusinessDoc {
     return this._businessDoc;
   }

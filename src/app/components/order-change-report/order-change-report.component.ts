@@ -75,22 +75,6 @@ export class OrderChangeReportComponent implements OnInit {
         this.oldPrice += ((p.pricePerUnit || 0) * (p.amount || 0));
       });
 
-      // // List all products IDs from both old and current versions and compare them
-      // const productsIds = new Set<string>();
-      // [...this.old.products, ...this.current.products].forEach((p)=>{
-      //   if(!productsIds.has(p.id)) {
-      //
-      //     const oldProduct = this.old.products.find((product)=>p.id == product.id);
-      //     const currentProduct = this.current.products.find((product)=>p.id == product.id);
-      //
-      //     if(!currentProduct || !oldProduct || currentProduct.amount != oldProduct.amount || currentProduct.pricePerUnit != oldProduct.pricePerUnit || currentProduct.comment != oldProduct.comment)
-      //       this.productChanges.push({old: oldProduct, current: currentProduct});
-      //
-      //     productsIds.add(p.id);
-      //
-      //   }
-      // });
-
       this.productsData = await this.productService.loadProductsByIds(...this.productChanges.map((p)=>p.productId));
 
     }

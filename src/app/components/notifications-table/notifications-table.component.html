@@ -1,0 +1,34 @@
+<ion-grid id="notifications-table">
+
+  <ion-row>
+    <ion-col size="1" class="ion-text-center">סטטוס</ion-col>
+    <ion-col class="center">{{businessColumnTitle}}</ion-col>
+    <ion-col class="center">מספר הזמנה</ion-col>
+    <ion-col size="6">נושא</ion-col>
+  </ion-row>
+
+  <div *ngIf="!notificationsService.myNotifications.length" id="no-notes">אין הודעות</div>
+
+  <ion-row *ngFor="let note of notificationsService.myNotifications; let odd = odd" [ngClass]="odd ? '' : 'odd'">
+    <ion-col size="1" class="ion-text-center">
+      <ion-img [src]="'../../assets/images/' + (isNotificationRead(note) ? 'read' : 'unread') + '.png'"></ion-img>
+    </ion-col>
+    <ion-col>{{note.businessName}}</ion-col>
+    <ion-col class="center">{{note.orderSerial}}</ion-col>
+    <ion-col size="3.5" [ngStyle]="{fontWeight: isNotificationRead(note) ? 'normal' : 'bold'}">{{note.text}}</ion-col>
+    <ion-col size="2.5">
+      <ion-button color="secondary" shape="round" (click)="openNotification(note)">פתיחה</ion-button>
+      <ion-button class="small-circle-btn" fill="clear" (click)="onDeleteClicked(note.id)">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-col>
+  </ion-row>
+
+</ion-grid>
+
+<ion-row>
+  <ion-button fill="outline" color="dark" shape="round" size="small"
+              *ngIf="!notificationsService.noMoreNotes"
+              (click)="notificationsService.loadOlderNotifications()"
+              style="margin: 0 auto 1em">טען ישנות יותר</ion-button>
+</ion-row>

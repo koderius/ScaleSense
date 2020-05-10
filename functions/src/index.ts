@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import {OrderChange, OrderDoc} from '../../src/app/models/OrderI';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
-import {checkUserPermission, saveOrderChanges} from './inner_functions';
+import {checkUserPermission, saveOrderChanges, sendNotification} from './inner_functions';
 
 admin.initializeApp();
 
@@ -168,5 +168,77 @@ export const changeOrderStatus = functions.https.onCall(async (order: OrderDoc, 
   }
 
   return null;
+
+});
+
+
+
+/**
+ * Cloud function that runs every 5 minutes TODO: Update to every minute?
+ * */
+export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('every 5 minutes').onRun(async context => {
+
+  // Current server time
+  const now = admin.firestore.Timestamp.now().toMillis();
+  // The value of 24 hours in milliseconds
+  const h24 = 24*60*60*1000;
+
+  // Get all orders that were sent to the supplier but has not been approved after 24 hours
+  const unApprovedOrders = await admin.firestore().collection('orders')
+    .where('status', 'in', [10,11,20,21])
+    .where('created', '<', now - h24)
+    .where('adminNotes.nAfter24', '==', false)
+    .get();
+
+  unApprovedOrders.docs.forEach((doc)=>{
+
+    const data = doc.data() as OrderDoc;
+
+    // Notification content
+    const notification: OrderChange = {
+      by: 'admin',
+      time: now,
+      orderId: doc.id,
+      status: data.status,
+      adminCode: 'nAfter24'
+    };
+
+    // Send notifications to the supplier, and update the order flag that notification has been sent
+    admin.firestore().runTransaction(async transaction => {
+      sendNotification(transaction, 's', data.sid || '', notification);
+      transaction.update(doc.ref, {'adminNotes.nAfter24': true});
+    });
+
+  });
+
+
+  // Get all orders that were not finally approved 24 before supply time
+  const supplyTimeOrders = await admin.firestore().collection('orders')
+    .where('status', 'in', [10,11,20,21,30,31])
+    .where('supplyTime', '<', now + h24)
+    .where('adminNotes.n24Before', '==', false)
+    .get();
+
+  supplyTimeOrders.docs.forEach((doc)=>{
+
+    const data = doc.data() as OrderDoc;
+
+    // Notification content
+    const notification: OrderChange = {
+      by: 'admin',
+      time: now,
+      orderId: doc.id,
+      status: data.status,
+      adminCode: 'n24Before'
+    };
+
+    // Send notifications to the supplier and the customer, and update the order flag that notification has been sent
+    admin.firestore().runTransaction(async transaction => {
+      sendNotification(transaction, 's', data.sid || '', notification);
+      sendNotification(transaction, 'c', data.cid || '', notification);
+      transaction.update(doc.ref, {'adminNotes.n24Before': true});
+    });
+
+  });
 
 });

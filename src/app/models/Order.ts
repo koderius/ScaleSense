@@ -12,6 +12,11 @@ export class Order {
     if (!this._props.status)
       this._props.status = OrderStatus.DRAFT;
 
+    this._props.adminNotes = {
+      n24Before: false,
+      nAfter24: false,
+    }
+
   }
 
   get id() {

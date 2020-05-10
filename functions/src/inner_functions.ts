@@ -4,6 +4,7 @@ import DocumentSnapshot = admin.firestore.DocumentSnapshot;
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {OrderChange, OrderDoc} from '../../src/app/models/OrderI';
 import {ProductsListUtil} from '../../src/app/utilities/productsList';
+import {BusinessSide} from '../../src/app/models/Business';
 
 
 /** The function reads the user's document (through a transaction) and checks whether the user has permission to change the given order */
@@ -105,17 +106,24 @@ export const saveOrderChanges = async (transaction: Transaction, orderSnapshot: 
     return changeReport;
 
   // If the changes were made by the customer, send a notification to the supplier, and v.v.
-  const sendToCollection = changeReport.side == 'c' ? 'suppliers' : 'customers';
   const bid = changeReport.side == 'c' ? 'sid' : 'cid';
   const sendToId = orderSnapshot.get(bid) || orderDoc[bid] as string;
-
-  // Send notification with the report + order ID
-  const notificationsRef = admin.firestore().collection(sendToCollection).doc(sendToId).collection('my_notifications').doc();
-  await transaction.create(notificationsRef, {
+  const noteContent = {
     ...changeReport,
-    orderId: orderSnapshot.get('id') || orderDoc.id,
-  });
+    orderId: orderSnapshot.get('id') || orderDoc.id
+  };
+
+  sendNotification(transaction, changeReport.side == 'c' ? 's' : 'c', sendToId, noteContent);
 
   return changeReport;
+
+};
+
+
+
+export const sendNotification = (transaction: Transaction, side: BusinessSide, id: string, note: OrderChange) => {
+
+  const noteRef = admin.firestore().collection(side == 'c' ? 'customers' : 'suppliers').doc(id).collection('my_notifications').doc();
+  transaction.create(noteRef, note);
 
 };

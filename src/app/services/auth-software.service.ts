@@ -65,6 +65,7 @@ export class AuthSoftwareService {
         }
         catch (e) {
           console.error(e);
+          //TODO: Go back to the website
         }
 
       }

@@ -18,6 +18,7 @@ import {UserNamePipe} from '../pipes/user-name.pipe';
 import {PricePipe} from '../pipes/price.pipe';
 import {SelectPopoverDirective} from '../directives/select-popover.directive';
 import {PaginationComponent} from './pagination/pagination.component';
+import {NotificationsTableComponent} from './notifications-table/notifications-table.component';
 
 
 
@@ -42,6 +43,7 @@ import {PaginationComponent} from './pagination/pagination.component';
     PricePipe,
     SelectPopoverDirective,
     PaginationComponent,
+    NotificationsTableComponent,
   ],
   exports: [
     MatFormFieldModule,
@@ -59,6 +61,7 @@ import {PaginationComponent} from './pagination/pagination.component';
     PricePipe,
     SelectPopoverDirective,
     PaginationComponent,
+    NotificationsTableComponent,
   ],
 })
 export class ComponentsModule { }

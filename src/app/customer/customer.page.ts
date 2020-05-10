@@ -8,13 +8,12 @@ import {NavigationService} from '../services/navigation.service';
 })
 export class CustomerPage implements OnInit {
 
-  notifications = [1,2,3,4,5];
-
   constructor(
     private navService: NavigationService,
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   goToNewOrder() {
     this.navService.goToOrder('new');

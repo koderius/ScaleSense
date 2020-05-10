@@ -1,0 +1,53 @@
+#notifications-table {
+  width: 100%;
+  margin: 2em 0;
+  // Every row
+  ion-row {
+    padding: 0 2em;
+    background-color: white;
+  }
+  // Odd rows color
+  ion-row.odd {
+    background-color: var(--ion-color-tertiary);
+  }
+  // First row (header)
+  ion-row:first-child {
+    background-color: var(--ion-color-primary);
+    color: white;
+    font-weight: bold;
+  }
+  // Every cell
+  ion-col {
+    display: flex;
+    align-items: center;
+  }
+  // Centered text
+  ion-col.center {
+    justify-content: center;
+  }
+  // Space between buttons in last cell each row
+  ion-col:last-child {
+    justify-content: space-between;
+  }
+  // Size of the 'eye' image
+  ion-img {
+    height: 1.2em;
+  }
+  // Size of 'open' button
+  ion-button {
+    height: 1.6em;
+    margin: 0;
+  }
+  // Properties for the circled delete button
+  .del-btn {
+    height: 1.7em;
+    width: 1.7em;
+    margin: 0;
+    --padding-end: 0;
+    --padding-start: 0;
+    --border-width: 2px;
+    --border-style: solid;
+    --border-color: var(--ion-color-dark);
+    --border-radius: 50%;
+  }
+}

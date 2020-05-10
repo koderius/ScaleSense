@@ -21,14 +21,14 @@ export type ProductOrder = {
 
 export type OrderChange = {
 
-  /** The ID of the user who made the change */
-  by: string;
-
-  /** By supplier or by customer */
-  side: BusinessSide;
+  /** The ID of the user who made the change or 'admin' for system notifications */
+  by: string | 'admin';
 
   /** Time of change */
   time: number;
+
+  /** By supplier or by customer */
+  side?: BusinessSide;
 
   /** The status of the order */
   status?: OrderStatus;
@@ -38,6 +38,9 @@ export type OrderChange = {
 
   /** The ID of the order that these changes belongs to - for notifications */
   orderId?: string;
+
+  /** The type of notification - for admin notifications */
+  adminCode?: string;
 
 }
 
@@ -95,6 +98,15 @@ export interface OrderDoc {
   /** Time of supply */
   supplyTime?: number;
 
+  /** Order status */
+  status?: OrderStatus;
+
+  /** Invoice no. */
+  invoice?: string;
+
+  /** Number of boxes */
+  boxes?: number;
+
   /** Time of creation (according to client time) */
   created?: number;
 
@@ -104,13 +116,17 @@ export interface OrderDoc {
   /** List of changes */
   changes?: OrderChange[];
 
-  /** Order status */
-  status?: OrderStatus;
+  /** Notifications flags */
+  adminNotes?: AdminNotes;
 
-  /** Invoice no. */
-  invoice?: string;
+}
 
-  /** Number of boxes */
-  boxes?: number;
+export type AdminNotes = {
+
+  /** Flag that notification has already sent to the supplier 24 hours after the order was sent, and has not been opened yet */
+  nAfter24?: boolean;
+
+  /** Flag that notification has already sent to the supplier 24 hours before the order supply time, and has not been finally approved yet */
+  n24Before?: boolean;
 
 }
