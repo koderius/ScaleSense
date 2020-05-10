@@ -3,6 +3,8 @@ import * as admin from 'firebase-admin';
 import {OrderChange, OrderDoc} from '../../src/app/models/OrderI';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {checkUserPermission, saveOrderChanges, sendNotification} from './inner_functions';
+import {ProductPublicDoc} from '../../src/app/models/Product';
+import {BaseNotificationDoc} from '../../src/app/models/Notification';
 
 admin.initializeApp();
 
@@ -187,7 +189,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
   const unApprovedOrders = await admin.firestore().collection('orders')
     .where('status', 'in', [10,11,20,21])
     .where('created', '<', now - h24)
-    .where('adminNotes.nAfter24', '==', false)
+    .where('adminAlerts.nAfter24', '==', false)
     .get();
 
   unApprovedOrders.docs.forEach((doc)=>{
@@ -195,18 +197,20 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
     const data = doc.data() as OrderDoc;
 
     // Notification content
-    const notification: OrderChange = {
-      by: 'admin',
+    const notification: BaseNotificationDoc = {
+      code: 2,
       time: now,
-      orderId: doc.id,
-      status: data.status,
-      adminCode: 'nAfter24'
+      content: {
+        adminData: 'nAfter24',
+        orderId: doc.id,
+        orderStatus: data.status,
+      }
     };
 
     // Send notifications to the supplier, and update the order flag that notification has been sent
     admin.firestore().runTransaction(async transaction => {
       sendNotification(transaction, 's', data.sid || '', notification);
-      transaction.update(doc.ref, {'adminNotes.nAfter24': true});
+      transaction.update(doc.ref, {'adminAlerts.nAfter24': true});
     });
 
   });
@@ -216,7 +220,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
   const supplyTimeOrders = await admin.firestore().collection('orders')
     .where('status', 'in', [10,11,20,21,30,31])
     .where('supplyTime', '<', now + h24)
-    .where('adminNotes.n24Before', '==', false)
+    .where('adminAlerts.n24Before', '==', false)
     .get();
 
   supplyTimeOrders.docs.forEach((doc)=>{
@@ -224,20 +228,69 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
     const data = doc.data() as OrderDoc;
 
     // Notification content
-    const notification: OrderChange = {
-      by: 'admin',
+    const notification: BaseNotificationDoc = {
+      code: 2,
       time: now,
-      orderId: doc.id,
-      status: data.status,
-      adminCode: 'n24Before'
+      content: {
+        adminData: 'n24Before',
+        orderId: doc.id,
+        orderStatus: data.status,
+      }
     };
 
     // Send notifications to the supplier and the customer, and update the order flag that notification has been sent
     admin.firestore().runTransaction(async transaction => {
       sendNotification(transaction, 's', data.sid || '', notification);
       sendNotification(transaction, 'c', data.cid || '', notification);
-      transaction.update(doc.ref, {'adminNotes.n24Before': true});
+      transaction.update(doc.ref, {'adminAlerts.n24Before': true});
     });
+
+  });
+
+});
+
+
+
+export const onProductWrite = functions.firestore.document('products/{pid}').onWrite((change, context) => {
+
+  // Product new data
+  const data = (change.after.data() || {}) as ProductPublicDoc;
+
+  // Create notification
+  const notification: BaseNotificationDoc = {
+    code: 3,
+    time: data.modified || NaN,
+    refBid: data.modifiedBy,
+    content: {
+      productId: data.id || '',
+    }
+  };
+
+  // Add notification admin data (product created/updated/deleted)
+  if(notification.content) {
+    if(change.after.data() && change.before.data())
+      notification.content.adminData = 'u';
+    if(change.after.data() && !change.before.data())
+      notification.content.adminData = 'c';
+    if(!change.after.data() && change.before.data())
+      notification.content.adminData = 'd';
+  }
+
+  admin.firestore().runTransaction(async transaction=> {
+
+    // If change was made by the supplier, send notifications to all the customers that subscribe this product
+    if(data.modifiedBy == data.sid) {
+      const privateProductsRef = admin.firestore().collectionGroup('my_products').where('id', '==', data.id);
+      const res = await transaction.get(privateProductsRef);
+      res.docs.map((d)=>d.ref.parent.parent).forEach((b)=>{
+        const bid = b ? b.id : '';
+        sendNotification(transaction, 'c', bid || '', notification);
+      });
+    }
+    // If change was made by the customer, send notification to the supplier
+    else {
+      sendNotification(transaction, 's', data.sid || '', notification);
+    }
 
   });
 
