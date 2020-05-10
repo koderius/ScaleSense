@@ -13,7 +13,7 @@
   </ion-thumbnail>
   <ion-row class="inner-item">
     <ion-col size="3">
-      <h6>{{productDetails.name}}</h6>
+      <h6 (click)="navService.goToEditProduct(productDetails.id)" style="cursor: pointer">{{productDetails.name}}</h6>
     </ion-col>
     <ion-col>
       <h6>{{productOrder.pricePerUnit || productDetails.price | price}}</h6>

@@ -1,127 +1,60 @@
 import * as admin from 'firebase-admin';
 import Transaction = admin.firestore.Transaction;
-import DocumentSnapshot = admin.firestore.DocumentSnapshot;
 import {HttpsError} from 'firebase-functions/lib/providers/https';
-import {OrderChange, OrderDoc} from '../../src/app/models/OrderI';
-import {ProductsListUtil} from '../../src/app/utilities/productsList';
 import {BusinessSide} from '../../src/app/models/Business';
+import {BaseNotificationDoc} from '../../src/app/models/Notification';
 
 
-/** The function reads the user's document (through a transaction) and checks whether the user has permission to change the given order */
-export const checkUserPermission = async (transaction: Transaction, uid: string, orderSnapshot: DocumentSnapshot, requestedPermission?: string) : Promise<OrderChange> =>{
+export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, requestedStatus?: number) => {
 
-  // Read the user data, and his business belonging
-  const userSnapshot = (await transaction.get(admin.firestore().collection('users').doc(uid)));
-  const side = userSnapshot.get('side');
-  const bid = userSnapshot.get('bid');
-  const role = userSnapshot.get('role');
-  const permissions = userSnapshot.get('permissions') as string[];
+  // If order has not been finally approved yet, it is possible to cancel it
+  if(requestedStatus == 400 && currentStatus && currentStatus < 80)
+    return 400 + (side == 'c' ? 1 : 2);
 
-  if(role < 3 && !permissions.includes(requestedPermission || ''))
-    throw new HttpsError('permission-denied','The user has no permission','The user has no permission to perform the requested operation');
+  // Customer can update (or create) the order if it has not been finally approved yet (or cancelled, or closed)
+  if(side == 'c') {
+    // The status auto changes as followed:
+    switch (currentStatus) {
+      case 0: return 10;                                        // Order does not exist -> order sent
+      case 10: case 11: return 11;                              // Order sent or edited -> order edited
+      case 20: case 21: case 30: case 31: return 21;            // Order opened by supplier or changed by customer after opened -> changed after opened
+        //TODO: Close order
+    }
+  }
 
-  // Check whether the user's business ID is equal to the order CID or SID (if it's an existing order)
-  if(orderSnapshot.exists && bid != orderSnapshot.get(side + 'id'))
-    throw new HttpsError('permission-denied','The user is not linked to this order','The user is not under the supplier or the customer account of this order');
+  if(side == 's') {
 
-  // Return a change report basic data
-  return {
-    by: uid + '@' + bid,    // Pass also the BID and remove it later
-    side: side,
-    time: admin.firestore.Timestamp.now().toMillis(),
-  };
+    // The supplier can change the status to 'opened', if has not been opened yet
+    if(requestedStatus == 20 && currentStatus < 20)
+      return 20;
+
+    // If the order has not been finally approved yet, it can be approved or finally approved (changes will be checked further)
+    if(currentStatus < 80 && currentStatus >= 20)
+      if(requestedStatus == 80)
+        return 80;
+      else
+        return 30;
+
+  }
+
+  // Throw error if nothing match
+  throw new HttpsError('permission-denied','The order cannot be changed','The requested changes cannot be made due to the user business side or to the current order status');
 
 };
 
-
-/** This function saves changes into the order's document, after getting the change report, and send a notification to the other business */
-export const saveOrderChanges = async (transaction: Transaction, orderSnapshot: DocumentSnapshot, orderDoc: OrderDoc, changeReport: OrderChange) => {
-
-  let newData: OrderDoc;
-
-  // Set data changes
-  if (orderSnapshot.exists) {
-
-    newData = {
-      products: orderDoc.products || [],
-      supplyTime: orderDoc.supplyTime || 0,
-      comment: orderDoc.comment || '',
-    };
-
-    // Supplier can change also these fields
-    if(changeReport.side == 's') {
-      newData.boxes = orderDoc.boxes || 0;
-      newData.invoice = orderDoc.invoice || '';
-    }
-
-    newData.status = orderDoc.status || NaN;
-
-    const currentStatus = orderSnapshot.get('status') || NaN;
-
-    // If some changes were made
-    if(newData.comment != orderSnapshot.get('comment') || newData.supplyTime != orderSnapshot.get('supplyTime') || ProductsListUtil.CompareLists(orderSnapshot.get('products'), newData.products).length) {
-
-      // Set to approved with changes / final approved with changes
-      if(changeReport.side == 's') {
-        newData.status++;
-      }
-      // Change by customer after opened by the supplier or before
-      else {
-        newData.status = currentStatus < 20 ? 11 : 21;
-      }
-
-    }
-    // If no changes and same status
-    else
-      if(newData.status == currentStatus) {
-        throw new HttpsError('permission-denied','No changes has been made');
-      }
-
+export const getRequestedPermission = (status: number)=>{
+  switch (status) {
+    case 10: return 'canCreate';
+    case 11: return 'canEdit';
+    case 21: return 'canChange';
+    case 401: case 402: return 'canCancel';
+    //TODO: more
+    default: return null;
   }
-  // For new orders, take all properties
-  else {
-    newData = orderDoc;
-  }
-
-  const changes = {
-    products: newData.products,
-    comment: newData.comment,
-    supplyTime: newData.supplyTime,
-  };
-
-  // Update the change report
-  changeReport.by = changeReport.by.split('@')[0];   // Remove the BID from the 'by' property, so it will contain the user ID only
-  changeReport.status = newData.status;                       // Update the new status in the report
-  changeReport.data = JSON.stringify(changes);                // Save changes snapshot
-
-  // Update the order with the new data (or create a new order), set modification time and add the report object to the list
-  await transaction.set(orderSnapshot.ref, {
-    ...newData,
-    modified: changeReport.time,
-    changes: admin.firestore.FieldValue.arrayUnion(changeReport),
-  }, {merge: true});
-
-  // If the changes made by the customer before the supplier opened the order, don't sent him another notification
-  if(newData.status == 11)
-    return changeReport;
-
-  // If the changes were made by the customer, send a notification to the supplier, and v.v.
-  const bid = changeReport.side == 'c' ? 'sid' : 'cid';
-  const sendToId = orderSnapshot.get(bid) || orderDoc[bid] as string;
-  const noteContent = {
-    ...changeReport,
-    orderId: orderSnapshot.get('id') || orderDoc.id
-  };
-
-  sendNotification(transaction, changeReport.side == 'c' ? 's' : 'c', sendToId, noteContent);
-
-  return changeReport;
-
 };
 
 
-
-export const sendNotification = (transaction: Transaction, side: BusinessSide, id: string, note: OrderChange) => {
+export const sendNotification = (transaction: Transaction, side: BusinessSide, id: string, note: BaseNotificationDoc) => {
 
   const noteRef = admin.firestore().collection(side == 'c' ? 'customers' : 'suppliers').doc(id).collection('my_notifications').doc();
   transaction.create(noteRef, note);

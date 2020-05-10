@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {BusinessService} from '../../services/business.service';
-import {AppNotification, NotificationsService} from '../../services/notifications.service';
+import {NotificationsService} from '../../services/notifications.service';
 import {NavigationService} from '../../services/navigation.service';
 import {AlertsService} from '../../services/alerts.service';
+import {AppNotification, NotificationCode} from '../../models/Notification';
 
 @Component({
   selector: 'app-notifications-table',
@@ -30,8 +31,11 @@ export class NotificationsTableComponent implements OnInit {
 
   openNotification(notification: AppNotification) {
     this.notificationsService.markAsRead(notification);
-    if(notification.orderId) {
-      this.navService.goToOrder(notification.orderId);
+    if(notification.code == NotificationCode.ORDER_CHANGE || notification.code == NotificationCode.ORDER_ALERT) {
+      this.navService.goToOrder(notification.content.orderId);
+    }
+    if(notification.code == NotificationCode.PRODUCT_CHANGE) {
+      this.navService.goToEditProduct(notification.content.productId);
     }
   }
 

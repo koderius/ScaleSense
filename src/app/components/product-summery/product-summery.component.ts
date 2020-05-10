@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductOrder} from '../../models/OrderI';
 import {ProductPublicDoc} from '../../models/Product';
 import {IonInput} from '@ionic/angular';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-product-summery',
@@ -23,7 +24,9 @@ export class ProductSummeryComponent implements OnInit {
 
   editAmount: boolean;
 
-  constructor() { }
+  constructor(
+    public navService: NavigationService,
+  ) { }
 
   ngOnInit() {}
 

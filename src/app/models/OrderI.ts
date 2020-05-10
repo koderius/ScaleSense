@@ -19,13 +19,13 @@ export type ProductOrder = {
 
 }
 
-export type OrderChange = {
-
-  /** The ID of the user who made the change or 'admin' for system notifications */
-  by: string | 'admin';
+export interface OrderChange {
 
   /** Time of change */
   time: number;
+
+  /** User ID who made the change */
+  by: string;
 
   /** By supplier or by customer */
   side?: BusinessSide;
@@ -38,9 +38,6 @@ export type OrderChange = {
 
   /** The ID of the order that these changes belongs to - for notifications */
   orderId?: string;
-
-  /** The type of notification - for admin notifications */
-  adminCode?: string;
 
 }
 
@@ -117,11 +114,11 @@ export interface OrderDoc {
   changes?: OrderChange[];
 
   /** Notifications flags */
-  adminNotes?: AdminNotes;
+  adminAlerts?: AdminAlerts;
 
 }
 
-export type AdminNotes = {
+export type AdminAlerts = {
 
   /** Flag that notification has already sent to the supplier 24 hours after the order was sent, and has not been opened yet */
   nAfter24?: boolean;

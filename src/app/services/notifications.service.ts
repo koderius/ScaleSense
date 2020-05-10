@@ -1,19 +1,12 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BusinessService} from './business.service';
 import {AuthSoftwareService} from './auth-software.service';
-import {OrderChange} from '../models/OrderI';
 import {OrdersService} from './orders.service';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
-
-export interface AppNotification extends OrderChange {
-  id?: string;
-  orderSerial?: string;
-  businessName?: string;
-  text?: string;
-  readBy?: string[];
-}
+import {AppNotification, BaseNotificationDoc, NotificationCode} from '../models/Notification';
+import {ProductsService} from './products.service';
 
 
 @Injectable({
@@ -37,6 +30,7 @@ export class NotificationsService {
     private businessService: BusinessService,
     private authService: AuthSoftwareService,
     private orderService: OrdersService,
+    private productService: ProductsService,
     private statusText: OrderStatusTextPipe,
   ) {
 
@@ -47,13 +41,11 @@ export class NotificationsService {
       snapshot.docChanges()
         .filter((change)=>change.type == 'added')
         .map((change)=>change.doc)
-        .reverse()
         .forEach(async (doc)=>{
-          const newNote = await this.notificationParse(doc);
-          this._notifications.unshift(newNote);
+          await this.notificationParse(doc);
         });
 
-      this.noMoreNotes = false;
+      this.noMoreNotes = snapshot.docChanges().length < this.NOTES_PER_LOAD;
 
     });
 
@@ -78,8 +70,7 @@ export class NotificationsService {
 
     // Add them to the end of the array
     res.docs.reverse().forEach(async (doc)=>{
-      const newNote = await this.notificationParse(doc);
-      this._notifications.push(newNote);
+      await this.notificationParse(doc);
     });
 
     // Flag for no more notes
@@ -104,38 +95,60 @@ export class NotificationsService {
   }
 
 
-  /** Get the data out of the given notification */
+  /** Get the data out of the given notification and parse it for display */
   private async notificationParse(notificationDoc) {
 
     // Get notification document data & ID
-    const newNotification: AppNotification = notificationDoc.data() as OrderChange;
+    const newNotification: AppNotification = notificationDoc.data() as BaseNotificationDoc;
     newNotification.id = notificationDoc.id;
 
-    // For notifications about order changes
-    if(newNotification.orderId) {
+    // Get the business according to the base notification data
+    const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
+    newNotification.businessName = business.name;
+
+    // For notifications about order
+    if(newNotification.code == NotificationCode.ORDER_CHANGE || newNotification.code == NotificationCode.ORDER_ALERT) {
 
       // Load the order data
-      const order = await this.orderService.getOrderById(newNotification.orderId, false);
+      const order = await this.orderService.getOrderById(newNotification.content.orderId, false);
       newNotification.orderSerial = order.serial;
 
-      // Get the business according to the order SID/CID
-      const business = await this.businessService.getBusinessDoc(this.businessService.otherSide, order[this.businessService.otherSide + 'id']);
-      newNotification.businessName = business.name;
-
-      switch (newNotification.adminCode) {
+      switch (newNotification.content.adminData) {
+        // Text for different alerts
         case 'nAfter24': newNotification.text = 'נשלחה לפני 24 שעות וטרם נפתחה'; break;
         case 'n24Before': newNotification.text = 'מועד אספקה מתקרב וטרם אושרה סופית'; break;
-        // No admin code, means it is a user change
-        default: newNotification.text = this.statusText.transform(newNotification.status);
+        // The text for order change will be the order's new status
+        default: newNotification.text = this.statusText.transform(newNotification.content.orderStatus);
       }
 
     }
 
-    return newNotification;
+    // For notifications about products
+    if(newNotification.code == NotificationCode.PRODUCT_CHANGE) {
+
+      // It's not about order
+      newNotification.orderSerial = '-';
+
+      // Notification text
+      switch (newNotification.content.adminData) {
+        case 'c': newNotification.text = 'מוצר חדש: '; break;
+        case 'u': newNotification.text = 'עדכון מוצר: '; break;
+        case 'd': newNotification.text = 'מוצר הוסר: '; break;
+      }
+      // Add the product's name
+      const product = await this.productService.loadProductsByIds(newNotification.content.productId);
+      newNotification.text += product[0].name;
+
+    }
+
+    // Push notification to the list, and make sure is sorted by time
+    this._notifications.push(newNotification);
+    this._notifications.sort((a, b) => b.time - a.time);
 
   }
 
 
+  /** Delete the given notification for ALL USERS */
   async deleteNotification(noteId: string) {
     await this.notificationRef.doc(noteId).delete();
     const idx = this._notifications.findIndex((n)=>n.id == noteId);

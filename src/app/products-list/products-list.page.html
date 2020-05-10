@@ -59,7 +59,7 @@
             </ion-thumbnail>
           </ion-col>
           <ion-col size="3"><b><ion-text color="primary">{{product.name}}</ion-text></b></ion-col>
-          <ion-col>{{product.catalogNumC}}</ion-col>
+          <ion-col>{{product.catalogNumS}}</ion-col>
           <ion-col>{{product.price | price}} / {{null | unitAmount : product.type}}</ion-col>
           <ion-col>
             <ion-button fill="outline" color="dark" shape="round" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>

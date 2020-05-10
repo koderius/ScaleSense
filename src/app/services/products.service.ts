@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import {FullProductDoc, ProductCustomerDoc, ProductFactory, ProductPublicDoc} from '../models/Product';
+import {FullProductDoc, ProductCustomerDoc, ProductPublicDoc} from '../models/Product';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
 import {BusinessService} from './business.service';
 import {Dictionary} from '../utilities/dictionary';
 import {FilesService} from './files.service';
+import {ProductFactory} from '../models/ProductFactory';
 
 
 /**
@@ -221,8 +222,9 @@ export class ProductsService {
       console.error(e);
     }
 
-    // Set update time
+    // Set update info
     product.modified = Date.now();
+    product.modifiedBy = this.businessService.myBid;
 
     // Save the public product's data
     try {

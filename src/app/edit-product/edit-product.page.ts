@@ -8,6 +8,7 @@ import {Enum} from '../utilities/enum';
 import {AlertsService} from '../services/alerts.service';
 import {CategoriesService} from '../services/categories.service';
 import {BusinessService} from '../services/business.service';
+import {Objects} from '../utilities/objects';
 
 @Component({
   selector: 'app-edit-product',
@@ -17,6 +18,8 @@ import {BusinessService} from '../services/business.service';
 export class EditProductPage implements OnInit {
 
   product: FullProductDoc;
+
+  oldProduct: FullProductDoc;
 
   logoPreview: string;
   tempLogo: File;
@@ -45,10 +48,17 @@ export class EditProductPage implements OnInit {
     const id = this.activatedRoute.snapshot.params['id'];
     if(id == 'new') {
       this.product = {};
+      // For suppliers, auto fill the supplier ID, and set the product to be public for all customers
+      if(this.businessService.side == 's') {
+        this.product.sid = this.businessService.myBid;
+        this.product.cid = ProductsService.PUBLIC_PRODUCT_CID_VALUE;
+      }
     }
     else {
       this.product = (await this.productsService.loadProductsByIds(id))[0];
     }
+
+    this.oldProduct = {...this.product};
 
     // If no tara weight, it means that the tara included
     this.taraIncluded = !this.product.tara;
@@ -56,6 +66,11 @@ export class EditProductPage implements OnInit {
     // Show the product image
     this.logoPreview = this.product.image;
 
+  }
+
+
+  hasChanges() : boolean {
+    return !Objects.IsEqual(this.oldProduct, this.product);
   }
 
 
@@ -77,6 +92,9 @@ export class EditProductPage implements OnInit {
 
   async save() {
 
+    if(!this.hasChanges())
+      return;
+
     if(this.taraIncluded)
       delete this.product.tara;
 
@@ -92,6 +110,10 @@ export class EditProductPage implements OnInit {
       await this.productsService.saveProductPublicData(this.product, this.tempLogo);
 
     this.alerts.loaderStop(l);
+
+    this.oldProduct = {...this.product};
+
+    alert('נתוני מוצר נשמרו');
 
   }
 

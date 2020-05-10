@@ -30,9 +30,6 @@ export class OrdersService {
 
   readonly ordersRef = firebase.firestore().collection('orders');
 
-  private readonly updateOrderCloudFunction = firebase.functions().httpsCallable('updateOrder');
-  private readonly changeOrderStatusCloudFunction = firebase.functions().httpsCallable('changeOrderStatus');
-
   /** The reference to the firestore collection where the list of orders is stored */
   private _myOrders: OrderDoc[] = [];
 
@@ -196,11 +193,8 @@ export class OrdersService {
 
     try {
 
-      let res;
-      if(newStatus == OrderStatus.CANCELED || newStatus == OrderStatus.OPENED || newStatus == OrderStatus.CLOSED)
-        res = (await this.changeOrderStatusCloudFunction(orderDoc)).data as OrderChange;
-      else
-        res = (await this.updateOrderCloudFunction(orderDoc)).data as OrderChange;
+      const updateOrder = firebase.functions().httpsCallable('updateOrder');
+      const res = (await updateOrder(orderDoc)).data as OrderChange;
 
       // On success
       if(res) {

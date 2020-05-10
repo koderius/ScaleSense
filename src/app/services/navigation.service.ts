@@ -21,6 +21,15 @@ export class NavigationService {
     this.navCtrl.navigateRoot(this.authService.currentUser.side == 'c' ? 'customer' : 'supplier', {animationDirection: 'back'});
   }
 
+  /** Go back to the last page in the app's stack. If nothing happened, go to main page */
+  async goBack() {
+    const id = window.history.state.navigationId;
+    await this.navCtrl.pop();
+    if (window.history.state.navigationId == id)
+      this.goToMain();
+  }
+
+
   goToDraftsList() {
     if(this.authService.currentUser.side == 'c')
       this.navCtrl.navigateForward('orders-list?mode=drafts');
