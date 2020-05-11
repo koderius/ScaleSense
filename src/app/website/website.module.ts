@@ -9,6 +9,7 @@ import {FooterComponent} from './components/footer/footer.component';
 import {WebsiteHeaderComponent} from './components/header/website-header.component';
 import {RegisterPage} from './register/register.page';
 import {MailService} from './mail/mail.service';
+import {RecaptchaModule} from 'ng-recaptcha';
 
 @NgModule({
   imports: [
@@ -28,7 +29,8 @@ import {MailService} from './mail/mail.service';
         path: 'register',
         redirectTo: 'register/0'
       }
-    ])
+    ]),
+    RecaptchaModule.forRoot(),
   ],
   declarations: [WebsitePage, RegisterPage, FooterComponent, WebsiteHeaderComponent],
   providers: [MailService],

@@ -125,7 +125,7 @@ export class AuthWebsiteService {
       // Create new user with email & password
       const cred = await this.auth.createUserWithEmailAndPassword(email, password);
 
-      // Set basic details
+      // Set basic content
       cred.user.updateProfile({
         displayName: name || null,
         photoURL: photo || null
@@ -175,7 +175,7 @@ export class AuthWebsiteService {
   //
   //   try {
   //
-  //     // Update the name & photo details in the firebase auth user (not so important)
+  //     // Update the name & photo content in the firebase auth user (not so important)
   //     const fbProfile: {displayName?: string, photoURL?: string} = {};
   //     if(newUserDetails.displayName)
   //       fbProfile.displayName = newUserDetails.displayName;

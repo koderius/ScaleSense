@@ -3,6 +3,7 @@ import {ActivatedRoute} from '@angular/router';
 import {AuthWebsiteService} from '../auth-website.service';
 import {NavController} from '@ionic/angular';
 import {UserDoc} from '../../models/UserDoc';
+import {MailService} from '../mail/mail.service';
 
 enum PageStatus {
 
@@ -48,7 +49,8 @@ export class RegisterPage implements OnInit {
     private authService: AuthWebsiteService,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
-    ) {}
+    public mailService: MailService,
+  ) {}
 
   ngOnInit() {
 

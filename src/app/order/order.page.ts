@@ -165,7 +165,7 @@ export class OrderPage implements OnInit {
       this.customerEditMode = true;
     }
 
-    // Or, get the order details and go to summery page.
+    // Or, get the order content and go to summery page.
     else {
       this.order = await this.ordersService.getOrderById(orderId, urlSnapshot.queryParams['draft']);
       if(this.order) {
@@ -215,7 +215,7 @@ export class OrderPage implements OnInit {
   }
 
 
-  /** Check whether the order details has changed since the last save */
+  /** Check whether the order content has changed since the last save */
   orderHasChanged(): boolean {
     const orderDoc = this.order.getDocument();
     this.sortProductsByName(orderDoc.products);
@@ -246,7 +246,7 @@ export class OrderPage implements OnInit {
   }
 
 
-  /** Get product details by its ID */
+  /** Get product content by its ID */
   findProductDetails(id: string) {
     return this.supplierProducts.find((p)=>p.id == id);
   }
@@ -288,7 +288,7 @@ export class OrderPage implements OnInit {
   }
 
 
-  /** Get selected supplier details from service */
+  /** Get selected supplier content from service */
   getSelectedSupplier() {
     return this.businessService.side == 'c' ? this.getSupplierData(this.order.sid) : this.businessService.businessDoc;
   }

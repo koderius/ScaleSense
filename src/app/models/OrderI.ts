@@ -86,7 +86,7 @@ export interface OrderDoc {
   /** Supplier ID */
   sid?: string;
 
-  /** List of products to order (Each contains productOrder ID + order's details) */
+  /** List of products to order (Each contains productOrder ID + order's content) */
   products?: ProductOrder[];
 
   /** General comment for the supplier about the order */

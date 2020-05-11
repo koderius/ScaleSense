@@ -6,6 +6,8 @@ import {getNewOrderStatus, getRequestedPermission, sendNotification} from './inn
 import {ProductPublicDoc} from '../../src/app/models/Product';
 import {BaseNotificationDoc} from '../../src/app/models/Notification';
 import {ProductsListUtil} from '../../src/app/utilities/productsList';
+import {MailForm} from '../../src/app/website/mail/MailForm';
+import * as axios from 'axios';
 
 admin.initializeApp();
 
@@ -19,7 +21,7 @@ admin.initializeApp();
 //  */
 // export const registerCustomerFirstStep = functions.https.onCall(async (data) => {
 //
-//   // Create the main user with his details + random password
+//   // Create the main user with his content + random password
 //   const user = await admin.auth().createUser({
 //     displayName: data.fullname,
 //     email: data.email,
@@ -70,6 +72,40 @@ admin.initializeApp();
 //   }
 //
 // });
+
+
+/**
+ * This function sends email to the support, after checking reCAPTCHA
+ * */
+export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm, recaptcha: string}) => {
+
+  // Recaptcha properties
+  const secret = '6LeDYvUUAAAAALxLMZzV0IXYIjxSaVhUwAxOPQ8D';
+  const token = data.recaptcha || '';
+  const url = `https://recaptcha.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
+
+  // Send recaptcha
+  const res = (await axios.default.post(url)).data;
+
+  // On success, send the requested email
+  if(res.success) {
+
+    const mailContent = {
+      to: 'mestroti@gmail.com', //'support@scale-sense.com', TODO
+      template: {
+        name: 'web-contact',
+        data: {...data.mailForm},
+      },
+    };
+
+    admin.firestore().collection('mails').add(mailContent);
+
+  }
+  else {
+    throw new HttpsError('failed-precondition', 'Recaptcha failed');
+  }
+
+});
 
 
 /**

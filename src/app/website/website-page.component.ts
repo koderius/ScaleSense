@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import {AuthWebsiteService} from './auth-website.service';
 import {BusinessSide} from '../models/Business';
 import {NavController} from '@ionic/angular';
+import {MailService} from './mail/mail.service';
+import {MailForm} from './mail/MailForm';
 
 @Component({
   selector: 'app-home',
@@ -15,9 +17,12 @@ export class WebsitePage {
   email: string;
   password: string;
 
+  contact: MailForm = {};
+
   constructor(
     private authService: AuthWebsiteService,
     private navCtrl: NavController,
+    public mailService: MailService,
   ) {}
 
   goToRegister() {
@@ -36,6 +41,11 @@ export class WebsitePage {
     this.navCtrl.navigateRoot(homePage);
     // TODO: Change app domain
     // window.open('https://APP-DOMAIN.com/' + homePage);
+  }
+
+  sendMail(recaptcha: string) {
+    console.log(recaptcha);
+    this.mailService.sendRegistrationMail(recaptcha, this.contact)
   }
 
 }

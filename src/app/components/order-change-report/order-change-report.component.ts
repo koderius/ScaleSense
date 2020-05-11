@@ -62,7 +62,7 @@ export class OrderChangeReportComponent implements OnInit {
 
     this.hasDetails = !!(this.current.supplyTime != this.old.supplyTime || this.current.comment != this.old.comment || this.productChanges.length);
 
-    // Add lines for changes details
+    // Add lines for changes content
     if(this.hasDetails) {
 
       // Calc current price
