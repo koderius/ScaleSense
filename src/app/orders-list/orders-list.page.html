@@ -7,9 +7,11 @@
   <div class="page-container">
 
     <div id="search-section">
+
       <ion-searchbar placeholder="הקלד שם {{side == 'c' ? 'ספק' : 'לקוח'}} | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()">
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
+
       <p class="ion-text-center" *ngIf="pageMode != 'drafts'">
         <ion-text color="primary">איתור לפי תאריך ביצוע הזמנה:</ion-text>
       </p>
@@ -17,17 +19,13 @@
         <p>בין התאריכים</p>
         <mat-form-field>
           <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" readonly (dateChange)="toDate ? searchOrders() : ''">
-          <mat-datepicker-toggle matSuffix [for]="fromPicker">
-            <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
-          </mat-datepicker-toggle>
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
           <mat-datepicker #fromPicker></mat-datepicker>
         </mat-form-field>
         <p>ל-</p>
         <mat-form-field>
           <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" [min]="fromDate" [disabled]="!fromDate" readonly (dateChange)="searchOrders()">
-          <mat-datepicker-toggle matSuffix [for]="toPicker">
-            <mat-icon matDatepickerToggleIcon>keyboard_arrow_down</mat-icon>
-          </mat-datepicker-toggle>
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
           <mat-datepicker #toPicker [startAt]="fromDate"></mat-datepicker>
         </mat-form-field>
         <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null; searchOrders()" *ngIf="fromDate">
@@ -39,6 +37,19 @@
           <ion-button slot="end" class="ion-hide"></ion-button>
         </ion-item>
       </div>
+
+      <div style="display: flex; justify-content: center; align-items: center">
+        <p class="ion-text-center ion-no-margin" *ngIf="pageMode != 'drafts'">
+          <ion-text color="primary">איתור לפי סטטוס הזמנה:</ion-text>
+        </p>
+        <div style="width: 20%; border: none" class="select-box">
+          <ion-select [(ngModel)]="byStatusGroup" (ionChange)="searchOrders()" placeholder="בחירת סטטוס" interface="popover" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
+            <ion-select-option [value]="null"></ion-select-option>
+            <ion-select-option *ngFor="let group of OrderStatusGroup" [value]="group[0]">{{group[0] | orderStatusText : true}}</ion-select-option>
+          </ion-select>
+        </div>
+      </div>
+
     </div>
 
     <div id="table-section">

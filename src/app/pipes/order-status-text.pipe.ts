@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {OrderStatus} from '../models/OrderI';
+import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {BusinessService} from '../services/business.service';
 
 /**
@@ -15,7 +15,18 @@ export class OrderStatusTextPipe implements PipeTransform {
     private businessService: BusinessService,
   ) {}
 
-  transform(value: OrderStatus): string {
+  transform(value: OrderStatus, groupName?: boolean): string {
+
+    if(groupName) {
+      const idx = OrderStatusGroup.findIndex((group)=>group.includes(value));
+      switch (idx) {
+        case 0: return 'פתוחה';
+        case 1: return 'מאושרת סופית';
+        case 2: return 'סגורה';
+        case 3: return 'מבוטלת';
+        default: return '';
+      }
+    }
 
     if(this.businessService.side == 'c') {
 

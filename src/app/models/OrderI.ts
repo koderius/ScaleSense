@@ -69,8 +69,15 @@ export enum OrderStatus {
   CANCELED_BY_CUSTOMER = 401,
   CANCELED_BY_SUPPLIER = 402,
 
-
 }
+
+export const OrderStatusGroup = [
+  [OrderStatus.SENT, OrderStatus.EDITED, OrderStatus.OPENED, OrderStatus.CHANGED, OrderStatus.APPROVED, OrderStatus.APPROVED_WITH_CHANGES],
+  [OrderStatus.FINAL_APPROVE, OrderStatus.FINAL_APPROVE_WITH_CHANGES],
+  [OrderStatus.CLOSED],
+  [OrderStatus.CANCELED_BY_CUSTOMER, OrderStatus.CANCELED_BY_SUPPLIER],
+];
+
 
 export interface OrderDoc {
 

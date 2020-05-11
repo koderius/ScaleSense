@@ -4,7 +4,7 @@ import {OrdersService} from '../services/orders.service';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
-import {OrderStatus} from '../models/OrderI';
+import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {CustomersService} from '../services/customers.service';
@@ -24,9 +24,12 @@ export class OrdersListPage implements OnInit, OnDestroy {
   orders: Order[] = [];
 
   query: string = '';
+  byStatusGroup: OrderStatus;
   fromDate: Date;
   toDate: Date;
   showPast: boolean;
+
+  OrderStatusGroup = OrderStatusGroup;
 
   isSearching: boolean;
 
@@ -147,6 +150,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
     const res = await this.ordersService.queryOrders(
       this.pageMode == 'drafts',
       this.query,
+      this.OrderStatusGroup.find((g)=>g.includes(this.byStatusGroup)),
       byDate ? [this.fromDate, this.toDate] : (this.showPast ? null : [new Date()]),
       movePage == 1 ? this.orders.slice(-1)[0] : null,
       movePage == -1 ? this.orders[0] : null,

@@ -47,7 +47,7 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-button shape="round" (click)="login()" [disabled]="!captchaResponse || !password || !email">כניסה למערכת</ion-button>
+        <ion-button shape="round" (click)="login()" [disabled]="!password || !email">כניסה למערכת</ion-button>
       </ion-row>
       <a (click)="goToRegister()">הרשמה</a>
       <a (click)="goToResetPassword()">שכחתי סיסמה</a>
