@@ -271,3 +271,9 @@ ion-grid.app-table {
     border: solid var(--ion-color-medium) 1px;
   }
 }
+
+.wide-modal {
+  --max-width: 1000px;
+  --width: 1000px;
+}
+

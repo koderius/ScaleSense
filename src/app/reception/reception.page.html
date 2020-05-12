@@ -1,0 +1,63 @@
+<ion-header>
+  <app-header [pageTitle]="pageTitle"></app-header>
+</ion-header>
+
+<ion-content *ngIf="order">
+
+  <div class="page-container">
+
+    <div id="main-container">
+
+      <div style="display: flex; justify-content: space-between">
+        <div id="upper-part">
+          <ion-item lines="none">
+            <ion-label color="medium">חשבונית מספר: </ion-label>
+            <ion-input type="number" [(ngModel)]="order.invoice"></ion-input>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-label color="medium">שם הנהג: </ion-label>
+            <ion-input [(ngModel)]="order.driverName"></ion-input>
+          </ion-item>
+        </div>
+
+        <div id="alerts">
+          <p *ngIf="!isFinal">* הזמנה טרם אושרה סופית ע"י הספק</p>
+          <p *ngIf="!isSupplyDate">* מועד האספקה טרם הגיע</p>
+        </div>
+      </div>
+
+      <ion-grid class="app-table">
+
+        <ion-row>
+          <ion-col>שם המוצר</ion-col>
+          <ion-col>משקל ספק</ion-col>
+          <ion-col>מחיר</ion-col>
+          <ion-col>סה"כ</ion-col>
+          <ion-col>שקילה</ion-col>
+          <ion-col>תוצאת שקילה</ion-col>
+          <ion-col>פער בק"ג</ion-col>
+          <ion-col>פער במחיר</ion-col>
+        </ion-row>
+
+        <ion-row *ngFor="let product of order.products">
+          <ion-col>{{productData(product.id).name}}</ion-col>
+          <ion-col>{{product.amount | unitAmount : productData(product.id).type}}</ion-col>
+          <ion-col>{{product.pricePerUnit | price}}</ion-col>
+          <ion-col style="font-weight: bold">{{(product.pricePerUnit * product.amount) | price}}</ion-col>
+          <ion-col>
+            <ion-button fill="clear" color="secondary" (click)="weightIconClicked(product)">
+              <ion-icon slot="icon-only" src="../../assets/svg/icon_weight.svg"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col></ion-col>
+          <ion-col></ion-col>
+          <ion-col></ion-col>
+        </ion-row>
+
+      </ion-grid>
+
+    </div>
+
+  </div>
+
+</ion-content>

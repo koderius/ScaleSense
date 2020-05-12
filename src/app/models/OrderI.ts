@@ -17,6 +17,9 @@ export type ProductOrder = {
   /** Product's unit price */
   pricePerUnit?: number;
 
+  /** Amount after received by the customer */
+  finalAmount?: number;
+
 }
 
 export interface OrderChange {
@@ -110,6 +113,9 @@ export interface OrderDoc {
 
   /** Number of boxes */
   boxes?: number;
+
+  /** Name of the driver */
+  driverName?: string;
 
   /** Time of creation (according to client time) */
   created?: number;

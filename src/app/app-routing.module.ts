@@ -41,6 +41,12 @@ const routes: Routes = [
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
     canActivateChild: [AppEnterGuard],
   },
+  {
+    path: 'reception',
+    loadChildren: () => import('./reception/reception.module').then( m => m.ReceptionPageModule),
+    canActivateChild: [AppEnterGuard],
+    data: {side: 'c'}
+  },
 
 ];
 

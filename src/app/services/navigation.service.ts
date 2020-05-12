@@ -76,4 +76,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('settings/categories-list');
   }
 
+  goToReception(orderId: string) {
+    this.navCtrl.navigateForward('reception/' + orderId);
+  }
+
 }

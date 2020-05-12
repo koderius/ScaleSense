@@ -37,10 +37,10 @@ export class AuthWebsiteService {
   public onAuthError : (e: FirebaseError)=>void = e =>console.error(e);
 
   /** Regular expresion for password (alphanumeric + underscore, minimum 6 chars) */
-  public readonly PASSWORD_REGEX = '^[a-zA-Z0-9_]{6,}$';
+  static readonly PASSWORD_REGEX = '^[a-zA-Z0-9_]{6,}$';
 
   /** Regular expresion for email address */
-  public readonly EMAIL_REGEX = '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$';
+  static readonly EMAIL_REGEX = '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$';
 
 
   constructor(

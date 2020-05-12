@@ -4,6 +4,7 @@ import {AuthWebsiteService} from '../auth-website.service';
 import {NavController} from '@ionic/angular';
 import {UserDoc} from '../../models/UserDoc';
 import {MailService} from '../mail/mail.service';
+import {MailForm} from '../mail/MailForm';
 
 enum PageStatus {
 
@@ -109,18 +110,32 @@ export class RegisterPage implements OnInit {
   }
 
   buttonAction() {
-    this.checkFields();
+
+    if(!this.checkFields())
+      return;
+
     switch (this.pageStatus) {
       case PageStatus.CONTACT: this.sendDetailsClick(); break;
       case PageStatus.FORGOT_PASSWORD: this.sendResetPasswordEmail(); break;
       case PageStatus.RESET_PASSWORD: this.resetPasswordClicked(); break;
       case PageStatus.FIRST_STEP: case PageStatus.SECOND_STEP: this.nextStep(); break;
     }
+
   }
 
 
   sendDetailsClick() {
-    this.pageStatus = PageStatus.CONTACT_DONE;
+    const mailContact: MailForm = {
+      businessName: this.businessName,
+      name: this.fullName,
+      email: this.email,
+      phone: this.phone,
+      registrationReq: true,
+    };
+    if(this.mailService.sendRegistrationMail(mailContact))
+      this.pageStatus = PageStatus.CONTACT_DONE;
+    else
+      alert('פנייה נכשלה');
   }
 
   nextStep() {
@@ -164,7 +179,7 @@ export class RegisterPage implements OnInit {
     }
 
     // Check email is well formatted
-    if(this.inputToShow('email') && !this.email.match(this.authService.EMAIL_REGEX)) {
+    if(this.inputToShow('email') && !this.email.match(AuthWebsiteService.EMAIL_REGEX)) {
       alert('כתובת דוא"ל אינה תקינה');
       return false;
     }
@@ -177,7 +192,7 @@ export class RegisterPage implements OnInit {
 
 
     // Check password is valid
-    if(this.inputToShow('password') && (!this.password || !this.password.match(this.authService.PASSWORD_REGEX))) {
+    if(this.inputToShow('password') && (!this.password || !this.password.match(AuthWebsiteService.PASSWORD_REGEX))) {
       alert('הסיסמה חייבת להכיל לפחות 6 תוים');
       return false;
     }
@@ -185,6 +200,11 @@ export class RegisterPage implements OnInit {
     // Check both password fields are identical
     if(this.inputToShow('passwordV') && this.password != this.passwordV) {
       alert('הסיסמה ואימות הסיסמא אינם זהים');
+      return false;
+    }
+
+    if(this.pageStatus == PageStatus.CONTACT && !this.mailService.recaptcha) {
+      alert('יש לסמן את תיבת "אני לא רובוט"');
       return false;
     }
 

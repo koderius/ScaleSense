@@ -75,22 +75,26 @@ admin.initializeApp();
 
 
 /**
- * This function sends email to the support, after checking reCAPTCHA
+ * This function sends email to the support, after verifying reCAPTCHA
+ * If the user asked to register, it handles the registration request
  * */
 export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm, recaptcha: string}) => {
 
-  // Recaptcha properties
+  // Recaptcha secret server-side key
   const secret = '6LeDYvUUAAAAALxLMZzV0IXYIjxSaVhUwAxOPQ8D';
+  // Token from the user
   const token = data.recaptcha || '';
+  // URL for verifying recaptcha
   const url = `https://recaptcha.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
 
-  // Send recaptcha
+  // Send verification
   const res = (await axios.default.post(url)).data;
 
-  // On success, send the requested email
+  // On recaptcha success, send the requested email to the support by adding a document to the mails collection
   if(res.success) {
 
     const mailContent = {
+      from: 'mestroti@gmail.com', // TODO: Right now, this is the only verified sender in "send grid" - need to verify scale sense domain or get their ACMP
       to: 'mestroti@gmail.com', //'support@scale-sense.com', TODO
       template: {
         name: 'web-contact',
@@ -98,7 +102,7 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
       },
     };
 
-    admin.firestore().collection('mails').add(mailContent);
+    return await admin.firestore().collection('mails').add(mailContent);
 
   }
   else {

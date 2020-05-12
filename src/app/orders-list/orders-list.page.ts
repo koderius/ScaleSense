@@ -56,6 +56,10 @@ export class OrdersListPage implements OnInit, OnDestroy {
       else
         this.pageMode = 'view';
 
+      // For the receive page, filter by all the opened statuses group
+      if(this.pageMode == 'receive')
+        this.byStatusGroup = OrderStatus.SENT;
+
       // Get all 10 first orders
       this.searchOrders();
 
@@ -99,7 +103,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
       case 'drafts': this.navService.goToDraft(orderId); break;
       case 'view': this.navService.goToOrder(orderId); break;
       case 'edit': this.navService.goToOrder(orderId, true); break;
-      case 'receive': break; //TODO
+      case 'receive': this.navService.goToReception(orderId); break;
     }
   }
 

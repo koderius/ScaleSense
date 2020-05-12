@@ -43,9 +43,35 @@ export class WebsitePage {
     // window.open('https://APP-DOMAIN.com/' + homePage);
   }
 
-  sendMail(recaptcha: string) {
-    console.log(recaptcha);
-    this.mailService.sendRegistrationMail(recaptcha, this.contact)
+
+  checkContactFields() {
+
+    // Check there is a name, content and email and/or phone number
+    if(!(this.contact.name && this.contact.content && ((this.contact.email || '').match(AuthWebsiteService.EMAIL_REGEX) || this.contact.phone))) {
+      alert('יש למלא שם משתמש, תוכן פנייה, ואמצעי יצירת קשר אחד לפחות');
+      return false;
+    }
+
+    // Check recaptcha
+    if(!this.mailService.recaptcha) {
+      alert('יש לסמן את תיבת "אני לא רובוט"');
+      return false;
+    }
+
+  }
+
+  // Send email to the support team (executed after front-end recaptcha resolved)
+  async sendMail() {
+
+    if(!this.checkContactFields())
+      return;
+
+    if(await this.mailService.sendRegistrationMail(this.contact)) {
+      alert('פנייתך נשלחה בהצלחה למערכת ותטופל בהקדם');
+      this.contact = {};
+    }
+    else
+      alert('שליחת פנייה נכשלה');
   }
 
 }

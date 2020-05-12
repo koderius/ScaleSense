@@ -135,6 +135,14 @@ export class Order {
     this._props.invoice = ''+num;
   }
 
+  get driverName() {
+    return this._props.driverName;
+  }
+
+  set driverName(driverName: string) {
+    this._props.driverName = driverName;
+  }
+
 
   getDocument(): OrderDoc {
     return JSON.parse(JSON.stringify(this._props));

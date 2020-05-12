@@ -128,6 +128,12 @@
 
     </div>
 
+    <re-captcha
+            siteKey="6LeDYvUUAAAAAOMyXostbdK5Gleg3GAI-wwbysoL"
+            (resolved)="mailService.recaptcha = $event"
+            class="ion-margin"
+            *ngIf="pageStatus == PageStatus.CONTACT">
+    </re-captcha>
 
     <ion-row class="send-btn">
       <ion-button color="secondary" shape="round" strong="true" (click)="buttonAction()" *ngIf="buttonText()">{{buttonText()}}</ion-button>
@@ -147,11 +153,8 @@
     <h2>נציגנו ייצור איתך קשר בהקדם</h2>
   </div>
 
-
 </ion-content>
 
 <ion-footer>
   <website-footer></website-footer>
 </ion-footer>
-
-<re-captcha siteKey="6LeDYvUUAAAAAOMyXostbdK5Gleg3GAI-wwbysoL" size="invisible" (resolved)="mailService.recaptcha = $event" class="ion-padding"></re-captcha>

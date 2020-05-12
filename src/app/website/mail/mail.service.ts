@@ -6,13 +6,22 @@ import 'firebase/functions';
 @Injectable()
 export class MailService {
 
+  recaptcha: string;
+
   private readonly SUPPORT_MAIL = 'mestroti@gmail.com'; //'support@scale-sense.com';
   private readonly REGISTRATION_DOMAIN = 'localhost:8100/';
 
-  sendRegistrationMail(recaptcha: string, mailForm: MailForm) {
+  async sendRegistrationMail(mailForm: MailForm) : Promise<boolean> {
 
     const sendEmail = firebase.functions().httpsCallable('sendEmail');
-    sendEmail({recaptcha: recaptcha, mailForm: mailForm});
+    try {
+      await sendEmail({recaptcha: this.recaptcha, mailForm: mailForm});
+      return true;
+    }
+    catch (e) {
+      console.error(e);
+      return false;
+    }
 
   }
 
