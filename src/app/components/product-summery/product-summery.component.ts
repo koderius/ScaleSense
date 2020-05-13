@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductOrder} from '../../models/OrderI';
 import {ProductPublicDoc} from '../../models/Product';
-import {IonInput} from '@ionic/angular';
 import {NavigationService} from '../../services/navigation.service';
 
 @Component({
@@ -16,13 +15,17 @@ export class ProductSummeryComponent implements OnInit {
   @Input() editProduct: boolean;
   @Input() showComment: boolean;
   @Input() editComment: boolean;
+  @Input() disabled: boolean;
 
   @Output() editClicked = new EventEmitter();
+  @Output() doneEdit = new EventEmitter();
   @Output() clearClicked = new EventEmitter();
 
   randomSkeletonWidth = (Math.random()*100) + '%';
 
-  editAmount: boolean;
+  edit: boolean;
+  tempPrice: number;
+  tempAmount: number;
 
   constructor(
     public navService: NavigationService,
@@ -30,17 +33,24 @@ export class ProductSummeryComponent implements OnInit {
 
   ngOnInit() {}
 
-  async onEditClicked(input: IonInput) {
-    this.editAmount = true;
-    await input.setFocus();
-    (await input.getInputElement()).select();
+  async onEditClicked() {
+    this.edit = true;
+    this.tempAmount = this.productOrder.amount;
+    this.tempPrice = this.productOrder.pricePerUnit;
     this.editClicked.emit();
   }
 
-  onAmountChange($event) {
-    const amount = $event.detail.value;
-    if(amount > 0)
-      this.productOrder.amount = amount;
+  onAcceptChange() {
+    this.productOrder.pricePerUnit = this.tempPrice;
+    this.productOrder.amount = this.tempAmount;
+    this.edit = false;
+    this.doneEdit.emit();
+  }
+
+  onCancelChange() {
+    this.tempAmount = this.tempPrice = null;
+    this.edit = false;
+    this.doneEdit.emit();
   }
 
 }

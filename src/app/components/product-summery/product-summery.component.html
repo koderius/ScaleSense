@@ -16,27 +16,39 @@
       <h6 (click)="navService.goToEditProduct(productDetails.id)" style="cursor: pointer">{{productDetails.name}}</h6>
     </ion-col>
     <ion-col>
-      <h6>{{productOrder.pricePerUnit || productDetails.price | price}}</h6>
+      <h6 *ngIf="!edit">{{productOrder.pricePerUnit || productDetails.price | price}}</h6>
+      <ion-input *ngIf="edit" type="number" step="any" [(ngModel)]="tempPrice" select-text></ion-input>
+      <ion-text *ngIf="edit" class="ion-margin-end">{{null | price}}</ion-text>
     </ion-col>
     <ion-col>
-      <h6 *ngIf="!editAmount">{{productOrder.amount | unitAmount : productDetails.type}}</h6>
-      <ion-input [ngClass]="editAmount ? '' : 'ion-hide'" type="number" [value]="productOrder.amount" (ionChange)="onAmountChange($event)" (ionBlur)="editAmount = false" #inputA></ion-input>
+      <h6 *ngIf="!edit">{{productOrder.amount | unitAmount : productDetails.type}}</h6>
+      <ion-input *ngIf="edit" type="number" step="any" [(ngModel)]="tempAmount" select-text></ion-input>
+      <ion-text *ngIf="edit" class="ion-margin-end">{{null | unitAmount : productDetails.type}}</ion-text>
     </ion-col>
     <ion-col>
       <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.price) | price}}</h6>
     </ion-col>
     <ion-col [size]="showComment ? 1 : 2" *ngIf="editProduct">
-      <div>
-        <ion-button class="small-circle-btn" fill="clear" (click)="clearClicked.emit()">
+      <div *ngIf="!edit">
+        <ion-button class="small-circle-btn" fill="clear" (click)="clearClicked.emit()" [disabled]="disabled" title="הסרת פריט מהרשימה">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" (click)="onEditClicked(inputA)">
-          <ion-icon slot="icon-only"src="../../assets/svg/icon_pen.svg"></ion-icon>
+        <ion-button fill="clear" (click)="onEditClicked()" [disabled]="disabled" title="עריכת כמות ומחיר עבור הפריט">
+          <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+        </ion-button>
+      </div>
+      <div *ngIf="edit">
+        <ion-button fill="clear" color="danger" (click)="onCancelChange()" title="ביטול שינוי">
+          <ion-icon slot="icon-only" name="close"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="success" (click)="onAcceptChange()" title="אישור שינוי">
+          <ion-icon slot="icon-only" name="checkmark"></ion-icon>
         </ion-button>
       </div>
     </ion-col>
     <ion-col size="4" *ngIf="showComment">
-      <ion-input id="inputComment" [placeholder]="editComment ? 'הערות בנוגע למוצר' : 'הערות לקוח'" [(ngModel)]="productOrder.comment" [readonly]="!editComment"></ion-input>
+      <ion-input id="inputComment" *ngIf="editComment" placeholder="הערות בנוגע למוצר" [(ngModel)]="productOrder.comment" [readonly]="!editComment"></ion-input>
+      <p *ngIf="!editComment && productOrder.comment" style="overflow: auto"><ion-text style="text-decoration: underline">הערת לקוח</ion-text>: {{productOrder.comment}}</p>
     </ion-col>
   </ion-row>
 </ion-item>

@@ -20,7 +20,7 @@
     <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount + 1">
       <ion-icon slot="icon-only" name="add"></ion-icon>
     </ion-button>
-    <ion-input [value]="inputValue()" (ionBlur)="onInputChange($event)" (ionFocus)="selectInput($event)" (keyup.enter)="addToCart.emit(+$event.target.value.split(' ')[0])"></ion-input>
+    <ion-input [value]="inputValue()" (ionBlur)="onInputChange($event)" select-text (keyup.enter)="addToCart.emit(+$event.target.value.split(' ')[0])"></ion-input>
     <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount - 1">
       <ion-icon slot="icon-only" name="remove"></ion-icon>
     </ion-button>

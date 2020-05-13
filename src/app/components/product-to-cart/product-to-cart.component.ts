@@ -32,11 +32,6 @@ export class ProductToCartComponent implements OnInit {
   }
 
 
-  // Select input text when focusing on it
-  selectInput(ev) {
-    ev.target.getElementsByTagName('input')[0].select();
-  }
-
   inputValue() {
     return this.unitPipe.transform(this._amount, this.product.type);
   }

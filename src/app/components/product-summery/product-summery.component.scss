@@ -17,6 +17,11 @@ ion-item {
       display: flex;
       align-items: center;
     }
+    ion-input {
+      border-bottom: solid var(--ion-color-medium) 1px;
+      --padding-top: 0;
+      --padding-bottom: 0;
+    }
   }
   ion-col {
     padding: 0;

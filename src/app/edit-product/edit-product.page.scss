@@ -14,6 +14,15 @@
   }
 }
 
+.inputs {
+  // See in two rows only if the screen width is more than 1000
+  @media only screen and (min-width: 1000px) {
+    display: grid;
+    grid-template-columns: 45% 45%;
+    grid-column-gap: 10%;
+  }
+}
+
 .inputs > ion-col {
   padding: 0;
 }

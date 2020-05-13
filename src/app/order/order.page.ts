@@ -63,6 +63,9 @@ export class OrderPage implements OnInit {
   now = new Date().toISOString().slice(0,10); // Today's date as yyyy-mm-dd
   supplierEditDate: boolean;
 
+  /** The product that is now being edited (in page 3) - for not allowing editing more than 1 product at a time */
+  editedProduct: string;
+
   constructor(
     private activeRoute: ActivatedRoute,
     public suppliersService: SuppliersService,

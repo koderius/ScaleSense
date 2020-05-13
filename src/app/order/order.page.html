@@ -137,10 +137,13 @@
                 *ngFor="let product of sortProductsByName(order.products)"
                 [productOrder]="product"
                 [productDetails]="findProductDetails(product.id)"
-                [editProduct]="customerEditMode || supplierEditMode"
+                [editProduct]="(customerEditMode || supplierEditMode)"
                 [showComment]="true"
                 [editComment]="customerEditMode"
                 (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? page = 2 : ''"
+                (editClicked)="editedProduct = product.id"
+                (doneEdit)="editedProduct = null"
+                [disabled]="editedProduct && editedProduct != product.id"
         ></app-product-summery>
 
         <ion-item lines="none" *ngIf="order.products.length">
