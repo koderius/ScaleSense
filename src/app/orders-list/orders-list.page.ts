@@ -43,6 +43,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private navService: NavigationService,
     private businessService: BusinessService,
+    private alerts: AlertsService,
   ) {}
 
   async ngOnInit() {
@@ -123,8 +124,15 @@ export class OrdersListPage implements OnInit, OnDestroy {
     return this.customerService.getCustomerById(cid) || {};
   }
 
-  xClicked() {
-    alert('מה הכפתור הזה עושה? האם צריכה להיות אפשרות למחוק הזמנה שכבר נשלחה לספק?');
+  async xClicked(order : Order) {
+    if(await this.alerts.areYouSure('האם לבטל את ההזמנה?')) {
+      const l = this.alerts.loaderStart('מבטל הזמנה...');
+      const change = await this.ordersService.updateOrder(order, OrderStatus.CANCELED);
+      this.alerts.loaderStop(l);
+      if (change) {
+        alert('ההזמנה בוטלה.');
+      }
+    }
   }
 
   async deleteDraft(orderId: string) {

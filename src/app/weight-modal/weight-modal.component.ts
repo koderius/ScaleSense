@@ -25,7 +25,7 @@ export class WeightModalComponent implements OnInit {
 
   get orderFit() {
     const expectedNetto = Calculator.ProductExpectedNetWeight(this.productData, this.product.amount);
-    return Calculator.IsTolerant(expectedNetto, this.netto, this.productData.weightTolerance + '%');
+    return Calculator.IsTolerant(expectedNetto, this.netto, this.productData.orderWeightTolerance + '%');
   }
 
   onBlur() {

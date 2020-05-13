@@ -87,11 +87,14 @@ export interface ProductCustomerDoc {
   /** The maximum price to accept from the supplier */
   priceLimit?: number;
 
-  /** in % */
+  /** Max price differences between original order to order approve (in %) */
   priceTolerance?: number;
 
-  /** in % */
-  weightTolerance?: number;
+  /** Max weight differences between original order to order approve (in %) */
+  orderWeightTolerance?: number;
+
+  /** Max weight differences between final order to reception (in %) */
+  receiveWeightTolerance?: number;
 
   /** Time of updating the customer properties */
   customerModified?: number;

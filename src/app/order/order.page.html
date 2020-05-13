@@ -187,7 +187,7 @@
             </ion-button>
           </p>
           <p *ngIf="supplierEditMode">
-            <ion-text>מספר קבלה: </ion-text>
+            <ion-text>מספר חשבונית: </ion-text>
             <ion-input type="number" color="primary" placeholder="______________" [(ngModel)]="order.invoice" #invoiceInput readonly="true" (ionBlur)="invoiceInput.readonly = true"></ion-input>
             <ion-button color="dark" fill="clear" size="small" (click)="editInput(invoiceInput)" title="עדכון מספר חשבונית">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>

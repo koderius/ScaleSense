@@ -16,7 +16,7 @@ export class ProductFactory {
       category: product.category,
       priceLimit: product.priceLimit,
       priceTolerance: product.priceTolerance,
-      weightTolerance: product.weightTolerance,
+      orderWeightTolerance: product.orderWeightTolerance,
       customerModified: product.customerModified,
     };
 

@@ -78,7 +78,12 @@
 
         <ion-row *ngFor="let order of orders">
           <ion-col size="1">
-            <ion-button class="small-circle-btn" shape="round" fill="clear" color="secondary" (click)="xClicked()" *ngIf="pageMode != 'drafts'">
+            <ion-button class="small-circle-btn" shape="round" fill="clear" color="secondary"
+                        (click)="xClicked(order)"
+                        *ngIf="pageMode == 'edit'"
+                        [disabled]="order.status >= OrderStatus.FINAL_APPROVE"
+                        title="ביטול הזמנה"
+            >
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-col>

@@ -8,6 +8,7 @@ import {HighlightifyPipe} from '../pipes/highlightify.pipe';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
+  MAT_DATE_LOCALE,
   MatDatepickerModule,
   MatFormFieldModule,
   MatIconModule,
@@ -20,8 +21,6 @@ import {SelectPopoverDirective} from '../directives/select-popover.directive';
 import {PaginationComponent} from './pagination/pagination.component';
 import {NotificationsTableComponent} from './notifications-table/notifications-table.component';
 import {SelectTextDirective} from '../directives/select-text.directive';
-
-
 
 @NgModule({
   imports: [
@@ -66,5 +65,9 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     NotificationsTableComponent,
     SelectTextDirective,
   ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy
+    // { provide: MAT_DATE_LOCALE, useValue: 'iw' }   // Mat date format: dd.mm.yyyy
+  ]
 })
 export class ComponentsModule { }

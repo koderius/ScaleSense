@@ -1,7 +1,7 @@
 <ion-row id="container">
 
   <ion-col size="3">
-    <ion-img src="../../assets/logo_small.png" style="height: 3em;"></ion-img>
+    <ion-img src="../../assets/logo_small.png" style="height: 3em; cursor: pointer" (click)="navService.goToMain()"></ion-img>
     <div id="business-logo">
       <div>
         <ion-img [src]="logo"></ion-img>
