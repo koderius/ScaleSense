@@ -236,6 +236,12 @@ export class OrderPage implements OnInit {
   }
 
 
+  selectOrderSupplier(sid: string) {
+    this.order.sid = sid;
+    this.page = 2;
+  }
+
+
   /** Set the order supply time by combining both the date & time inputs */
   mergeDateAndTime() {
     if(this.supplyDateInput && this.supplyHourInput) {
@@ -438,11 +444,6 @@ export class OrderPage implements OnInit {
 
     if(!this.order.products.length) {
       alert('לא נבחרו מוצרים.');
-      return;
-    }
-
-    if(this.businessService.side == 's' && !this.order.boxes && finalApprove) {
-      alert('יש למלא כמות ארגזים.');
       return;
     }
 

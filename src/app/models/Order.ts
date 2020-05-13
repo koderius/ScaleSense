@@ -49,6 +49,14 @@ export class Order {
     this._props.comment = newComment;
   }
 
+  get supplierComment(): string {
+    return this._props.supplierComment;
+  }
+
+  set supplierComment(newComment: string) {
+    this._props.supplierComment = newComment;
+  }
+
   get products(): ProductOrder[] {
     return this._props.products ? this._props.products : [];
   }
@@ -116,15 +124,6 @@ export class Order {
 
   get changes() {
     return this._props.changes ? this._props.changes.slice() : [];
-  }
-
-  get boxes() {
-    return this._props.boxes;
-  }
-
-  set boxes(num: number) {
-    if(num >= 0)
-      this._props.boxes = num;
   }
 
   get invoice() {

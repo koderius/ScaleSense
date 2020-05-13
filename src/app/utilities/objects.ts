@@ -4,6 +4,11 @@ export class Objects {
 
     Object.getOwnPropertyNames(obj).forEach((p)=>{
       const value = obj[p];
+
+      // Don't try to delete 'length' property from arrays (throw error)
+      if(Array.isArray(obj) && p == 'length')
+        return;
+
       if(value && typeof value == 'object')
         Objects.ClearFalsy(value);
       if(!value)

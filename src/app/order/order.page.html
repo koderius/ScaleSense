@@ -12,14 +12,14 @@
     </ion-searchbar>
 
     <div style="width: 40%" class="select-box">
-      <ion-select [(ngModel)]="order.sid" interface="popover" placeholder="רשימת ספקים" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
+      <ion-select (ionChange)="selectOrderSupplier($event.detail.value)" interface="popover" placeholder="רשימת ספקים" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
         <ion-select-option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</ion-select-option>
       </ion-select>
     </div>
 
     <div class="suppliers-header" *ngIf="suppliersSearchResults.length">תוצאות החיפוש</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplierId of suppliersSearchResults" (click)="order.sid = supplierId" [ngClass]="order.sid == supplierId ? 'selected' : ''">
+      <div class="supplier-box" *ngFor="let supplierId of suppliersSearchResults" (click)="selectOrderSupplier(supplierId)" [ngClass]="order.sid == supplierId ? 'selected' : ''">
         <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
         <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
@@ -27,7 +27,7 @@
 
     <div class="suppliers-header" *ngIf="commonSuppliers.length">חיפושים שכיחים</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplierId of commonSuppliers" (click)="order.sid = supplierId" [ngClass]="order.sid == supplierId ? 'selected' : ''">
+      <div class="supplier-box" *ngFor="let supplierId of commonSuppliers" (click)="selectOrderSupplier(supplierId)" [ngClass]="order.sid == supplierId ? 'selected' : ''">
         <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
         <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
@@ -35,7 +35,7 @@
 
     <div class="suppliers-header" *ngIf="allSuppliers.length">כל הספקים</div>
     <div class="suppliers-boxes">
-      <div class="supplier-box" *ngFor="let supplierId of allSuppliers" (click)="order.sid = supplierId" [ngClass]="order.sid == supplierId ? 'selected' : ''">
+      <div class="supplier-box" *ngFor="let supplierId of allSuppliers" (click)="selectOrderSupplier(supplierId)" [ngClass]="order.sid == supplierId ? 'selected' : ''">
         <ion-img [src]="getSupplierData(supplierId).logo || '../../assets/defaults/default_logo.png'"></ion-img>
         <ion-text>{{getSupplierData(supplierId).name}}</ion-text>
       </div>
@@ -48,7 +48,7 @@
       </ion-button>
     </ion-row>
 
-    <ion-button size="large" [color]="order.sid ? 'primary' : 'medium'" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!order.sid" (click)="page = 2">המשך הזמנה</ion-button>
+<!--    <ion-button size="large" [color]="order.sid ? 'primary' : 'medium'" shape="round" class="ion-float-end" id="continue-btn" [disabled]="!order.sid" (click)="page = 2">המשך הזמנה</ion-button>-->
 
   </div>
 
@@ -144,6 +144,7 @@
                 (editClicked)="editedProduct = product.id"
                 (doneEdit)="editedProduct = null"
                 [disabled]="editedProduct && editedProduct != product.id"
+                [editBoxes]="supplierEditMode"
         ></app-product-summery>
 
         <ion-item lines="none" *ngIf="order.products.length">
@@ -157,6 +158,20 @@
       </ion-list>
 
       <div id="bottom-section">
+
+        <ion-textarea rows="2"
+                      *ngIf="customerEditMode"
+                      placeholder="הערות כלליות לספק"
+                      [(ngModel)]="order.comment"
+        ></ion-textarea>
+        <p *ngIf="!customerEditMode && order.comment">הערות לקוח: {{order.comment}}</p>
+
+        <ion-textarea rows="2"
+                      *ngIf="supplierEditMode"
+                      placeholder="הערות כלליות ללקוח"
+                      [(ngModel)]="order.supplierComment"
+        ></ion-textarea>
+        <p *ngIf="!supplierEditMode && order.supplierComment">הערות ספק: {{order.supplierComment}}</p>
 
         <div style="width: 60%">
 
@@ -183,13 +198,6 @@
           </div>
 
           <p *ngIf="supplierEditMode">
-            <ion-text>כמות ארגזים: </ion-text>
-            <ion-input type="number" color="primary" [(ngModel)]="order.boxes" #boxesInput readonly="true" (ionBlur)="boxesInput.readonly = true"></ion-input>
-            <ion-button color="dark" fill="clear" size="small" (click)="editInput(boxesInput)" title="שינוי כמות ארגזים">
-              <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
-            </ion-button>
-          </p>
-          <p *ngIf="supplierEditMode">
             <ion-text>מספר חשבונית: </ion-text>
             <ion-input type="number" color="primary" placeholder="______________" [(ngModel)]="order.invoice" #invoiceInput readonly="true" (ionBlur)="invoiceInput.readonly = true"></ion-input>
             <ion-button color="dark" fill="clear" size="small" (click)="editInput(invoiceInput)" title="עדכון מספר חשבונית">
@@ -198,12 +206,6 @@
           </p>
 
         </div>
-
-        <ion-textarea rows="2"
-                      [placeholder]="businessService.side == 'c' ? 'הערות כלליות לספק:' : 'אין הערות מהלקוח'"
-                      [(ngModel)]="order.comment"
-                      [readonly]="!customerEditMode">
-        </ion-textarea>
 
       </div>
 

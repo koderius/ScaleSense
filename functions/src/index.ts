@@ -166,19 +166,21 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       /** PART 2: Set changes */
         // The fields that are allowed to be change
       let newData: OrderDoc = {
-          products: order.products || [],
-          supplyTime: order.supplyTime || 0,
-          comment: order.comment || '',
-        };
+        products: order.products || [],
+        supplyTime: order.supplyTime || 0,
+      };
+
+      if(changeReport.side == 'c')
+        newData.comment = order.comment || '';
+      if(changeReport.side == 's')
+        newData.supplierComment = order.supplierComment || '';
 
       // Take a snapshot of these changes for comparing changes history
       changeReport.data = JSON.stringify(newData);
 
       // Suppliers can change also these fields (not for record)
-      if(changeReport.side == 's') {
-        newData.boxes = order.boxes || 0;
+      if(changeReport.side == 's')
         newData.invoice = order.invoice || '';
-      }
 
       // If the order is new, just take the new order as is, and set additional fields:
       if(isNew) {
@@ -192,7 +194,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       // For an existing order,
       else {
         // Check whether there are changes
-        if(newData.comment != (orderSnapshot.get('comment') || '') || newData.supplyTime != orderSnapshot.get('supplyTime') || ProductsListUtil.CompareLists(orderSnapshot.get('products'), newData.products).length) {
+        if(newData.comment != (orderSnapshot.get('comment') || '') || newData.supplierComment != (orderSnapshot.get('supplierComment') || '') || newData.supplyTime != orderSnapshot.get('supplyTime') || ProductsListUtil.CompareLists(orderSnapshot.get('products'), newData.products).length) {
           // Set to approved with changes / final approved with changes (from 30 or 80 to 31 or 81)
           if(changeReport.side == 's' && (changeReport.status == 30 || changeReport.status == 80))
             changeReport.status++;

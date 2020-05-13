@@ -17,6 +17,9 @@ export type ProductOrder = {
   /** Product's unit price */
   pricePerUnit?: number;
 
+  /** Number of boxes for that product (edited by supplier) */
+  boxes?: number;
+
   /** Amount after received by the customer */
   finalAmount?: number;
 
@@ -102,6 +105,9 @@ export interface OrderDoc {
   /** General comment for the supplier about the order */
   comment?: string;
 
+  /** General comment from the supplier about the order */
+  supplierComment?: string;
+
   /** Time of supply */
   supplyTime?: number;
 
@@ -110,9 +116,6 @@ export interface OrderDoc {
 
   /** Invoice no. */
   invoice?: string;
-
-  /** Number of boxes */
-  boxes?: number;
 
   /** Name of the driver */
   driverName?: string;

@@ -84,7 +84,7 @@ export class NotificationsService {
 
     const myUid = this.authService.currentUser.uid;
     // If the user is not in the readers list, add him
-    if(!markAsUnread && !notification.readBy.includes(myUid)) {
+    if(!markAsUnread && !(notification.readBy || []).includes(myUid)) {
       await this.notificationRef.doc(notification.id).update({readBy: firebase.firestore.FieldValue.arrayUnion(myUid)});
       if(!notification.readBy)
         notification.readBy = [];

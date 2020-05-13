@@ -31,6 +31,18 @@
       </p>
     </div>
 
+    <div *ngIf="current.supplierComment != old.supplierComment">
+      <p *ngIf="current.supplierComment">
+        <ion-icon name="pencil-outline" color="dark" class="ion-padding-end"></ion-icon>
+        <ion-text *ngIf="!old.supplierComment">נוספה הערה ללקוח: </ion-text>
+        <ion-text *ngIf="old.supplierComment">שונתה הערה ללקוח ל-</ion-text>
+        <b>"{{current.supplierComment}}"</b>.
+      </p>
+      <p *ngIf="!current.supplierComment && old.supplierComment">
+        <ion-text>נמחקה הערה ללקוח.</ion-text>
+      </p>
+    </div>
+
     <div *ngFor="let product of productChanges">
       <p>
 
