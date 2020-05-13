@@ -28,7 +28,7 @@
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">מספר ספק</ion-col>
             <ion-col>
-              <ion-input [value]="suppliersService.getSupplierById(product.sid).nid" placeholder="אוטומטי" readonly></ion-input>
+              <ion-input [value]="suppliersService.getSupplierById(product.sid)?.nid" placeholder="אוטומטי" readonly></ion-input>
             </ion-col>
           </ion-row>
 

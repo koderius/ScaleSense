@@ -122,7 +122,10 @@
       </ion-row>
       <ion-row>
         <ion-col push="9" size="3">
-          <ion-button shape="round" strong="true" id="send-contact" (click)="sendMail()">שליחה</ion-button>
+          <ion-button shape="round" strong="true" id="send-contact" (click)="sendMail()" [disabled]="isSending">
+            <ion-spinner slot="start" *ngIf="isSending"></ion-spinner>
+            <ion-text>שליחה</ion-text>
+          </ion-button>
         </ion-col>
       </ion-row>
     </div>

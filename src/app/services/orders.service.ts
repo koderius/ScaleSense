@@ -62,7 +62,7 @@ export class OrdersService {
    * - supplier's name (multiple results) - if the query text is non-numeric & non-serial format string, *limited to up to 10 different suppliers fits to the query
    * - date range (multiple results) - inclusive,
    * for more than 10 results use pagination */
-  async queryOrders(isDraft: boolean, query: string = '', status?: OrderStatus[], dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
+  async queryOrders(isDraft: boolean, query: string = '', statusGroup?: OrderStatus[], dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
 
     // Get the drafts collection or the orders collection
     const baseRef: CollectionReference | Query = isDraft ? this.myDrafts : this.myOrders;
@@ -124,8 +124,8 @@ export class OrdersService {
       this._myOrders = res.docs.map((d)=>d.data() as OrderDoc);
 
       // Filtering by status will be in the front-end
-      if(status)
-        this._myOrders = this._myOrders.filter((o)=>status.includes(o.status));
+      if(statusGroup)
+        this._myOrders = this._myOrders.filter((o)=>statusGroup.includes(o.status));
 
       return this._myOrders.map((o)=>new Order(o));
 

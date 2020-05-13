@@ -5,6 +5,8 @@ import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc} from '../models/Business';
 import {BusinessService} from '../services/business.service';
+import {XlsService} from '../services/xls.service';
+
 
 @Component({
   selector: 'app-products-list',
@@ -27,6 +29,7 @@ export class ProductsListPage {
     public suppliersService: SuppliersService,
     public navService: NavigationService,
     public businessService: BusinessService,
+    private excelService: XlsService,
   ) { }
 
   get productsList() : FullProductDoc[] {
@@ -65,6 +68,12 @@ export class ProductsListPage {
 
     this.isSearching = false;
 
+  }
+
+
+  async readExcel(evt) {
+    await this.excelService.readExcelWorkbook(evt);
+    console.log(this.excelService.readSheetData());
   }
 
 }

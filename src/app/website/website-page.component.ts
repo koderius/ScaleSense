@@ -18,6 +18,7 @@ export class WebsitePage {
   password: string;
 
   contact: MailForm = {};
+  isSending: boolean;
 
   constructor(
     private authService: AuthWebsiteService,
@@ -58,6 +59,8 @@ export class WebsitePage {
       return false;
     }
 
+    return true;
+
   }
 
   // Send email to the support team (executed after front-end recaptcha resolved)
@@ -66,12 +69,17 @@ export class WebsitePage {
     if(!this.checkContactFields())
       return;
 
+    this.isSending = true;
+
     if(await this.mailService.sendRegistrationMail(this.contact)) {
       alert('פנייתך נשלחה בהצלחה למערכת ותטופל בהקדם');
       this.contact = {};
     }
     else
       alert('שליחת פנייה נכשלה');
+
+    this.isSending = false;
+
   }
 
 }

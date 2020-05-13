@@ -33,12 +33,12 @@
         </ion-button>
         <ion-item lines="none" [disabled]="fromDate">
           <ion-checkbox slot="start" [(ngModel)]="showPast" (ionChange)="searchOrders()"></ion-checkbox>
-          <ion-label>הצג הזמנות שעברו</ion-label>
+          <ion-label>כולל הזמנות שמועד<br>אספקתן חלף</ion-label>
           <ion-button slot="end" class="ion-hide"></ion-button>
         </ion-item>
       </div>
 
-      <div style="display: flex; justify-content: center; align-items: center" *ngIf="pageMode != 'receive'">
+      <div style="display: flex; justify-content: center; align-items: center">
         <p class="ion-text-center ion-no-margin" *ngIf="pageMode != 'drafts'">
           <ion-text color="primary">איתור לפי סטטוס הזמנה:</ion-text>
         </p>
@@ -91,7 +91,7 @@
           </ion-col>
           <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status >= OrderStatus.FINAL_APPROVE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
           <ion-col>
-            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)" [disabled]="pageMode == 'edit' && order.status >= OrderStatus.FINAL_APPROVE">{{actionBtnTitle}}</ion-button>
+            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)" [disabled]="actionDisabled(order)">{{actionBtnTitle}}</ion-button>
           </ion-col>
           <ion-col *ngIf="pageMode == 'drafts'">
             <ion-button color="dark" fill="outline" shape="round" (click)="deleteDraft(order.id)">מחיקה</ion-button>

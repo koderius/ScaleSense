@@ -94,7 +94,7 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
   if(res.success) {
 
     const mailContent = {
-      from: 'mestroti@gmail.com', // TODO: Right now, this is the only verified sender in "send grid" - need to verify scale sense domain or get their ACMP
+      from: 'website@scale-sense.com',
       to: 'mestroti@gmail.com', //'support@scale-sense.com', TODO
       template: {
         name: 'web-contact',
@@ -102,7 +102,7 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
       },
     };
 
-    return await admin.firestore().collection('mails').add(mailContent);
+    await admin.firestore().collection('mails').add(mailContent);
 
   }
   else {

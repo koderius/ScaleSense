@@ -56,8 +56,11 @@ export class OrdersListPage implements OnInit, OnDestroy {
       else
         this.pageMode = 'view';
 
-      // For the receive page, filter by all the opened statuses group
-      if(this.pageMode == 'receive')
+      // // For the receive page, default filter by all the finally approved statuses group
+      // if(this.pageMode == 'receive')
+      //   this.byStatusGroup = OrderStatus.FINAL_APPROVE;
+      // Fot the editing page, default filter only the editable statuses
+      if(this.pageMode == 'edit')
         this.byStatusGroup = OrderStatus.SENT;
 
       // Get all 10 first orders
@@ -98,6 +101,11 @@ export class OrdersListPage implements OnInit, OnDestroy {
     }
   }
 
+  /** Disable edit when button when order has been already approved. Disable receive when order has already been closed or cancelled */
+  actionDisabled(order) {
+    return (this.pageMode == 'edit' && order.status >= OrderStatus.FINAL_APPROVE) || (this.pageMode == 'receive' && order.status >= this.OrderStatus.CLOSED);
+  }
+
   actionClicked(orderId: string) {
     switch (this.pageMode) {
       case 'drafts': this.navService.goToDraft(orderId); break;
@@ -116,7 +124,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   }
 
   xClicked() {
-    alert('מה הכפתור הזה עושה? בעקרון לא אמור להיות אפשרי למחוק הזמנה קיימת');
+    alert('מה הכפתור הזה עושה? האם צריכה להיות אפשרות למחוק הזמנה שכבר נשלחה לספק?');
   }
 
   async deleteDraft(orderId: string) {

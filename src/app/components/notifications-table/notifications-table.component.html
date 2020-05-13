@@ -11,7 +11,11 @@
 
   <ion-row *ngFor="let note of notificationsService.myNotifications; let odd = odd" [ngClass]="odd ? '' : 'odd'">
     <ion-col size="1" class="ion-text-center">
-      <ion-img [src]="'../../assets/images/' + (isNotificationRead(note) ? 'read' : 'unread') + '.png'"></ion-img>
+      <ion-img [src]="'../../assets/images/' + (isNotificationRead(note) ? 'read' : 'unread') + '.png'"
+               (click)="notificationsService.markAsRead(note, true)"
+               style="cursor: pointer"
+               [title]="isNotificationRead(note) ? 'סמן כלא נקרא' : ''"
+      ></ion-img>
     </ion-col>
     <ion-col>{{note.businessName}}</ion-col>
     <ion-col class="center">{{note.orderSerial}}</ion-col>

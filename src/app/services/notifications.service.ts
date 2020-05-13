@@ -79,13 +79,24 @@ export class NotificationsService {
   }
 
 
-  /** Set a notification as read (add the user to the list of users that have already read) */
-  async markAsRead(notification: AppNotification) {
+  /** Set a notification as read (add the user to the list of users that have already read). Can mark also as unread */
+  async markAsRead(notification: AppNotification, markAsUnread?: boolean) {
+
     const myUid = this.authService.currentUser.uid;
-    await this.notificationRef.doc(notification.id).update({readBy: firebase.firestore.FieldValue.arrayUnion(myUid)});
-    if(!notification.readBy)
-      notification.readBy = [];
-    notification.readBy.push(myUid);
+    // If the user is not in the readers list, add him
+    if(!markAsUnread && !notification.readBy.includes(myUid)) {
+      await this.notificationRef.doc(notification.id).update({readBy: firebase.firestore.FieldValue.arrayUnion(myUid)});
+      if(!notification.readBy)
+        notification.readBy = [];
+      notification.readBy.push(myUid);
+    }
+    // If the user is in the readers list, remover him
+    if(markAsUnread && notification.readBy.includes(myUid)) {
+      await this.notificationRef.doc(notification.id).update({readBy: firebase.firestore.FieldValue.arrayRemove(myUid)});
+      const idx = notification.readBy.findIndex((r)=>r == myUid);
+      notification.readBy.splice(idx);
+    }
+
   }
 
 

@@ -17,7 +17,8 @@
           <ion-icon slot="start" name="add"></ion-icon>
           <ion-text>הוספת מוצר</ion-text>
         </ion-button>
-        <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize">טעינת קובץ Excel</ion-button>
+        <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
+        <input class="ion-hide" type="file" #excel (change)="readExcel($event)">
       </div>
 
     </div>
