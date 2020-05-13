@@ -32,7 +32,7 @@ ion-col:first-child > div {
 ion-col:nth-child(2) {
   font-weight: bold;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   font-size: 1.5em;
   user-select: none;
 }
@@ -78,6 +78,11 @@ ion-col {
     margin: 0;
     font-weight: bold;
   }
+}
+
+h2 > ion-icon {
+  vertical-align: text-bottom;
+  margin: 0 0.5em;
 }
 
 #product-item {

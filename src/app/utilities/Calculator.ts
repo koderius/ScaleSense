@@ -7,18 +7,14 @@ export class Calculator {
 
     // If the product is measured by weight (type = 0), keep the weight.
     // If measured by some unit (type > 0), take the number of units multiply unit weight
-    const bruto = product.type ? (product.unitWeight * amount) : amount;
-
-    // If the box is included (no tara weight), keep the bruto.
-    // If there is a tara, reduce it (multiply the number of units) TODO: What about products by weight? (no unit)
-    return bruto - (product.tara || 0) * amount;
+    return amount * (product.type ? product.unitWeight : 1);
 
   }
 
 
   static CalcError(expected: number, real: number) : number {
 
-    const gap = Math.abs(real - expected);
+    const gap = real - expected;
     return gap/expected;
 
   }
@@ -37,8 +33,8 @@ export class Calculator {
         return false;
     }
 
-    // Rate smaller or equal to the tolerance = O.K.
-    return Calculator.CalcError(expected, real) <= tolerance;
+    // Rate (absolute) smaller or equal to the tolerance = O.K.
+    return Math.abs(Calculator.CalcError(expected, real)) <= tolerance;
 
   }
 
