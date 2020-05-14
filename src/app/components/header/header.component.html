@@ -1,7 +1,7 @@
 <ion-row id="container">
 
   <ion-col size="3">
-    <ion-img src="../../assets/logo_small.png" style="height: 3em; cursor: pointer" (click)="navService.goToMain()"></ion-img>
+    <ion-img src="../../assets/logo_small.png" style="height: 3em; cursor: pointer" (click)="backToMain()"></ion-img>
     <div id="business-logo">
       <div>
         <ion-img [src]="logo"></ion-img>
@@ -41,7 +41,7 @@
     </ion-fab-button>
   </ion-col>
 
-  <ion-button id="back-btn" color="secondary" fill="clear" strong="true" (click)="backToMain()" *ngIf="pageTitle">חזרה אחורה</ion-button>
+  <ion-button id="back-btn" color="secondary" fill="clear" strong="true" (click)="back()" *ngIf="pageTitle">חזרה אחורה</ion-button>
 
 </ion-row>
 

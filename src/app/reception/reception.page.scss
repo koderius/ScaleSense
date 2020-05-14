@@ -31,7 +31,7 @@
 
 .app-table {
   ion-row {
-    border-bottom: solid var(--ion-color-medium) 1px;
+    border-bottom: solid var(--ion-color-light-shade) 1px;
     &:first-child {
       border-bottom: solid black 2px;
     }
@@ -45,5 +45,13 @@
     ion-button {
       margin: 0;
     }
+  }
+}
+
+.result-col {
+  justify-content: space-evenly !important;
+  ion-icon {
+    height: 1.5em;
+    width: 1.5em;
   }
 }

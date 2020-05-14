@@ -44,7 +44,7 @@ export class WeightModalComponent implements OnInit {
     return formatNumber(Calculator.CalcError(expectedNetto, this.totalNetto * 100), 'en-US', '1.2-2') + '%';
   }
 
-  get orderFit() {
+  get orderMatch() {
     const expectedNetto = Calculator.ProductExpectedNetWeight(this.productData, this.product.amount);
     return Calculator.IsTolerant(expectedNetto, this.totalNetto, this.productWeightTolerance);
   }
@@ -69,7 +69,7 @@ export class WeightModalComponent implements OnInit {
   }
 
   weighBruto() {
-    this.bruto = Math.random()*100;
+    this.bruto = Math.random()*50;
     if(this.bruto < this.tara)
       this.weighBruto();
   }
@@ -77,7 +77,7 @@ export class WeightModalComponent implements OnInit {
 
   nextBox() {
     this.totalNetto += this.netto;
-    this.bruto = this.tara = NaN;
+    this.bruto = NaN;
     if(this.currentBox < this.numOfBoxes)
       this.currentBox++;
     else
@@ -87,7 +87,8 @@ export class WeightModalComponent implements OnInit {
 
   save() {
     // Get the amount (no. of units) out of the weight, using the unit weight (If type of unit is Kg, keep the weight)
-    this.product.finalAmount = this.totalNetto * (this.productData.type ? this.productData.unitWeight : 1);
+    this.product.finalAmount = this.totalNetto / (this.productData.type ? this.productData.unitWeight : 1);
+    this.product.isWeightMatch = this.orderMatch;
     this.modalCtrl.dismiss({data: this.product.finalAmount, role: 'ok'});
   }
 

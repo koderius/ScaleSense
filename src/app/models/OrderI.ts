@@ -20,8 +20,11 @@ export type ProductOrder = {
   /** Number of boxes for that product (edited by supplier) */
   boxes?: number;
 
-  /** Amount after received by the customer */
+  /** Amount after received and weighed by the customer */
   finalAmount?: number;
+
+  /** Whether the final amount matches the amount in the order (according to product's tolerance) */
+  isWeightMatch?: boolean;
 
 }
 

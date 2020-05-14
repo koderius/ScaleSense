@@ -35,9 +35,12 @@ export class HeaderComponent implements OnInit {
     this.navService.goToDraftsList();
   }
 
-  backToMain() {
+  back() {
     this.navService.goBack();
-    // this.navService.goToMain();
+  }
+
+  backToMain() {
+    this.navService.goToMain();
   }
 
   goToSettings() {

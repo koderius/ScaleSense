@@ -4,7 +4,6 @@ import {FullProductDoc, ProductCustomerDoc, ProductPublicDoc} from './Product';
 /** Theses methods handle merging and splitting the product's document(s) */
 export class ProductFactory {
 
-
   /** Split the full product's data into public and private data before saving it on the server.
    * Notice that the private price is not being set by the customer, and therefore not being saved in the private data
    * */

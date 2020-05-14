@@ -40,4 +40,11 @@ export class ProductToCartComponent implements OnInit {
     this.amount = +ev.target.value.split(' ')[0];
   }
 
+  setAmount(amount: number) {
+    if(amount >= this.product.orderMin)
+      this.addToCart.emit(amount);
+    else
+      alert(`מינימום הזמנה עבור ${this.product.name}: ${this.unitPipe.transform(this.product.orderMin, this.product.type)}`);
+  }
+
 }

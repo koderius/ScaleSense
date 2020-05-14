@@ -27,7 +27,7 @@
             </h1>
             <h2 style="display: flex; justify-content: space-between">
               <p><b>מחיר לק"ג: </b><ion-text>{{product.pricePerUnit | price}}</ion-text></p>
-              <p><b>כמות שהוזמנה: </b><ion-text>{{product.amount}}</ion-text></p>
+              <p><b>כמות שהוזמנה: </b><ion-text>{{product.amount | unitAmount : productData.type}}</ion-text></p>
               <p><b>סה"כ מחיר: </b><ion-text>{{(product.amount * product.pricePerUnit) | price}}</ion-text></p>
             </h2>
           </ion-label>
@@ -93,21 +93,21 @@
             <ion-text color="dark">{{currentBox}}</ion-text>
             <ion-text color="primary"> מתוך </ion-text>
             <ion-text color="dark">{{numOfBoxes}}</ion-text>
-            <ion-text *ngIf="currentBox > 1">
-              <ion-text color="primary"> - מצטבר: </ion-text>
+            <ion-text *ngIf="totalNetto">
+              <ion-text color="primary"> - סה"כ: </ion-text>
               <ion-text color="dark">{{(totalNetto | number : '1.0-3') || 0}}</ion-text>
               <ion-text color="dark" style="font-size: 0.5em"> ק"ג</ion-text>
             </ion-text>
           </h2>
           <h2 *ngIf="done">
             <ion-text color="primary">סיכום: </ion-text>
-            <ion-text color="dark">{{orderFit ? 'תואם להזמנה' : 'לא תואם להזמנה'}}</ion-text>
-            <ion-icon size="large" [name]="orderFit ? 'checkmark-circle' : 'close-circle'" [color]="orderFit ? 'success' : 'danger'"></ion-icon>
+            <ion-text color="dark">{{orderMatch ? 'תואם להזמנה' : 'לא תואם להזמנה'}}</ion-text>
+            <ion-icon size="large" [name]="orderMatch ? 'checkmark-circle' : 'close-circle'" [color]="orderMatch ? 'success' : 'danger'"></ion-icon>
           </h2>
           <h3 *ngIf="done">
             <ion-text color="primary">פער: </ion-text>
             <ion-text color="dark">{{weightGap}} (</ion-text>
-            <ion-text color="primary">אפיצות: </ion-text>
+            <ion-text color="primary">אפיצות למוצר: </ion-text>
             <ion-text color="dark">{{productWeightTolerance}})</ion-text>
           </h3>
         </div>

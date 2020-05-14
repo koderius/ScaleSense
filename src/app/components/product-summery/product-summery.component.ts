@@ -2,11 +2,14 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductOrder} from '../../models/OrderI';
 import {ProductPublicDoc} from '../../models/Product';
 import {NavigationService} from '../../services/navigation.service';
+import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
+import {ProductFactory} from '../../models/ProductFactory';
 
 @Component({
   selector: 'app-product-summery',
   templateUrl: './product-summery.component.html',
   styleUrls: ['./product-summery.component.scss'],
+  providers: [UnitAmountPipe],
 })
 export class ProductSummeryComponent implements OnInit {
 
@@ -30,6 +33,7 @@ export class ProductSummeryComponent implements OnInit {
 
   constructor(
     public navService: NavigationService,
+    private unitAmountPipe: UnitAmountPipe,
   ) { }
 
   ngOnInit() {}
@@ -42,6 +46,12 @@ export class ProductSummeryComponent implements OnInit {
   }
 
   onAcceptChange() {
+
+    if(this.tempAmount < this.productDetails.orderMin) {
+      alert(`מינימום הזמנה עבור ${this.productDetails.name}: ${this.unitAmountPipe.transform(this.productDetails.orderMin, this.productDetails.type)}`);
+      return;
+    }
+
     this.productOrder.pricePerUnit = this.tempPrice;
     this.productOrder.amount = this.tempAmount;
     this.edit = false;

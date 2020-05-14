@@ -43,10 +43,11 @@ export class ReceptionPage implements OnInit {
 
   async ngOnInit() {
 
+    // Get order by ID in the URL
     const id = this.activatedRoute.snapshot.params['id'];
     this.order = await this.orderService.getOrderById(id, false);
 
-    // Load products data
+    // Load products data for this order
     this.products = await this.productsService.loadProductsByIds(...this.order.products.map((p)=>p.id));
 
   }
