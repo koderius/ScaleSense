@@ -12,11 +12,13 @@ import {Objects} from '../utilities/objects';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {IonInput} from '@ionic/angular';
+import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 
 @Component({
   selector: 'app-order',
   templateUrl: './order.page.html',
   styleUrls: ['./order.page.scss'],
+  providers: [UnitAmountPipe],
 })
 export class OrderPage implements OnInit {
 
@@ -74,6 +76,7 @@ export class OrderPage implements OnInit {
     private alerts: AlertsService,
     public businessService: BusinessService,
     private navService: NavigationService,
+    private unitPipe: UnitAmountPipe,
   ) {}
 
   /** Whether in mode of draft (with wizard) */
@@ -392,6 +395,17 @@ export class OrderPage implements OnInit {
 
     if(!this.checkFields())
       return;
+
+    // For orders that has not been first approved yet, check that all products amounts are not bellow the minimum amount
+    if(this.order.status < OrderStatus.APPROVED && this.order.products.some((p)=>{
+      const product = this.findProductDetails(p.id);
+      if(product.orderMin && p.amount < product.orderMin) {
+        alert(`מינימום הזמנה עבור ${product.name}: ${this.unitPipe.transform(product.orderMin, product.type)}`);
+        return true;
+      }
+    })) {
+      return;
+    }
 
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח עדכון הזמנה לספק?')) {
 

@@ -105,6 +105,35 @@ export interface ProductCustomerDoc {
 }
 
 
+export type ProductOrderDoc = {
+
+  /** The product ID */
+  id?: string;
+
+  /** The product's properties, as they were when the order has finally approved (JSON) */
+  productDocSnapshot?: string;
+
+  /** The amount to order */
+  amount?: number;
+
+  /** Product's comment (if there is) */
+  comment?: string;
+
+  /** Product's unit price */
+  pricePerUnit?: number;
+
+  /** Number of boxes for that product (edited by supplier) */
+  boxes?: number;
+
+  /** Amount after received and weighed by the customer */
+  finalAmount?: number;
+
+  /** Whether the final amount matches the amount in the order (according to product's tolerance) */
+  isWeightMatch?: boolean;
+
+}
+
+
 /** Product's full data, as shown to the customer, contains both public and private data */
 export interface FullProductDoc extends ProductPublicDoc, ProductCustomerDoc {}
 
