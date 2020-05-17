@@ -21,6 +21,10 @@ import {OrderChangeReportComponent} from '../components/order-change-report/orde
     orderPageRoutingModule,
     ComponentsModule,
   ],
+  exports: [
+    ProductSummeryComponent,
+    ProductsTotalPriceComponent
+  ],
   declarations: [
     OrderPage,
     ProductToCartComponent,

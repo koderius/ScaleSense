@@ -42,6 +42,7 @@ export class OrderStatusTextPipe implements PipeTransform {
         case OrderStatus.FINAL_APPROVE_WITH_CHANGES: return 'אושרה סופית עם שינויים';
         case OrderStatus.CANCELED_BY_SUPPLIER: return 'בוטלה ע"י הספק';
         case OrderStatus.CANCELED_BY_CUSTOMER: return 'בוטלה ע"י הלקוח';
+        case OrderStatus.CLOSED: return 'סגורה';
       }
 
     }
@@ -57,6 +58,7 @@ export class OrderStatusTextPipe implements PipeTransform {
         case OrderStatus.FINAL_APPROVE_WITH_CHANGES: return 'אושרה סופית עם שינויים';
         case OrderStatus.CANCELED_BY_SUPPLIER: return 'בוטלה ע"י הספק';
         case OrderStatus.CANCELED_BY_CUSTOMER: return 'בוטלה ע"י הלקוח';
+        case OrderStatus.CLOSED: return 'סגורה';
       }
 
     }

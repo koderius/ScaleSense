@@ -8,6 +8,8 @@ import {Component, Input} from '@angular/core';
 export class ProductsTotalPriceComponent {
 
   @Input() price: number;
+  @Input() colSize: number;
+  @Input() colPush: number;
 
   constructor() {}
 

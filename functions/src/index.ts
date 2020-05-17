@@ -277,6 +277,8 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
     const notification: BaseNotificationDoc = {
       code: 2,
       time: now,
+      refSide: 'c',
+      refBid: data.cid,
       content: {
         adminData: 'nAfter24',
         orderId: doc.id,
@@ -317,8 +319,15 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 
     // Send notifications to the supplier and the customer, and update the order flag that notification has been sent
     admin.firestore().runTransaction(async transaction => {
+      // For the supplier (carries the customer ID)
+      notification.refSide = 'c';
+      notification.refBid = data.cid;
       sendNotification(transaction, 's', data.sid || '', notification);
+      // For the customer (carries the supplier ID)
+      notification.refSide = 's';
+      notification.refBid = data.sid;
       sendNotification(transaction, 'c', data.cid || '', notification);
+      // Flag the order
       transaction.update(doc.ref, {'adminAlerts.n24Before': true});
     });
 
@@ -357,6 +366,7 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
 
     // If change was made by the supplier, send notifications to all the customers that subscribe this product
     if(data.modifiedBy == data.sid) {
+      notification.refSide = 's';
       const privateProductsRef = admin.firestore().collectionGroup('my_products').where('id', '==', data.id);
       const res = await transaction.get(privateProductsRef);
       res.docs.map((d)=>d.ref.parent.parent).forEach((b)=>{
@@ -366,6 +376,7 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
     }
     // If change was made by the customer, send notification to the supplier
     else {
+      notification.refSide = 'c';
       sendNotification(transaction, 's', data.sid || '', notification);
     }
 

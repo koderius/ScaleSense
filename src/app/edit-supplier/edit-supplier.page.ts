@@ -4,6 +4,8 @@ import {BusinessDoc, SupplierDoc} from '../models/Business';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
+import {AuthSoftwareService} from '../services/auth-software.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-edit-supplier',
@@ -22,6 +24,7 @@ export class EditSupplierPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private suppliersService: SuppliersService,
     private alerts: AlertsService,
+    private navService: NavigationService,
   ) { }
 
   async ngOnInit() {
@@ -91,10 +94,27 @@ export class EditSupplierPage implements OnInit {
       return;
     }
 
+    if(!this.supplier.contacts[0].name || !this.supplier.contacts[0].email || !this.supplier.contacts[0].phone) {
+      alert('יש להזין פרטי איש קשר אחד לפחות');
+      return;
+    }
+
+    if(!(this.supplier.contacts[0].email || '').match(AuthSoftwareService.EMAIL_REGEX)) {
+      alert('כתובת אימייל לא תקינה');
+      return;
+    }
+
+    if(this.supplier.contacts[1] && !this.supplier.contacts[1].email.match(AuthSoftwareService.EMAIL_REGEX)) {
+      alert('כתובת אימייל של איש קשר נוסף לא תקינה');
+      return;
+    }
+
     // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
     const l = this.alerts.loaderStart('שומר פרטי ספק...');
     await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo);
     this.alerts.loaderStop(l);
+    alert('פרטי ספק נשמרו בהצלחה');
+    this.navService.goToSuppliersList();
 
   }
 

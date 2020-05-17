@@ -98,6 +98,10 @@
   background-color: white;
   width: 100%;
   padding: 1em;
+  & > * {
+    width: 80%;
+    margin: auto;
+  }
   p {
     font-weight: bold;
     display: flex;
@@ -160,11 +164,13 @@
     }
   }
   ion-textarea {
-    width: 70%;
-    margin: auto;
     border: solid var(--ion-color-medium) 1px;
     border-radius: 1rem;
     --padding-start: 1rem;
+    &.readonly {
+      color: var(--ion-color-medium);
+      font-style: italic;
+    }
   }
 }
 

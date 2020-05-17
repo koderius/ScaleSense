@@ -47,9 +47,6 @@ ion-col {
   display: flex;
   div {
     padding: 0 1em;
-    &:first-of-type {
-      border-left: solid var(--ion-color-primary-shade) 2px;
-    }
   }
   p {
     margin: 0;
@@ -89,5 +86,16 @@ h2 > ion-icon {
   max-width: 550px;
   h1 {
     font-size: 1.5em;
+  }
+}
+
+#checkbox-item {
+  --highlight-height: 0;
+  ion-input {
+    max-width: 6em;
+    border-bottom: solid black 1px;
+    --padding-bottom: 0;
+    --padding-top: 0;
+    --padding-start: 0;
   }
 }

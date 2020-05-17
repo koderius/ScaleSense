@@ -29,29 +29,46 @@
       <ion-grid class="app-table">
 
         <ion-row>
+          <ion-col size="0.5"></ion-col>
           <ion-col>שם המוצר</ion-col>
           <ion-col>משקל ספק</ion-col>
           <ion-col>מחיר</ion-col>
           <ion-col>סה"כ</ion-col>
-          <ion-col>שקילה</ion-col>
+          <ion-col size="1">שקילה</ion-col>
           <ion-col>תוצאת שקילה</ion-col>
           <ion-col>פער בק"ג</ion-col>
           <ion-col>פער במחיר</ion-col>
         </ion-row>
 
         <ion-row *ngFor="let product of order.products">
+          <ion-col size="0.5">
+            <ion-button fill="clear" color="dark" (click)="onEditClicked(product)" *ngIf="!editProduct">
+              <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="success" (click)="onEditDone(product)" *ngIf="editProduct == product.id">
+              <ion-icon slot="icon-only" name="checkmark"></ion-icon>
+            </ion-button>
+          </ion-col>
           <ion-col>{{productData(product.id).name}}</ion-col>
-          <ion-col>{{product.amount | unitAmount : productData(product.id).type}}</ion-col>
-          <ion-col>{{product.pricePerUnit | price}}</ion-col>
-          <ion-col style="font-weight: bold">{{(product.pricePerUnit * product.amount) | price}}</ion-col>
           <ion-col>
+            <ion-text *ngIf="editProduct != product.id">{{product.amount | unitAmount : productData(product.id).type}}</ion-text>
+            <ion-input *ngIf="editProduct == product.id" [(ngModel)]="tempAmount" select-text></ion-input>
+            <ion-text *ngIf="editProduct == product.id">{{null | unitAmount : productData(product.id).type}}</ion-text>
+          </ion-col>
+          <ion-col>
+            <ion-text *ngIf="editProduct != product.id">{{product.pricePerUnit | price}}</ion-text>
+            <ion-input *ngIf="editProduct == product.id" [(ngModel)]="tempPrice" select-text></ion-input>
+            <ion-text *ngIf="editProduct == product.id">{{null | price}}</ion-text>
+          </ion-col>
+          <ion-col style="font-weight: bold">{{(product.pricePerUnit * product.amount) | price}}</ion-col>
+          <ion-col size="1">
             <ion-button fill="clear" color="secondary" (click)="weightIconClicked(product)">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_weight.svg"></ion-icon>
             </ion-button>
           </ion-col>
           <ion-col class="result-col">
             <ion-icon *ngIf="product.finalAmount" [name]="product.isWeightMatch ? 'checkmark-circle' : 'close-circle'" [color]="product.isWeightMatch ? 'success' : 'danger'" [title]="product.isWeightMatch ? 'תואם להזמנה' : 'לא תואם להזמנה'"></ion-icon>
-            <ion-text>{{product.finalAmount ? (product.finalAmount | unitAmount : 0) : '-'}}</ion-text>
+            <ion-text>{{product.finalAmount ? (product.finalAmount | unitAmount : 0) : 'טרם נשקל'}}</ion-text>
           </ion-col>
           <ion-col>{{product.finalAmount ? (product.finalAmount - product.amount | unitAmount : 0) : '-'}}</ion-col>
           <ion-col>{{product.finalAmount ? (product.pricePerUnit * (product.finalAmount - product.amount) | price) : '-'}}</ion-col>

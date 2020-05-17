@@ -31,7 +31,7 @@
         <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null; searchOrders()" *ngIf="fromDate">
           <ion-icon slot="icon-only" name="close"></ion-icon>
         </ion-button>
-        <ion-item lines="none" [disabled]="fromDate">
+        <ion-item lines="none" [disabled]="fromDate" *ngIf="pageMode != 'edit' && pageMode != 'goods_return'">
           <ion-checkbox slot="start" [(ngModel)]="showPast" (ionChange)="searchOrders()"></ion-checkbox>
           <ion-label>כולל הזמנות שמועד<br>אספקתן חלף</ion-label>
           <ion-button slot="end" class="ion-hide"></ion-button>
@@ -39,7 +39,7 @@
       </div>
 
       <div style="display: flex; justify-content: center; align-items: center">
-        <p class="ion-text-center ion-no-margin" *ngIf="pageMode != 'drafts'">
+        <p class="ion-text-center ion-no-margin" *ngIf="pageMode != 'drafts' && pageMode != 'edit'">
           <ion-text color="primary">איתור לפי סטטוס הזמנה:</ion-text>
         </p>
         <div style="width: 20%; border: none" class="select-box">
@@ -52,7 +52,7 @@
 
     </div>
 
-    <div id="table-section">
+    <div class="table-section">
 
       <ion-grid class="app-table">
 
@@ -67,7 +67,6 @@
         </div>
 
         <ion-row *ngIf="orders.length">
-          <ion-col size="1"></ion-col>
           <ion-col>{{pageMode == 'drafts' ? 'תאריך ביצוע' : 'תאריך אספקה'}}</ion-col>
           <ion-col>מס. הזמנה</ion-col>
           <ion-col>{{side == 'c' ? 'ספק' : 'לקוח'}}</ion-col>
@@ -77,16 +76,6 @@
         </ion-row>
 
         <ion-row *ngFor="let order of orders">
-          <ion-col size="1">
-            <ion-button class="small-circle-btn" shape="round" fill="clear" color="secondary"
-                        (click)="xClicked(order)"
-                        *ngIf="pageMode == 'edit'"
-                        [disabled]="order.status >= OrderStatus.FINAL_APPROVE"
-                        title="ביטול הזמנה"
-            >
-              <ion-icon slot="icon-only" name="close"></ion-icon>
-            </ion-button>
-          </ion-col>
           <ion-col><ion-text dir="ltr">{{(pageMode == 'drafts' ? (order.modified || order.created) : order.supplyTime) | date : 'dd/MM/yyyy HH:mm'}}</ion-text></ion-col>
           <ion-col>{{order.serial}}</ion-col>
           <ion-col>
@@ -96,7 +85,7 @@
           </ion-col>
           <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status >= OrderStatus.FINAL_APPROVE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
           <ion-col>
-            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order.id)" [disabled]="actionDisabled(order)">{{actionBtnTitle}}</ion-button>
+            <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order)" [disabled]="actionDisabled(order)">{{actionBtnTitle}}</ion-button>
           </ion-col>
           <ion-col *ngIf="pageMode == 'drafts'">
             <ion-button color="dark" fill="outline" shape="round" (click)="deleteDraft(order.id)">מחיקה</ion-button>
@@ -112,6 +101,25 @@
             (onForward)="searchOrders(1)"
             (onBack)="searchOrders(-1)"
     ></app-pagination>
+
+    <ion-spinner *ngIf="orderReturn && !orderProducts.length" color="primary" style="margin: auto"></ion-spinner>
+
+    <div class="table-section" *ngIf="orderReturn && orderProducts.length">
+      <h2 style="font-weight: bold">הזמנה מס. {{orderReturn.serial}}</h2>
+      <ion-list id="return-list">
+        <app-product-summery *ngFor="let product of orderReturn.products"
+                             [productOrder]="product"
+                             [productDetails]="getProductToReturn(product.id)"
+                             extraBtnText="החזרת מוצר"
+                             (extraBtnClicked)="onProductReturn($event)"
+        ></app-product-summery>
+        <app-products-total-price [price]="orderReturn.orderTotalPrice()" [colSize]="9/4" [colPush]="3+9/4"></app-products-total-price>
+      </ion-list>
+      <h5 style="font-weight: bold; text-align: center">
+        <ion-text>ההזמנה סופקה בתאריך: </ion-text>
+        <ion-text color="primary">{{orderReturn.supplyTime | date : 'dd/MM/yyyy HH:mm'}}</ion-text>
+      </h5>
+    </div>
 
     <ion-row>
       <ion-button shape="round" strong="true" (click)="goBack()" id="back-btn">חזרה למסך הראשי</ion-button>

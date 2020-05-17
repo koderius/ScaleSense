@@ -19,6 +19,11 @@ export class ReceptionPage implements OnInit {
 
   products: FullProductDoc[] = [];
 
+  /** The product ID that is being edited now, and it's temporary values */
+  editProduct: string;
+  tempAmount: number;
+  tempPrice: number;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private orderService: OrdersService,
@@ -54,6 +59,19 @@ export class ReceptionPage implements OnInit {
 
   productData(id: string) : FullProductDoc {
     return this.products.find((p)=>p.id == id) || {};
+  }
+
+
+  onEditClicked(product: ProductOrder) {
+    this.editProduct = product.id;
+    this.tempAmount = product.amount;
+    this.tempPrice = product.pricePerUnit;
+  }
+
+  onEditDone(product: ProductOrder) {
+    product.pricePerUnit = this.tempPrice;
+    product.amount = this.tempAmount;
+    this.editProduct = null;
   }
 
 

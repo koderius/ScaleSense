@@ -36,23 +36,36 @@
     </ion-row>
 
     <ion-row>
+      <ion-col size="1"></ion-col>
+      <ion-col size="3"></ion-col>
+      <ion-col>
+        <ion-item [disabled]="!!bruto || !!totalNetto" lines="none" id="checkbox-item">
+          <ion-checkbox slot="start" [(ngModel)]="isKnownTara"></ion-checkbox>
+          <ion-label color="primary">משקל אריזה קבוע: </ion-label>
+          <ion-input type="number" [(ngModel)]="constTara" [disabled]="!isKnownTara" class="ion-margin-start"></ion-input>
+          <ion-text>ק"ג</ion-text>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
       <ion-col size="1">
         <div>1</div>
       </ion-col>
       <ion-col size="3">חישוב אריזה</ion-col>
       <ion-col>
         <div id="step1">
-          <ion-button color="dark" fill="outline" (click)="weighTara()" [disabled]="done">שקילת אריזה</ion-button>
+          <ion-button color="dark" fill="outline" (click)="weighTara()" [disabled]="isKnownTara || done">שקילת אריזה</ion-button>
           <div>
             <p><ion-text color="primary" style="font-weight: bold">משקל אריזה:</ion-text></p>
             <p><ion-text color="dark">{{tara ? (tara | unitAmount : 0) : 'טרם נשקל'}}</ion-text></p>
           </div>
-          <div>
+          <div *ngIf="isKnownTara" style="border-right: solid var(--ion-color-primary-shade) 2px">
             <p><ion-text>כמות ארגזים</ion-text></p>
             <p><ion-text>לשקילה</ion-text></p>
           </div>
           <div>
-            <ion-input type="number" [(ngModel)]="numOfBoxes" select-text></ion-input>
+            <ion-input type="number" *ngIf="isKnownTara" [(ngModel)]="numOfBoxes" [disabled]="counter > 0" select-text></ion-input>
           </div>
         </div>
         <p class="ion-no-margin" style="position: absolute"><ion-text color="medium" style="font-size: small">פעולה זו תחשב את משקל האריזה ותחסיר אותה בעת שקילת המוצר</ion-text></p>
@@ -65,7 +78,7 @@
       </ion-col>
       <ion-col size="3">אישור שקילה</ion-col>
       <ion-col id="step2">
-        <ion-button color="dark" fill="outline" (click)="weighBruto()" [disabled]="done">שקילת מוצר</ion-button>
+        <ion-button color="dark" fill="outline" (click)="weighBruto()" [disabled]="bruto || done">שקילת מוצר</ion-button>
         <div class="ion-padding-horizontal">
           <p><ion-text color="primary" style="font-weight: bold">משקל כולל:</ion-text></p>
           <p><ion-text color="dark">{{bruto ? (bruto | unitAmount : 0) : 'טרם נשקל'}}</ion-text></p>
@@ -85,18 +98,20 @@
             <ion-text color="dark">{{(netto | number : '1.0-3') || 0}}</ion-text>
             <ion-text color="dark" style="font-size: 0.5em"> ק"ג</ion-text>
           </h2>
-          <ion-button shape="round" color="dark" (click)="nextBox()" [disabled]="!netto || done">{{numOfBoxes == currentBox ? 'סיום' : 'המשך שקילה'}}</ion-button>
+          <ion-button shape="round" color="dark" (click)="nextBox()" [disabled]="this.counter >= this.numOfBoxes || !netto || done">המשך שקילה</ion-button>
+          <ion-button shape="round" color="dark" (click)="doneProcess()" [disabled]="!netto || done">סיום</ion-button>
         </div>
         <div>
           <h2>
-            <ion-text color="primary">ארגז </ion-text>
-            <ion-text color="dark">{{currentBox}}</ion-text>
-            <ion-text color="primary"> מתוך </ion-text>
-            <ion-text color="dark">{{numOfBoxes}}</ion-text>
-            <ion-text *ngIf="totalNetto">
-              <ion-text color="primary"> - סה"כ: </ion-text>
+            <ion-text>
+              <ion-text color="primary">מצטבר: </ion-text>
               <ion-text color="dark">{{(totalNetto | number : '1.0-3') || 0}}</ion-text>
               <ion-text color="dark" style="font-size: 0.5em"> ק"ג</ion-text>
+              <ion-text *ngIf="done">
+                <ion-text color="primary"> פער: </ion-text>
+                <ion-text color="dark">{{((totalNetto - expectedNet) | number : '1.0-3') || 0}}</ion-text>
+                <ion-text color="dark" style="font-size: 0.5em"> ק"ג</ion-text>
+              </ion-text>
             </ion-text>
           </h2>
           <h2 *ngIf="done">
@@ -104,12 +119,6 @@
             <ion-text color="dark">{{orderMatch ? 'תואם להזמנה' : 'לא תואם להזמנה'}}</ion-text>
             <ion-icon size="large" [name]="orderMatch ? 'checkmark-circle' : 'close-circle'" [color]="orderMatch ? 'success' : 'danger'"></ion-icon>
           </h2>
-          <h3 *ngIf="done">
-            <ion-text color="primary">פער: </ion-text>
-            <ion-text color="dark">{{weightGap}} (</ion-text>
-            <ion-text color="primary">אפיצות למוצר: </ion-text>
-            <ion-text color="dark">{{productWeightTolerance}})</ion-text>
-          </h3>
         </div>
       </ion-col>
     </ion-row>

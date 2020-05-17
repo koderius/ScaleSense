@@ -18,11 +18,11 @@
       <ion-icon slot="start" src="../../assets/svg/icon_settings.svg"></ion-icon>
       <ion-text>הגדרות</ion-text>
     </ion-button>
-    <ion-button fill="clear">
+    <ion-button fill="clear" *ngIf="side == 'c'">
       <ion-icon slot="start" src="../../assets/svg/icon_stock.svg"></ion-icon>
       <ion-text>ניהול מלאי</ion-text>
     </ion-button>
-    <ion-button fill="clear">
+    <ion-button fill="clear" *ngIf="side == 'c'">
       <ion-icon slot="start" src="../../assets/svg/icon_office.svg"></ion-icon>
       <ion-text>משרד ראשי</ion-text>
     </ion-button>

@@ -31,4 +31,8 @@ export class CustomerPage implements OnInit {
     this.navService.goToReceiveList();
   }
 
+  goToReturnGoods() {
+    this.navService.goToReturnGoodsList();
+  }
+
 }

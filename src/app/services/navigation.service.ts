@@ -80,4 +80,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('reception/' + orderId);
   }
 
+  goToReturnGoodsList() {
+    this.navCtrl.navigateForward('orders-list?mode=goods_return');
+  }
+
 }

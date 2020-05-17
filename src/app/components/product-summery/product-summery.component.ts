@@ -3,7 +3,8 @@ import {ProductOrder} from '../../models/OrderI';
 import {ProductPublicDoc} from '../../models/Product';
 import {NavigationService} from '../../services/navigation.service';
 import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
-import {ProductFactory} from '../../models/ProductFactory';
+import {AlertsService} from '../../services/alerts.service';
+import {ProductsService} from '../../services/products.service';
 
 @Component({
   selector: 'app-product-summery',
@@ -20,10 +21,12 @@ export class ProductSummeryComponent implements OnInit {
   @Input() editComment: boolean;
   @Input() disabled: boolean;
   @Input() editBoxes: boolean;
+  @Input() extraBtnText: string;
 
   @Output() editClicked = new EventEmitter();
   @Output() doneEdit = new EventEmitter();
   @Output() clearClicked = new EventEmitter();
+  @Output() extraBtnClicked = new EventEmitter();
 
   randomSkeletonWidth = (Math.random()*100) + '%';
 
@@ -34,6 +37,8 @@ export class ProductSummeryComponent implements OnInit {
   constructor(
     public navService: NavigationService,
     private unitAmountPipe: UnitAmountPipe,
+    private alertsService: AlertsService,
+    private productService: ProductsService,
   ) { }
 
   ngOnInit() {}
@@ -45,11 +50,17 @@ export class ProductSummeryComponent implements OnInit {
     this.editClicked.emit();
   }
 
-  onAcceptChange() {
+  async onAcceptChange() {
 
+    // Alert for minimum amount
     if(this.tempAmount < this.productDetails.orderMin) {
       alert(`מינימום הזמנה עבור ${this.productDetails.name}: ${this.unitAmountPipe.transform(this.productDetails.orderMin, this.productDetails.type)}`);
       return;
+    }
+
+    // Alert for changing price
+    if(this.tempPrice != this.productOrder.pricePerUnit && await this.alertsService.areYouSure('בוצע שינוי במחיר המוצר', 'האם לשנות את מחיר המוצר באופן קבוע או רק להזמנה זו?', 'באופן קבוע', 'להזמנה זו בלבד')) {
+      this.productService.saveProductPublicData({price: this.tempPrice}).then(()=>alert('מחיר מוצר התעדכן'));
     }
 
     this.productOrder.pricePerUnit = this.tempPrice;

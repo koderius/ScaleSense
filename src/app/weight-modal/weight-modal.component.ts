@@ -17,37 +17,26 @@ export class WeightModalComponent implements OnInit {
   productData: FullProductDoc;
   productWeightTolerance: string;
 
-  tara: number;
+  tara: number = 0;
+  constTara: number;
   bruto: number;
 
-  private _numOfBoxes: number;
-  currentBox: number = 1;
+  numOfBoxes: number;
 
   totalNetto: number = 0;
+
+  counter: number = 0;
+
   done: boolean;
 
-  get numOfBoxes() {
-    return this._numOfBoxes;
-  }
+  /** Whether the tara weight is known from the product's data */
+  isKnownTara;
 
-  set numOfBoxes(num: number) {
-    if(num >= this.currentBox)
-      this._numOfBoxes = num;
-  }
 
   get netto() {
     return (this.bruto - this.tara) || 0;
   }
 
-  get weightGap() {
-    const expectedNetto = Calculator.ProductExpectedNetWeight(this.productData, this.product.amount);
-    return formatNumber(Calculator.CalcError(expectedNetto, this.totalNetto * 100), 'en-US', '1.2-2') + '%';
-  }
-
-  get orderMatch() {
-    const expectedNetto = Calculator.ProductExpectedNetWeight(this.productData, this.product.amount);
-    return Calculator.IsTolerant(expectedNetto, this.totalNetto, this.productWeightTolerance);
-  }
 
   constructor(
     public modalCtrl: ModalController,
@@ -55,10 +44,13 @@ export class WeightModalComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // Default tara is as in the product's data
-    this.tara = this.productData.tara;
-    // Default number of boxes is as in the order
+
+    // Maximum number of weighs will be the number of boxes received
     this.numOfBoxes = this.product.boxes || 1;
+
+    // Get the tara of the product, if there is
+    this.constTara = this.productData.tara;
+    this.isKnownTara = !!this.constTara;
 
     this.productWeightTolerance = (this.productData.receiveWeightTolerance || 0) + '%';
   }
@@ -72,16 +64,35 @@ export class WeightModalComponent implements OnInit {
     this.bruto = Math.random()*50;
     if(this.bruto < this.tara)
       this.weighBruto();
+
+    // For known tara, the number of weighs should not be more than the number of boxes
+    if(this.isKnownTara)
+      this.counter++;
   }
 
 
   nextBox() {
+    // Add the result net weight
     this.totalNetto += this.netto;
+    // Reset the bruto weight
     this.bruto = NaN;
-    if(this.currentBox < this.numOfBoxes)
-      this.currentBox++;
-    else
-      this.done = true;
+  }
+
+  doneProcess() {
+    this.nextBox();
+    this.done = true;
+    // If in known tara mode, reduce the weight of the number of boxes from the total netto
+    if(this.isKnownTara)
+      this.totalNetto -= this.constTara * this.numOfBoxes;
+  }
+
+  get expectedNet() {
+    return Calculator.ProductExpectedNetWeight(this.productData, this.product.amount);
+  }
+
+
+  get orderMatch() {
+    return Calculator.IsTolerant(this.expectedNet, this.totalNetto, this.productWeightTolerance);
   }
 
 

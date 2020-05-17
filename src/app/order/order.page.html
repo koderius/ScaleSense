@@ -97,7 +97,7 @@
                                    (editClicked)="selectProductInput(product.id)"
               ></app-product-summery>
 
-              <app-products-total-price [price]="order.orderTotalPrice()"></app-products-total-price>
+              <app-products-total-price [price]="order.orderTotalPrice()" [colSize]="3.5" [colPush]="2+7/3"></app-products-total-price>
             </div>
 
 
@@ -147,64 +147,57 @@
                 [editBoxes]="supplierEditMode"
         ></app-product-summery>
 
-        <ion-item lines="none" *ngIf="order.products.length">
-          <ion-row style="width: 100%">
-            <ion-col size="5.5" push="2.5">
-              <app-products-total-price [price]="order.orderTotalPrice()"></app-products-total-price>
-            </ion-col>
-          </ion-row>
-        </ion-item>
+        <app-products-total-price *ngIf="order.products.length" [price]="order.orderTotalPrice()" [colSize]="(customerEditMode || supplierEditMode ? 4 : 5)/3" [colPush]="3+(customerEditMode || supplierEditMode ? 4 : 5)/3"></app-products-total-price>
 
       </ion-list>
 
       <div id="bottom-section">
 
-        <ion-textarea rows="2"
-                      *ngIf="customerEditMode"
-                      placeholder="הערות כלליות לספק"
-                      [(ngModel)]="order.comment"
-        ></ion-textarea>
-        <p *ngIf="!customerEditMode && order.comment">הערות לקוח: {{order.comment}}</p>
-
-        <ion-textarea rows="2"
-                      *ngIf="supplierEditMode"
-                      placeholder="הערות כלליות ללקוח"
-                      [(ngModel)]="order.supplierComment"
-        ></ion-textarea>
-        <p *ngIf="!supplierEditMode && order.supplierComment">הערות ספק: {{order.supplierComment}}</p>
-
-        <div style="width: 60%">
-
-          <p class="ion-text-center" *ngIf="!customerEditMode && !supplierEditDate">
-            <ion-text>ההזמנה תסופק בתאריך: </ion-text>
-            <ion-text color="primary">{{order.supplyTime | date : 'dd/MM/yyyy'}}</ion-text>
-            <ion-text> בשעה: </ion-text>
-            <ion-text color="primary">{{order.supplyTime | date : 'HH:mm'}}</ion-text>
-            <ion-button *ngIf="supplierEditMode" color="dark" fill="clear" size="small" (click)="supplierEditDate = true" title="שנה תאריך">
-              <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
-            </ion-button>
-          </p>
-          <div id="dates" *ngIf="customerEditMode || supplierEditDate">
-            <p>בחירת תאריך אספקה:</p>
-            <div class="date-picker">
-              <ion-icon name="close" (click)="supplyDateInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
-              <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()" readonly (click)="picker.open()">
-              <ion-icon name="caret-down" (click)="picker.open()"></ion-icon>
-              <mat-datepicker #picker></mat-datepicker>
-            </div>
-            <ion-input placeholder="שעה" [(ngModel)]="supplyHourInput" (ionChange)="mergeDateAndTime()" (ionFocus)="timeFocus = true" (ionBlur)="timeFocus = false" [type]="timeFocus || supplyHourInput ? 'time' : 'text'">
-              <ion-icon name="caret-down"></ion-icon>
-            </ion-input>
+        <p class="ion-text-center" *ngIf="!customerEditMode && !supplierEditDate">
+          <ion-text>ההזמנה תסופק בתאריך: </ion-text>
+          <ion-text color="primary">{{order.supplyTime | date : 'dd/MM/yyyy'}}</ion-text>
+          <ion-text> בשעה: </ion-text>
+          <ion-text color="primary">{{order.supplyTime | date : 'HH:mm'}}</ion-text>
+          <ion-button *ngIf="supplierEditMode" color="dark" fill="clear" size="small" (click)="supplierEditDate = true" title="שנה תאריך">
+            <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+          </ion-button>
+        </p>
+        <div id="dates" *ngIf="customerEditMode || supplierEditDate">
+          <p>בחירת תאריך אספקה:</p>
+          <div class="date-picker">
+            <ion-icon name="close" (click)="supplyDateInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
+            <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()" readonly (click)="picker.open()">
+            <ion-icon name="caret-down" (click)="picker.open()"></ion-icon>
+            <mat-datepicker #picker></mat-datepicker>
           </div>
+          <ion-input placeholder="שעה" [(ngModel)]="supplyHourInput" (ionChange)="mergeDateAndTime()" (ionFocus)="timeFocus = true" (ionBlur)="timeFocus = false" [type]="timeFocus || supplyHourInput ? 'time' : 'text'">
+            <ion-icon name="caret-down"></ion-icon>
+          </ion-input>
+        </div>
 
-          <p *ngIf="supplierEditMode">
-            <ion-text>מספר חשבונית: </ion-text>
-            <ion-input type="number" color="primary" placeholder="______________" [(ngModel)]="order.invoice" #invoiceInput readonly="true" (ionBlur)="invoiceInput.readonly = true"></ion-input>
-            <ion-button color="dark" fill="clear" size="small" (click)="editInput(invoiceInput)" title="עדכון מספר חשבונית">
-              <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
-            </ion-button>
-          </p>
+        <div *ngIf="customerEditMode || order.comment" style="margin-bottom: 1em">
+          <p style="font-weight: normal; margin: 0 0.5em">הערות {{businessService.side == 'c' ? 'לספק' : 'מהלקוח'}}</p>
+          <ion-textarea rows="2"
+                        placeholder="כתוב כאן..."
+                        [(ngModel)]="order.comment"
+                        [readonly]="!customerEditMode"
+                        [ngClass]="!customerEditMode ? 'readonly' : ''"
+          ></ion-textarea>
+        </div>
 
+        <p *ngIf="supplierEditMode">
+          <ion-text>מספר תעודת משלוח: </ion-text>
+          <ion-input type="number" color="primary" placeholder="______________" [(ngModel)]="order.invoice"></ion-input>
+        </p>
+
+        <div *ngIf="supplierEditMode || order.supplierComment" style="margin-top: 1em">
+          <p style="font-weight: normal; margin: 0 0.5em">הערות {{businessService.side == 'c' ? 'מהספק' : 'ללקוח'}}</p>
+          <ion-textarea rows="2"
+                        placeholder="כתוב כאן..."
+                        [(ngModel)]="order.supplierComment"
+                        [readonly]="!supplierEditMode"
+                        [ngClass]="!supplierEditMode ? 'readonly' : ''"
+          ></ion-textarea>
         </div>
 
       </div>

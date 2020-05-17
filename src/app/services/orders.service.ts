@@ -42,7 +42,9 @@ export class OrdersService {
   ) {}
 
   get myOrders() : Query {
-    return this.ordersRef.where(this.authService.currentUser.side + 'id','==',this.authService.currentUser.bid);
+    const bidProp = this.authService.currentUser.side + 'id';
+    const myBid = this.authService.currentUser.bid;
+    return this.ordersRef.where(bidProp,'==',myBid);
   }
 
   get myDrafts() : CollectionReference {
@@ -80,9 +82,13 @@ export class OrdersService {
     // For other strings or no query, there might be more than 1 results
     if(!ref) {
 
-      // Sort by supply time and by serial number, or by modification time for drafts
+      // Sort by supply time and by serial number,
+
+      // For drafts, sort by modification time
       if(isDraft)
         ref = baseRef.orderBy('modified');
+
+      // For orders, sort by supply time and then by serial number. other possible queries are SID, CID and status
       else
         ref = baseRef.orderBy('supplyTime').orderBy('serial');
 
@@ -94,6 +100,10 @@ export class OrdersService {
           ref = ref.where('supplyTime','<',dates[1].getTime());   // to date (exclusive)
         }
       }
+
+      // For querying by group of statuses
+      if(statusGroup && statusGroup.length)
+        ref = ref.where('status', 'in', statusGroup);
 
       // if there is a text query, filter by supplier/customer name (first get supplier/customer ID, and then search by their IDs)
       if(query) {
@@ -122,10 +132,6 @@ export class OrdersService {
       // Get results
       const res : QuerySnapshot = await ref.get();
       this._myOrders = res.docs.map((d)=>d.data() as OrderDoc);
-
-      // Filtering by status will be in the front-end
-      if(statusGroup)
-        this._myOrders = this._myOrders.filter((o)=>statusGroup.includes(o.status));
 
       return this._myOrders.map((o)=>new Order(o));
 

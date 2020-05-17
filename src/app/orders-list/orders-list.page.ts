@@ -4,10 +4,14 @@ import {OrdersService} from '../services/orders.service';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
-import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
+import {OrderStatus, OrderStatusGroup, ProductOrder} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {CustomersService} from '../services/customers.service';
+import {FullProductDoc} from '../models/Product';
+import {ProductsService} from '../services/products.service';
+import {ModalController} from '@ionic/angular';
+import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 
 @Component({
   selector: 'app-orders-list',
@@ -20,7 +24,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
   OrderStatus = OrderStatus;
 
-  pageMode : 'view' | 'edit' | 'drafts' | 'receive';
+  pageMode : 'view' | 'edit' | 'drafts' | 'receive' | 'goods_return';
   orders: Order[] = [];
 
   query: string = '';
@@ -35,6 +39,10 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
   numOfNewResults: number;
 
+  /** The selected order for returning products, and the list of its products data */
+  orderReturn: Order;
+  orderProducts: FullProductDoc[] = [];
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private ordersService: OrdersService,
@@ -43,6 +51,8 @@ export class OrdersListPage implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private navService: NavigationService,
     private businessService: BusinessService,
+    private productService: ProductsService,
+    private modalCtrl: ModalController,
     private alerts: AlertsService,
   ) {}
 
@@ -52,17 +62,21 @@ export class OrdersListPage implements OnInit, OnDestroy {
     this.paramsSubscription = this.activatedRoute.queryParams.subscribe((params)=>{
 
       const modeParam = params['mode'] || '';
-      if(['view','edit','drafts','receive'].includes(modeParam))
+      if(['view','edit','drafts','receive', 'goods_return'].includes(modeParam))
         this.pageMode = modeParam;
       else
         this.pageMode = 'view';
 
       // // For the receive page, default filter by all the finally approved statuses group
-      // if(this.pageMode == 'receive')
-      //   this.byStatusGroup = OrderStatus.FINAL_APPROVE;
+      if(this.pageMode == 'receive')
+        this.byStatusGroup = OrderStatus.FINAL_APPROVE;
       // Fot the editing page, default filter only the editable statuses
       if(this.pageMode == 'edit')
         this.byStatusGroup = OrderStatus.SENT;
+      if(this.pageMode == 'goods_return') {
+        this.byStatusGroup = OrderStatus.CLOSED;
+        this.showPast = true;
+      }
 
       // Get all 10 first orders
       this.searchOrders();
@@ -90,6 +104,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
       case 'edit': return 'עריכת הזמנה';
       case 'drafts': return 'טיוטות';
       case 'receive': return 'קבלת סחורה';
+      case 'goods_return': return 'החזרת סחורה';
     }
   }
 
@@ -99,20 +114,25 @@ export class OrdersListPage implements OnInit, OnDestroy {
       case 'edit': return 'עריכת הזמנה';
       case 'drafts': return 'כניסה להזמנה';
       case 'receive': return 'כניסה להזמנה';
+      case 'goods_return': return 'צפייה בהזמנה';
     }
   }
 
-  /** Disable edit when button when order has been already approved. Disable receive when order has already been closed or cancelled */
+  /** Disable edit when button when order has been already approved.
+   * Disable receive when order has already been closed or cancelled
+   * Disable return if order is not closed
+   * */
   actionDisabled(order) {
-    return (this.pageMode == 'edit' && order.status >= OrderStatus.FINAL_APPROVE) || (this.pageMode == 'receive' && order.status >= this.OrderStatus.CLOSED);
+    return (this.pageMode == 'edit' && order.status >= OrderStatus.FINAL_APPROVE) || (this.pageMode == 'receive' && order.status >= this.OrderStatus.CLOSED) || (this.pageMode == 'goods_return' && order.status != OrderStatus.CLOSED);
   }
 
-  actionClicked(orderId: string) {
+  actionClicked(order: Order) {
     switch (this.pageMode) {
-      case 'drafts': this.navService.goToDraft(orderId); break;
-      case 'view': this.navService.goToOrder(orderId); break;
-      case 'edit': this.navService.goToOrder(orderId, true); break;
-      case 'receive': this.navService.goToReception(orderId); break;
+      case 'drafts': this.navService.goToDraft(order.id); break;
+      case 'view': this.navService.goToOrder(order.id); break;
+      case 'edit': this.navService.goToOrder(order.id, true); break;
+      case 'receive': this.navService.goToReception(order.id); break;
+      case 'goods_return': this.openOrderProducts(order); break;
     }
   }
 
@@ -122,17 +142,6 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
   getCustomer(cid: string) {
     return this.customerService.getCustomerById(cid) || {};
-  }
-
-  async xClicked(order : Order) {
-    if(await this.alerts.areYouSure('האם לבטל את ההזמנה?')) {
-      const l = this.alerts.loaderStart('מבטל הזמנה...');
-      const change = await this.ordersService.updateOrder(order, OrderStatus.CANCELED);
-      this.alerts.loaderStop(l);
-      if (change) {
-        alert('ההזמנה בוטלה.');
-      }
-    }
   }
 
   async deleteDraft(orderId: string) {
@@ -154,6 +163,29 @@ export class OrdersListPage implements OnInit, OnDestroy {
       this.alertsService.loaderStop(l);
     }
 
+  }
+
+
+  async openOrderProducts(order: Order) {
+    this.orderReturn = order;
+    this.orderProducts = await this.productService.loadProductsByIds(...order.products.map((p)=>p.id));
+  }
+
+  getProductToReturn(id: string) {
+    return this.orderProducts.find((p)=>p.id == id);
+  }
+
+  async onProductReturn(product: ProductOrder) {
+    const m = await this.modalCtrl.create({
+      component: ReturnGoodModalComponent,
+      componentProps: {
+        product: product,
+        productData: this.getProductToReturn(product.id),
+      },
+      backdropDismiss: false,
+      cssClass: 'wide-modal',
+    });
+    m.present();
   }
 
   /**

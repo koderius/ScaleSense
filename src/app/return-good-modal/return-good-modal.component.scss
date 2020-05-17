@@ -1,0 +1,58 @@
+ion-toolbar {
+  --background: #f0f0f0;
+  color: var(--ion-color-primary);
+}
+
+ion-footer:before {
+  content: none;
+}
+
+ion-content {
+  --background: white;
+}
+
+#container {
+  padding: 2em;
+}
+
+ion-row {
+  margin-bottom: 1em;
+}
+
+ion-col {
+  display: flex;
+  align-items: center;
+  &:first-child {
+    font-weight: bold;
+    font-size: 1.5em;
+    user-select: none;
+  }
+  ion-button {
+    width: 33%;
+    max-width: 6em;
+    height: 2.5em;
+    font-weight: bold;
+    --color: black;
+    --background: transparent;
+    --border-color: black;
+    --border-style: solid;
+    --border-width: 2px;
+    &.selected {
+      --color: white;
+      --border-color: white;
+      --background: var(--ion-color-primary);
+    }
+  }
+  ion-input {
+    border-bottom: solid black 1px;
+    max-width: 15em;
+  }
+}
+
+#product-item {
+  width: 100%;
+  max-width: 550px;
+  h1 {
+    font-size: 1.5em;
+  }
+}

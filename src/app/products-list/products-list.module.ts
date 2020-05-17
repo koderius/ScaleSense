@@ -17,6 +17,9 @@ import {ComponentsModule} from '../components/components.module';
     ProductsListPageRoutingModule,
     ComponentsModule
   ],
+  exports: [
+    ProductsListPage
+  ],
   declarations: [ProductsListPage]
 })
 export class ProductsListPageModule {}

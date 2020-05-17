@@ -1,10 +1,11 @@
 <ion-grid id="notifications-table">
 
   <ion-row>
-    <ion-col size="1" class="ion-text-center">סטטוס</ion-col>
+    <ion-col size="1" class="center">סטטוס</ion-col>
+    <ion-col size="2" class="center">התקבלה</ion-col>
     <ion-col class="center">{{businessColumnTitle}}</ion-col>
-    <ion-col class="center">מספר הזמנה</ion-col>
-    <ion-col size="6">נושא</ion-col>
+    <ion-col size="2" class="center">מספר הזמנה</ion-col>
+    <ion-col size="5.5">נושא</ion-col>
   </ion-row>
 
   <div *ngIf="!notificationsService.myNotifications.length" id="no-notes">אין הודעות</div>
@@ -17,10 +18,11 @@
                [title]="isNotificationRead(note) ? 'סמן כלא נקרא' : ''"
       ></ion-img>
     </ion-col>
-    <ion-col>{{note.businessName}}</ion-col>
-    <ion-col class="center">{{note.orderSerial}}</ion-col>
+    <ion-col size="2">{{note.time | date : 'dd/MM/yyyy HH:mm'}}</ion-col>
+    <ion-col class="center">{{note.businessName}}</ion-col>
+    <ion-col size="2" class="center">{{note.orderSerial}}</ion-col>
     <ion-col size="3.5" [ngStyle]="{fontWeight: isNotificationRead(note) ? 'normal' : 'bold'}">{{note.text}}</ion-col>
-    <ion-col size="2.5">
+    <ion-col size="2">
       <ion-button color="secondary" shape="round" (click)="openNotification(note)">פתיחה</ion-button>
       <ion-button class="small-circle-btn" fill="clear" (click)="onDeleteClicked(note.id)">
         <ion-icon slot="icon-only" name="close"></ion-icon>

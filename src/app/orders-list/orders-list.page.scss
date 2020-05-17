@@ -20,7 +20,7 @@
 }
 
 
-#table-section {
+.table-section {
   background-color: white;
   padding: 2em;
 }
@@ -40,4 +40,9 @@
     --color-hover: rgba(var(--ion-color-primary-rgb),0.5);
     --color-activated: rgba(var(--ion-color-primary-rgb),0.5);
   }
+}
+
+#return-list {
+  max-width: 800px;
+  margin: auto;
 }

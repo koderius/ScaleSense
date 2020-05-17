@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="close()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>החזרת מוצר</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+
+  <div id="container">
+
+    <ion-row>
+      <ion-col size="4">פירוט מוצר</ion-col>
+      <ion-col>
+        <ion-item id="product-item" lines="none">
+          <ion-thumbnail slot="start">
+            <img [src]="productData.image">
+          </ion-thumbnail>
+          <ion-label>
+            <h1>
+              <ion-text color="primary" style="font-weight: bold">{{productData.name}}</ion-text>
+            </h1>
+            <h2 style="display: flex; justify-content: space-between">
+              <p><b>מחיר לק"ג: </b><ion-text>{{product.pricePerUnit | price}}</ion-text></p>
+              <p><b>כמות שהוזמנה: </b><ion-text>{{product.amount | unitAmount : productData.type}}</ion-text></p>
+              <p><b>סה"כ מחיר: </b><ion-text>{{(product.amount * product.pricePerUnit) | price}}</ion-text></p>
+            </h2>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="4">
+        <ion-text>
+          <ion-text>סטטוס החזרה </ion-text>
+          <ion-text style="font-weight: normal">(בחר את הרצוי)</ion-text>
+        </ion-text>
+      </ion-col>
+      <ion-col>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="status = 'refund'" [ngClass]="status == 'refund' ? 'selected' : ''">זיכוי</ion-button>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="status = 'change'" [ngClass]="status == 'change' ? 'selected' : ''">החלפה</ion-button>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="status = 'trash'" [ngClass]="status == 'trash' ? 'selected' : ''">אשפה</ion-button>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="4">שם נהג מקבל</ion-col>
+      <ion-col>
+        <ion-input [(ngModel)]="driver"></ion-input>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="4">סיבת החזרה</ion-col>
+      <ion-col>
+        <ion-input [(ngModel)]="reason"></ion-input>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col size="4">אישור שקילה</ion-col>
+      <ion-col style="align-items: flex-end">
+        <ion-button fill="outline" size="large" style="max-width: 8em" (click)="weigh()">שקילת מוצר</ion-button>
+        <p style="margin: 0.5em">
+          <b>סטטוס:</b>
+          <ion-text></ion-text>
+        </p>
+      </ion-col>
+    </ion-row>
+
+  </div>
+
+</ion-content>
+
+
+<ion-footer>
+  <div style="display: flex; justify-content: flex-end">
+    <ion-button shape="round" class="ion-margin">סיום והחזרה</ion-button>
+    <ion-button shape="round" color="dark" class="ion-margin">שמירה לטיוטה</ion-button>
+    <ion-button shape="round" color="dark" class="ion-margin">שמירה והחזרת מוצר נוסף</ion-button>
+  </div>
+</ion-footer>

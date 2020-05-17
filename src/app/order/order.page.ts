@@ -340,12 +340,6 @@ export class OrderPage implements OnInit {
 
   }
 
-  async editInput(input: IonInput) {
-    input.readonly = false;
-    await input.setFocus();
-    (await input.getInputElement()).select();
-  }
-
   /**
    * Sort by name (if names are equal sort by ID, just for having a constant order). Two reasons:
    * 1. Presenting the sorted products
@@ -462,7 +456,7 @@ export class OrderPage implements OnInit {
     }
 
     if(this.businessService.side == 's' && !this.order.invoice && finalApprove) {
-      alert('יש למלא מספר קבלה.');
+      alert('יש למלא מספר תעודת משלוח.');
       return;
     }
 
