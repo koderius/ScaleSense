@@ -24,7 +24,10 @@
     </ion-col>
 
     <ion-col>
-      <h6 *ngIf="!edit">{{productOrder.amount | unitAmount : productDetails.type}}</h6>
+      <h6 *ngIf="!edit" [title]="productOrder.amount < productDetails.orderMin ? 'מינימום הזמנה: ' + productDetails.orderMin : ''">
+        <ion-text *ngIf="productOrder.amount < productDetails.orderMin ? 'danger' : ''" color="danger">* </ion-text>
+        <ion-text [color]="productOrder.amount < productDetails.orderMin ? 'danger' : ''">{{productOrder.amount | unitAmount : productDetails.type}}</ion-text>
+      </h6>
       <ion-input *ngIf="edit" type="number" step="any" [(ngModel)]="tempAmount" select-text></ion-input>
       <ion-text *ngIf="edit" class="ion-margin-end">{{null | unitAmount : productDetails.type}}</ion-text>
     </ion-col>

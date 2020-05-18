@@ -2,35 +2,32 @@
   <ion-thumbnail slot="start">
     <img [src]="product.image || '../../assets/defaults/default_logo.png'">
   </ion-thumbnail>
-  <ion-label>
-    <h2>
-      <ion-text>{{product.name}}</ion-text>
-      <ion-icon name="information-circle" color="dark" (click)="psaudo.focus()"></ion-icon>
-      <button #psaudo style="position: absolute" class="ion-no-padding" (focus)="showBubble = true" (blur)="showBubble = false"></button>
-    </h2>
-    <p>מק"ט: {{product.catalogNumS}}</p>
-    <h6>
-      <ion-text>מחיר ל</ion-text>
-      <ion-text>{{null | unitAmount : product.type}}</ion-text>
-      <ion-text> | </ion-text>
-      <ion-text>{{product.price | price}}</ion-text>
-    </h6>
-  </ion-label>
-  <div class="item-amount">
-    <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount + 1">
-      <ion-icon slot="icon-only" name="add"></ion-icon>
-    </ion-button>
-    <ion-input [value]="inputValue()" (ionBlur)="onInputChange($event)" select-text (keyup.enter)="setAmount(+$event.target.value.split(' ')[0])"></ion-input>
-    <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount - 1">
-      <ion-icon slot="icon-only" name="remove"></ion-icon>
-    </ion-button>
-  </div>
-  <ion-button slot="end" color="secondary" shape="round" (click)="setAmount(amount)">
-    <ion-icon slot="icon-only" src="../../assets/svg/icon_cart.svg"></ion-icon>
-  </ion-button>
-  <div class="info-bubble" *ngIf="showBubble">
-    {{product.description || 'לא קיים תיאור'}}
-    <div></div>
+  <div class="inner-wrapper">
+    <ion-label>
+      <h2>
+        <ion-icon name="information-circle" color="dark"
+                  [matTooltip]="product.description || 'לא קיים תיאור'"
+                  matTooltipPosition="before"
+        ></ion-icon>
+        <ion-text>{{product.name}}</ion-text>
+      </h2>
+      <p>מק"ט: {{product.catalogNumS}}</p>
+      <h6>
+        <ion-text>מחיר ל</ion-text>
+        <ion-text>{{null | unitAmount : product.type}}</ion-text>
+        <ion-text> | </ion-text>
+        <ion-text>{{product.price | price}}</ion-text>
+      </h6>
+    </ion-label>
+    <div class="item-amount">
+      <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount + 1">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+      <ion-input [value]="inputValue()" (ionBlur)="onInputChange($event)" select-text (keyup.enter)="onInputChange($event)"></ion-input>
+      <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount - 1">
+        <ion-icon slot="icon-only" name="remove"></ion-icon>
+      </ion-button>
+    </div>
   </div>
 </ion-item>
 

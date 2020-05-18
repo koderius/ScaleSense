@@ -389,16 +389,8 @@ export class OrderPage implements OnInit {
     if(!this.checkFields())
       return;
 
-    // For orders that has not been first approved yet, check that all products amounts are not bellow the minimum amount
-    if(this.order.status < OrderStatus.APPROVED && this.order.products.some((p)=>{
-      const product = this.findProductDetails(p.id);
-      if(product.orderMin && p.amount < product.orderMin) {
-        alert(`מינימום הזמנה עבור ${product.name}: ${this.unitPipe.transform(product.orderMin, product.type)}`);
-        return true;
-      }
-    })) {
+    if(!this.checkMinimumAmount())
       return;
-    }
 
     if(await this.alerts.areYouSure(this.order.status == OrderStatus.DRAFT ? 'האם לשלוח הזמנה לספק?' : 'האם לשלוח עדכון הזמנה לספק?')) {
 
@@ -412,6 +404,18 @@ export class OrderPage implements OnInit {
 
     }
 
+  }
+
+
+  // Check that all orders are not below minimum amount
+  checkMinimumAmount() {
+    return !this.order.products.some((p)=>{
+      const product = this.findProductDetails(p.id);
+      if(product.orderMin && p.amount < product.orderMin) {
+        alert(`מינימום הזמנה עבור ${product.name}: ${this.unitPipe.transform(product.orderMin, product.type)}`);
+        return true;
+      }
+    });
   }
 
 

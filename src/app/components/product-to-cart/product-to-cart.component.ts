@@ -29,6 +29,7 @@ export class ProductToCartComponent implements OnInit {
     if(!amount || amount <= 0)
       amount = 0;
     this._amount = amount;
+    this.addToCart.emit(this.amount);
   }
 
 

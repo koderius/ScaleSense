@@ -76,7 +76,7 @@ export class EditSupplierPage implements OnInit {
   }
 
 
-  async save() {
+  checkFields() {
 
     if(!this.supplier.name) {
       alert('יש להזין שם ספק');
@@ -108,6 +108,16 @@ export class EditSupplierPage implements OnInit {
       alert('כתובת אימייל של איש קשר נוסף לא תקינה');
       return;
     }
+
+    return true;
+
+  }
+
+
+  async save() {
+
+    if(!this.checkFields())
+      return;
 
     // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
     const l = this.alerts.loaderStart('שומר פרטי ספק...');

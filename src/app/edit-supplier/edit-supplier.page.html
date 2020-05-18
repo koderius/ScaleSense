@@ -86,7 +86,7 @@
               <ion-input [(ngModel)]="supplier.contacts[0].name"></ion-input>
             </ion-col>
             <ion-col size="1" style="padding: 0">
-              <ion-fab-button size="small" (click)="supplier.contacts.push({})" [disabled]="supplier.contacts.length > 1 || !(supplier.contacts[0].name && (supplier.contacts[0].phone || supplier.contacts[0].email))" title="איש קשר נוסף">
+              <ion-fab-button size="small" (click)="supplier.contacts.push({})" [disabled]="supplier.contacts.length > 1 || !supplier.contacts[0].name || !supplier.contacts[0].email || !supplier.contacts[0].phone" title="איש קשר נוסף">
                 <ion-icon name="add"></ion-icon>
               </ion-fab-button>
             </ion-col>

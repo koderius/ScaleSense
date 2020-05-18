@@ -12,15 +12,21 @@ ion-item {
       object-fit: contain;
     }
   }
+  .inner-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
   h2 {
     font-weight: bold;
     color: var(--ion-color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    ion-text {
+      margin: 0 0.5em;
+    }
     ion-icon {
       height: 1.2em;
       width: 1.2em;
+      vertical-align: top;
       cursor: pointer;
       pointer-events: all;
     }
@@ -29,7 +35,7 @@ ion-item {
     width: 8em;
     display: flex;
     align-items: center;
-    margin: auto auto 0 auto;
+    margin: auto 1em 0 1em;
     ion-input {
       width: 100%;
       background-color: white;
@@ -37,7 +43,7 @@ ion-item {
       border-radius: 1em;
       font-size: smaller;
       text-align: center;
-      margin: 1em 0.5em;
+      margin: 0.5em;
       --padding-bottom: 0;
       --padding-top: 0;
       --padding-start: 0;
@@ -49,28 +55,28 @@ ion-item {
   overflow: visible; // To see bubble outside of item's border
 }
 
-.info-bubble {
-  position: absolute;
-  bottom: 6.5em;
-  margin: 0 13em;
-  padding: 1em;
-  background-color: var(--ion-color-dark);
-  font-size: x-small;
-  color: white;
-  height: auto;
-  width: 15em;
-  border-radius: 2em;
-  div {
-    position: absolute;
-    height: 1em;
-    border-bottom: solid var(--ion-color-dark) 1em;
-  }
-  &:after {
-    content: "";
-    right: -1em;
-    bottom: 0;
-    position: absolute;
-    border: solid transparent 1.2em;
-    border-bottom: solid var(--ion-color-dark) 2em;
-  }
-}
+//.info-bubble {
+//  position: absolute;
+//  bottom: 6.5em;
+//  margin: 0 13em;
+//  padding: 1em;
+//  background-color: var(--ion-color-dark);
+//  font-size: x-small;
+//  color: white;
+//  height: auto;
+//  width: 15em;
+//  border-radius: 2em;
+//  div {
+//    position: absolute;
+//    height: 1em;
+//    border-bottom: solid var(--ion-color-dark) 1em;
+//  }
+//  &:after {
+//    content: "";
+//    right: -1em;
+//    bottom: 0;
+//    position: absolute;
+//    border: solid transparent 1.2em;
+//    border-bottom: solid var(--ion-color-dark) 2em;
+//  }
+//}

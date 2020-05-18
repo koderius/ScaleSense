@@ -13,7 +13,8 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
-  MatNativeDateModule
+  MatNativeDateModule,
+  MatTooltipModule,
 } from '@angular/material';
 import {UserNamePipe} from '../pipes/user-name.pipe';
 import {PricePipe} from '../pipes/price.pipe';
@@ -32,6 +33,7 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     MatNativeDateModule,
     MatInputModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   declarations: [
     HeaderComponent,

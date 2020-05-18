@@ -12,6 +12,7 @@ import {ProductToCartComponent} from '../components/product-to-cart/product-to-c
 import {ProductSummeryComponent} from '../components/product-summery/product-summery.component';
 import {ProductsTotalPriceComponent} from '../components/products-total-price/products-total-price.component';
 import {OrderChangeReportComponent} from '../components/order-change-report/order-change-report.component';
+import {MatTooltipModule} from '@angular/material';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import {OrderChangeReportComponent} from '../components/order-change-report/orde
     IonicModule,
     orderPageRoutingModule,
     ComponentsModule,
+    MatTooltipModule,
   ],
   exports: [
     ProductSummeryComponent,
