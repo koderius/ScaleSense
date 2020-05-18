@@ -9,6 +9,8 @@ import 'firebase/analytics';
 import 'firebase/firestore';
 import {MetadataService} from './services/metadata.service';
 
+export let ScreenMode: 'l' | 's';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -28,6 +30,10 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+
+      // Set between two modes: Large (992px by Ionic large breakpoint) and small
+      ScreenMode = this.platform.width() >= 992 ? 'l' : 's';
+
     });
 
     // Initialize firebase

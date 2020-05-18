@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
 import {Order} from '../models/Order';
@@ -7,13 +7,14 @@ import {ProductsService} from '../services/products.service';
 import {FullProductDoc} from '../models/Product';
 import {ModalController} from '@ionic/angular';
 import {WeightModalComponent} from '../weight-modal/weight-modal.component';
+import {AlertsService} from '../services/alerts.service';
 
 @Component({
   selector: 'app-reception',
   templateUrl: './reception.page.html',
   styleUrls: ['./reception.page.scss'],
 })
-export class ReceptionPage implements OnInit {
+export class ReceptionPage implements OnInit, OnDestroy {
 
   order: Order;
 
@@ -24,11 +25,16 @@ export class ReceptionPage implements OnInit {
   tempAmount: number;
   tempPrice: number;
 
+  readonly TEMP_RECEPTION_KEY = 'scale-sense_TempReception';
+  autoSave;
+  done: boolean;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private orderService: OrdersService,
     private productsService: ProductsService,
     private modalCtrl: ModalController,
+    private alerts: AlertsService,
   ) {}
 
   get pageTitle() {
@@ -55,6 +61,26 @@ export class ReceptionPage implements OnInit {
     // Load products data for this order
     this.products = await this.productsService.loadProductsByIds(...this.order.products.map((p)=>p.id));
 
+    // If has active backup, ask to restore the process
+    const backup = localStorage.getItem(this.TEMP_RECEPTION_KEY);
+    if(backup && await this.alerts.areYouSure('תהליך קבלת הסחורה הופסק באמצע', 'האם לשחזר את השינויים?', 'שחזור', 'לא')) {
+      const doc = this.order.getDocument();
+      doc.products = JSON.parse(backup);
+      this.order = new Order(doc);
+    }
+
+    // Auto save every second
+    this.autoSave = setInterval(()=>{
+      localStorage.setItem(this.TEMP_RECEPTION_KEY, JSON.stringify(this.order.products));
+    }, 1000);
+
+  }
+
+  // On safe exit: stop auto save, and clear local backup
+  ngOnDestroy(): void {
+    if(this.autoSave)
+      clearInterval(this.autoSave);
+    localStorage.removeItem(this.TEMP_RECEPTION_KEY);
   }
 
   productData(id: string) : FullProductDoc {

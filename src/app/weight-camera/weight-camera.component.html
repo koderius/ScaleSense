@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="close()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>שקילה</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-text id="waiting" *ngIf="!stream">ממתין למצלמה...</ion-text>
+
+  <video *ngIf="!snapshot && !isMobile"
+         autoplay
+         [srcObject]="stream"
+         id="video"
+         class="view"
+  ></video>
+
+  <div *ngIf="isMobile && !snapshot" class="view"></div>
+
+  <img [src]="snapshot" *ngIf="snapshot" class="view">
+
+  <h1 id="weight-text" *ngIf="stream">{{weight? (weight | unitAmount : 0) : 'ממתין לשקילה'}}</h1>
+
+  <ion-row>
+
+    <ion-button *ngIf="!snapshot" shape="round" color="secondary" (click)="takeSnapshot()" size="large" strong="true" [disabled]="!stream">
+      <ion-icon slot="start" src="../../assets/svg/icon_weight_white.svg"></ion-icon>
+      <ion-text>שקילה</ion-text>
+    </ion-button>
+
+    <ion-button *ngIf="snapshot" shape="round" color="secondary" (click)="accept()" size="large" strong="true">
+      <ion-icon slot="start" name="checkmark"></ion-icon>
+      <ion-text>אישור</ion-text>
+    </ion-button>
+
+  </ion-row>
+
+</ion-content>
+

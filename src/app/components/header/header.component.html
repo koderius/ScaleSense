@@ -1,6 +1,6 @@
 <ion-row id="container">
 
-  <ion-col size="3">
+  <ion-col size="6" sizeLg="3">
     <ion-img src="../../assets/logo_small.png" style="height: 3em; cursor: pointer" (click)="backToMain()"></ion-img>
     <div id="business-logo">
       <div>
@@ -9,7 +9,7 @@
     </div>
   </ion-col>
 
-  <ion-col id="main">
+  <ion-col id="main" class="ion-hide-lg-down">
     <ion-button fill="clear">
       <ion-icon slot="start" src="../../assets/svg/icon_reports.svg"></ion-icon>
       <ion-text>דוחות</ion-text>
@@ -32,7 +32,7 @@
     </ion-button>
   </ion-col>
 
-  <ion-col size="2" id="buttons">
+  <ion-col size="4" sizeLg="2" id="buttons">
     <ion-fab-button size="small">
       <ion-icon src="../../assets/svg/icon_info.svg"></ion-icon>
     </ion-fab-button>

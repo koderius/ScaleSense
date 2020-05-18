@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { ReceptionPage } from './reception.page';
+import {LeaveReceptionGuard} from './leave-reception.guard';
 
 const routes: Routes = [
   {
     path: ':id',
-    component: ReceptionPage
+    component: ReceptionPage,
+    canDeactivate: [LeaveReceptionGuard],
   },
 ];
 

@@ -12,6 +12,7 @@ import {FullProductDoc} from '../models/Product';
 import {ProductsService} from '../services/products.service';
 import {ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
+import {ScreenMode} from '../app.component';
 
 @Component({
   selector: 'app-orders-list',
@@ -19,6 +20,8 @@ import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.c
   styleUrls: ['./orders-list.page.scss'],
 })
 export class OrdersListPage implements OnInit, OnDestroy {
+
+  ScreenMode = ScreenMode;
 
   paramsSubscription;
 
@@ -53,7 +56,6 @@ export class OrdersListPage implements OnInit, OnDestroy {
     private businessService: BusinessService,
     private productService: ProductsService,
     private modalCtrl: ModalController,
-    private alerts: AlertsService,
   ) {}
 
   async ngOnInit() {

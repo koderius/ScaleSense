@@ -6,6 +6,11 @@
       </ion-button>
     </ion-buttons>
     <ion-title>שקילת מוצר</ion-title>
+    <ion-buttons slot="end" *ngIf="isStreamOn()">
+      <ion-button fill="clear" title="מצלמה דולקת" (click)="stopCamera()">
+        <ion-icon name="camera-outline" slot="icon-only" color="success"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -55,7 +60,7 @@
       <ion-col size="3">חישוב אריזה</ion-col>
       <ion-col>
         <div id="step1">
-          <ion-button color="dark" fill="outline" (click)="weighTara()" [disabled]="isKnownTara || done">שקילת אריזה</ion-button>
+          <ion-button color="dark" fill="outline" (click)="weighTara()" [disabled]="isKnownTara || (tara && bruto) || done">שקילת אריזה</ion-button>
           <div>
             <p><ion-text color="primary" style="font-weight: bold">משקל אריזה:</ion-text></p>
             <p><ion-text color="dark">{{tara ? (tara | unitAmount : 0) : 'טרם נשקל'}}</ion-text></p>

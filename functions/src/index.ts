@@ -178,9 +178,9 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       // Take a snapshot of these changes for comparing changes history
       changeReport.data = JSON.stringify(newData);
 
-      // Suppliers can change also these fields (not for record)
-      if(changeReport.side == 's')
-        newData.invoice = order.invoice || '';
+      // Additional fields that are allowed to be changed (not for record)
+      newData.invoice = order.invoice || '';
+      newData.driverName = order.driverName || '';
 
       // If the order is new, just take the new order as is, and set additional fields:
       if(isNew) {

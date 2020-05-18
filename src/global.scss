@@ -275,5 +275,13 @@ ion-grid.app-table {
 .wide-modal {
   --max-width: 1000px;
   --width: 1000px;
+  .modal-wrapper {
+    min-height: 650px;
+  }
 }
 
+.cameraModal {
+  .modal-wrapper {
+    min-height: 750px;
+  }
+}

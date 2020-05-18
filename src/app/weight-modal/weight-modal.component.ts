@@ -1,17 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {ProductOrder} from '../models/OrderI';
 import {FullProductDoc} from '../models/Product';
 import {Calculator} from '../utilities/Calculator';
 import {AlertsService} from '../services/alerts.service';
 import {formatNumber} from '@angular/common';
+import {WeighService} from '../services/weigh.service';
 
 @Component({
   selector: 'app-weight-modal',
   templateUrl: './weight-modal.component.html',
   styleUrls: ['./weight-modal.component.scss'],
 })
-export class WeightModalComponent implements OnInit {
+export class WeightModalComponent implements OnInit, OnDestroy {
 
   product: ProductOrder;
   productData: FullProductDoc;
@@ -41,6 +42,7 @@ export class WeightModalComponent implements OnInit {
   constructor(
     public modalCtrl: ModalController,
     private alerts: AlertsService,
+    private weighService: WeighService,
   ) { }
 
   ngOnInit() {
@@ -56,14 +58,16 @@ export class WeightModalComponent implements OnInit {
   }
 
 
-  weighTara() {
-    this.tara = Math.random()*10;
+  async weighTara() {
+    const res = await this.weighService.takePicture();
+    if(res)
+      this.tara = res;
   }
 
-  weighBruto() {
-    this.bruto = Math.random()*50;
-    if(this.bruto < this.tara)
-      this.weighBruto();
+  async weighBruto() {
+    const res = await this.weighService.takePicture();
+    if(res)
+      this.bruto = res;
 
     // For known tara, the number of weighs should not be more than the number of boxes
     if(this.isKnownTara)
@@ -84,6 +88,7 @@ export class WeightModalComponent implements OnInit {
     // If in known tara mode, reduce the weight of the number of boxes from the total netto
     if(this.isKnownTara)
       this.totalNetto -= this.constTara * this.numOfBoxes;
+    this.weighService.stopStream();
   }
 
   get expectedNet() {
@@ -106,6 +111,19 @@ export class WeightModalComponent implements OnInit {
   async close() {
     if((!this.totalNetto && !this.bruto) || await this.alerts.areYouSure('האם לבטל שקילה?'))
       this.modalCtrl.dismiss()
+  }
+
+  isStreamOn() : boolean {
+    return !!this.weighService.stream;
+  }
+
+  async stopCamera() {
+    await this.weighService.stopStream();
+    alert('מצלמה כובתה');
+  }
+
+  ngOnDestroy(): void {
+    this.weighService.stopStream();
   }
 
 }

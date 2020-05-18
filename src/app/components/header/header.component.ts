@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {OrderStatus} from '../../models/OrderI';
 import {NavigationService} from '../../services/navigation.service';
 import {BusinessService} from '../../services/business.service';
+import {ScreenMode} from '../../app.component';
 
 @Component({
   selector: 'app-header',
@@ -9,6 +10,8 @@ import {BusinessService} from '../../services/business.service';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
+
+  ScreenMode = ScreenMode;
 
   readonly DEFAULT_LOGO = '../../assets/defaults/default_logo.png';
 

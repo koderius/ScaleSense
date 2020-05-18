@@ -11,7 +11,6 @@ import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
-import {IonInput} from '@ionic/angular';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 
 @Component({

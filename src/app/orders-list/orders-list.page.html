@@ -13,20 +13,20 @@
       </ion-searchbar>
 
       <p class="ion-text-center" *ngIf="pageMode != 'drafts'">
-        <ion-text color="primary">איתור לפי תאריך ביצוע הזמנה:</ion-text>
+        <ion-text color="primary">איתור לפי תאריך אספקה:</ion-text>
       </p>
       <div id="dates" *ngIf="pageMode != 'drafts'">
         <p>בין התאריכים</p>
         <mat-form-field>
           <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" readonly (dateChange)="toDate ? searchOrders() : ''">
           <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
-          <mat-datepicker #fromPicker></mat-datepicker>
+          <mat-datepicker [touchUi]="ScreenMode == 's'" #fromPicker></mat-datepicker>
         </mat-form-field>
         <p>ל-</p>
         <mat-form-field>
           <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" [min]="fromDate" [disabled]="!fromDate" readonly (dateChange)="searchOrders()">
           <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
-          <mat-datepicker #toPicker [startAt]="fromDate"></mat-datepicker>
+          <mat-datepicker [touchUi]="ScreenMode == 's'" #toPicker [startAt]="fromDate"></mat-datepicker>
         </mat-form-field>
         <ion-button fill="clear" color="dark" (click)="fromDate = toDate = null; searchOrders()" *ngIf="fromDate">
           <ion-icon slot="icon-only" name="close"></ion-icon>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {NavigationService} from '../services/navigation.service';
+import {WeighService} from '../services/weigh.service';
 
 @Component({
   selector: 'app-customer',
@@ -10,6 +11,7 @@ export class CustomerPage implements OnInit {
 
   constructor(
     private navService: NavigationService,
+    private weighService: WeighService,
   ) {}
 
   ngOnInit() {
@@ -33,6 +35,10 @@ export class CustomerPage implements OnInit {
 
   goToReturnGoods() {
     this.navService.goToReturnGoodsList();
+  }
+
+  async weighTest() {
+    this.weighService.takePicture(true);
   }
 
 }

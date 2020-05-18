@@ -1,0 +1,32 @@
+ion-toolbar {
+  --background: #f0f0f0;
+  color: var(--ion-color-primary);
+}
+
+.view {
+  width: var(--video-width);
+  //max-width: 600px;
+  height: var(--video-height);
+  box-sizing: content-box;
+  padding: 1em;
+  background: black;
+}
+
+ion-button {
+  margin: 1em auto;
+}
+
+#waiting {
+  position: absolute;
+  top: 236px;
+  transform: translateY(-50%);
+  color: white;
+  width: 100%;
+  text-align: center;
+}
+
+#weight-text {
+  text-align: center;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+}

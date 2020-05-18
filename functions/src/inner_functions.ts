@@ -60,3 +60,43 @@ export const sendNotification = (transaction: Transaction, side: BusinessSide, i
   transaction.create(noteRef, note);
 
 };
+
+
+type StatusFlow = {
+  by: 'c' | 's' | 'both',
+  from: number[];
+  to: number;
+  permission: string;
+}
+
+
+// const statusFlows: StatusFlow[] = [
+//   // Create new
+//   {
+//     by: 'c',
+//     from: [0],
+//     to: 10,
+//     permission: 'canCreate',
+//   },
+//   // Edit unopened order
+//   {
+//     by: 'c',
+//     from: [10, 11],
+//     to: 11,
+//     permission: 'canEdit',
+//   },
+//   // Open order by supplier
+//   {
+//     by: 's',
+//     from: [10, 11],
+//     to: 20,
+//     permission: '',
+//   },
+//   // Change by customer after it was approved
+//   {
+//     by: 'c',
+//     from: [20, 21, 30, 31],
+//     to: 21,
+//     permission: 'canChange',
+//   },
+// ];
