@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
 import {SuppliersService} from '../services/suppliers.service';
@@ -10,7 +10,7 @@ import {BusinessService} from '../services/business.service';
 import {CustomersService} from '../services/customers.service';
 import {FullProductDoc} from '../models/Product';
 import {ProductsService} from '../services/products.service';
-import {ModalController} from '@ionic/angular';
+import {IonSearchbar, ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {ScreenMode} from '../app.component';
 
@@ -20,6 +20,8 @@ import {ScreenMode} from '../app.component';
   styleUrls: ['./orders-list.page.scss'],
 })
 export class OrdersListPage implements OnInit, OnDestroy {
+
+  @ViewChild('ionSearchbar', {static: true}) ionSearchbar: IonSearchbar;
 
   ScreenMode = ScreenMode;
 
@@ -31,7 +33,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   orders: Order[] = [];
 
   query: string = '';
-  byStatusGroup: OrderStatus;
+  byStatusGroup: OrderStatus[];
   fromDate: Date;
   toDate: Date;
   showPast: boolean;
@@ -58,6 +60,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
     private modalCtrl: ModalController,
   ) {}
 
+
   async ngOnInit() {
 
     // Get the page mode (type of list) from the URL query parameter 'mode'. Default is 'view'
@@ -71,12 +74,12 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
       // // For the receive page, default filter by all the finally approved statuses group
       if(this.pageMode == 'receive')
-        this.byStatusGroup = OrderStatus.FINAL_APPROVE;
+        this.byStatusGroup = [OrderStatus.SENT, OrderStatus.FINAL_APPROVE];
       // Fot the editing page, default filter only the editable statuses
       if(this.pageMode == 'edit')
-        this.byStatusGroup = OrderStatus.SENT;
+        this.byStatusGroup = [OrderStatus.SENT];
       if(this.pageMode == 'goods_return') {
-        this.byStatusGroup = OrderStatus.CLOSED;
+        this.byStatusGroup = [OrderStatus.CLOSED];
         this.showPast = true;
       }
 
@@ -200,11 +203,18 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
     const byDate = this.fromDate && this.toDate;
 
+    // All statuses group
+    let statuses;
+    if(this.byStatusGroup && this.byStatusGroup.length)
+     statuses = [].concat(...this.byStatusGroup.map((gName: OrderStatus)=>
+      this.OrderStatusGroup.find((g)=>g.includes(gName))
+    ));
+
     this.isSearching = true;
     const res = await this.ordersService.queryOrders(
       this.pageMode == 'drafts',
       this.query,
-      this.OrderStatusGroup.find((g)=>g.includes(this.byStatusGroup)),
+      statuses && statuses.length ? statuses : null,
       byDate ? [this.fromDate, this.toDate] : (this.showPast ? null : [new Date()]),
       movePage == 1 ? this.orders.slice(-1)[0] : null,
       movePage == -1 ? this.orders[0] : null,

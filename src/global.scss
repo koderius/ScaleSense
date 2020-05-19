@@ -30,8 +30,8 @@
 //@import url('https://fonts.googleapis.com/earlyaccess/opensanshebrewcondensed.css');
 @import "theme/openSansHebrew.css"; // TODO: Download the font
 
-// Import angular material styles
-@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+// Import angular material custom style
+@import "theme/angular-mat-style.sass";
 
 body {
   font-family: 'Open Sans Hebrew', serif;

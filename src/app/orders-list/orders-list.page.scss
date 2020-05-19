@@ -13,9 +13,28 @@
       padding-right: 1em;
     }
   }
+  #statuses {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    mat-select {
+      width: 12em;
+    }
+    & > * {
+      margin: 0 1em;
+    }
+  }
 
   ion-searchbar {
     margin: auto;
+  }
+}
+
+#search-inputs {
+  display: flex;
+  justify-content: space-between;
+  & > * {
+    width: 20%;
   }
 }
 

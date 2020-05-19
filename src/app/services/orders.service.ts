@@ -108,10 +108,10 @@ export class OrdersService {
       // if there is a text query, filter by supplier/customer name (first get supplier/customer ID, and then search by their IDs)
       if(query) {
         const businesses = this.businessService.side == 'c' ? this.suppliersService.getSupplierByName(query) : this.customersService.getCustomerByName(query);
-        if(businesses.length > 0 && businesses.length <= 10) {
-          const ids = businesses.map((d)=>d.id);
+        if(businesses.length == 1) {
+          const id = businesses[0].id;
           const prop = this.businessService.side == 'c' ? 'sid' : 'cid';
-          ref = ref.where(prop,'in', ids);
+          ref = ref.where(prop,'==', id);
         }
         else
           return [];

@@ -8,12 +8,12 @@ import {HighlightifyPipe} from '../pipes/highlightify.pipe';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
-  MAT_DATE_LOCALE,
+  MAT_DATE_LOCALE, MatAutocompleteModule,
   MatDatepickerModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
-  MatNativeDateModule,
+  MatNativeDateModule, MatSelectModule,
   MatTooltipModule,
 } from '@angular/material';
 import {UserNamePipe} from '../pipes/user-name.pipe';
@@ -34,6 +34,8 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     MatInputModule,
     MatIconModule,
     MatTooltipModule,
+    MatSelectModule,
+    MatAutocompleteModule,
   ],
   declarations: [
     HeaderComponent,
@@ -66,6 +68,8 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     PaginationComponent,
     NotificationsTableComponent,
     SelectTextDirective,
+    MatSelectModule,
+    MatAutocompleteModule,
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy
