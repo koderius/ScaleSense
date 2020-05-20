@@ -49,9 +49,11 @@
         <p class="ion-text-center ion-no-margin">
           <ion-text color="primary">איתור לפי סטטוס הזמנה:</ion-text>
         </p>
-        <mat-select multiple [(ngModel)]="byStatusGroup" placeholder="סטטוס הזמנה" (selectionChange)="searchOrders()">
-          <mat-option *ngFor="let group of OrderStatusGroup" [value]="group[0]">{{group[0] | orderStatusText : true}}</mat-option>
-        </mat-select>
+        <mat-form-field>
+          <mat-select multiple [(ngModel)]="byStatusGroup" placeholder="סטטוס הזמנה" (selectionChange)="searchOrders()">
+            <mat-option *ngFor="let group of OrderStatusGroup" [value]="group[0]">{{group[0] | orderStatusText : true}}</mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
 
     </div>

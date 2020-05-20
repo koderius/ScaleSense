@@ -218,8 +218,10 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
 
 
       /** PART 4: Send notification about order change */
-      // If the changes made by the customer before the supplier opened the order, don't sent him another notification
-      if(newData.status == 11)
+      // Don't sent notification when:
+      // 1. If the changes made by the customer before the supplier opened the order
+      // 2. When the supplier open the order
+      if(newData.status == 11 || newData.status == 20)
         return changeReport;
 
       // If the changes were made by the customer, send a notification to the supplier, and v.v.
