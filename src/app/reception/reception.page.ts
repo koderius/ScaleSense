@@ -25,7 +25,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
   tempAmount: number;
   tempPrice: number;
 
-  readonly TEMP_RECEPTION_KEY = 'scale-sense_TempReception';
+  readonly TEMP_RECEPTION_KEY = 'scale-sense_TempReception-';
   autoSave;
   done: boolean;
 
@@ -62,7 +62,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
     this.products = await this.productsService.loadProductsByIds(...this.order.products.map((p)=>p.id));
 
     // If has active backup, ask to restore the process
-    const backup = localStorage.getItem(this.TEMP_RECEPTION_KEY);
+    const backup = localStorage.getItem(this.TEMP_RECEPTION_KEY + this.order.id);
     if(backup && await this.alerts.areYouSure('תהליך קבלת הסחורה הופסק באמצע', 'האם לשחזר את השינויים?', 'שחזור', 'לא')) {
       const doc = this.order.getDocument();
       doc.products = JSON.parse(backup);
@@ -71,7 +71,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
     // Auto save every second
     this.autoSave = setInterval(()=>{
-      localStorage.setItem(this.TEMP_RECEPTION_KEY, JSON.stringify(this.order.products));
+      localStorage.setItem(this.TEMP_RECEPTION_KEY + this.order.id, JSON.stringify(this.order.products));
     }, 1000);
 
   }
@@ -80,7 +80,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if(this.autoSave)
       clearInterval(this.autoSave);
-    localStorage.removeItem(this.TEMP_RECEPTION_KEY);
+    localStorage.removeItem(this.TEMP_RECEPTION_KEY + this.order.id);
   }
 
   productData(id: string) : FullProductDoc {

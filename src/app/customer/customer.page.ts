@@ -38,7 +38,7 @@ export class CustomerPage implements OnInit {
   }
 
   async weighTest() {
-    this.weighService.takePicture(true);
+    this.weighService.openWeightModal(true);
   }
 
 }

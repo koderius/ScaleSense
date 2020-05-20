@@ -4,8 +4,8 @@ import {ProductOrder} from '../models/OrderI';
 import {FullProductDoc} from '../models/Product';
 import {Calculator} from '../utilities/Calculator';
 import {AlertsService} from '../services/alerts.service';
-import {formatNumber} from '@angular/common';
 import {WeighService} from '../services/weigh.service';
+import {CameraService} from '../services/camera.service';
 
 @Component({
   selector: 'app-weight-modal',
@@ -43,6 +43,7 @@ export class WeightModalComponent implements OnInit, OnDestroy {
     public modalCtrl: ModalController,
     private alerts: AlertsService,
     private weighService: WeighService,
+    private cameraService: CameraService,
   ) { }
 
   ngOnInit() {
@@ -59,13 +60,13 @@ export class WeightModalComponent implements OnInit, OnDestroy {
 
 
   async weighTara() {
-    const res = await this.weighService.takePicture();
+    const res = await this.weighService.openWeightModal();
     if(res)
       this.tara = res;
   }
 
   async weighBruto() {
-    const res = await this.weighService.takePicture();
+    const res = await this.weighService.openWeightModal();
     if(res)
       this.bruto = res;
 
@@ -88,7 +89,7 @@ export class WeightModalComponent implements OnInit, OnDestroy {
     // If in known tara mode, reduce the weight of the number of boxes from the total netto
     if(this.isKnownTara)
       this.totalNetto -= this.constTara * this.numOfBoxes;
-    this.weighService.stopStream();
+    this.weighService.stopCamera();
   }
 
   get expectedNet() {
@@ -114,16 +115,16 @@ export class WeightModalComponent implements OnInit, OnDestroy {
   }
 
   isStreamOn() : boolean {
-    return !!this.weighService.stream;
+    return !!this.cameraService.isCameraOn;
   }
 
   async stopCamera() {
-    await this.weighService.stopStream();
+    await this.weighService.stopCamera();
     alert('מצלמה כובתה');
   }
 
   ngOnDestroy(): void {
-    this.weighService.stopStream();
+    this.weighService.stopCamera();
   }
 
 }

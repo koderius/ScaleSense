@@ -1,13 +1,14 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WeighService} from '../services/weigh.service';
 import {ModalController} from '@ionic/angular';
+import {CameraService} from '../services/camera.service';
 
 @Component({
   selector: 'app-weight-camera',
   templateUrl: './weight-camera.component.html',
   styleUrls: ['./weight-camera.component.scss'],
 })
-export class WeightCameraComponent implements OnInit {
+export class WeightCameraComponent implements OnInit, OnDestroy {
 
   /** Base64 string of the camera snapshot */
   snapshot: string;
@@ -17,24 +18,33 @@ export class WeightCameraComponent implements OnInit {
 
   /** Stream from the service. on PC, it's the video element's stream. On mobile it's a useless object. Indicating the camera is on */
   get stream() {
-    return this.weighService.stream;
+    return this.cameraService.stream;
   }
 
   constructor(
     private weighService: WeighService,
+    private cameraService: CameraService,
     private modalCtrl: ModalController,
   ) {
   }
 
   ngOnInit() {
     // Set the size of the picture screen
-    document.body.style.setProperty('--video-width', (this.weighService.videoSize.width) + 'px');
-    document.body.style.setProperty('--video-height', (this.weighService.videoSize.height) + 'px');
+    document.body.style.setProperty('--video-width', (this.cameraService.videoSize.width) + 'px');
+    document.body.style.setProperty('--video-height', (this.cameraService.videoSize.height) + 'px');
+
+    // Show camera preview for mobile
+    if(this.isMobile)
+      this.cameraService.showCameraPreview().then(async ()=>{
+        await this.takeSnapshot();
+        this.cameraService.hideCameraPreview();
+      });
+
   }
 
 
   get isMobile() {
-    return this.weighService.isMobile;
+    return this.cameraService.isMobile;
   }
 
 
@@ -43,17 +53,12 @@ export class WeightCameraComponent implements OnInit {
 
     // Get snapshot from the mobile camera
     if(this.isMobile) {
-      this.snapshot = await this.weighService.getCameraSnapshot();
+      this.snapshot = await this.cameraService.getCameraSnapshot();
     }
     // Create a snapshot from the video element
     else {
-      // From: https://www.html5rocks.com/en/tutorials/getusermedia/intro/
-      const canvas = document.createElement('canvas');
-      const video = document.getElementById('video') as HTMLVideoElement;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      this.snapshot = canvas.toDataURL('image/jpeg');
+      const videoEl = document.getElementById('video');
+      this.snapshot = this.cameraService.getSnapshotFromVideo(videoEl as HTMLVideoElement);
     }
 
     // Snapshot from the scales
@@ -69,6 +74,11 @@ export class WeightCameraComponent implements OnInit {
 
   close() {
     this.modalCtrl.dismiss();
+  }
+
+  ngOnDestroy(): void {
+    if(this.isMobile)
+      this.cameraService.hideCameraPreview();
   }
 
 }

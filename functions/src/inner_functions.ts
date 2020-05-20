@@ -62,14 +62,6 @@ export const sendNotification = (transaction: Transaction, side: BusinessSide, i
 };
 
 
-type StatusFlow = {
-  by: 'c' | 's' | 'both',
-  from: number[];
-  to: number;
-  permission: string;
-}
-
-
 // const statusFlows: StatusFlow[] = [
 //   // Create new
 //   {
