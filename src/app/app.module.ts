@@ -13,6 +13,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {OrderStatusTextPipe} from './pipes/order-status-text.pipe';
 import {WeightCameraComponent} from './weight-camera/weight-camera.component';
 import {CameraPreview} from '@ionic-native/camera-preview/ngx';
+import {Camera} from '@ionic-native/camera/ngx';
+
 
 @NgModule({
   declarations: [AppComponent, WeightCameraComponent],
@@ -23,6 +25,7 @@ import {CameraPreview} from '@ionic-native/camera-preview/ngx';
     SplashScreen,
     OrderStatusTextPipe,
     CameraPreview,
+    Camera,
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
   ],
   bootstrap: [AppComponent]

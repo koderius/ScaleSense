@@ -9,6 +9,7 @@ import {AlertsService} from '../services/alerts.service';
 import {CategoriesService} from '../services/categories.service';
 import {BusinessService} from '../services/business.service';
 import {Objects} from '../utilities/objects';
+import {CameraService} from '../services/camera.service';
 
 @Component({
   selector: 'app-edit-product',
@@ -35,6 +36,7 @@ export class EditProductPage implements OnInit {
     private alerts: AlertsService,
     public categoriesService: CategoriesService,
     public businessService: BusinessService,
+    private cameraService: CameraService,
   ) { }
 
   get pageTitle() {
@@ -87,6 +89,17 @@ export class EditProductPage implements OnInit {
 
   async enterLink() {
     this.product.image = this.logoPreview = await this.alerts.inputAlert('', 'הדבק קישור לתמונה');
+  }
+
+  async getPicture() {
+    if(this.cameraService.isMobile) {
+      this.logoPreview = await this.cameraService.takePhoto();
+      this.tempLogo = FilesService.CreateFile(this.logoPreview, this.product.name + '.jpg');
+    }
+    else {
+      // TODO
+      alert('כרגע אפשרי רק דרך מכשיר נייד')
+    }
   }
 
 
