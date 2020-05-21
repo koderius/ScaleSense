@@ -19,14 +19,17 @@
         <ion-text>{{product.price | price}}</ion-text>
       </h6>
     </ion-label>
-    <div class="item-amount">
-      <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount + 1">
-        <ion-icon slot="icon-only" name="add"></ion-icon>
-      </ion-button>
-      <ion-input [value]="inputValue()" (ionBlur)="onInputChange($event)" select-text (keyup.enter)="onInputChange($event)"></ion-input>
-      <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount - 1">
-        <ion-icon slot="icon-only" name="remove"></ion-icon>
-      </ion-button>
+    <div>
+      <ion-text color="danger" class="limit-text" *ngIf="amount && amount < product.orderMin">מינימום הזמנה: {{product.orderMin | unitAmount : product.type}}</ion-text>
+      <div class="item-amount">
+        <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount + 1">
+          <ion-icon slot="icon-only" name="add"></ion-icon>
+        </ion-button>
+        <ion-input [value]="inputValue()" (ionBlur)="onInputChange($event)" select-text (keyup.enter)="onInputChange($event)"></ion-input>
+        <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="amount = amount - 1">
+          <ion-icon slot="icon-only" name="remove"></ion-icon>
+        </ion-button>
+      </div>
     </div>
   </div>
 </ion-item>

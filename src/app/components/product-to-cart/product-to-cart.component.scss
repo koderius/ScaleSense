@@ -31,11 +31,15 @@ ion-item {
       pointer-events: all;
     }
   }
+  .limit-text {
+    position: absolute;
+    font-size: small;
+  }
   .item-amount {
     width: 8em;
     display: flex;
     align-items: center;
-    margin: auto 1em 0 1em;
+    margin: 2em 0 0;
     ion-input {
       width: 100%;
       background-color: white;
