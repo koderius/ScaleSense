@@ -84,8 +84,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('orders-list?mode=goods_return');
   }
 
-  goToReturnsDrafts() {
-    this.navCtrl.navigateForward('returns-drafts');
+  goToReturnsDrafts(selectedSupplier?: string) {
+    this.navCtrl.navigateForward('returns-drafts' + (selectedSupplier ? '?sid=' + selectedSupplier : ''));
   }
 
   goToReturnsList() {

@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import {OrderChange, OrderDoc} from '../../src/app/models/OrderI';
+import {OrderChange, OrderDoc, ProductOrder} from '../../src/app/models/OrderI';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {getNewOrderStatus, getRequestedPermission, sendNotification} from './inner_functions';
 import {ProductPublicDoc} from '../../src/app/models/Product';
@@ -392,7 +392,19 @@ export const onReturnCreated = functions.firestore.document('returns/{returnId}'
 
   const data = change.data() as ReturnDoc;
 
-  // Don't include 'trash' status
+  // Update the product that inside the order about his returned amount
+  admin.firestore().runTransaction(async transaction=> {
+
+    const idParts = change.id.split('_');
+    const orderRef = admin.firestore().collection('orders').doc(idParts[0]);
+    const products = (await transaction.get(orderRef)).get('products') as ProductOrder[];
+    const idx = products.findIndex((p)=>p.id == idParts[1]);
+    products[idx].amountReturned = (data.product || {}).amountReturned;
+    transaction.update(orderRef, {products: products});
+
+  });
+
+  // Don't send notification for 'trash' status
   if(!data.status)
     return;
 

@@ -5,7 +5,7 @@ import {ReturnService} from '../services/return.service';
 import {ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {AlertsService} from '../services/alerts.service';
-import {__await} from 'tslib';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-returns-drafts',
@@ -19,6 +19,8 @@ export class ReturnsDraftsPage implements OnInit {
 
   drafts: ReturnDoc[] = [];
 
+  driverName: string;
+
   get suppliers() {
     return (this.suppliersService.mySuppliers || []).filter((s)=>s.name.startsWith(this.supplierQuery));
   }
@@ -28,9 +30,15 @@ export class ReturnsDraftsPage implements OnInit {
     private suppliersService: SuppliersService,
     private modalService: ModalController,
     private alerts: AlertsService,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+
+    const sid = this.activatedRoute.snapshot.queryParams['sid'];
+    if(sid)
+      this.drafts = await this.returnsService.queryDrafts(sid)
+
   }
 
   async search() {
@@ -92,10 +100,24 @@ export class ReturnsDraftsPage implements OnInit {
   }
 
   async sendToSupplier() {
-    const l = this.alerts.loaderStart('שולח...');
-    await this.returnsService.sendListToSupplier();
-    this.alerts.loaderStop(l);
-    this.search();
+
+    if(await this.alerts.areYouSure('האם לשלוח ' + this.returnsService.returnsDocsList.length + ' מוצרים להחזרה?')) {
+
+      // Stamp driver name on each product to send
+      this.returnsService.returnsDocsList.forEach((doc)=>{
+        doc.driverName = this.driverName;
+      });
+
+      // Send
+      const l = this.alerts.loaderStart('שולח...');
+      await this.returnsService.sendListToSupplier();
+      this.alerts.loaderStop(l);
+
+      // Refresh the list
+      this.search();
+
+    }
+
   }
 
 }

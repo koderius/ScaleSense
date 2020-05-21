@@ -49,12 +49,12 @@
       </ion-col>
     </ion-row>
 
-    <ion-row>
-      <ion-col size="4">שם נהג מקבל</ion-col>
-      <ion-col>
-        <ion-input [(ngModel)]="returnDoc.driverName"></ion-input>
-      </ion-col>
-    </ion-row>
+<!--    <ion-row>-->
+<!--      <ion-col size="4">שם נהג מקבל</ion-col>-->
+<!--      <ion-col>-->
+<!--        <ion-input [(ngModel)]="returnDoc.driverName"></ion-input>-->
+<!--      </ion-col>-->
+<!--    </ion-row>-->
 
     <ion-row>
       <ion-col size="4">סיבת החזרה</ion-col>
@@ -69,7 +69,7 @@
         <ion-button fill="outline" size="large" style="max-width: 8em" (click)="weigh()">שקילת מוצר</ion-button>
         <p style="margin: 0.5em">
           <b>כמות להחזרה: </b>
-          <ion-text>{{returnDoc.product.finalAmount ? (returnDoc.product.finalAmount | unitAmount : productData?.type) : 'טרם נשקל'}}</ion-text>
+          <ion-text>{{returnDoc.product.amountReturned ? (returnDoc.product.amountReturned | unitAmount : productData?.type) : 'טרם נשקל'}}</ion-text>
         </p>
       </ion-col>
     </ion-row>

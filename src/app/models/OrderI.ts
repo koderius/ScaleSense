@@ -26,6 +26,9 @@ export type ProductOrder = {
   /** Whether the final amount matches the amount in the order (according to product's tolerance) */
   isWeightMatch?: boolean;
 
+  /** The amount that has been returned to the supplier */
+  amountReturned?: number;
+
 }
 
 export interface OrderChange {

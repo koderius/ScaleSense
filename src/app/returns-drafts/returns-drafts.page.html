@@ -30,7 +30,7 @@
 
       <ion-grid class="app-table">
 
-        <h2 class="ion-text-center" *ngIf="!query && !supplierQuery">
+        <h2 class="ion-text-center" *ngIf="!query && !supplierQuery && !drafts.length">
           <i><ion-text color="medium">בחר ספק, או סנן לפי הזמנה או מוצר</ion-text></i>
         </h2>
 
@@ -71,6 +71,12 @@
           <ion-col size="2" class="ion-justify-content-end">
             <ion-checkbox (ionChange)="onChecked(draft, $event)" [ngModel]="returnsService.isInList(draft.id)"></ion-checkbox>
           </ion-col>
+        </ion-row>
+
+        <ion-row style="display: flex; justify-content: flex-end">
+          <mat-form-field *ngIf="returnsService.returnsDocsList.length">
+            <input matInput placeholder="שם הנהג המקבל" [(ngModel)]="driverName">
+          </mat-form-field>
         </ion-row>
 
       </ion-grid>

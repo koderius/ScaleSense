@@ -116,6 +116,7 @@ export class ReturnService {
     }
     catch (e) {
       console.error(e);
+      return [];
     }
 
   }
@@ -150,13 +151,6 @@ export class ReturnService {
     Objects.ClearFalsy(doc);
     // Save
     try {
-
-      // Prevent creating draft for a product that already sent
-      if((await this.returnsCollectionRef.doc(doc.id).get()).exists) {
-        alert('החזרה למוצר זה כבר נשלחה לספק');
-        return;
-      }
-
       await this.returnsDraftsCollectionRef.doc(doc.id).set(doc, {merge: true});
     }
     catch (e) {

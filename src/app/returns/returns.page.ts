@@ -3,6 +3,7 @@ import {ReturnService} from '../services/return.service';
 import {ReturnDoc} from '../models/Return';
 import {AlertsService} from '../services/alerts.service';
 import {CustomersService} from '../services/customers.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-returns',
@@ -17,6 +18,7 @@ export class ReturnsPage implements OnInit {
     private returnService: ReturnService,
     private alerts: AlertsService,
     private customersService: CustomersService,
+    public navService: NavigationService,
   ) { }
 
   async ngOnInit() {

@@ -6,6 +6,7 @@ import {ProductsService} from '../services/products.service';
 import {WeighService} from '../services/weigh.service';
 import {ReturnService} from '../services/return.service';
 import {AlertsService} from '../services/alerts.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-return-good-modal',
@@ -19,8 +20,6 @@ export class ReturnGoodModalComponent implements OnInit {
 
   ReturnStatus = ReturnStatus;
 
-  toast;
-
   constructor(
     private modalCtrl: ModalController,
     private productsService: ProductsService,
@@ -28,6 +27,7 @@ export class ReturnGoodModalComponent implements OnInit {
     private returnService: ReturnService,
     private alerts: AlertsService,
     private toastCtrl: ToastController,
+    private navService: NavigationService,
   ) { }
 
 
@@ -53,7 +53,11 @@ export class ReturnGoodModalComponent implements OnInit {
 
 
   async weigh() {
-    this.weighService.openProductsWeightModal(this.returnDoc.product, this.productData);
+    // Get net weight
+    await this.weighService.openProductsWeightModal(this.returnDoc.product, this.productData);
+    // Pass the weight data from the final amount to the returned amount, and delete it
+    this.returnDoc.product.amountReturned = this.returnDoc.product.finalAmount;
+    delete this.returnDoc.product.finalAmount;
   }
 
   checkFields() {
@@ -68,7 +72,7 @@ export class ReturnGoodModalComponent implements OnInit {
       return;
     }
 
-    if(!this.returnDoc.product.finalAmount) {
+    if(!this.returnDoc.product.amountReturned) {
       alert('יש למלא/לשקול כמות להחזרה');
       return;
     }
@@ -98,20 +102,16 @@ export class ReturnGoodModalComponent implements OnInit {
   async sendProducts() {
     if(this.checkFields()) {
       this.saveAndAdd();
-      const l = this.alerts.loaderStart('שולח...');
-      const count = this.returnService.returnsDocsList.length;
-      await this.returnService.sendListToSupplier();
-      this.alerts.loaderStop(l);
-      this.toast.message = count + ' מוצרים נשלחו להחזרה';
+      this.navService.goToReturnsDrafts(this.returnDoc.sid);
     }
   }
 
   async showToast() {
-    this.toast = await this.toastCtrl.create({
+    const t = await this.toastCtrl.create({
       message: 'טיוטת החזרה נשמרה',
       duration: 3000,
     });
-    this.toast.present();
+    t.present();
   }
 
 

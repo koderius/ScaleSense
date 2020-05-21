@@ -21,12 +21,12 @@ export class ProductSummeryComponent implements OnInit {
   @Input() editComment: boolean;
   @Input() disabled: boolean;
   @Input() editBoxes: boolean;
-  @Input() extraBtnText: string;
+  @Input() returnBtn: boolean;
 
   @Output() editClicked = new EventEmitter();
   @Output() doneEdit = new EventEmitter();
   @Output() clearClicked = new EventEmitter();
-  @Output() extraBtnClicked = new EventEmitter();
+  @Output() returnBtnClicked = new EventEmitter();
 
   randomSkeletonWidth = (Math.random()*100) + '%';
 

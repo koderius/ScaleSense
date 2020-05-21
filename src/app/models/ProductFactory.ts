@@ -13,8 +13,8 @@ export class ProductFactory {
     let privateData: ProductCustomerDoc = {
       catalogNumC: product.catalogNumC,
       category: product.category,
-      priceLimit: product.priceLimit,
-      priceTolerance: product.priceTolerance,
+      maxPrice: product.maxPrice,
+      minPrice: product.minPrice,
       orderWeightTolerance: product.orderWeightTolerance,
       customerModified: product.customerModified,
     };

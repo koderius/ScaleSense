@@ -116,8 +116,8 @@
         <app-product-summery *ngFor="let product of orderReturn.products"
                              [productOrder]="product"
                              [productDetails]="getProductToReturn(product.id)"
-                             extraBtnText="החזרת מוצר"
-                             (extraBtnClicked)="onProductReturn($event)"
+                             [returnBtn]="true"
+                             (returnBtnClicked)="onProductReturn($event)"
         ></app-product-summery>
         <app-products-total-price [price]="orderReturn.orderTotalPrice()" [colSize]="9/4" [colPush]="3+9/4"></app-products-total-price>
       </ion-list>

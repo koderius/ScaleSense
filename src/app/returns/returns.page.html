@@ -39,7 +39,7 @@
             <ion-img [src]="getCustomerById(ret.cid)?.logo" class="ion-margin-end"></ion-img>
             <ion-text>{{getCustomerById(ret.cid)?.name}}</ion-text>
           </ion-col>
-          <ion-col>{{ret.orderSerial}}</ion-col>
+          <ion-col><a (click)="navService.goToOrder(ret.orderId)" style="cursor: pointer">{{ret.orderSerial}}</a></ion-col>
           <ion-col>{{ret.productName}}</ion-col>
           <ion-col size="4">
             <ion-label>
