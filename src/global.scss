@@ -272,6 +272,11 @@ ion-grid.app-table {
   }
 }
 
+// Angular material input - adjust text to the bottom line
+.mat-form-field-infix {
+  padding-bottom: 0 !important;
+}
+
 .wide-modal {
   --max-width: 1000px;
   --width: 1000px;

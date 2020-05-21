@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {WeightCameraComponent} from '../weight-camera/weight-camera.component';
 import {CameraService} from './camera.service';
+import {WeightModalComponent} from '../weight-modal/weight-modal.component';
+import {ProductOrder} from '../models/OrderI';
+import {FullProductDoc} from '../models/Product';
 
 
 @Injectable({
@@ -15,6 +18,24 @@ export class WeighService {
   ) {
 
   }
+
+
+  async openProductsWeightModal(product: ProductOrder, productData: FullProductDoc) {
+
+    const m = await this.modalCtrl.create({
+      component: WeightModalComponent,
+      componentProps: {
+        product: product,
+        productData: productData,
+      },
+      backdropDismiss: false,
+      cssClass: 'wide-modal',
+    });
+    m.present();
+    const res = await m.onDidDismiss();
+
+  }
+
 
   async openWeightModal(closeStreamWhenDone?: boolean) {
 
@@ -42,12 +63,6 @@ export class WeighService {
     if(res.role == 'ok')
       return res.data.weight;
 
-  }
-
-
-  async getWeightSnapshot() : Promise<number> {
-    // Get weight TODO
-    return await Math.random()*20;
   }
 
   // Stop video

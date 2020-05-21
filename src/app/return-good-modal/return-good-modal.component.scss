@@ -3,8 +3,18 @@ ion-toolbar {
   color: var(--ion-color-primary);
 }
 
-ion-footer:before {
-  content: none;
+ion-footer {
+  &:before {
+    content: none;
+  }
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    ion-button:last-child {
+      height: 3em;
+    }
+  }
 }
 
 ion-content {

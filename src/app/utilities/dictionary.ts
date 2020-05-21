@@ -4,7 +4,7 @@ export class Dictionary {
    * e.g: if the query was "bla", the method will return "blb" - search every name between "bla" (inclusive) and "blb" (exclusive)
    *
    * */
-  static queryByString(str: string) : string {
+  static NextLastLetter(str: string) : string {
 
     // Get the last letter
     const lastLetter = str.slice(-1)[0];

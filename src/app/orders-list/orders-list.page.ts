@@ -54,7 +54,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
     private supplierService: SuppliersService,
     private customerService: CustomersService,
     private alertsService: AlertsService,
-    private navService: NavigationService,
+    public navService: NavigationService,
     private businessService: BusinessService,
     private productService: ProductsService,
     private modalCtrl: ModalController,
@@ -184,7 +184,13 @@ export class OrdersListPage implements OnInit, OnDestroy {
     const m = await this.modalCtrl.create({
       component: ReturnGoodModalComponent,
       componentProps: {
-        product: product,
+        returnDoc: {
+          orderId: this.orderReturn.id,
+          orderSerial: this.orderReturn.serial,
+          sid: this.orderReturn.sid,
+          product: {...product},
+          productName: this.getProductToReturn(product.id).name,
+        },
         productData: this.getProductToReturn(product.id),
       },
       backdropDismiss: false,

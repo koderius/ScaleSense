@@ -37,6 +37,9 @@ export class NotificationsTableComponent implements OnInit {
     if(notification.code == NotificationCode.PRODUCT_CHANGE) {
       this.navService.goToEditProduct(notification.content.productId);
     }
+    if(notification.code == NotificationCode.PRODUCTS_RETURN) {
+
+    }
   }
 
   async onDeleteClicked(noteId: string) {

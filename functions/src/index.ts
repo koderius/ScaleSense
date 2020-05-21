@@ -8,6 +8,7 @@ import {BaseNotificationDoc} from '../../src/app/models/Notification';
 import {ProductsListUtil} from '../../src/app/utilities/productsList';
 import {MailForm} from '../../src/app/website/mail/MailForm';
 import * as axios from 'axios';
+import {ReturnDoc} from '../../src/app/models/Return';
 
 admin.initializeApp();
 
@@ -383,5 +384,33 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
     }
 
   });
+
+});
+
+
+export const onReturnCreated = functions.firestore.document('returns/{returnId}').onCreate(async (change, context)=>{
+
+  const data = change.data() as ReturnDoc;
+
+  // Current server time
+  const now = admin.firestore.Timestamp.now().toMillis();
+
+  // Because return documents are being created as a batch, send one notification only for the first document being created within 10 seconds
+  const supplierNotificationsRef = admin.firestore().collection('suppliers').doc(data.sid || '').collection('my_notifications');
+  const res = await supplierNotificationsRef.orderBy('time', 'desc').limit(1).get();
+  const lastNote = res.docs[0];
+  if(lastNote.get('code') == 4 && (now - lastNote.createTime.toMillis()) < 10000)
+    return;
+
+  // Create notification
+  const notification: BaseNotificationDoc = {
+    code: 4,
+    time: now,
+    refSide: 'c',
+    refBid: data.cid || '',
+  };
+
+  // Send it to the supplier
+  supplierNotificationsRef.add(notification);
 
 });

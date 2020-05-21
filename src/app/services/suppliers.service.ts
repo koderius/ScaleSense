@@ -96,12 +96,12 @@ export class SuppliersService {
       try {
         const p1 = this.productsService.customerProductsRef
           .where('name','>=',q)
-          .where('name','<',Dictionary.queryByString(q)).get().then((res)=>{
+          .where('name','<',Dictionary.NextLastLetter(q)).get().then((res)=>{
           queryResults.push(...res.docs);
         });
         const p2 = this.productsService.customerProductsRef
           .where('category','>=',q)
-          .where('category','<',Dictionary.queryByString(q)).get().then((res)=>{
+          .where('category','<',Dictionary.NextLastLetter(q)).get().then((res)=>{
           queryResults.push(...res.docs)
         });
         await Promise.all([p1,p2]);

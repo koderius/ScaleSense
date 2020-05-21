@@ -12,7 +12,7 @@ export class MetadataService {
   private readonly METADATA_LOCAL = 'scale-sense_app_metadata';
 
   static VAT;
-  static COIN_SIGN;
+  static COIN_SIGN = '';
 
   private metadataRef;
 

@@ -47,6 +47,13 @@ const routes: Routes = [
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
+  {
+    path: 'returns-drafts',
+    loadChildren: () => import('./returns-drafts/returns-drafts.module').then( m => m.ReturnsDraftsPageModule),
+    canActivateChild: [AppEnterGuard],
+    data: {side: 'c'}
+  },
+
 
 ];
 

@@ -21,6 +21,8 @@ import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 })
 export class OrderPage implements OnInit {
 
+  OrderStatus = OrderStatus;
+
   /** The order to show/edit/create */
   order: Order;
 
@@ -66,6 +68,8 @@ export class OrderPage implements OnInit {
 
   /** The product that is now being edited (in page 3) - for not allowing editing more than 1 product at a time */
   editedProduct: string;
+
+  isFinalApprove: boolean;
 
   constructor(
     private activeRoute: ActivatedRoute,
@@ -419,7 +423,9 @@ export class OrderPage implements OnInit {
   }
 
 
-  async approveOrder(final?: boolean) {
+  async approveOrder() {
+
+    const final = this.isFinalApprove;
 
     if(!this.checkFields(final))
       return;

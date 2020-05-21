@@ -22,11 +22,16 @@ import {SelectPopoverDirective} from '../directives/select-popover.directive';
 import {PaginationComponent} from './pagination/pagination.component';
 import {NotificationsTableComponent} from './notifications-table/notifications-table.component';
 import {SelectTextDirective} from '../directives/select-text.directive';
+import {WeightModalComponent} from '../weight-modal/weight-modal.component';
+import {WeightCameraComponent} from '../weight-camera/weight-camera.component';
+import {FormsModule} from '@angular/forms';
+import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 
 @NgModule({
   imports: [
     CommonModule,
     IonicModule,
+    FormsModule,
     NgSelectModule,
     MatFormFieldModule,
     MatDatepickerModule,
@@ -36,6 +41,11 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     MatTooltipModule,
     MatSelectModule,
     MatAutocompleteModule,
+  ],
+  entryComponents: [
+    ReturnGoodModalComponent,
+    WeightModalComponent,
+    WeightCameraComponent,
   ],
   declarations: [
     HeaderComponent,
@@ -49,8 +59,13 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     PaginationComponent,
     NotificationsTableComponent,
     SelectTextDirective,
+    WeightModalComponent,
+    WeightCameraComponent,
+    ReturnGoodModalComponent,
   ],
   exports: [
+    MatSelectModule,
+    MatAutocompleteModule,
     MatFormFieldModule,
     MatDatepickerModule,
     MatNativeDateModule,
@@ -68,8 +83,9 @@ import {SelectTextDirective} from '../directives/select-text.directive';
     PaginationComponent,
     NotificationsTableComponent,
     SelectTextDirective,
-    MatSelectModule,
-    MatAutocompleteModule,
+    WeightCameraComponent,
+    WeightModalComponent,
+    ReturnGoodModalComponent,
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy

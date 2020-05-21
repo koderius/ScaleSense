@@ -8,7 +8,6 @@ import { ReceptionPageRoutingModule } from './reception-routing.module';
 
 import { ReceptionPage } from './reception.page';
 import {ComponentsModule} from '../components/components.module';
-import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 
 @NgModule({
   imports: [
@@ -18,7 +17,6 @@ import {WeightModalComponent} from '../weight-modal/weight-modal.component';
     ReceptionPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [ReceptionPage, WeightModalComponent],
-  entryComponents: [WeightModalComponent],
+  declarations: [ReceptionPage],
 })
 export class ReceptionPageModule {}

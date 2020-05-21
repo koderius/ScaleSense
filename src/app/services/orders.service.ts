@@ -102,7 +102,7 @@ export class OrdersService {
       }
 
       // For querying by group of statuses
-      if(statusGroup && statusGroup.length)
+      if(statusGroup && statusGroup.length && !isDraft)
         ref = ref.where('status', 'in', statusGroup);
 
       // if there is a text query, filter by supplier/customer name (first get supplier/customer ID, and then search by their IDs)

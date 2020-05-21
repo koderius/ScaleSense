@@ -1,0 +1,89 @@
+<ion-header>
+  <app-header pageTitle="טיוטות החזרות"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container ion-padding-vertical">
+
+    <div class="section">
+
+      <ion-searchbar placeholder="חיפוש לפי מספר הזמנה | מספר חשבונית | שם מוצר" [(ngModel)]="query" (ionChange)="search()"></ion-searchbar>
+
+      <div style="display: flex; justify-content: center">
+        <mat-form-field class="example-full-width">
+          <input type="text"
+                 (keyup)="search()"
+                 placeholder="שם ספק"
+                 matInput
+                 [(ngModel)]="supplierQuery"
+                 [matAutocomplete]="auto">
+          <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="search()">
+            <mat-option *ngFor="let supplier of suppliers" [value]="supplier.name">{{supplier.name}}</mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+
+    </div>
+
+    <div class="section">
+
+      <ion-grid class="app-table">
+
+        <h2 class="ion-text-center" *ngIf="!query && !supplierQuery">
+          <i><ion-text color="medium">בחר ספק, או סנן לפי הזמנה או מוצר</ion-text></i>
+        </h2>
+
+        <h2 class="ion-text-center" *ngIf="(query || supplierQuery) && !drafts.length">
+          <i><ion-text color="medium">לא נמצאו טיוטות החזרה</ion-text></i>
+        </h2>
+
+        <ion-row *ngIf="drafts.length">
+          <ion-col size="1"></ion-col>
+          <ion-col>ספק</ion-col>
+          <ion-col>מספר הזמנה</ion-col>
+          <ion-col>מוצר</ion-col>
+          <ion-col></ion-col>
+          <ion-col size="2" class="ion-justify-content-between">
+            <ion-text>סימון לשליחה</ion-text>
+            <ion-checkbox (click)="onCheckAll($event)"
+                          [ngModel]="returnsService.returnsDocsList.length == drafts.length"
+                          [indeterminate]="returnsService.returnsDocsList.length > 0 && returnsService.returnsDocsList.length < drafts.length"
+            ></ion-checkbox>
+          </ion-col>
+        </ion-row>
+
+        <ion-row *ngFor="let draft of drafts">
+          <ion-col size="1">
+            <ion-button shape="round" color="secondary" class="small-circle-btn" fill="clear" (click)="deleteDraft(draft)">
+              <ion-icon name="close" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-img [src]="getSupplierById(draft.sid)?.logo" class="ion-margin-end"></ion-img>
+            <ion-text>{{getSupplierById(draft.sid)?.name}}</ion-text>
+          </ion-col>
+          <ion-col>{{draft.orderSerial}}</ion-col>
+          <ion-col>{{draft.productName}}</ion-col>
+          <ion-col>
+            <ion-button color="dark" shape="round" fill="outline" (click)="openDraft(draft)">כניסה לטיוטה</ion-button>
+          </ion-col>
+          <ion-col size="2" class="ion-justify-content-end">
+            <ion-checkbox (ionChange)="onChecked(draft, $event)" [ngModel]="returnsService.isInList(draft.id)"></ion-checkbox>
+          </ion-col>
+        </ion-row>
+
+      </ion-grid>
+
+    </div>
+
+    <ion-row class="ion-padding">
+      <ion-button shape="round" strong="true" style="margin: auto" [disabled]="!returnsService.returnsDocsList.length" (click)="sendToSupplier()">
+        <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
+        <ion-text>ביצוע החזרה</ion-text>
+      </ion-button>
+    </ion-row>
+
+  </div>
+
+</ion-content>

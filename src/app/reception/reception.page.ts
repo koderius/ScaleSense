@@ -5,9 +5,8 @@ import {Order} from '../models/Order';
 import {OrderStatusGroup, ProductOrder} from '../models/OrderI';
 import {ProductsService} from '../services/products.service';
 import {FullProductDoc} from '../models/Product';
-import {ModalController} from '@ionic/angular';
-import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 import {AlertsService} from '../services/alerts.service';
+import {WeighService} from '../services/weigh.service';
 
 @Component({
   selector: 'app-reception',
@@ -33,8 +32,8 @@ export class ReceptionPage implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private orderService: OrdersService,
     private productsService: ProductsService,
-    private modalCtrl: ModalController,
     private alerts: AlertsService,
+    private weighService: WeighService,
   ) {}
 
   get pageTitle() {
@@ -103,17 +102,8 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
   async weightIconClicked(product: ProductOrder) {
 
-    const m = await this.modalCtrl.create({
-      component: WeightModalComponent,
-      componentProps: {
-        product: product,
-        productData: this.productData(product.id),
-      },
-      backdropDismiss: false,
-      cssClass: 'wide-modal',
-    });
-    m.present();
-    const res = await m.onDidDismiss();
+    this.weighService.openProductsWeightModal(product, this.productData(product.id));
+
   }
 
 }

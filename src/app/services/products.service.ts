@@ -63,7 +63,7 @@ export class ProductsService {
 
     // May filter by name
     if(q)
-      ref = ref.where('name', '>=', q).where('name', '<', Dictionary.queryByString(q));
+      ref = ref.where('name', '>=', q).where('name', '<', Dictionary.NextLastLetter(q));
 
     // May filter by other side ID
     const side = this.businessService.side == 'c' ? 'sid' : 'cid';

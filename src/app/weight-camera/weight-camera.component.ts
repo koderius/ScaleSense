@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {WeighService} from '../services/weigh.service';
 import {ModalController} from '@ionic/angular';
 import {CameraService} from '../services/camera.service';
 
@@ -22,7 +21,6 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private weighService: WeighService,
     private cameraService: CameraService,
     private modalCtrl: ModalController,
   ) {
@@ -62,8 +60,13 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     }
 
     // Snapshot from the scales
-    this.weight = await this.weighService.getWeightSnapshot();
+    this.weight = await this.getWeightSnapshot();
 
+  }
+
+  async getWeightSnapshot() : Promise<number> {
+    // Get weight TODO
+    return await Math.random()*20;
   }
 
   /** Return the weight snapshot */

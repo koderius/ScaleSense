@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import {ModalController} from '@ionic/angular';
-import {ProductOrder} from '../models/OrderI';
+import {ModalController, ToastController} from '@ionic/angular';
 import {FullProductDoc} from '../models/Product';
-import {WeightModalComponent} from '../weight-modal/weight-modal.component';
+import {ReturnDoc, ReturnStatus} from '../models/Return';
+import {ProductsService} from '../services/products.service';
+import {WeighService} from '../services/weigh.service';
+import {ReturnService} from '../services/return.service';
+import {AlertsService} from '../services/alerts.service';
 
 @Component({
   selector: 'app-return-good-modal',
@@ -11,36 +14,104 @@ import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 })
 export class ReturnGoodModalComponent implements OnInit {
 
-  product: ProductOrder;
+  returnDoc: ReturnDoc;
   productData: FullProductDoc;
 
-  status: 'refund' | 'change' | 'trash';
-  driver: string;
-  reason: string;
+  ReturnStatus = ReturnStatus;
 
-  weight: number;
+  toast;
 
   constructor(
     private modalCtrl: ModalController,
+    private productsService: ProductsService,
+    private weighService: WeighService,
+    private returnService: ReturnService,
+    private alerts: AlertsService,
+    private toastCtrl: ToastController,
   ) { }
 
-  ngOnInit() {}
+
+  async ngOnInit() {
+
+    // Load the product data if needed
+    if(!this.productData)
+      this.productData = (await this.productsService.loadProductsByIds(this.returnDoc.product.id))[0];
+
+    // Generate ID according to the order and the product (for new documents)
+    ReturnService.ReturnID(this.returnDoc);
+
+    // If this product in this order already has a draft, continue edit it
+    const draft = await this.returnService.loadDraft(this.returnDoc.id);
+    if(draft)
+      this.returnDoc = draft;
+
+    // Get the temporary driver name from last drafts
+    if(!this.returnDoc.driverName)
+      this.returnDoc.driverName = this.returnService.tempDriverName;
+
+  }
 
 
   async weigh() {
-    const m = await this.modalCtrl.create({
-      component: WeightModalComponent,
-      componentProps: {
-        product: this.product,
-        productData: this.productData,
-      },
-      backdropDismiss: false,
-      cssClass: 'wideModal',
+    this.weighService.openProductsWeightModal(this.returnDoc.product, this.productData);
+  }
+
+  checkFields() {
+
+    if(!this.returnDoc.status) {
+      alert('יש למלא סטטוס החזרה');
+      return;
+    }
+
+    if(!this.returnDoc.reason) {
+      alert('יש למלא סיבת החזרה');
+      return;
+    }
+
+    if(!this.returnDoc.product.finalAmount) {
+      alert('יש למלא/לשקול כמות להחזרה');
+      return;
+    }
+
+    return true;
+
+  }
+
+
+  saveAndAdd() {
+    if(this.checkFields()) {
+      this.returnService.addDoc(this.returnDoc);
+      this.close();
+      this.showToast();
+    }
+  }
+
+  saveDraft() {
+    if(this.checkFields()) {
+      this.returnService.saveDraft(this.returnDoc);
+      this.returnService.clearList();
+      this.close();
+      this.showToast();
+    }
+  }
+
+  async sendProducts() {
+    if(this.checkFields()) {
+      this.saveAndAdd();
+      const l = this.alerts.loaderStart('שולח...');
+      const count = this.returnService.returnsDocsList.length;
+      await this.returnService.sendListToSupplier();
+      this.alerts.loaderStop(l);
+      this.toast.message = count + ' מוצרים נשלחו להחזרה';
+    }
+  }
+
+  async showToast() {
+    this.toast = await this.toastCtrl.create({
+      message: 'טיוטת החזרה נשמרה',
+      duration: 3000,
     });
-    m.present();
-    const res = await m.onDidDismiss();
-    if(res.role == 'ok')
-      this.weight = res.data;
+    this.toast.present();
   }
 
 

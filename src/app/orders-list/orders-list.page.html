@@ -8,7 +8,7 @@
 
     <div id="search-section">
 
-      <ion-searchbar placeholder="הקלד שם {{side == 'c' ? 'ספק' : 'לקוח'}} | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()" (ionFocus)="searchInput.focus()">
+      <ion-searchbar placeholder="הקלד שם {{side == 'c' ? 'ספק' : 'לקוח'}} | מס. הזמנה | מס. חשבונית" [(ngModel)]="query" (ionChange)="searchOrders()">
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
 <!--      <div style="width: 60%">-->
@@ -110,7 +110,7 @@
 
     <ion-spinner *ngIf="orderReturn && !orderProducts.length" color="primary" style="margin: auto"></ion-spinner>
 
-    <div class="table-section" *ngIf="orderReturn && orderProducts.length">
+    <div class="table-section" *ngIf="pageMode == 'goods_return' && orderReturn && orderProducts.length">
       <h2 style="font-weight: bold">הזמנה מס. {{orderReturn.serial}}</h2>
       <ion-list id="return-list">
         <app-product-summery *ngFor="let product of orderReturn.products"
@@ -126,6 +126,10 @@
         <ion-text color="primary">{{orderReturn.supplyTime | date : 'dd/MM/yyyy HH:mm'}}</ion-text>
       </h5>
     </div>
+
+    <ion-row class="ion-justify-content-end" *ngIf="pageMode == 'drafts' || pageMode == 'goods_return'">
+      <ion-button fill="clear" strong="true" style="text-decoration: underline" (click)="navService.goToReturnsDrafts()">מעבר אל טיוטות של החזרות</ion-button>
+    </ion-row>
 
     <ion-row>
       <ion-button shape="round" strong="true" (click)="goBack()" id="back-btn">חזרה למסך הראשי</ion-button>

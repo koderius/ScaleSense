@@ -142,7 +142,7 @@
                 (editClicked)="editedProduct = product.id"
                 (doneEdit)="editedProduct = null"
                 [disabled]="editedProduct && editedProduct != product.id"
-                [editBoxes]="supplierEditMode"
+                [editBoxes]="supplierEditMode && isFinalApprove"
         ></app-product-summery>
 
         <app-products-total-price *ngIf="order.products.length" [price]="order.orderTotalPrice()" [colSize]="(customerEditMode || supplierEditMode ? 4 : 5)/3" [colPush]="3+(customerEditMode || supplierEditMode ? 4 : 5)/3"></app-products-total-price>
@@ -160,6 +160,7 @@
             <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
           </ion-button>
         </p>
+
         <div id="dates" *ngIf="customerEditMode || supplierEditDate">
           <p>בחירת תאריך אספקה:</p>
           <div class="date-picker">
@@ -173,6 +174,14 @@
           </ion-input>
         </div>
 
+        <ion-item lines="none" *ngIf="supplierEditMode">
+          <ion-checkbox slot="start" [value]="order.status >= OrderStatus.APPROVED" [(ngModel)]="isFinalApprove"></ion-checkbox>
+          <ion-label>
+            <h2>אישור סופי</h2>
+            <h6>לקראת יציאה למשלוח. יש למלא כמות ארגזים לכל מוצר ומספר ת. משלוח</h6>
+          </ion-label>
+        </ion-item>
+
         <div *ngIf="customerEditMode || order.comment" style="margin-bottom: 1em">
           <p style="font-weight: normal; margin: 0 0.5em">הערות {{businessService.side == 'c' ? 'לספק' : 'מהלקוח'}}</p>
           <ion-textarea rows="2"
@@ -183,9 +192,15 @@
           ></ion-textarea>
         </div>
 
-        <p *ngIf="supplierEditMode">
+        <p *ngIf="supplierEditMode && isFinalApprove">
           <ion-text>מספר תעודת משלוח: </ion-text>
-          <ion-input type="number" color="primary" placeholder="______________" [(ngModel)]="order.invoice"></ion-input>
+          <mat-form-field>
+            <input matInput type="number" [(ngModel)]="order.invoice">
+          </mat-form-field>
+          <ion-text>שם נהג: </ion-text>
+          <mat-form-field>
+            <input matInput [(ngModel)]="order.driverName">
+          </mat-form-field>
         </p>
 
         <div *ngIf="supplierEditMode || order.supplierComment" style="margin-top: 1em">
@@ -219,15 +234,15 @@
         <ion-row>
           <ion-button shape="round" color="dark" *ngIf="customerEditMode" (click)="page = 2">הוספת פריטים להזמנה</ion-button>
           <ion-button shape="round" color="dark" *ngIf="isDraft" (click)="saveDraft()">שמירה כטיוטה</ion-button>
-          <ion-button shape="round" color="dark" *ngIf="supplierEditMode" (click)="approveOrder()">אישור ראשוני</ion-button>
+<!--          <ion-button shape="round" color="dark" *ngIf="supplierEditMode" (click)="approveOrder()">אישור ראשוני</ion-button>-->
           <ion-button shape="round" color="dark" *ngIf="!isDraft && (customerEditMode || supplierEditMode)" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="customerEditMode || supplierEditMode" (click)="businessService.side == 'c' ? sendOrder() : approveOrder(true)">
+          <ion-button shape="round" strong="true" *ngIf="customerEditMode || supplierEditMode" (click)="businessService.side == 'c' ? sendOrder() : approveOrder()">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
-            <ion-text *ngIf="supplierEditMode">אישור הזמנה ושמירת שינויים</ion-text>
-            <ion-text *ngIf="!isDraft && customerEditMode">שמירת שינויים ו</ion-text>
+            <ion-text *ngIf="(!isDraft && customerEditMode) || supplierEditMode">שמירת שינויים ו</ion-text>
             <ion-text *ngIf="customerEditMode">שליחת הזמנה לספק</ion-text>
+            <ion-text *ngIf="supplierEditMode">{{isFinalApprove ? 'אישור סופי' : 'אישור ראשוני'}}</ion-text>
           </ion-button>
           <ion-button shape="round" *ngIf="!customerEditMode && !supplierEditMode" (click)="backToMain()">חזרה למסך הראשי</ion-button>
         </ion-row>

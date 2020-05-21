@@ -117,6 +117,7 @@ export class NotificationsService {
     const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
     newNotification.businessName = business.name;
 
+
     // For notifications about order
     if(newNotification.code == NotificationCode.ORDER_CHANGE || newNotification.code == NotificationCode.ORDER_ALERT) {
 
@@ -134,6 +135,7 @@ export class NotificationsService {
 
     }
 
+
     // For notifications about products
     if(newNotification.code == NotificationCode.PRODUCT_CHANGE) {
 
@@ -149,6 +151,16 @@ export class NotificationsService {
       // Add the product's name
       const product = await this.productService.loadProductsByIds(newNotification.content.productId);
       newNotification.text += product[0].name;
+
+    }
+
+
+    // For notification about products return
+    if(newNotification.code == NotificationCode.PRODUCTS_RETURN) {
+
+      // Can be from multiple orders
+      newNotification.orderSerial = '-';
+      newNotification.text = 'החזרת מוצר/ים מהלקוח';
 
     }
 

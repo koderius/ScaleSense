@@ -33,6 +33,7 @@ export enum NotificationCode {
   ORDER_CHANGE = 1,
   ORDER_ALERT = 2,
   PRODUCT_CHANGE = 3,
+  PRODUCTS_RETURN = 4,
 }
 
 
