@@ -55,14 +55,14 @@
       </div>
     </ion-col>
 
-    <ion-col [size]="editBoxes ? 3 : 4" *ngIf="showComment">
+    <ion-col [size]="editBoxes || productOrder.boxes ? 3 : 4" *ngIf="showComment">
       <ion-input id="inputComment" *ngIf="editComment" placeholder="הערות בנוגע למוצר" [(ngModel)]="productOrder.comment" [readonly]="!editComment"></ion-input>
       <p *ngIf="!editComment && productOrder.comment" style="overflow: auto"><ion-text style="text-decoration: underline">הערת לקוח</ion-text>: {{productOrder.comment}}</p>
     </ion-col>
 
-    <ion-col size="1" *ngIf="editBoxes" title="מספר ארגזים">
+    <ion-col size="1" *ngIf="editBoxes || productOrder.boxes" title="מספר ארגזים">
       <mat-form-field style="width: 100% !important; text-align: center">
-        <input matInput [(ngModel)]="productOrder.boxes">
+        <input matInput [(ngModel)]="productOrder.boxes" [readonly]="!editBoxes">
         <mat-hint>מס. ארגזים</mat-hint>
       </mat-form-field>
     </ion-col>

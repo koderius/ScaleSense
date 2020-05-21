@@ -84,11 +84,9 @@ export interface ProductCustomerDoc {
   /** ProductPublicDoc category (name or ID?) */
   category?: string;
 
-  /** The maximum price to accept from the supplier */
-  priceLimit?: number;
-
-  /** Max price differences between original order to order approve (in %) */
-  priceTolerance?: number;
+  /** Price limits */
+  minPrice?: number;
+  maxPrice?: number;
 
   /** Max weight differences between original order to order approve (in %) */
   orderWeightTolerance?: number;

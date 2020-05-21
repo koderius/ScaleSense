@@ -392,6 +392,10 @@ export const onReturnCreated = functions.firestore.document('returns/{returnId}'
 
   const data = change.data() as ReturnDoc;
 
+  // Don't include 'trash' status
+  if(!data.status)
+    return;
+
   // Current server time
   const now = admin.firestore.Timestamp.now().toMillis();
 

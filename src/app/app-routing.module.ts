@@ -53,6 +53,13 @@ const routes: Routes = [
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
+  {
+    path: 'returns',
+    loadChildren: () => import('./returns/returns.module').then( m => m.ReturnsPageModule),
+    canActivateChild: [AppEnterGuard],
+    data: {side: 's'}
+  },
+
 
 
 ];

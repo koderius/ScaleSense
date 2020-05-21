@@ -26,6 +26,7 @@ import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 import {WeightCameraComponent} from '../weight-camera/weight-camera.component';
 import {FormsModule} from '@angular/forms';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
+import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
 
 @NgModule({
   imports: [
@@ -62,6 +63,7 @@ import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.c
     WeightModalComponent,
     WeightCameraComponent,
     ReturnGoodModalComponent,
+    ReturnStatusTextPipe,
   ],
   exports: [
     MatSelectModule,
@@ -86,6 +88,7 @@ import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.c
     WeightCameraComponent,
     WeightModalComponent,
     ReturnGoodModalComponent,
+    ReturnStatusTextPipe,
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy

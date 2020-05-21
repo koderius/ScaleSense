@@ -15,7 +15,7 @@ export interface ReturnDoc {
 }
 
 export enum ReturnStatus {
+  TRASH = 0,
   REFUND = 1,
   CHANGE,
-  TRASH,
 }

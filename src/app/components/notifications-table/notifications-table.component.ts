@@ -38,7 +38,7 @@ export class NotificationsTableComponent implements OnInit {
       this.navService.goToEditProduct(notification.content.productId);
     }
     if(notification.code == NotificationCode.PRODUCTS_RETURN) {
-
+      this.navService.goToReturnsList();
     }
   }
 

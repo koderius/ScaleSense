@@ -157,4 +157,20 @@ export class EditProductPage implements OnInit {
 
   }
 
+  onPriceChange() {
+    if(this.product.price < this.product.minPrice)
+      this.product.minPrice = this.product.price;
+    if(this.product.price > this.product.maxPrice)
+      this.product.maxPrice = this.product.price;
+  }
+
+  onPriceLimitChange() {
+    if(this.product.price < this.product.minPrice)
+      this.product.price = this.product.minPrice;
+    if(this.product.price > this.product.maxPrice)
+      this.product.price = this.product.maxPrice;
+    if(this.product.minPrice > this.product.maxPrice)
+      this.product.minPrice = this.product.maxPrice;
+  }
+
 }

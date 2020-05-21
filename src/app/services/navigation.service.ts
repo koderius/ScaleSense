@@ -88,4 +88,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('returns-drafts');
   }
 
+  goToReturnsList() {
+    this.navCtrl.navigateForward('returns');
+  }
+
 }

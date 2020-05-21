@@ -125,16 +125,21 @@
           <ion-row class="input-div">
             <ion-col size="4" required>מחיר</ion-col>
             <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.price"></ion-input>
+              <ion-input type="number" step="any" [(ngModel)]="product.price" (ionBlur)="onPriceChange()"></ion-input>
               <ion-text class="ion-text-end" style="border-bottom: solid black 1px">{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
-            <ion-col size="4">אפיצות מחיר</ion-col>
+            <ion-col size="4">טווח מחיר</ion-col>
             <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.priceTolerance"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
+              <ion-text>בין</ion-text>
+              <ion-input type="number" step="any" [(ngModel)]="product.minPrice" (ionBlur)="onPriceLimitChange()"></ion-input>
+            </ion-col>
+            <ion-col style="display: flex">
+              <ion-text>ל-&nbsp;</ion-text>
+              <ion-input type="number" step="any" [(ngModel)]="product.maxPrice" (ionBlur)="onPriceLimitChange()"></ion-input>
+              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
             </ion-col>
           </ion-row>
 

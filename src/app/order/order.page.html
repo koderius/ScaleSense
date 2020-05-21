@@ -151,6 +151,16 @@
 
       <div id="bottom-section">
 
+        <div *ngIf="customerEditMode || order.comment" style="margin-bottom: 1em">
+          <p style="font-weight: normal; margin: 0 0.5em">הערות {{businessService.side == 'c' ? 'לספק' : 'מהלקוח'}}</p>
+          <ion-textarea rows="2"
+                        placeholder="כתוב כאן..."
+                        [(ngModel)]="order.comment"
+                        [readonly]="!customerEditMode"
+                        [ngClass]="!customerEditMode ? 'readonly' : ''"
+          ></ion-textarea>
+        </div>
+
         <p class="ion-text-center" *ngIf="!customerEditMode && !supplierEditDate">
           <ion-text>ההזמנה תסופק בתאריך: </ion-text>
           <ion-text color="primary">{{order.supplyTime | date : 'dd/MM/yyyy'}}</ion-text>
@@ -182,24 +192,14 @@
           </ion-label>
         </ion-item>
 
-        <div *ngIf="customerEditMode || order.comment" style="margin-bottom: 1em">
-          <p style="font-weight: normal; margin: 0 0.5em">הערות {{businessService.side == 'c' ? 'לספק' : 'מהלקוח'}}</p>
-          <ion-textarea rows="2"
-                        placeholder="כתוב כאן..."
-                        [(ngModel)]="order.comment"
-                        [readonly]="!customerEditMode"
-                        [ngClass]="!customerEditMode ? 'readonly' : ''"
-          ></ion-textarea>
-        </div>
-
-        <p *ngIf="supplierEditMode && isFinalApprove">
+        <p *ngIf="(supplierEditMode && isFinalApprove) || order.status >= OrderStatus.FINAL_APPROVE">
           <ion-text>מספר תעודת משלוח: </ion-text>
           <mat-form-field>
-            <input matInput type="number" [(ngModel)]="order.invoice">
+            <input matInput type="number" [(ngModel)]="order.invoice" [readonly]="OrderStatus.FINAL_APPROVE">
           </mat-form-field>
           <ion-text>שם נהג: </ion-text>
           <mat-form-field>
-            <input matInput [(ngModel)]="order.driverName">
+            <input matInput [(ngModel)]="order.driverName" [readonly]="OrderStatus.FINAL_APPROVE">
           </mat-form-field>
         </p>
 

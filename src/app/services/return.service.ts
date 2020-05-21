@@ -1,10 +1,9 @@
 import {Injectable} from '@angular/core';
-import {ReturnDoc} from '../models/Return';
+import {ReturnDoc, ReturnStatus} from '../models/Return';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import {BusinessService} from './business.service';
 import {OrdersService} from './orders.service';
-import {ProductsService} from './products.service';
 import {Dictionary} from '../utilities/dictionary';
 import {Objects} from '../utilities/objects';
 
@@ -13,8 +12,10 @@ import {Objects} from '../utilities/objects';
 })
 export class ReturnService {
 
+  /** The reference for the returns collection */
   readonly returnsCollectionRef = firebase.firestore().collection('returns');
-  readonly returnsDraftsCollectionRef = this.businessService.businessDocRef.collection('my_drafts_returns');
+  /** The reference for the returns drafts collection (Only for customers) */
+  readonly returnsDraftsCollectionRef = this.businessService.side == 'c' ? this.businessService.businessDocRef.collection('my_drafts_returns') : null;
 
   /** Temporary list of drafts, for sending as a batch */
   returnsDocsList: ReturnDoc[] = [];
@@ -25,19 +26,51 @@ export class ReturnService {
   constructor(
     private businessService: BusinessService,
     private orderService: OrdersService,
-    private productsService: ProductsService,
   ) { }
 
 
-  // loadReturnsOfBusiness(bid: string) {
-  //
-  //   // Get Supplier and customer IDs
-  //   const cid = this.businessService.side == 'c' ? this.businessService.myBid : bid;
-  //   const sid = this.businessService.side == 's' ? this.businessService.myBid : bid;
-  //
-  //   this.returnsCollectionRef.where('cid', '==', cid).where('sid', '==', sid)
-  //
-  // }
+  /** Load all the returns (For suppliers) */
+  async loadAllMyReturns(lastDoc?: ReturnDoc, firstDoc?: ReturnDoc, refreshFromFirstDoc?: ReturnDoc) : Promise<ReturnDoc[]> {
+
+    // Get all supplier's returns, ordered from new to old
+    let ref = this.returnsCollectionRef
+      .where('sid', '==', this.businessService.myBid)
+      .where('status', '>', ReturnStatus.TRASH)
+      .orderBy('status')
+      .orderBy('time', 'desc')
+      .orderBy('id');
+
+    // Pagination
+    if(refreshFromFirstDoc)
+      ref = ref.startAt(refreshFromFirstDoc);
+    if(lastDoc)
+      ref = ref.startAfter(lastDoc.status, lastDoc.time, lastDoc.id);
+    if(firstDoc)
+      ref = ref.endBefore(firstDoc.status, firstDoc.time, firstDoc.id).limitToLast(10);
+    else
+      ref = ref.limit(10);
+
+    try {
+      const res = await ref.get();
+      return res.docs.map((d)=>d.data() as ReturnDoc);
+    }
+    catch (e) {
+      console.error(e);
+      return [];
+    }
+
+  }
+
+
+  /** Delete return (For suppliers) */
+  async deleteReturn(returnId: string) {
+    try {
+      await this.returnsCollectionRef.doc(returnId).delete();
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
 
 
   /** Get a document draft according to ID (which contains the order's and the product's IDs) */
@@ -117,6 +150,13 @@ export class ReturnService {
     Objects.ClearFalsy(doc);
     // Save
     try {
+
+      // Prevent creating draft for a product that already sent
+      if((await this.returnsCollectionRef.doc(doc.id).get()).exists) {
+        alert('החזרה למוצר זה כבר נשלחה לספק');
+        return;
+      }
+
       await this.returnsDraftsCollectionRef.doc(doc.id).set(doc, {merge: true});
     }
     catch (e) {

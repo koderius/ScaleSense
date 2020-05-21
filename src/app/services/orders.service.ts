@@ -102,7 +102,7 @@ export class OrdersService {
       }
 
       // For querying by group of statuses
-      if(statusGroup && statusGroup.length && !isDraft)
+      if(statusGroup && statusGroup.length && statusGroup.length <= 10 && !isDraft)
         ref = ref.where('status', 'in', statusGroup);
 
       // if there is a text query, filter by supplier/customer name (first get supplier/customer ID, and then search by their IDs)
@@ -119,9 +119,9 @@ export class OrdersService {
 
       // For pagination, start after the last (next page), or end before the first (previous page)
       if(lastDoc && !firstDoc)
-        ref = ref.startAfter(isDraft ? lastDoc.modified : [lastDoc.supplyTime, lastDoc.serial]);
+        ref = isDraft ? ref.startAfter(lastDoc.modified) : ref.startAfter(lastDoc.supplyTime, lastDoc.serial);
       if(firstDoc && !lastDoc)
-        ref = ref.endBefore(isDraft ? lastDoc.modified : [lastDoc.supplyTime, lastDoc.serial]).limitToLast(10);
+        ref = (isDraft ? ref.endBefore(firstDoc.modified) : ref.endBefore(firstDoc.supplyTime, firstDoc.serial)).limitToLast(10);
       else
         ref = ref.limit(10);
 
