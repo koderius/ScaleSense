@@ -17,21 +17,27 @@
           <ion-row class="input-div">
             <ion-col size="4" required>שם מוצר</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="product.name"></ion-input>
+              <mat-form-field>
+                <input matInput [(ngModel)]="product.name">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4" required>מק"ט (משתמש)</ion-col>
             <ion-col>
-              <ion-input type="number" [(ngModel)]="product.catalogNumC"></ion-input>
+              <mat-form-field>
+                <input matInput type="number" [(ngModel)]="product.catalogNumC">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="4" required>מק"ט (ספק)</ion-col>
             <ion-col>
-              <ion-input type="number" [(ngModel)]="product.catalogNumS"></ion-input>
+              <mat-form-field>
+                <input matInput type="number" [(ngModel)]="product.catalogNumS">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
@@ -60,56 +66,67 @@
             <ion-row class="input-div">
               <ion-col size="4">תיאור פריט</ion-col>
               <ion-col>
-                <ion-input [(ngModel)]="product.description"></ion-input>
+                <mat-form-field>
+                  <input matInput [(ngModel)]="product.description">
+                </mat-form-field>
               </ion-col>
             </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4" required>ספק</ion-col>
             <ion-col>
-              <div class="select-box">
-                <ion-select [(ngModel)]="product.sid" interface="popover" placeholder="בחר ספק" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
-                  <ion-select-option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</ion-select-option>
-                </ion-select>
-              </div>
+              <app-autocomplete-field placeholder="שם ספק"
+                                      [list]="suppliersService.mySuppliers"
+                                      displayProp="name"
+                                      valueProp="id"
+                                      [selected]="product.sid"
+                                      (onSelect)="product.sid = $event"
+              ></app-autocomplete-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">מספר ספק</ion-col>
             <ion-col>
-              <ion-input [value]="suppliersService.getSupplierById(product.sid)?.nid" placeholder="אוטומטי" readonly></ion-input>
+              <mat-form-field>
+                <mat-label></mat-label>
+                <input matInput type="number" [value]="suppliersService.getSupplierById(product.sid)?.nid || ''" placeholder="אוטומטי" readonly>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4" required>קטגוריה</ion-col>
             <ion-col>
-              <div class="select-box">
-                <ion-select [(ngModel)]="product.category" interface="popover" placeholder="בחר קטגוריה" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
-                  <ion-select-option [value]="''"></ion-select-option>
-                  <ion-select-option *ngFor="let c of categoriesService.categoriesToShow" [value]="c.title">{{c.title}}</ion-select-option>
-                </ion-select>
-              </div>
+              <app-autocomplete-field placeholder="בחר קטגוריה"
+                                      [list]="categoriesService.categoriesToShow"
+                                      displayProp="title"
+                                      valueProp="title"
+                                      [selected]="product.category"
+                                      (onSelect)="product.category = $event"
+              ></app-autocomplete-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="4" required>סוג יחידה</ion-col>
             <ion-col>
-              <div class="select-box">
-                <ion-select [(ngModel)]="product.type" interface="popover" placeholder="בחר" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
-                  <ion-select-option *ngFor="let type of productTypes" [value]="type">{{null | unitAmount : type}}</ion-select-option>
-                </ion-select>
-              </div>
+              <mat-form-field>
+                <mat-label></mat-label>
+                <mat-select [(ngModel)]="product.type">
+                  <mat-option *ngFor="let type of productTypes" [value]="type">{{null | unitAmount : type}}</mat-option>
+                </mat-select>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="product.type">
             <ion-col size="4" required>משקל {{null | unitAmount : product.type}}</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.unitWeight"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">ק"ג</ion-text>
+            <ion-col>
+              <mat-form-field>
+                <input matInput type="number" [(ngModel)]="product.unitWeight">
+                <ion-text matSuffix>{{null | unitAmount : 0}}</ion-text>
+              </mat-form-field>
             </ion-col>
             <ion-col size="4" style="padding: 0">
               <ion-button fill="clear" color="secondary" class="ion-float-end" title="שקילה">
@@ -124,38 +141,50 @@
 
           <ion-row class="input-div">
             <ion-col size="4" required>מחיר</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.price" (ionBlur)="onPriceChange()"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+            <ion-col>
+              <mat-form-field>
+                <input matInput type="number" step="any" [formControl]="priceFormControl" [min]="product.minPrice" [max]="product.maxPrice" [(ngModel)]="product.price">
+                <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+                <mat-error *ngIf="priceFormControl.hasError('min') || priceFormControl.hasError('max')">מחיר מחוץ לטווח</mat-error>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">טווח מחיר</ion-col>
-            <ion-col style="display: flex">
-              <ion-text>בין</ion-text>
-              <ion-input type="number" step="any" [(ngModel)]="product.minPrice" (ionBlur)="onPriceLimitChange()"></ion-input>
+            <ion-col size="3.75">
+              <mat-form-field>
+                <mat-label>מינימום</mat-label>
+                <input matInput type="number" step="any" [(ngModel)]="product.minPrice" (blur)="onPriceLimitChange()">
+              </mat-form-field>
             </ion-col>
-            <ion-col style="display: flex">
-              <ion-text>ל-&nbsp;</ion-text>
-              <ion-input type="number" step="any" [(ngModel)]="product.maxPrice" (ionBlur)="onPriceLimitChange()"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+            <ion-col size="0.5"></ion-col>
+            <ion-col size="3.75">
+              <mat-form-field>
+                <mat-label>מקסימום</mat-label>
+                <input matInput type="number" step="any" [(ngModel)]="product.maxPrice" (blur)="onPriceLimitChange()">
+                <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">אפיצות משקל בהזמנה</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.orderWeightTolerance"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
+            <ion-col>
+              <mat-form-field>
+                <input matInput type="number" step="any" [(ngModel)]="product.orderWeightTolerance">
+                <ion-text matSuffix>%</ion-text>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">אפיצות משקל בקבלה</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.receiveWeightTolerance"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">%</ion-text>
+            <ion-col>
+              <mat-form-field>
+                <input matInput type="number" step="any" [(ngModel)]="product.receiveWeightTolerance">
+                <ion-text matSuffix>%</ion-text>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
@@ -170,27 +199,29 @@
           <ion-row class="input-div" *ngIf="!taraIncluded">
             <ion-col size="4" required>משקל אריזה</ion-col>
             <ion-col>
-              <div style="display: flex">
-                <ion-input type="number" step="any" [(ngModel)]="product.tara"></ion-input>
-                <ion-text class="ion-text-end" style="border-bottom: solid black 1px">ק"ג</ion-text>
-              </div>
+              <mat-form-field>
+                <input matInput type="number" step="any" [(ngModel)]="product.tara">
+                <ion-text matSuffix>{{null | unitAmount : 0}}</ion-text>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="4">מינימום להזמנה</ion-col>
-            <ion-col style="display: flex">
-              <ion-input type="number" step="any" [(ngModel)]="product.orderMin"></ion-input>
-              <ion-text class="ion-text-end" style="border-bottom: solid black 1px">{{null | unitAmount : product.type}}</ion-text>
+            <ion-col>
+              <mat-form-field>
+                <input matInput type="number" step="any" [(ngModel)]="product.orderMin">
+                <ion-text matSuffix>{{null | unitAmount : product.type}}</ion-text>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="4" required>ברקוד</ion-col>
             <ion-col>
-              <div class="select-box">
-                <ion-input type="number" [(ngModel)]="product.barcode"></ion-input>
-              </div>
+              <mat-form-field>
+                <input matInput type="number" [(ngModel)]="product.barcode">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
@@ -203,12 +234,13 @@
           </ion-row>
 
           <ion-row class="input-div" *ngIf="product.isVeg">
-            <ion-col size="8">קישור לפריט באתר משרד החקלאות</ion-col>
-            <ion-col>
-              <div class="select-box">
-                <ion-input type="url" [(ngModel)]="product.agriLink" clearInput="true"></ion-input>
-              </div>
-            </ion-col>
+            <mat-form-field>
+              <mat-label>קישור לפריט באתר משרד החקלאות</mat-label>
+              <input matInput type="url" [(ngModel)]="product.agriLink">
+              <button mat-button *ngIf="product.agriLink" matSuffix mat-icon-button aria-label="Clear" (click)="product.agriLink=''">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-form-field>
           </ion-row>
 
         </div>

@@ -10,6 +10,7 @@ import {CategoriesService} from '../services/categories.service';
 import {BusinessService} from '../services/business.service';
 import {Objects} from '../utilities/objects';
 import {CameraService} from '../services/camera.service';
+import {FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-edit-product',
@@ -29,6 +30,9 @@ export class EditProductPage implements OnInit {
 
   taraIncluded: boolean = true;
 
+  // Price field control
+  priceFormControl = new FormControl();
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private productsService: ProductsService,
@@ -37,7 +41,7 @@ export class EditProductPage implements OnInit {
     public categoriesService: CategoriesService,
     public businessService: BusinessService,
     private cameraService: CameraService,
-  ) { }
+  ) {}
 
   get pageTitle() {
     if(this.product)
@@ -67,6 +71,8 @@ export class EditProductPage implements OnInit {
 
     // Show the product image
     this.logoPreview = this.product.image;
+
+    this.onPriceLimitChange();
 
   }
 
@@ -153,24 +159,31 @@ export class EditProductPage implements OnInit {
       return false;
     }
 
+    if(!this.priceFormControl.hasError('min') || this.priceFormControl.hasError('max')) {
+      alert('מחיר מחוץ לטוווח שהוגדר');
+      return;
+    }
+
     return true;
 
   }
 
-  onPriceChange() {
-    if(this.product.price < this.product.minPrice)
-      this.product.minPrice = this.product.price;
-    if(this.product.price > this.product.maxPrice)
-      this.product.maxPrice = this.product.price;
-  }
 
   onPriceLimitChange() {
-    if(this.product.price < this.product.minPrice)
-      this.product.price = this.product.minPrice;
-    if(this.product.price > this.product.maxPrice)
-      this.product.price = this.product.maxPrice;
+
+    // Make sure limits are valid
     if(this.product.minPrice > this.product.maxPrice)
       this.product.minPrice = this.product.maxPrice;
+
+    // Create a price validator within there limits
+    this.priceFormControl.clearValidators();
+    this.priceFormControl.setValidators([
+      Validators.min(this.product.minPrice),
+      Validators.max(this.product.maxPrice)
+    ]);
+
+    this.priceFormControl.setValue(this.product.price);
+
   }
 
 }

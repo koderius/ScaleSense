@@ -9,6 +9,8 @@ import {Camera} from '@ionic-native/camera/ngx';
 })
 export class CameraService {
 
+  hasCamera: boolean;
+
   /** Stream of the PC's camera */
   stream: MediaStream;
 
@@ -31,6 +33,9 @@ export class CameraService {
     private platform: Platform,
   ) {
 
+    // TODO: Enable camera check on start
+    // this.cameraCheck();
+
     // Get platform
     this.isMobile = this.platform.is('cordova');
 
@@ -44,8 +49,10 @@ export class CameraService {
 
   /** Open the PC camera and get its stream object (Video only, no audio) */
   async openVideoStream() {
-    if(!this.isMobile && !this.stream)
+    if(!this.isMobile && !this.stream) {
       this.stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+      this.hasCamera = this.stream && !!this.stream.getVideoTracks().length;
+    }
   }
 
   /** Close the PC camera stream */
@@ -90,6 +97,7 @@ export class CameraService {
         // disableExifHeaderStripping: false
       });
       this.isCameraPreviewOn = true;
+      this.hasCamera = true;
     }
   }
 
@@ -152,6 +160,24 @@ export class CameraService {
       saveToPhotoAlbum: false,
     });
     return 'data:image/jpeg;base64,' + base64;
+
+  }
+
+  async cameraCheck() {
+
+    if(this.isMobile) {
+      await this.openFullScreenCamera();
+      await this.closeFullScreenCamera();
+    }
+    else {
+      await this.openVideoStream();
+      this.closeVideoStream();
+    }
+
+    if(this.hasCamera)
+      console.log('Camera works');
+    else
+      console.warn('No camera');
 
   }
 

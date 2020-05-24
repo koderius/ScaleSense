@@ -35,7 +35,7 @@
             <p>מצב<br>מערכת</p>
             <ion-img src="../../assets/images/scales_on.png" class="on"></ion-img>
             <ion-img src="../../assets/images/printer_on.png" class="on"></ion-img>
-            <ion-img src="../../assets/images/camera_on.png" class="on"></ion-img>
+            <ion-img [src]="cameraService.hasCamera ? '../../assets/images/camera_on.png' : '../../assets/images/camera_off.png'" [ngClass]="cameraService.hasCamera ? 'on' : 'off'"></ion-img>
           </div>
           <div id="weight">
             <ion-button size="large" fill="clear" strong="true" (click)="weighTest()">שקילה</ion-button>

@@ -8,7 +8,7 @@ import {HighlightifyPipe} from '../pipes/highlightify.pipe';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
-  MAT_DATE_LOCALE, MatAutocompleteModule,
+  MAT_DATE_LOCALE, MatAutocompleteModule, MatButtonModule,
   MatDatepickerModule,
   MatFormFieldModule,
   MatIconModule,
@@ -27,6 +27,7 @@ import {WeightCameraComponent} from '../weight-camera/weight-camera.component';
 import {FormsModule} from '@angular/forms';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
+import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-field.component';
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
     MatTooltipModule,
     MatSelectModule,
     MatAutocompleteModule,
+    MatButtonModule,
   ],
   entryComponents: [
     ReturnGoodModalComponent,
@@ -64,6 +66,7 @@ import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
     WeightCameraComponent,
     ReturnGoodModalComponent,
     ReturnStatusTextPipe,
+    AutocompleteFieldComponent,
   ],
   exports: [
     MatSelectModule,
@@ -73,6 +76,7 @@ import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
     MatNativeDateModule,
     MatInputModule,
     MatIconModule,
+    MatButtonModule,
     HeaderComponent,
     OredersWizardComponent,
     NgSelectComponent,
@@ -89,6 +93,7 @@ import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
     WeightModalComponent,
     ReturnGoodModalComponent,
     ReturnStatusTextPipe,
+    AutocompleteFieldComponent,
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy

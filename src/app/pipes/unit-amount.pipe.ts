@@ -15,7 +15,7 @@ export class UnitAmountPipe implements PipeTransform {
     // Set the name of the unit
     let unitName;
     switch (unit) {
-      case ProductType.BY_WEIGHT: unitName = 'ק"ג'; break;
+      case ProductType.BY_WEIGHT: default: unitName = 'ק"ג'; break;
       case ProductType.BOX: unitName = p ? 'ארגזים' : 'ארגז'; break;
       case ProductType.BLOCK: unitName = p ? 'בלוקים' : 'בלוק'; break;
       case ProductType.UNIT: unitName = p ? 'יחידות' : 'יחידה'; break;

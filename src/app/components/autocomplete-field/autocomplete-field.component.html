@@ -1,0 +1,13 @@
+<mat-form-field>
+  <mat-label>{{label}}</mat-label>
+  <input [placeholder]="placeholder || ''"
+         matInput
+         [(ngModel)]="query"
+         (keyup)="onQueryChange.emit(query)"
+         [matAutocomplete]="auto"
+         (blur)="onClosed()"
+  >
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelect.emit($event.option.id)" (closed)="onClosed()">
+    <mat-option *ngFor="let option of filteredList" [value]="option[displayProp]" [id]="option[valueProp]">{{option[displayProp]}}</mat-option>
+  </mat-autocomplete>
+</mat-form-field>

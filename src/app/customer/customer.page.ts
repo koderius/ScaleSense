@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {NavigationService} from '../services/navigation.service';
 import {WeighService} from '../services/weigh.service';
+import {CameraService} from '../services/camera.service';
 
 @Component({
   selector: 'app-customer',
@@ -12,6 +13,7 @@ export class CustomerPage implements OnInit {
   constructor(
     private navService: NavigationService,
     private weighService: WeighService,
+    public cameraService: CameraService,
   ) {}
 
   ngOnInit() {
