@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import {ProductsService} from '../services/products.service';
-import {FullProductDoc} from '../models/Product';
+import {FullProductDoc, ProductPublicDoc} from '../models/Product';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc} from '../models/Business';
 import {BusinessService} from '../services/business.service';
 import {XlsService} from '../services/xls.service';
+import {ModalController} from '@ionic/angular';
+import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
 
 
 @Component({
@@ -30,6 +32,7 @@ export class ProductsListPage {
     public navService: NavigationService,
     public businessService: BusinessService,
     private excelService: XlsService,
+    private modalCtrl: ModalController,
   ) { }
 
   get productsList() : FullProductDoc[] {
@@ -75,5 +78,18 @@ export class ProductsListPage {
     await this.excelService.readExcelWorkbook(evt);
     console.log(this.excelService.readSheetData());
   }
+
+
+  async customerPricing(product: ProductPublicDoc) {
+    if(this.businessService.side == 's') {
+      const m = await this.modalCtrl.create({
+        component: CustomerPricingModalComponent,
+        componentProps: {product: product},
+        backdropDismiss: false,
+      });
+      m.present();
+    }
+  }
+
 
 }

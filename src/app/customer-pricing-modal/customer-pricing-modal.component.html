@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="close()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>תמחור לקוחות</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-thumbnail slot="start">
+      <img [src]="product.image">
+    </ion-thumbnail>
+    <ion-label>
+      <h1>{{product.name}} (מק"ט: {{product.catalogNumS}})</h1>
+      <p>{{product.description}}</p>
+      <h2>מחיר כללי: {{product.price | price}} / {{null | unitAmount : product.type}}</h2>
+    </ion-label>
+  </ion-item>
+
+  <div id="inputs">
+
+    <h1>
+      <ion-text color="primary">מחיר ללקוח</ion-text>
+    </h1>
+
+    <ion-row class="input-section">
+      <ion-col>
+        <ion-label>לקוח</ion-label>
+      </ion-col>
+      <ion-col size="9">
+        <app-autocomplete-field
+                [list]="customerService.myCustomers"
+                label="בחר לקוח"
+                (onSelect)="onCustomerSelected($event)"
+                displayProp="name"
+                valueProp="id"
+        ></app-autocomplete-field>
+      </ion-col>
+    </ion-row>
+
+    <ion-row class="input-section">
+      <ion-col>
+        <ion-label>מחיר</ion-label>
+      </ion-col>
+      <ion-col size="9">
+        <mat-form-field floatLabel="never">
+          <input matInput type="number" [(ngModel)]="newPrice" placeholder="לא נקבע מחיר מיוחד" [disabled]="!selectedCustomerId">
+          <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+        </mat-form-field>
+      </ion-col>
+    </ion-row>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 1em">
+      <ion-button shape="round" [disabled]="!newPrice || price == newPrice" (click)="setPrice()">קבע מחיר</ion-button>
+      <ion-button shape="round" [disabled]="!selectedCustomerId" (click)="resetPrice()" color="dark">אפס מחיר</ion-button>
+    </div>
+
+  </div>
+
+
+</ion-content>

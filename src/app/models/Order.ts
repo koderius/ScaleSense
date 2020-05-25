@@ -79,10 +79,11 @@ export class Order {
       }
     } else if (newAmount === 0) {
       const idx = this.products.findIndex((p) => p.id == id);
-      if (idx > -1)
+      if (idx > -1) {
         this._props.products.splice(idx, 1);
-      if(!this._props.products.length)
-        delete this._props.products;
+        if(!this._props.products.length)
+          delete this._props.products;
+      }
     }
   }
 

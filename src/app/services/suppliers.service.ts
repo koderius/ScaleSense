@@ -88,7 +88,7 @@ export class SuppliersService {
     // First, add the suppliers by their name to the results
     const results = this.getSupplierByName(q);
 
-    if(q.length >= 3) {
+    if(q.length) {
 
       const queryResults = [];
 

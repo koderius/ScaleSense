@@ -9,6 +9,7 @@ import {ProductsListUtil} from '../../src/app/utilities/productsList';
 import {MailForm} from '../../src/app/website/mail/MailForm';
 import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
+import {UserDoc} from '../../src/app/models/UserDoc';
 
 admin.initializeApp();
 
@@ -137,40 +138,36 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       /** PART 1: Check user permission */
         // Read the user data, and his business belonging
       const uid = context.auth ? context.auth.uid : '';
-      const userSnapshot = (await transaction.get(admin.firestore().collection('users').doc(uid)));
-      const side = userSnapshot.get('side');
-      const bid = userSnapshot.get('bid');
-      const role = userSnapshot.get('role');
-      const permissions = userSnapshot.get('permissions') as string[];
+      const userDoc = (await transaction.get(admin.firestore().collection('users').doc(uid))).data() as UserDoc;
 
       // Create initial data for change report
       const changeReport: OrderChange = {
         by: uid,
-        side: side,
+        side: userDoc.side,
         time: admin.firestore.Timestamp.now().toMillis(),
         // Get the new status according to the current status and the requested status
-        status: getNewOrderStatus(side, orderSnapshot.get('status') || 0, order.status),
+        status: getNewOrderStatus(userDoc.side, orderSnapshot.get('status') || 0, order.status),
       };
 
       // Check whether the user's business ID is equal to the order CID or SID (if it's an existing order)
-      if(orderSnapshot.exists && bid != orderSnapshot.get(side + 'id'))
+      if(orderSnapshot.exists && userDoc.bid != orderSnapshot.get(userDoc.side + 'id'))
         throw new HttpsError('permission-denied','The user is not linked to this order','The user is not under the supplier or the customer account of this order');
 
       // Get requested permission for each order status change
       const requestedPermission = getRequestedPermission(changeReport.status || NaN);
 
       // Check whether the user is an admin or has that permission
-      if(role !== 3 && !permissions.includes(requestedPermission || ''))
+      if(userDoc.role !== 3 && !userDoc.permissions.includes(requestedPermission || ''))
         throw new HttpsError('permission-denied','The user has no permission','The user has no permission to perform the requested operation');
 
 
       /** PART 2: Set changes */
+
         // The fields that are allowed to be change
       let newData: OrderDoc = {
         products: order.products || [],
         supplyTime: order.supplyTime || 0,
       };
-
       if(changeReport.side == 'c')
         newData.comment = order.comment || '';
       if(changeReport.side == 's')
@@ -179,7 +176,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       // Take a snapshot of these changes for comparing changes history
       changeReport.data = JSON.stringify(newData);
 
-      // Additional fields that are allowed to be changed (not for record)
+      // Additional fields that are allowed to be changed (but not for record)
       newData.invoice = order.invoice || '';
       newData.driverName = order.driverName || '';
 
@@ -188,14 +185,19 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         newData = order;
         // Stamp the customer ID who created the order and the time
         order.created = changeReport.time;
-        order.cid = bid;
+        order.cid = userDoc.bid;
         // Create a document for this customers in the supplier's customers list
         transaction.set(admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_customers').doc(order.cid ||''), {id: order.cid}, {merge: true});
       }
+
       // For an existing order,
       else {
-        // Check whether there are changes
-        if(newData.comment != (orderSnapshot.get('comment') || '') || newData.supplierComment != (orderSnapshot.get('supplierComment') || '') || newData.supplyTime != orderSnapshot.get('supplyTime') || ProductsListUtil.CompareLists(orderSnapshot.get('products'), newData.products).length) {
+
+        const oldData = orderSnapshot.data() as OrderDoc;
+        const productChanges = ProductsListUtil.CompareLists(orderSnapshot.get('products'), newData.products);
+
+        // Check whether there are changes (in supply time, comments & products list)
+        if(newData.comment != (oldData.comment || '') || newData.supplierComment != (oldData.supplierComment || '') || newData.supplyTime != oldData.supplyTime || productChanges.length) {
           // Set to approved with changes / final approved with changes (from 30 or 80 to 31 or 81)
           if(changeReport.side == 's' && (changeReport.status == 30 || changeReport.status == 80))
             changeReport.status++;
@@ -204,6 +206,15 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         else
           if(changeReport.status == 11 || changeReport.status == 21 || (changeReport.status == 30 && orderSnapshot.get('status') >= 30))
             throw new HttpsError('permission-denied','No changes has been made');
+
+        // Price alerts
+        productChanges.forEach((pc)=>{
+          if(pc.price && pc.price.old != pc.price.new) {
+            const product = (newData.products || []).find((p)=>p.id == pc.productId) as ProductOrder;
+            product.priceChangedInOrder = changeReport.side;
+          }
+        });
+
       }
 
       // Set the new status
@@ -234,7 +245,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         code: 1,
         time: changeReport.time,
         refSide: changeReport.side,
-        refBid: bid,
+        refBid: userDoc.bid,
         content: {
           orderId: orderSnapshot.get('id') || order.id,
           orderStatus: changeReport.status,
@@ -252,6 +263,57 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
   return null;
 
 });
+
+
+
+// export const onOrderChange = functions.firestore.document('orders/{orderId}').onWrite((change, context) => {
+//
+//   const orderData = change.after.data() as OrderDoc;
+//   const oldData = change.before.data() as OrderDoc;
+//
+//   if(orderData) {
+//
+//     // Don't do anything when:
+//     // 1. The changes made by the customer before the supplier opened the order
+//     // 2. The supplier opened the order
+//     if(orderData.status == 11 || orderData.status == 20)
+//       return;
+//
+//     // Get last change report
+//     const changeReport = (orderData.changes || []).slice(-1)[0] as OrderChange;
+//
+//     /** Prepare change notification to the other side */
+//     // If the changes were made by the customer, send a notification to the supplier, and v.v.
+//     const sendToId = orderData[changeReport.side == 'c' ? 'sid' : 'cid'] as string;
+//
+//     // Create notification based on the order change report
+//     const noteContent: BaseNotificationDoc = {
+//       code: 1,
+//       time: changeReport.time,
+//       refSide: changeReport.side,
+//       refBid: orderData[changeReport.side == 'c' ? 'cid' : 'sid'] as string,
+//       content: {
+//         orderId: change.after.id,
+//         orderStatus: changeReport.status,
+//       }
+//     };
+//
+//     sendNotification(transaction, changeReport.side == 'c' ? 's' : 'c', sendToId, noteContent);
+//
+//
+//     const productChanges = ProductsListUtil.CompareLists(oldData.products || [], orderData.products || []);
+//
+//     productChanges.forEach((pc)=>{
+//       if(pc.price && pc.price.old != pc.price.new) {
+//
+//         const product =
+//
+//       }
+//     });
+//
+//   }
+//
+// });
 
 
 

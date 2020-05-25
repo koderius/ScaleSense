@@ -45,13 +45,14 @@
         </ion-item>
       </div>
 
-      <div id="statuses" *ngIf="pageMode != 'drafts' && pageMode != 'edit'">
+      <div id="statuses" *ngIf="pageMode == 'view'">
         <p class="ion-text-center ion-no-margin">
           <ion-text color="primary">איתור לפי סטטוס הזמנה:</ion-text>
         </p>
         <mat-form-field>
-          <mat-select multiple [(ngModel)]="byStatusGroup" placeholder="סטטוס הזמנה" (selectionChange)="searchOrders()">
-            <mat-option *ngFor="let group of OrderStatusGroup" [value]="group[0]">{{group[0] | orderStatusText : true}}</mat-option>
+          <mat-select [(ngModel)]="byStatusGroup" placeholder="סטטוס הזמנה" (selectionChange)="searchOrders()">
+            <mat-option (click)="byStatusGroup = null">- הכל -</mat-option>
+            <mat-option *ngFor="let group of OrderStatusGroup" [value]="[group[0]]">{{group[0] | orderStatusText : true}}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -74,22 +75,22 @@
 
         <ion-row *ngIf="orders.length">
           <ion-col>{{pageMode == 'drafts' ? 'תאריך ביצוע' : 'תאריך אספקה'}}</ion-col>
-          <ion-col>מס. הזמנה</ion-col>
+          <ion-col size="1.5">מס. הזמנה</ion-col>
           <ion-col>{{side == 'c' ? 'ספק' : 'לקוח'}}</ion-col>
-          <ion-col *ngIf="pageMode != 'drafts'">סטטוס</ion-col>
+          <ion-col size="3" *ngIf="pageMode != 'drafts'">סטטוס</ion-col>
           <ion-col></ion-col>
           <ion-col *ngIf="pageMode == 'drafts'"></ion-col>
         </ion-row>
 
         <ion-row *ngFor="let order of orders">
-          <ion-col><ion-text dir="ltr">{{(pageMode == 'drafts' ? (order.modified || order.created) : order.supplyTime) | date : 'dd/MM/yyyy HH:mm'}}</ion-text></ion-col>
-          <ion-col>{{order.serial}}</ion-col>
+          <ion-col><ion-text dir="ltr">{{(pageMode == 'drafts' ? (order.modified || order.created) : order.supplyTime) | date : 'dd/MM/yyyy&emsp;HH:mm'}}</ion-text></ion-col>
+          <ion-col size="1.5">{{order.serial}}</ion-col>
           <ion-col>
             <ion-img [src]="getSupplier(order.sid).logo" class="ion-margin-end" *ngIf="side == 'c'"></ion-img>
             <ion-text *ngIf="side == 'c'">{{getSupplier(order.sid).name}}</ion-text>
             <ion-text *ngIf="side == 's'">{{getCustomer(order.cid).name}}</ion-text>
           </ion-col>
-          <ion-col *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status >= OrderStatus.FINAL_APPROVE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
+          <ion-col size="3" *ngIf="pageMode != 'drafts'"><ion-text [color]="order.status >= OrderStatus.FINAL_APPROVE ? 'danger' : ''">{{order.status | orderStatusText}}</ion-text></ion-col>
           <ion-col>
             <ion-button color="dark" fill="outline" shape="round" (click)="actionClicked(order)" [disabled]="actionDisabled(order)">{{actionBtnTitle}}</ion-button>
           </ion-col>

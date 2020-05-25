@@ -17,7 +17,7 @@ export class LeaveReceptionGuard implements CanDeactivate<ReceptionPage> {
   {
 
     // If the reception has not been done yet, ask to leave
-    if(!component.done)
+    if(component.hasChanges)
       return await this.alerts.areYouSure('האם לצאת מתהליך קבלת הסחורה?', 'השינויים לא יישמרו');
     else
       return true;

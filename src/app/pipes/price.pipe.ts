@@ -17,7 +17,16 @@ export class PricePipe implements PipeTransform {
     if(!value && value !== 0)
       return MetadataService.COIN_SIGN;
 
-    return (formatNumber(value, 'en-US', '1.2-2')) + MetadataService.COIN_SIGN;
+    // Show currency with 2 digits after decimal point
+    let numberStr = formatNumber(value, 'en-US', '1.2-2');
+
+    // On right-to-left direction, transfer the minus sign form the start to the end
+    if(numberStr.startsWith('-') && document.documentElement.dir == 'rtl')
+      numberStr = numberStr.slice(1) + '-';
+
+    // Add currency sign
+    return numberStr + MetadataService.COIN_SIGN;
+
   }
 
 }

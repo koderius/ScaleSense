@@ -103,10 +103,10 @@ export class WeightModalComponent implements OnInit, OnDestroy {
 
 
   save() {
-    // Get the amount (no. of units) out of the weight, using the unit weight (If type of unit is Kg, keep the weight)
-    this.product.finalAmount = this.totalNetto / (this.productData.type ? this.productData.unitWeight : 1);
+    this.product.finalWeight = this.totalNetto;
+    this.product.isManualWeight = false;
     this.product.isWeightMatch = this.orderMatch;
-    this.modalCtrl.dismiss({data: this.product.finalAmount, role: 'ok'});
+    this.modalCtrl.dismiss({data: this.product.finalWeight, role: 'ok'});
   }
 
   async close() {

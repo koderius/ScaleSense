@@ -56,8 +56,8 @@ export class ReturnGoodModalComponent implements OnInit {
     // Get net weight
     await this.weighService.openProductsWeightModal(this.returnDoc.product, this.productData);
     // Pass the weight data from the final amount to the returned amount, and delete it
-    this.returnDoc.product.amountReturned = this.returnDoc.product.finalAmount;
-    delete this.returnDoc.product.finalAmount;
+    this.returnDoc.product.amountReturned = this.returnDoc.product.finalWeight;
+    delete this.returnDoc.product.finalWeight;
   }
 
   checkFields() {

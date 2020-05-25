@@ -1,0 +1,34 @@
+<ion-list>
+
+  <ion-radio-group [(ngModel)]="radioSelection">
+
+    <ion-item>
+      <ion-radio slot="start" value="accept"></ion-radio>
+      <ion-label>קבל מוצר ללא שקילה</ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-radio slot="start" value="missing"></ion-radio>
+      <ion-label>מוצר חסר</ion-label>
+    </ion-item>
+
+    <ion-item lines="none" (click)="setInputFocus()">
+      <ion-radio slot="start" value="custom"></ion-radio>
+      <ion-label *ngIf="radioSelection != 'custom'">הזנת כמות ידנית</ion-label>
+      <ion-input type="number" step="any" [(ngModel)]="amount" *ngIf="radioSelection == 'custom'" placeholder="כמות" (keyup.enter)="ok()" id="manualInput" select-text></ion-input>
+      <ion-text slot="end" *ngIf="radioSelection == 'custom'">{{null | unitAmount : (byWeight ? 0 : product.type)}}</ion-text>
+    </ion-item>
+
+    <ion-item *ngIf="product.type && radioSelection == 'custom'" lines="none">
+      <ion-checkbox slot="end" [(ngModel)]="byWeight"></ion-checkbox>
+      <ion-label slot="end">לפי משקל</ion-label>
+    </ion-item>
+
+  </ion-radio-group>
+
+  <ion-button color="success" fill="clear" class="ion-float-end" [disabled]="!radioSelection" (click)="ok()">
+    <ion-icon slot="start" name="checkmark"></ion-icon>
+    <ion-text>אישור</ion-text>
+  </ion-button>
+
+</ion-list>

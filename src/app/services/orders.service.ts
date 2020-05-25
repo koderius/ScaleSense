@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OrderChange, OrderDoc, OrderStatus} from '../models/OrderI';
+import {OrderChange, OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
 import {ProductsService} from './products.service';
 import {formatNumber} from '@angular/common';
 import * as firebase from 'firebase/app';
@@ -14,6 +14,7 @@ import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
+import {Objects} from '../utilities/objects';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,8 @@ export class OrdersService {
   static readonly TEMP_SERIAL_SUFFIX = '*';
 
   readonly ordersRef = firebase.firestore().collection('orders');
+
+  readonly splitOrdersRef = this.businessService.businessDocRef.collection('split_orders');
 
   /** The reference to the firestore collection where the list of orders is stored */
   private _myOrders: OrderDoc[] = [];
@@ -189,7 +192,7 @@ export class OrdersService {
   }
 
 
-  async updateOrder(order: Order, newStatus?: OrderStatus) : Promise<OrderChange> {
+  async updateOrder(order: Order, newStatus?: OrderStatus, isRetry?: boolean) : Promise<OrderChange> {
 
     // If it's new order, save it as draft first
     if(!order.id)
@@ -222,6 +225,10 @@ export class OrdersService {
 
     }
     catch (e) {
+      if(!isRetry) {
+        console.log('Retry...');
+        this.updateOrder(order, newStatus, true);
+      }
       console.error(e);
     }
   }
@@ -305,4 +312,29 @@ export class OrdersService {
 
   }
 
+
+  /** Get and set split order products data (for reception) */
+  async getSplitOrder(orderId: string) : Promise<ProductOrder[]> {
+    try {
+      const doc = (await this.splitOrdersRef.doc(orderId).get()).data();
+      return doc ? doc.products : null;
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
+  async setSplitOrder(order: Order) {
+    try {
+      // Save only the products that has been changed/weighed during the reception
+      const productsToSave = order.products.filter((p)=>p.finalWeight || p.priceChangedInReception || p.amountChangedInReception);
+      await this.splitOrdersRef.doc(order.id).set({products: productsToSave}, {merge: true});
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
 }
+
+

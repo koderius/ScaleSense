@@ -31,6 +31,6 @@ export interface UserDoc extends UserInfo {
 
   /** The role of the user, and a list of his permissions */
   role: UserRole;
-  permissions: UserPermission[];
+  permissions: string[];
 
 }

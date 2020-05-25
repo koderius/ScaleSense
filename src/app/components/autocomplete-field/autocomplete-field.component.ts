@@ -19,6 +19,8 @@ export class AutocompleteFieldComponent implements OnInit {
   // Selected value on init
   @Input() selected: string;
 
+  @Input() allowFreeText: boolean;
+
   // On selection of an option - returns the value property
   @Output() onSelect = new EventEmitter();
   // On typing in the input field - returns the text value
@@ -49,12 +51,13 @@ export class AutocompleteFieldComponent implements OnInit {
       this.onSelect.emit(firstOption[this.valueProp]);
     }
     else
-      // If the query does not match any option, set back the previous option
-      if(this.query)
-        this.ngOnInit();
-      // For empty query emit with null value
-      else
+      // For empty query, or the query does not match any option (when free text is not allowed), emit with null value
+      if(!this.query || !this.allowFreeText) {
+        this.query = '';
         this.onSelect.emit(null);
+      }
+
+
   }
 
 }

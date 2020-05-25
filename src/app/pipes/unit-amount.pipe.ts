@@ -21,8 +21,15 @@ export class UnitAmountPipe implements PipeTransform {
       case ProductType.UNIT: unitName = p ? 'יחידות' : 'יחידה'; break;
     }
 
+    // Amount format - up to 3 digits after decimal point
+    let numberStr = formatNumber(amount, 'en-US', '1.0-3');
+
+    // On right-to-left direction, transfer the minus sign form the start to the end
+    if(numberStr.startsWith('-') && document.documentElement.dir == 'rtl')
+      numberStr = numberStr.slice(1) + '-';
+
     // Return the amount + the name of the unit. if null - only the name of the unit
-    return amount !== null ? (formatNumber(amount, 'en-US', '1.0-3') + ' ' + unitName) : unitName;
+    return amount !== null ? (numberStr + ' ' + unitName) : unitName;
 
   }
 

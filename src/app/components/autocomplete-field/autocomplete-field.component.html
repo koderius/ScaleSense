@@ -7,7 +7,7 @@
          [matAutocomplete]="auto"
          (blur)="onClosed()"
   >
-  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelect.emit($event.option.id)" (closed)="onClosed()">
+  <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelect.emit($event.option.id)">
     <mat-option *ngFor="let option of filteredList" [value]="option[displayProp]" [id]="option[valueProp]">{{option[displayProp]}}</mat-option>
   </mat-autocomplete>
 </mat-form-field>

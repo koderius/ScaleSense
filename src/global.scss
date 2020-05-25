@@ -55,6 +55,8 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 input[type=number] {
   -moz-appearance: textfield;
+  // All number inputs will be left to right
+  direction: ltr;
 }
 
 // No clear button in inputs of type time

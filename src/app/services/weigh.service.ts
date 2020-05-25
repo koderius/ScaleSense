@@ -32,7 +32,7 @@ export class WeighService {
       cssClass: 'wide-modal',
     });
     m.present();
-    const res = await m.onDidDismiss();
+    return await m.onDidDismiss();
 
   }
 

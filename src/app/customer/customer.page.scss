@@ -58,18 +58,18 @@
       font-size: larger;
     }
     ion-img {
-      width: 2.5em;
       margin: 0 0.5em;
-    }
-    ion-img:after {
-      display: flex;
-      justify-content: center;
-    }
-    ion-img.on:after {
-      content: 'פעיל';
-    }
-    ion-img.off:after {
-      content: 'לא פעיל';
+      &.on:after {
+        content: 'פעיל';
+      }
+      &.off:after {
+        content: 'לא פעיל';
+      }
+      &:after {
+        display: flex;
+        justify-content: center;
+        font-size: small;
+      }
     }
   }
   #weight {

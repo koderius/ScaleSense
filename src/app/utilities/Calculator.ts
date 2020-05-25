@@ -15,6 +15,11 @@ export class Calculator {
   static CalcError(expected: number, real: number) : number {
 
     const gap = real - expected;
+
+    // Ignore less than one gram differences
+    if(Math.abs(gap) < 1e-3)
+      return 0;
+
     return gap/expected;
 
   }
@@ -22,6 +27,9 @@ export class Calculator {
 
   /** Tolerance calculation */
   static IsTolerant(expected: number, real: number, tolerance: number | string) : boolean {
+
+    if(!tolerance)
+      tolerance = 0;
 
     // For value in '%', transform into real number ('34%' -> 0.34)
     if(typeof tolerance == 'string') {

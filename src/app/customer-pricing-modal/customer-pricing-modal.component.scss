@@ -1,0 +1,24 @@
+ion-toolbar {
+  --background: #f0f0f0;
+  color: var(--ion-color-primary);
+}
+
+ion-content {
+  --background: white;
+}
+
+#inputs {
+  padding: 0 2em;
+  margin-top: 4em;
+}
+
+.input-section {
+  ion-col {
+    display: flex;
+    align-items: center;
+  }
+  ion-label {
+    padding: 0 1em;
+    font-weight: bold;
+  }
+}

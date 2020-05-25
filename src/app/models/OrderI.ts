@@ -20,11 +20,23 @@ export type ProductOrder = {
   /** Number of boxes for that product (edited by supplier) */
   boxes?: number;
 
-  /** Amount after received and weighed by the customer */
-  finalAmount?: number;
+  /** Weight after received and weighed by the customer */
+  finalWeight?: number;
 
   /** Whether the final amount matches the amount in the order (according to product's tolerance) */
   isWeightMatch?: boolean;
+
+  /** Whether the weight was entered manually during the reception */
+  isManualWeight?: boolean;
+
+  /** Whether the price/amount was changed manually during the reception */
+  priceChangedInReception?: boolean;
+  amountChangedInReception?: boolean;
+
+  /** Flag whether the price was changed by one of the sides.
+   * If it was changed, the other side can remove the product from the order.
+   * When the other side approves the changes the property is being deleted */
+  priceChangedInOrder?: BusinessSide;
 
   /** The amount that has been returned to the supplier */
   amountReturned?: number;
@@ -72,8 +84,6 @@ export enum OrderStatus {
 
   FINAL_APPROVE = 80,
   FINAL_APPROVE_WITH_CHANGES = 81,
-
-  //TODO: Some statuses before closing
 
   CLOSED = 100,
 

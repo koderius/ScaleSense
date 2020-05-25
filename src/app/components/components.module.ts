@@ -28,6 +28,8 @@ import {FormsModule} from '@angular/forms';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
 import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-field.component';
+import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
+import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
 
 @NgModule({
   imports: [
@@ -49,6 +51,8 @@ import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-fiel
     ReturnGoodModalComponent,
     WeightModalComponent,
     WeightCameraComponent,
+    CustomerPricingModalComponent,
+    ManualWeightPopoverComponent,
   ],
   declarations: [
     HeaderComponent,
@@ -67,6 +71,8 @@ import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-fiel
     ReturnGoodModalComponent,
     ReturnStatusTextPipe,
     AutocompleteFieldComponent,
+    CustomerPricingModalComponent,
+    ManualWeightPopoverComponent,
   ],
   exports: [
     MatSelectModule,
@@ -77,6 +83,7 @@ import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-fiel
     MatInputModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltipModule,
     HeaderComponent,
     OredersWizardComponent,
     NgSelectComponent,
