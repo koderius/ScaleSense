@@ -15,6 +15,7 @@ import DocumentReference = firebase.firestore.DocumentReference;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
 import {Objects} from '../utilities/objects';
+import {Dictionary} from '../utilities/dictionary';
 
 @Injectable({
   providedIn: 'root'
@@ -62,10 +63,11 @@ export class OrdersService {
   /**
    * Get all my orders, or filtered by query.
    * Can be filtered by:
-   * - serial number (single result) - if the query text is a number,
-   * - invoice number (single result) - if the query text fits the serial number format (yy-serial),
-   * - supplier's name (multiple results) - if the query text is non-numeric & non-serial format string, *limited to up to 10 different suppliers fits to the query
-   * - date range (multiple results) - inclusive,
+   * - invoice number - if the query text is a number (longer than 3 digits),
+   * - serial number - if the query text starts with number and has '-' in the 3rd place,
+   * - supplier's name - if the query text is non-numeric & does not fit to serial check, *limited to up to 10 different suppliers fits to the query
+   * - date range - inclusive,
+   * - statuses - can filter by up to 10 different statuses - more than 10 will get all
    * for more than 10 results use pagination */
   async queryOrders(isDraft: boolean, query: string = '', statusGroup?: OrderStatus[], dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
 
@@ -74,15 +76,15 @@ export class OrdersService {
 
     let ref;
 
-    // If it's a number, search by invoice number (only one result)
-    if(query && +query)
-      ref = baseRef.where('invoice', '==', query).limit(1);
+    // If it's a number longer than 2 digits, search by invoice number
+    if(query && +query && query.length > 2)
+      ref = baseRef.where('invoice', '>=', query).where('invoice', '<', Dictionary.NextLastLetter(query));
 
-    // If it's in order serial format, search by order serial (only one result)
-    if(query && OrdersService.CheckOrderIdFormat(query))
-      ref = baseRef.where('serial','==', query).limit(1);
+    // If the first char is a number and 3rd is '-', try to search by serial number
+    if(query && +query[0] && query[2] == '-')
+      ref = baseRef.where('serial','>=', query).where('serial', '<', Dictionary.NextLastLetter(query));
 
-    // For other strings or no query, there might be more than 1 results
+    // For other strings or no query:
     if(!ref) {
 
       // Sort by supply time and by serial number,

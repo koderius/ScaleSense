@@ -12,6 +12,7 @@ import {Objects} from '../utilities/objects';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
+import {NotificationsService} from '../services/notifications.service';
 
 @Component({
   selector: 'app-order',
@@ -71,6 +72,8 @@ export class OrderPage implements OnInit {
 
   isFinalApprove: boolean;
 
+  notification: string;
+
   constructor(
     private activeRoute: ActivatedRoute,
     public suppliersService: SuppliersService,
@@ -80,6 +83,7 @@ export class OrderPage implements OnInit {
     public businessService: BusinessService,
     private navService: NavigationService,
     private unitPipe: UnitAmountPipe,
+    private notificationService: NotificationsService,
   ) {}
 
   /** Whether in mode of draft (with wizard) */
@@ -188,6 +192,12 @@ export class OrderPage implements OnInit {
         return;
       }
     }
+
+    // Get notification ID from URL
+    const note = this.notificationService.myNotifications.find((n)=>n.id == urlSnapshot.queryParams['note']);
+    if(note)
+      this.notification = note.text;
+
 
     // Check whether the order had sudden close before, and ask whether to load it
     if(this.customerEditMode) {
@@ -366,6 +376,14 @@ export class OrderPage implements OnInit {
         }
       }
     });
+  }
+
+
+  async clearOrderFromList(product: ProductOrder) {
+    if(this.businessService.side == 'c' || (this.order.products.length > 1 &&await this.alerts.areYouSure('האם לבטל פריט זה?')))
+      this.order.setProductAmount(product.id, 0, null);
+    if(!this.order.products.length)
+      this.page = 2;
   }
 
 

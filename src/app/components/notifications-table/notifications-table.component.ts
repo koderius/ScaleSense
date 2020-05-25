@@ -32,7 +32,7 @@ export class NotificationsTableComponent implements OnInit {
   openNotification(notification: AppNotification) {
     this.notificationsService.markAsRead(notification);
     if(notification.code == NotificationCode.ORDER_CHANGE || notification.code == NotificationCode.ORDER_ALERT) {
-      this.navService.goToOrder(notification.content.orderId);
+      this.navService.goToOrder(notification.content.orderId, null, notification.id);
     }
     if(notification.code == NotificationCode.PRODUCT_CHANGE) {
       this.navService.goToEditProduct(notification.content.productId);

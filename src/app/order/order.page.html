@@ -128,6 +128,7 @@
       <ion-text *ngIf="page == 3" [title]="newSerialMsg"> מס. {{order.serial}}</ion-text>
       <ion-img [src]="getSelectedSupplier().logo" style="position: absolute"></ion-img>
     </h1>
+    <h4 *ngIf="notification" class="ion-text-center" style="margin: 1em">{{notification}}</h4>
 
     <div *ngIf="!orderSent">
       <ion-list id="order-list">
@@ -138,7 +139,7 @@
                 [editProduct]="(customerEditMode || supplierEditMode)"
                 [showComment]="true"
                 [editComment]="customerEditMode"
-                (clearClicked)="order.setProductAmount(product.id, 0, null); !order.products.length ? page = 2 : ''"
+                (clearClicked)="clearOrderFromList(product)"
                 (editClicked)="editedProduct = product.id"
                 (doneEdit)="editedProduct = null"
                 [disabled]="editedProduct && editedProduct != product.id"

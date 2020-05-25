@@ -11,14 +11,14 @@
   <div *ngIf="!notificationsService.myNotifications.length" id="no-notes">אין הודעות</div>
 
   <ion-row *ngFor="let note of notificationsService.myNotifications; let odd = odd" [ngClass]="odd ? '' : 'odd'">
-    <ion-col size="1" class="ion-text-center">
+    <ion-col size="1">
       <ion-img [src]="'../../assets/images/' + (isNotificationRead(note) ? 'read' : 'unread') + '.png'"
                (click)="notificationsService.markAsRead(note, true)"
-               style="cursor: pointer"
+               style="cursor: pointer; margin: auto"
                [title]="isNotificationRead(note) ? 'סמן כלא נקרא' : ''"
       ></ion-img>
     </ion-col>
-    <ion-col size="2">{{note.time | date : 'dd/MM/yyyy HH:mm'}}</ion-col>
+    <ion-col size="2" dir="ltr">{{note.time | date : 'dd/MM/yyyy&emsp;HH:mm'}}</ion-col>
     <ion-col class="center">{{note.businessName}}</ion-col>
     <ion-col size="2" class="center">{{note.orderSerial}}</ion-col>
     <ion-col size="3.5" [ngStyle]="{fontWeight: isNotificationRead(note) ? 'normal' : 'bold'}">{{note.text}}</ion-col>

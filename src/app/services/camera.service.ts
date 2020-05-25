@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {Platform} from '@ionic/angular';
 import {CameraPreview} from '@ionic-native/camera-preview/ngx';
 import {Camera} from '@ionic-native/camera/ngx';
+import {environment} from '../../environments/environment';
 
 
 @Injectable({
@@ -33,8 +34,9 @@ export class CameraService {
     private platform: Platform,
   ) {
 
-    // TODO: Enable camera check on start
-    // this.cameraCheck();
+    // Camera check on start
+    if(environment.production)
+      this.cameraCheck();
 
     // Get platform
     this.isMobile = this.platform.is('cordova');

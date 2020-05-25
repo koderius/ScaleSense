@@ -36,20 +36,26 @@ export class NavigationService {
   }
 
   goToOrdersList(edit?: boolean) {
-    this.navCtrl.navigateForward('/orders-list' + (edit ? '?mode=edit' : ''));
+    const queryParams = edit ? {mode: edit} : null;
+    this.navCtrl.navigateForward('/orders-list', {queryParams: queryParams});
   }
 
   goToReceiveList() {
     this.navCtrl.navigateForward('/orders-list?mode=receive');
   }
 
-  goToOrder(orderId: string, editMode?: boolean) {
-    this.navCtrl.navigateForward('/order/' + orderId + (editMode ? '?edit=true' : ''));
+  goToOrder(orderId: string, editMode?: boolean, notification?: string) {
+    const queryParams = {};
+    if(editMode)
+      queryParams['edit'] = true;
+    if(notification)
+      queryParams['note'] = notification;
+    this.navCtrl.navigateForward('/order/' + orderId, {queryParams: queryParams});
   }
 
   goToDraft(orderId: string) {
     if(this.authService.currentUser.side == 'c')
-      this.navCtrl.navigateForward('/order/' + orderId + '?draft=true');
+      this.navCtrl.navigateForward('/order/' + orderId, {queryParams: {draft: true}});
   }
 
   goToSettings() {
@@ -85,7 +91,8 @@ export class NavigationService {
   }
 
   goToReturnsDrafts(selectedSupplier?: string) {
-    this.navCtrl.navigateForward('returns-drafts' + (selectedSupplier ? '?sid=' + selectedSupplier : ''));
+    const queryParams = selectedSupplier ? {sid: selectedSupplier} : null;
+    this.navCtrl.navigateForward('returns-drafts', {queryParams: queryParams});
   }
 
   goToReturnsList() {
