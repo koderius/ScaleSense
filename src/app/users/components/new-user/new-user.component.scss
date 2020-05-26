@@ -1,0 +1,28 @@
+#container {
+  background-color: var(--ion-color-light-shade);
+}
+
+#grid {
+  max-width: 1000px;
+  margin: auto;
+  padding: 0 1em;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    ion-label {
+      margin: 0 1em;
+    }
+  }
+
+}
+
+#button {
+  display: flex;
+  justify-content: flex-end;
+  ion-button {
+    margin: 1em;
+  }
+}

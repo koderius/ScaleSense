@@ -16,7 +16,7 @@ export enum UserPermission {
 }
 
 /** User document - the user data which is stored in firestore. */
-export interface UserDoc extends UserInfo {
+export interface UserDoc extends Partial<UserInfo> {
 
   /** Additional unique identity detail */
   username: string;

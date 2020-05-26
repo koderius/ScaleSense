@@ -1,0 +1,66 @@
+<div id="container" *ngIf="show">
+
+  <div id="grid">
+
+    <div>
+      <ion-label>* שם מלא</ion-label>
+      <mat-form-field>
+        <input matInput [formControl]="fullName">
+        <mat-error *ngIf="fullName.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* סיסמה</ion-label>
+      <mat-form-field>
+        <input matInput [formControl]="password">
+        <mat-error *ngIf="password.hasError('minLength') && !password.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
+        <mat-error *ngIf="password.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* אימייל</ion-label>
+      <mat-form-field>
+        <input matInput [formControl]="email">
+        <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">כתובת אימייל אינה חוקית</mat-error>
+        <mat-error *ngIf="email.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* שם משתמש</ion-label>
+      <mat-form-field>
+        <input matInput [formControl]="userName">
+        <mat-error *ngIf="userName.hasError('minLength') && !userName.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
+        <mat-error *ngIf="userName.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* אימות סיסמה</ion-label>
+      <mat-form-field>
+        <input matInput [formControl]="passwordV">
+        <mat-error *ngIf="passwordV.hasError('notSimilar') && !passwordV.hasError('required')">אימות סיסמה לא זהה</mat-error>
+        <mat-error *ngIf="passwordV.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* דרג</ion-label>
+      <mat-form-field>
+        <mat-select [formControl]="role">
+          <mat-option *ngFor="let role of roles" [value]="role" [disabled]="role == UserRole.ADMIN">{{role | roleName}}</mat-option>
+        </mat-select>
+        <mat-error *ngIf="role.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+  </div>
+
+  <div id="button">
+    <ion-button shape="round" color="dark" class="ion-float-end" (click)="createUser()" [disabled]="!allValid()">יצירת משתמש</ion-button>
+  </div>
+
+
+</div>

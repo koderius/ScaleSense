@@ -1,0 +1,25 @@
+<ion-header>
+  <app-header pageTitle="הרשאות גישה"></app-header>
+</ion-header>
+
+<ion-content>
+
+  <div class="page-container">
+
+    <div id="new-user-section">
+
+      <ion-button color="secondary" size="large" strong="true" shape="round"
+                  class="ion-margin"
+                  (click)="extOpen == 'newUser' ? extOpen = null : extOpen = 'newUser'">
+        <ion-icon name="add" slot="start"></ion-icon>
+        <ion-text>הקמת משתמש חדש</ion-text>
+      </ion-button>
+
+      <app-new-user [show]="extOpen == 'newUser'" (userCreated)="extOpen = null"></app-new-user>
+
+    </div>
+
+
+  </div>
+
+</ion-content>

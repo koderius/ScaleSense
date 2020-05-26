@@ -30,6 +30,10 @@ const routes: Routes = [
     loadChildren: () => import('../categories-list/categories-list.module').then( m => m.CategoriesListPageModule),
     data: {side: 'c'}
   },
+  {
+    path: 'users',
+    loadChildren: () => import('../users/users.module').then( m => m.UsersPageModule)
+  },
 ];
 
 @NgModule({

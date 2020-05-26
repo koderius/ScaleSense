@@ -82,6 +82,10 @@ export class NavigationService {
     this.navCtrl.navigateForward('settings/edit-product/' + productId);
   }
 
+  goToUsers() {
+    this.navCtrl.navigateForward('settings/users');
+  }
+
   goToCategoriesList() {
     this.navCtrl.navigateForward('settings/categories-list');
   }

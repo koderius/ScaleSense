@@ -30,6 +30,7 @@ import {ReturnStatusTextPipe} from '../pipes/return-status-text.pipe';
 import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-field.component';
 import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
 import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
+import {RoleNamePipe} from '../pipes/role-name.pipe';
 
 @NgModule({
   imports: [
@@ -62,6 +63,7 @@ import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weig
     OrderStatusTextPipe,
     UserNamePipe,
     PricePipe,
+    RoleNamePipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,
@@ -92,6 +94,7 @@ import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weig
     OrderStatusTextPipe,
     UserNamePipe,
     PricePipe,
+    RoleNamePipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,

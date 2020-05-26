@@ -76,6 +76,51 @@ admin.initializeApp();
 // });
 
 
+export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc, password: string}, context) => {
+
+  // Check admin
+  const uid = context.auth ? context.auth.uid : '';
+  const usersRef = admin.firestore().collection('users');
+  const user = await usersRef.doc(uid).get();
+  if(user.get('role') < 3)
+    throw new HttpsError('permission-denied', 'Only admins can create users');
+
+  // Check required data
+  if(data.userDoc && data.password) {
+
+    const userDoc = data.userDoc;
+
+    try {
+
+      // Create user
+      const userRec = await admin.auth().createUser({
+        displayName: userDoc.displayName || '',
+        email: userDoc.email || '',
+        password: data.password,
+      });
+
+      // Create his document
+      await usersRef.doc(userRec.uid).set({
+        ...userDoc,
+        uid: userRec.uid,
+        bid: user.get('bid'),
+        side: user.get('side'),
+      });
+
+      return userDoc;
+
+    }
+    catch (e) {
+      throw new HttpsError('internal', 'Could not create user', e);
+    }
+
+  }
+  else
+    throw new HttpsError('invalid-argument', 'Must contain user document and password')
+
+});
+
+
 /**
  * This function sends email to the support, after verifying reCAPTCHA
  * If the user asked to register, it handles the registration request
