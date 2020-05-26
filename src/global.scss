@@ -169,10 +169,6 @@ ion-grid.app-table {
     align-items: center;
     &:first-child {
       justify-content: center;
-      //ion-button {
-      //  height: 1.5em;
-      //  width: 1.5em;
-      //}
     }
     ion-img {
       height: 1.5em;
@@ -186,7 +182,7 @@ ion-grid.app-table {
     }
   }
 
-  ion-row:first-child {
+  ion-row:first-child:not(.not-header) {
     color: var(--ion-color-primary);
     font-weight: bold;
     border-bottom: solid black 3px;

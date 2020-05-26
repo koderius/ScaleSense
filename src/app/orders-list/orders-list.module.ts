@@ -9,6 +9,7 @@ import { OrdersListPageRoutingModule } from './orders-list-routing.module';
 import { OrdersListPage } from './orders-list.page';
 import {ComponentsModule} from '../components/components.module';
 import {OrderPageModule} from '../order/order.module';
+import {OrderItemComponent} from '../components/order-item/order-item.component';
 
 @NgModule({
   imports: [
@@ -19,6 +20,9 @@ import {OrderPageModule} from '../order/order.module';
     ComponentsModule,
     OrderPageModule,
   ],
-  declarations: [OrdersListPage],
+  declarations: [
+    OrdersListPage,
+    OrderItemComponent,
+  ],
 })
 export class OrdersListPageModule {}

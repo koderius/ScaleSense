@@ -1,18 +1,17 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
-import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {OrderStatus, OrderStatusGroup, ProductOrder} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
-import {CustomersService} from '../services/customers.service';
 import {FullProductDoc} from '../models/Product';
 import {ProductsService} from '../services/products.service';
 import {IonSearchbar, ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {ScreenMode} from '../app.component';
+import {OrderActionMode} from '../components/order-item/order-item.component';
 
 @Component({
   selector: 'app-orders-list',
@@ -29,7 +28,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
   OrderStatus = OrderStatus;
 
-  pageMode : 'view' | 'edit' | 'drafts' | 'receive' | 'goods_return';
+  pageMode : OrderActionMode;
   orders: Order[] = [];
 
   query: string = '';
@@ -51,8 +50,6 @@ export class OrdersListPage implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
     private ordersService: OrdersService,
-    private supplierService: SuppliersService,
-    private customerService: CustomersService,
     private alertsService: AlertsService,
     public navService: NavigationService,
     private businessService: BusinessService,
@@ -72,7 +69,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
       else
         this.pageMode = 'view';
 
-      // // For the receive page, default filter by all the finally approved statuses group
+      // For the receive page, default filter by all the finally approved statuses group
       if(this.pageMode == 'receive')
         this.byStatusGroup = [OrderStatus.SENT, OrderStatus.FINAL_APPROVE];
       // Fot the editing page, default filter only the editable statuses
@@ -113,42 +110,6 @@ export class OrdersListPage implements OnInit, OnDestroy {
     }
   }
 
-  get actionBtnTitle() {
-    switch (this.pageMode) {
-      case 'view': return 'צפייה בהזמנה';
-      case 'edit': return 'עריכת הזמנה';
-      case 'drafts': return 'כניסה להזמנה';
-      case 'receive': return 'כניסה להזמנה';
-      case 'goods_return': return 'צפייה בהזמנה';
-    }
-  }
-
-  /** Disable edit when button when order has been already approved.
-   * Disable receive when order has already been closed or cancelled
-   * Disable return if order is not closed
-   * */
-  actionDisabled(order) {
-    return (this.pageMode == 'edit' && order.status >= OrderStatus.FINAL_APPROVE) || (this.pageMode == 'receive' && order.status >= this.OrderStatus.CLOSED) || (this.pageMode == 'goods_return' && order.status != OrderStatus.CLOSED);
-  }
-
-  actionClicked(order: Order) {
-    switch (this.pageMode) {
-      case 'drafts': this.navService.goToDraft(order.id); break;
-      case 'view': this.navService.goToOrder(order.id); break;
-      case 'edit': this.navService.goToOrder(order.id, true); break;
-      case 'receive': this.navService.goToReception(order.id); break;
-      case 'goods_return': this.openOrderProducts(order); break;
-    }
-  }
-
-  getSupplier(sid: string) {
-    return this.supplierService.getSupplierById(sid) || {};
-  }
-
-  getCustomer(cid: string) {
-    return this.customerService.getCustomerById(cid) || {};
-  }
-
   async deleteDraft(orderId: string) {
 
     // Delete from server
@@ -172,8 +133,10 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
 
   async openOrderProducts(order: Order) {
-    this.orderReturn = order;
-    this.orderProducts = await this.productService.loadProductsByIds(...order.products.map((p)=>p.id));
+    if(this.pageMode == 'goods_return') {
+      this.orderReturn = order;
+      this.orderProducts = await this.productService.loadProductsByIds(...order.products.map((p)=>p.id));
+    }
   }
 
   getProductToReturn(id: string) {

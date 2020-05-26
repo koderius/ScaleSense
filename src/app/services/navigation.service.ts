@@ -36,12 +36,16 @@ export class NavigationService {
   }
 
   goToOrdersList(edit?: boolean) {
-    const queryParams = edit ? {mode: edit} : null;
+    const queryParams = edit ? {mode: 'edit'} : null;
     this.navCtrl.navigateForward('/orders-list', {queryParams: queryParams});
   }
 
   goToReceiveList() {
     this.navCtrl.navigateForward('/orders-list?mode=receive');
+  }
+
+  goToReturnGoodsList() {
+    this.navCtrl.navigateForward('orders-list?mode=goods_return');
   }
 
   goToOrder(orderId: string, editMode?: boolean, notification?: string) {
@@ -84,10 +88,6 @@ export class NavigationService {
 
   goToReception(orderId: string) {
     this.navCtrl.navigateForward('reception/' + orderId);
-  }
-
-  goToReturnGoodsList() {
-    this.navCtrl.navigateForward('orders-list?mode=goods_return');
   }
 
   goToReturnsDrafts(selectedSupplier?: string) {
