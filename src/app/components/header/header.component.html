@@ -10,23 +10,23 @@
   </ion-col>
 
   <ion-col id="main" class="ion-hide-lg-down">
-    <ion-button fill="clear">
+    <ion-button fill="clear" [disabled]="!usersService.hasPermission(UserPermissions.REPORTS)">
       <ion-icon slot="start" src="../../assets/svg/icon_reports.svg"></ion-icon>
       <ion-text>דוחות</ion-text>
     </ion-button>
-    <ion-button fill="clear" (click)="goToSettings()">
+    <ion-button fill="clear" (click)="goToSettings()" [disabled]="!usersService.hasPermission(UserPermissions.SETTINGS)">
       <ion-icon slot="start" src="../../assets/svg/icon_settings.svg"></ion-icon>
       <ion-text>הגדרות</ion-text>
     </ion-button>
-    <ion-button fill="clear" *ngIf="side == 'c'">
+    <ion-button fill="clear" *ngIf="side == 'c'" [disabled]="!usersService.hasPermission(UserPermissions.STOCK)">
       <ion-icon slot="start" src="../../assets/svg/icon_stock.svg"></ion-icon>
       <ion-text>ניהול מלאי</ion-text>
     </ion-button>
-    <ion-button fill="clear" *ngIf="side == 'c'">
+    <ion-button fill="clear" *ngIf="side == 'c'" [disabled]="!usersService.hasPermission(UserPermissions.MAIN_OFFICE)">
       <ion-icon slot="start" src="../../assets/svg/icon_office.svg"></ion-icon>
       <ion-text>משרד ראשי</ion-text>
     </ion-button>
-    <ion-button fill="clear" (click)="goToDrafts()" *ngIf="side == 'c'">
+    <ion-button fill="clear" (click)="goToDrafts()" *ngIf="side == 'c'"  [disabled]="!usersService.hasPermission(UserPermissions.NEW_ORDER)">
       <ion-icon slot="start" src="../../assets/svg/icon_drafts.svg"></ion-icon>
       <ion-text>טיוטות</ion-text>
     </ion-button>

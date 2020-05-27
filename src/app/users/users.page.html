@@ -10,15 +10,69 @@
 
       <ion-button color="secondary" size="large" strong="true" shape="round"
                   class="ion-margin"
-                  (click)="extOpen == 'newUser' ? extOpen = null : extOpen = 'newUser'">
+                  [disabled]="hasChanges"
+                  (click)="extOpen == 'newUser' ? extOpen = null : extOpen = 'newUser'; selectedPermission = null">
         <ion-icon name="add" slot="start"></ion-icon>
         <ion-text>הקמת משתמש חדש</ion-text>
       </ion-button>
 
-      <app-new-user [show]="extOpen == 'newUser'" (userCreated)="extOpen = null"></app-new-user>
+      <app-new-user [show]="extOpen == 'newUser'" (userCreated)="extOpen = selectedPermission = null"></app-new-user>
 
     </div>
 
+    <div class="section">
+
+      <h3 class="ion-margin-bottom">רשימת משתמשים:</h3>
+
+      <app-users-list [selectedUser]="selectedPermission?.uid"
+                      [disabled]="hasChanges"
+                      (onEditPermissions)="editPermissions($event)"
+      ></app-users-list>
+
+      <h3>רשימת דרגים:</h3>
+
+      <div id="edit-roles">
+        <ion-grid class="app-table">
+          <h3>
+            <ion-text color="primary">שם דרג</ion-text>
+          </h3>
+          <ion-row *ngFor="let role of roles" class="not-header">
+            <ion-col>{{role | roleName}}</ion-col>
+            <ion-col>
+              <ion-button shape="round"
+                          [fill]="selectedPermission == role ? 'solid' : 'outline'"
+                          [color]="selectedPermission == role ? 'secondary' : 'dark'"
+                          [disabled]="hasChanges || role == UserRole.ADMIN"
+                          (click)="editPermissions(role)">
+                <ion-icon slot="start" src="../../assets/svg/icon_pen.svg"></ion-icon>
+                <ion-text>עריכת דרג</ion-text>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="page-container section" style="margin-bottom: 1em" *ngIf="selectedPermission">
+
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h3>
+        <ion-text>{{selectedPermission.uid ? 'הרשאות למשתמש: ' : 'הרשאות כלליות לדרג: '}}</ion-text>
+        <ion-text>{{selectedPermission.uid ? selectedPermission.displayName : (selectedPermission | roleName)}}</ion-text>
+      </h3>
+      <ion-button shape="round" color="danger" size="small"
+                  *ngIf="selectedPermission && !selectedPermission.uid"
+                  (click)="restore()"
+      >שחזור הגדרות מערכת</ion-button>
+    </div>
+
+    <app-permissions-list (onChange)="hasChanges = $event"
+                          (onCancel)="selectedPermission = null"
+                          [userOrRole]="selectedPermission"
+    ></app-permissions-list>
 
   </div>
 

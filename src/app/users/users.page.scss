@@ -2,3 +2,22 @@
   background-color: white;
   margin-top: 1em;
 }
+
+.section {
+  padding: 2em;
+  h3 {
+    font-weight: bold;
+  }
+}
+
+#edit-roles {
+  display: flex;
+  justify-content: flex-end;
+  ion-grid {
+    max-width: 360px;
+    margin: 0;
+    ion-col {
+      justify-content: flex-start;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+#grid {
+  padding: 1em;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  ion-item {
+    --padding-end: 3em;
+    --padding-start: 0;
+  }
+}
+
+#buttons {
+  display: flex;
+  justify-content: flex-end;
+  ion-button {
+    margin: 1em;
+  }
+}

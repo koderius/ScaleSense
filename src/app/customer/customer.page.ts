@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {NavigationService} from '../services/navigation.service';
 import {WeighService} from '../services/weigh.service';
 import {CameraService} from '../services/camera.service';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-customer',
@@ -10,10 +12,13 @@ import {CameraService} from '../services/camera.service';
 })
 export class CustomerPage implements OnInit {
 
+  UserPermissions = UserPermission;
+
   constructor(
     private navService: NavigationService,
     private weighService: WeighService,
     public cameraService: CameraService,
+    public userService: UsersService,
   ) {}
 
   ngOnInit() {

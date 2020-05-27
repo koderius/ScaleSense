@@ -4,6 +4,8 @@ import {NotificationsService} from '../../services/notifications.service';
 import {NavigationService} from '../../services/navigation.service';
 import {AlertsService} from '../../services/alerts.service';
 import {AppNotification, NotificationCode} from '../../models/Notification';
+import {UserPermission} from '../../models/UserDoc';
+import {UsersService} from '../../services/users.service';
 
 @Component({
   selector: 'app-notifications-table',
@@ -19,6 +21,7 @@ export class NotificationsTableComponent implements OnInit {
     public notificationsService: NotificationsService,
     private navService: NavigationService,
     private alerts: AlertsService,
+    private userService: UsersService,
   ) { }
 
   ngOnInit() {
@@ -33,6 +36,8 @@ export class NotificationsTableComponent implements OnInit {
     this.notificationsService.markAsRead(notification);
     if(notification.code == NotificationCode.ORDER_CHANGE || notification.code == NotificationCode.ORDER_ALERT) {
       this.navService.goToOrder(notification.content.orderId, null, notification.id);
+      if(!this.userService.hasPermission(UserPermission.ORDER_STATUS))
+        alert('אין הרשאה להכנס להזמנה');
     }
     if(notification.code == NotificationCode.PRODUCT_CHANGE) {
       this.navService.goToEditProduct(notification.content.productId);

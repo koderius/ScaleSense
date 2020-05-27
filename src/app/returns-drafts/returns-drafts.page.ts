@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SuppliersService} from '../services/suppliers.service';
 import {ReturnDoc} from '../models/Return';
 import {ReturnService} from '../services/return.service';
@@ -6,6 +6,9 @@ import {ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {AlertsService} from '../services/alerts.service';
 import {ActivatedRoute} from '@angular/router';
+import {UsersService} from '../services/users.service';
+import {NavigationService} from '../services/navigation.service';
+import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-returns-drafts',
@@ -31,9 +34,17 @@ export class ReturnsDraftsPage implements OnInit {
     private modalService: ModalController,
     private alerts: AlertsService,
     private activatedRoute: ActivatedRoute,
+    private userService: UsersService,
+    private navService: NavigationService,
   ) { }
 
   async ngOnInit() {
+
+    // Page's "mini guard"
+    if(!this.userService.hasPermission(UserPermission.ORDER_RETURN)) {
+      this.navService.goBack();
+      alert('אין הרשאה להחזרת סחורה');
+    }
 
     const sid = this.activatedRoute.snapshot.queryParams['sid'];
     if(sid)

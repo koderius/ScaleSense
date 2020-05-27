@@ -8,7 +8,9 @@ import { UsersPageRoutingModule } from './users-routing.module';
 
 import { UsersPage } from './users.page';
 import {ComponentsModule} from '../components/components.module';
-import {NewUserComponent} from './components/new-user/new-user.component';
+import {NewUserComponent} from './new-user/new-user.component';
+import {UsersListComponent} from './users-list/users-list.component';
+import {PermissionsListComponent} from './permissions-list/permissions-list.component';
 
 @NgModule({
   imports: [
@@ -22,6 +24,8 @@ import {NewUserComponent} from './components/new-user/new-user.component';
   declarations: [
     UsersPage,
     NewUserComponent,
+    UsersListComponent,
+    PermissionsListComponent,
   ]
 })
 export class UsersPageModule {}

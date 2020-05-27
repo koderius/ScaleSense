@@ -31,6 +31,7 @@ import {AutocompleteFieldComponent} from './autocomplete-field/autocomplete-fiel
 import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
 import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
 import {RoleNamePipe} from '../pipes/role-name.pipe';
+import {PermissionNamePipe} from '../pipes/permission-name.pipe';
 
 @NgModule({
   imports: [
@@ -64,6 +65,7 @@ import {RoleNamePipe} from '../pipes/role-name.pipe';
     UserNamePipe,
     PricePipe,
     RoleNamePipe,
+    PermissionNamePipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,
@@ -95,6 +97,7 @@ import {RoleNamePipe} from '../pipes/role-name.pipe';
     UserNamePipe,
     PricePipe,
     RoleNamePipe,
+    PermissionNamePipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,

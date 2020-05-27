@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {UserDoc, UserRole} from '../../../models/UserDoc';
-import {Enum} from '../../../utilities/enum';
+import {UserDoc, UserRole} from '../../models/UserDoc';
+import {Enum} from '../../utilities/enum';
 import {AbstractControl, FormControl, Validators} from '@angular/forms';
-import {UsersService} from '../../../services/users.service';
-import {AlertsService} from '../../../services/alerts.service';
+import {UsersService} from '../../services/users.service';
+import {AlertsService} from '../../services/alerts.service';
 
 @Component({
   selector: 'app-new-user',
@@ -31,7 +31,6 @@ export class NewUserComponent implements OnInit {
   roles = Enum.ListEnum(UserRole) as number[];
 
   constructor(
-    private usersService: UsersService,
     private alerts: AlertsService,
   ) { }
 
@@ -78,7 +77,7 @@ export class NewUserComponent implements OnInit {
 
     // Create user
     const l = this.alerts.loaderStart('יוצר משתמש חדש...');
-    const userDoc = await this.usersService.createNewUser(doc, this.password.value);
+    const userDoc = await UsersService.CreateNewUser(doc, this.password.value);
     this.alerts.loaderStop(l);
 
     // On success

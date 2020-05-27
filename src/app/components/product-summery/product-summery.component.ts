@@ -5,6 +5,8 @@ import {NavigationService} from '../../services/navigation.service';
 import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
 import {AlertsService} from '../../services/alerts.service';
 import {ProductsService} from '../../services/products.service';
+import {UsersService} from '../../services/users.service';
+import {UserPermission} from '../../models/UserDoc';
 
 @Component({
   selector: 'app-product-summery',
@@ -39,7 +41,12 @@ export class ProductSummeryComponent implements OnInit {
     private unitAmountPipe: UnitAmountPipe,
     private alertsService: AlertsService,
     private productService: ProductsService,
+    private usersService: UsersService,
   ) { }
+
+  get hasPermissionToChangePrice() {
+    return this.usersService.hasPermission(UserPermission.PRODUCT_PRICE);
+  }
 
   ngOnInit() {}
 

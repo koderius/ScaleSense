@@ -12,6 +12,8 @@ import {Platform, PopoverController} from '@ionic/angular';
 import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
 import {Calculator} from '../utilities/Calculator';
 import {isNumber} from 'util';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-reception',
@@ -42,11 +44,17 @@ export class ReceptionPage implements OnInit, OnDestroy {
     private navService: NavigationService,
     private popoverCtrl: PopoverController,
     private platform: Platform,
+    private userService: UsersService,
   ) {}
 
   get pageTitle() {
     if(this.order)
       return 'קבלת הזמנה מס. ' + this.order.serial;
+  }
+
+  /** Whether the current user has permission to accept products without scaling */
+  get hasNoWeightPermission() {
+    return this.userService.hasPermission(UserPermission.ORDER_RECEIVE_NO_WEIGHT);
   }
 
   /** Whether the order is final approved */

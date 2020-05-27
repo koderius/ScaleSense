@@ -66,7 +66,7 @@
             <ion-button fill="clear" color="secondary" (click)="weightIconClicked(product)" title="פתח אשף שקילה">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_weight.svg"></ion-icon>
             </ion-button>
-            <ion-button fill="clear" title="הזנה ידנית" (click)="openManualWeightPopover(product, $event)">
+            <ion-button fill="clear" title="הזנה ידנית" (click)="openManualWeightPopover(product, $event)" *ngIf="hasNoWeightPermission">
               <ion-icon slot="icon-only" name="create-sharp"></ion-icon>
             </ion-button>
           </ion-col>

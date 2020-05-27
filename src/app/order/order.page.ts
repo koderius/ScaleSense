@@ -13,6 +13,7 @@ import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {NotificationsService} from '../services/notifications.service';
+import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-order',

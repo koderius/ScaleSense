@@ -1,15 +1,16 @@
-import {isNumber} from 'util';
-
 export class Enum {
 
   static ListEnum(e: object, propNames?: boolean) : (string | number)[] {
 
-    const keys = Object.keys(e);
+    // Get only the property names (string keys)
+    const keys = Object.keys(e).filter((k)=>isNaN(+k));
 
+    // Return the property names
     if(propNames)
-      return keys.slice(keys.length/2) as string[];
+      return keys as string[];
+    // Or the values
     else
-      return keys.slice(0, keys.length/2).map((key)=>!isNaN(+key) ? +key as number : key as string);
+      return keys.map((k)=>e[k] as string | number);
 
   }
 

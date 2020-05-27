@@ -99,12 +99,22 @@ export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc,
         password: data.password,
       });
 
-      // Create his document
+      // Get business details
+      const side = user.get('side');
+      const bid = user.get('bid');
+
+      // Get default permissions from the business metadata (Each role has array of permission under the field: role{number})
+      const defaultPermissions = await admin.firestore().collection(side == 'c' ? 'customers' : 'suppliers').doc(bid).collection('metadata').doc('permissions').get();
+      const permissions = defaultPermissions.get('role' + userDoc.role) as string[];
+
+      // Create the new user's document
       await usersRef.doc(userRec.uid).set({
         ...userDoc,
         uid: userRec.uid,
-        bid: user.get('bid'),
-        side: user.get('side'),
+        bid: bid,
+        side: side,
+        permissions: permissions,
+        exist: true,
       });
 
       return userDoc;
@@ -117,6 +127,27 @@ export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc,
   }
   else
     throw new HttpsError('invalid-argument', 'Must contain user document and password')
+
+});
+
+export const deleteUser = functions.https.onCall(async (data: string, context) => {
+
+  // Check admin
+  const uid = context.auth ? context.auth.uid : '';
+  const usersRef = admin.firestore().collection('users');
+  const user = await usersRef.doc(uid).get();
+  if(user.get('role') < 3)
+    throw new HttpsError('permission-denied', 'Only admins can delete users');
+
+  try {
+    // Delete the user
+    await admin.auth().deleteUser(data);
+    // Keep the user's document (for history details), but mark him as not exist
+    return await admin.firestore().collection('users').doc(data).update({exist: false});
+  }
+  catch (e) {
+    throw new HttpsError('internal', 'Could not delete user', e);
+  }
 
 });
 
@@ -202,7 +233,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       const requestedPermission = getRequestedPermission(changeReport.status || NaN);
 
       // Check whether the user is an admin or has that permission
-      if(userDoc.role !== 3 && !userDoc.permissions.includes(requestedPermission || ''))
+      if(requestedPermission && userDoc.role !== 3 && !userDoc.permissions[requestedPermission])
         throw new HttpsError('permission-denied','The user has no permission','The user has no permission to perform the requested operation');
 
 
@@ -495,6 +526,10 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
 });
 
 
+/**
+ * When a return document is being created, this function update the product that inside the order with the return data, and send a notification to the supplier.
+ * (Notifications are being sent once for a numerous documents creation within 10 seconds)
+ */
 export const onReturnCreated = functions.firestore.document('returns/{returnId}').onCreate(async (change, context)=>{
 
   const data = change.data() as ReturnDoc;

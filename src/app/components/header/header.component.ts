@@ -3,6 +3,8 @@ import {OrderStatus} from '../../models/OrderI';
 import {NavigationService} from '../../services/navigation.service';
 import {BusinessService} from '../../services/business.service';
 import {ScreenMode} from '../../app.component';
+import {UsersService} from '../../services/users.service';
+import {UserPermission} from '../../models/UserDoc';
 
 @Component({
   selector: 'app-header',
@@ -13,6 +15,8 @@ export class HeaderComponent implements OnInit {
 
   ScreenMode = ScreenMode;
 
+  UserPermissions = UserPermission;
+
   readonly DEFAULT_LOGO = '../../assets/defaults/default_logo.png';
 
   @Input() pageTitle;
@@ -21,6 +25,7 @@ export class HeaderComponent implements OnInit {
   constructor(
     private navService: NavigationService,
     private businessService: BusinessService,
+    public usersService: UsersService,
   ) { }
 
   ngOnInit() {}

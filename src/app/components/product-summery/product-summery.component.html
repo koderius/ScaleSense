@@ -18,9 +18,9 @@
     </ion-col>
 
     <ion-col>
-      <h6 *ngIf="!edit">{{productOrder.pricePerUnit || productDetails.price | price}}</h6>
-      <ion-input *ngIf="edit" type="number" step="any" [(ngModel)]="tempPrice" select-text></ion-input>
-      <ion-text *ngIf="edit" class="ion-margin-end">{{null | price}}</ion-text>
+      <h6 *ngIf="!edit || !hasPermissionToChangePrice">{{productOrder.pricePerUnit || productDetails.price | price}}</h6>
+      <ion-input *ngIf="edit && hasPermissionToChangePrice" type="number" step="any" [(ngModel)]="tempPrice" select-text></ion-input>
+      <ion-text *ngIf="edit && hasPermissionToChangePrice" class="ion-margin-end">{{null | price}}</ion-text>
     </ion-col>
 
     <ion-col>

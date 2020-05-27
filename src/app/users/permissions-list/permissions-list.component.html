@@ -1,0 +1,27 @@
+<div *ngIf="(userDoc || role) && oldPermissions">
+
+  <div id="grid">
+
+    <ion-item *ngFor="let p of allPermissions" lines="none">
+      <ion-checkbox slot="start"
+                    [checked]="oldPermissions[p]"
+                    [indeterminate]="intermediate.includes(p)"
+                    [title]="intermediate.includes(p) ? 'קיימים משתמשים מדרג זה בעלי הגדרות שונות' : ''"
+                    (ionChange)="onCheck(p, $event.detail.checked)"
+      ></ion-checkbox>
+      <ion-label>{{p | permissionName}}</ion-label>
+    </ion-item>
+
+  </div>
+
+  <div id="buttons">
+    <ion-button shape="round" color="dark"
+                (click)="cancel()"
+    >ביטול</ion-button>
+    <ion-button shape="round"
+                [disabled]="!hasChanges()"
+                (click)="save()"
+    >שמירת נתונים</ion-button>
+  </div>
+
+</div>

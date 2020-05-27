@@ -15,7 +15,7 @@
 
 #grid {
   display: grid;
-  grid-template-columns: 33% 33% 33%;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   ion-item {
     --padding-end: 3em;
     --padding-start: 0;
