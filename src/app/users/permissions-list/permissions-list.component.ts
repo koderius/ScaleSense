@@ -22,6 +22,7 @@ export class PermissionsListComponent implements OnInit {
     this.oldPermissions = null;
     this.newPermissions = {};
     this.intermediate = [];
+    this.managePermissionsChecked = false;
 
     // Make sure there is some data
     if(!userOrRole) {
@@ -35,6 +36,7 @@ export class PermissionsListComponent implements OnInit {
       this.oldPermissions = userOrRole.permissions;
       this.userDoc = userOrRole;
       this.role = null;
+      this.managePermissionsChecked = this.userDoc.permissions[UserPermission.MASTER];
     }
 
     // For role type
