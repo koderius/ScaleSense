@@ -5,6 +5,8 @@
          [(ngModel)]="query"
          (keyup)="onQueryChange.emit(query)"
          [matAutocomplete]="auto"
+         [required]="required"
+         [name]="name"
          (blur)="onClosed()"
   >
   <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="onSelect.emit($event.option.id)">

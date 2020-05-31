@@ -17,8 +17,8 @@
           <ion-row class="input-div">
             <ion-col size="4" required>שם מוצר</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput [(ngModel)]="product.name">
+              <mat-form-field aria-label="Product Name">
+                <input matInput [(ngModel)]="product.name" name="title" required>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -26,8 +26,8 @@
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4" required>מק"ט (משתמש)</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" [(ngModel)]="product.catalogNumC">
+              <mat-form-field aria-label="Catalog number (customer)">
+                <input matInput type="number" [(ngModel)]="product.catalogNumC" name="catalogCustomer" required>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -35,8 +35,8 @@
           <ion-row class="input-div">
             <ion-col size="4" required>מק"ט (ספק)</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" [(ngModel)]="product.catalogNumS">
+              <mat-form-field aria-label="Catalog number (supplier)">
+                <input matInput type="number" [(ngModel)]="product.catalogNumS" name="catalogSupplier" required>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -45,7 +45,7 @@
             <ion-col size="4" required>תמונה</ion-col>
             <ion-col style="padding: 0" *ngIf="!logoPreview">
               <ion-button shape="round" color="secondary" (click)="fileInput.click()">העלאת תמונה</ion-button>
-              <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])">
+              <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])" name="Image" required>
               <ion-button fill="clear" color="dark" class="ion-float-end" (click)="getPicture()">
                 <ion-icon name="camera" slot="icon-only"></ion-icon>
               </ion-button>
@@ -66,8 +66,8 @@
             <ion-row class="input-div">
               <ion-col size="4">תיאור פריט</ion-col>
               <ion-col>
-                <mat-form-field>
-                  <input matInput [(ngModel)]="product.description">
+                <mat-form-field aria-label="Product description">
+                  <input matInput [(ngModel)]="product.description" name="description">
                 </mat-form-field>
               </ion-col>
             </ion-row>
@@ -81,6 +81,8 @@
                                       valueProp="id"
                                       [selected]="product.sid"
                                       (onSelect)="product.sid = $event"
+                                      [required]="true"
+                                      name="supplierName"
               ></app-autocomplete-field>
             </ion-col>
           </ion-row>
@@ -88,9 +90,9 @@
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">מספר ספק</ion-col>
             <ion-col>
-              <mat-form-field>
+              <mat-form-field aria-label="Supplier Serial">
                 <mat-label></mat-label>
-                <input matInput type="number" [value]="suppliersService.getSupplierById(product.sid)?.nid || ''" placeholder="אוטומטי" readonly>
+                <input matInput type="number" [value]="suppliersService.getSupplierById(product.sid)?.nid || ''" placeholder="אוטומטי" readonly required>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -111,9 +113,9 @@
           <ion-row class="input-div">
             <ion-col size="4" required>סוג יחידה</ion-col>
             <ion-col>
-              <mat-form-field>
+              <mat-form-field aria-label="Category">
                 <mat-label></mat-label>
-                <mat-select [(ngModel)]="product.type">
+                <mat-select [(ngModel)]="product.type" required name="category">
                   <mat-option *ngFor="let type of productTypes" [value]="type">{{null | unitAmount : type}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -123,8 +125,8 @@
           <ion-row class="input-div" *ngIf="product.type">
             <ion-col size="4" required>משקל {{null | unitAmount : product.type}}</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" [(ngModel)]="product.unitWeight">
+              <mat-form-field aria-label="Type">
+                <input matInput type="number" [(ngModel)]="product.unitWeight" name="type" required>
                 <ion-text matSuffix>{{null | unitAmount : 0}}</ion-text>
               </mat-form-field>
             </ion-col>
@@ -142,8 +144,14 @@
           <ion-row class="input-div">
             <ion-col size="4" required>מחיר</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" step="any" [formControl]="priceFormControl" [min]="product.minPrice" [max]="product.maxPrice" [(ngModel)]="product.price">
+              <mat-form-field aria-label="Price">
+                <input matInput type="number" step="any"
+                       [formControl]="priceFormControl"
+                       [min]="product.minPrice"
+                       [max]="product.maxPrice"
+                       [(ngModel)]="product.price"
+                       name="price"
+                       required>
                 <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
                 <mat-error *ngIf="priceFormControl.hasError('min') || priceFormControl.hasError('max')">מחיר מחוץ לטווח</mat-error>
               </mat-form-field>
@@ -153,16 +161,16 @@
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">טווח מחיר</ion-col>
             <ion-col size="3.75">
-              <mat-form-field>
+              <mat-form-field aria-label="Min price">
                 <mat-label>מינימום</mat-label>
-                <input matInput type="number" step="any" [(ngModel)]="product.minPrice" (blur)="onPriceLimitChange()">
+                <input matInput type="number" step="any" [(ngModel)]="product.minPrice" (blur)="onPriceLimitChange()" name="minPrice">
               </mat-form-field>
             </ion-col>
             <ion-col size="0.5"></ion-col>
             <ion-col size="3.75">
-              <mat-form-field>
+              <mat-form-field aria-label="Max price">
                 <mat-label>מקסימום</mat-label>
-                <input matInput type="number" step="any" [(ngModel)]="product.maxPrice" (blur)="onPriceLimitChange()">
+                <input matInput type="number" step="any" [(ngModel)]="product.maxPrice" (blur)="onPriceLimitChange()" name="maxPrice">
                 <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
               </mat-form-field>
             </ion-col>
@@ -171,8 +179,8 @@
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">אפיצות משקל בהזמנה</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" step="any" [(ngModel)]="product.orderWeightTolerance">
+              <mat-form-field aria-label="Weight Tolerance (in order)">
+                <input matInput type="number" step="any" [(ngModel)]="product.orderWeightTolerance" name="weightToleranceOrder">
                 <ion-text matSuffix>%</ion-text>
               </mat-form-field>
             </ion-col>
@@ -181,8 +189,8 @@
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">אפיצות משקל בקבלה</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" step="any" [(ngModel)]="product.receiveWeightTolerance">
+              <mat-form-field aria-label="Weight Tolerance (in reception)">
+                <input matInput type="number" step="any" [(ngModel)]="product.receiveWeightTolerance" name="weightToleranceReception">
                 <ion-text matSuffix>%</ion-text>
               </mat-form-field>
             </ion-col>
@@ -199,8 +207,8 @@
           <ion-row class="input-div" *ngIf="!taraIncluded">
             <ion-col size="4" required>משקל אריזה</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" step="any" [(ngModel)]="product.tara">
+              <mat-form-field aria-label="Tara">
+                <input matInput type="number" step="any" [(ngModel)]="product.tara" name="tara">
                 <ion-text matSuffix>{{null | unitAmount : 0}}</ion-text>
               </mat-form-field>
             </ion-col>
@@ -209,8 +217,8 @@
           <ion-row class="input-div">
             <ion-col size="4">מינימום להזמנה</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" step="any" [(ngModel)]="product.orderMin">
+              <mat-form-field aria-label="Order min">
+                <input matInput type="number" step="any" [(ngModel)]="product.orderMin" name="orderMin">
                 <ion-text matSuffix>{{null | unitAmount : product.type}}</ion-text>
               </mat-form-field>
             </ion-col>
@@ -219,8 +227,8 @@
           <ion-row class="input-div">
             <ion-col size="4" required>ברקוד</ion-col>
             <ion-col>
-              <mat-form-field>
-                <input matInput type="number" [(ngModel)]="product.barcode">
+              <mat-form-field aria-label="Barcode">
+                <input matInput type="number" [(ngModel)]="product.barcode" name="barcode">
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -234,9 +242,9 @@
           </ion-row>
 
           <ion-row class="input-div" *ngIf="product.isVeg">
-            <mat-form-field>
+            <mat-form-field aria-label="Agriculture ministry link">
               <mat-label>קישור לפריט באתר משרד החקלאות</mat-label>
-              <input matInput type="url" [(ngModel)]="product.agriLink">
+              <input matInput type="url" [(ngModel)]="product.agriLink" name="agriLink">
               <button mat-button *ngIf="product.agriLink" matSuffix mat-icon-button aria-label="Clear" (click)="product.agriLink=''">
                 <mat-icon>close</mat-icon>
               </button>

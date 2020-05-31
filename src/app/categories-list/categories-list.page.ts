@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import {CategoriesService} from '../services/categories.service';
 import {ProductCategory} from '../models/Product';
 import {AlertsService} from '../services/alerts.service';
+import {UserPermission} from '../models/UserDoc';
+import {UsersService} from '../services/users.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-categories-list',

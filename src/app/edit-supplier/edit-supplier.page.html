@@ -4,7 +4,7 @@
 
 <ion-content>
 
-  <div class="page-container" *ngIf="supplier">
+  <form class="page-container" *ngIf="supplier">
 
     <div id="forms">
 
@@ -15,14 +15,19 @@
           <ion-row class="input-div">
             <ion-col size="3" required>מספר ספק</ion-col>
             <ion-col>
-              <ion-input disabled [value]="(supplier.nid || temporalSerial) | number : '3.0-0'"></ion-input>
+              <mat-form-field aria-label="Supplier serial">
+                <input matInput disabled [value]="(supplier.nid || temporalSerial) | number : '3.0-0'" name="supplierNum">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="3" required>שם הספק</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.name"></ion-input>
+              <mat-form-field aria-label="Supplier name">
+                <input matInput [(ngModel)]="supplier.name" required name="supplierName">
+                <mat-error>שדה חובה</mat-error>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
@@ -30,7 +35,7 @@
             <ion-col size="3" required>לוגו</ion-col>
             <ion-col style="padding: 0" *ngIf="!logoPreview">
               <ion-button shape="round" color="secondary" (click)="fileInput.click()">העלאת תמונה</ion-button>
-              <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])">
+              <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])" aria-label="Logo" name="logo" required>
               <ion-button fill="clear" color="dark" class="ion-float-end" (click)="enterLink()">
                 <ion-icon name="link" slot="icon-only"></ion-icon>
               </ion-button>
@@ -48,28 +53,36 @@
           <ion-row class="input-div">
             <ion-col size="3" required>ח.פ</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.companyId" type="number"></ion-input>
+              <mat-form-field aria-label="Company ID">
+                <input matInput [(ngModel)]="supplier.companyId" type="tel" required name="companyId">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="3">כתובת</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.address"></ion-input>
+              <mat-form-field aria-label="Address">
+                <input matInput [(ngModel)]="supplier.address" name="address">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="3">מספר טלפון</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.businessPhone" type="tel"></ion-input>
+              <mat-form-field aria-label="Business phone">
+                <input matInput [(ngModel)]="supplier.businessPhone" type="tel" name="businessPhone">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div">
             <ion-col size="3">מספר פקס</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.fax" type="tel"></ion-input>
+              <mat-form-field aria-label="Fax number">
+                <input matInput [(ngModel)]="supplier.fax" type="tel" name="fax">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
@@ -83,7 +96,10 @@
           <ion-row class="input-div" *ngIf="supplier.contacts[0]">
             <ion-col size="3" required>איש קשר</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.contacts[0].name"></ion-input>
+              <mat-form-field aria-label="Contact name">
+                <input matInput [(ngModel)]="supplier.contacts[0].name" required name="contactName1">
+                <mat-error>שדה חובה</mat-error>
+              </mat-form-field>
             </ion-col>
             <ion-col size="1" style="padding: 0">
               <ion-fab-button size="small" (click)="supplier.contacts.push({})" [disabled]="supplier.contacts.length > 1 || !supplier.contacts[0].name || !supplier.contacts[0].email || !supplier.contacts[0].phone" title="איש קשר נוסף">
@@ -95,35 +111,49 @@
           <ion-row class="input-div" *ngIf="supplier.contacts[0]">
             <ion-col size="3" required>נייד</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.contacts[0].phone" type="tel"></ion-input>
+              <mat-form-field aria-label="Contact phone">
+                <input matInput [(ngModel)]="supplier.contacts[0].phone" type="tel" required name="phone1">
+                <mat-error *ngIf="!supplier.contacts[0].phone">שדה חובה</mat-error>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="supplier.contacts[0]">
             <ion-col size="3" required>דוא"ל</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.contacts[0].email" type="email"></ion-input>
+              <mat-form-field aria-label="Contact email">
+                <input matInput [(ngModel)]="supplier.contacts[0].email" type="email" name="email1" [pattern]="emailRegex" required>
+                <mat-error *ngIf="supplier.contacts[0].email">כתובת אימייל לא תקינה</mat-error>
+                <mat-error *ngIf="!supplier.contacts[0].email">שדה חובה</mat-error>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="supplier.contacts[1]">
             <ion-col size="3">איש קשר נוסף</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.contacts[1].name"></ion-input>
+              <mat-form-field aria-label="Additional contact name">
+                <input matInput [(ngModel)]="supplier.contacts[1].name" name="contactName2">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="supplier.contacts[1]">
             <ion-col size="3">נייד</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.contacts[1].phone" type="tel"></ion-input>
+              <mat-form-field aria-label="Additional contact phone">
+                <input matInput [(ngModel)]="supplier.contacts[1].phone" type="tel" name="phone2">
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="supplier.contacts[1]">
             <ion-col size="3">דוא"ל</ion-col>
             <ion-col>
-              <ion-input [(ngModel)]="supplier.contacts[1].email" type="email"></ion-input>
+              <mat-form-field aria-label="Additional contact email">
+                <input matInput [(ngModel)]="supplier.contacts[1].email" type="email" name="email2" [pattern]="emailRegex">
+                <mat-error>כתובת אימייל לא תקינה</mat-error>
+              </mat-form-field>
             </ion-col>
           </ion-row>
 
@@ -144,10 +174,10 @@
         </p>
       </ion-col>
       <ion-col>
-        <ion-button shape="round" class="ion-float-end" (click)="save()">שמירת נתונים</ion-button>
+        <ion-button type="submit" shape="round" class="ion-float-end" (click)="save()">שמירת נתונים</ion-button>
       </ion-col>
     </ion-row>
 
-  </div>
+  </form>
 
 </ion-content>

@@ -9,7 +9,7 @@ import {ProductsListUtil} from '../../src/app/utilities/productsList';
 import {MailForm} from '../../src/app/website/mail/MailForm';
 import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
-import {UserDoc} from '../../src/app/models/UserDoc';
+import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
 
 admin.initializeApp();
 
@@ -105,7 +105,7 @@ export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc,
 
       // Get default permissions from the business metadata (Each role has array of permission under the field: role{number})
       const defaultPermissions = await admin.firestore().collection(side == 'c' ? 'customers' : 'suppliers').doc(bid).collection('metadata').doc('permissions').get();
-      const permissions = defaultPermissions.get('role' + userDoc.role) as string[];
+      const permissions = defaultPermissions.get('role' + userDoc.role) as Permissions;
 
       // Create the new user's document
       await usersRef.doc(userRec.uid).set({

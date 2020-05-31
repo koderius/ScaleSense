@@ -16,6 +16,8 @@ export class AutocompleteFieldComponent implements OnInit {
   // Input's placeholder and label
   @Input() placeholder: string;
   @Input() label: string;
+  @Input() name: string;
+  @Input() required: boolean;
   // Selected value on init
   @Input() selected: string;
 

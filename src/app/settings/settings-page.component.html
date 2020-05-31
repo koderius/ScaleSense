@@ -12,11 +12,13 @@
 
         <div class="item">
           <p>הגדרת שפה</p>
-          <div class="select-box">
-            <ion-select interface="popover" mode="md" [interfaceOptions]="{cssClass: 'select-popover', showBackdrop: false, animated: false}" appSelectPopover placeholder="בחר שפה">
-              <ion-select-option>עברית</ion-select-option>
-            </ion-select>
-          </div>
+          <mat-form-field>
+            <mat-select value="he">
+              <mat-option value="he">עברית</mat-option>
+              <mat-option value="en" disabled>English</mat-option>
+              <mat-option value="ar" disabled>العربية</mat-option>
+            </mat-select>
+          </mat-form-field>
           <ion-button color="secondary" shape="round">החל</ion-button>
         </div>
 

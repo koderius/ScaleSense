@@ -11,6 +11,9 @@ import {BusinessService} from '../services/business.service';
 import {Objects} from '../utilities/objects';
 import {CameraService} from '../services/camera.service';
 import {FormControl, Validators} from '@angular/forms';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-edit-product',

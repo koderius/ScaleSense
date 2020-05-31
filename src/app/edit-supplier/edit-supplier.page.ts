@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {BusinessDoc, SupplierDoc} from '../models/Business';
+import {SupplierDoc} from '../models/Business';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
 import {AuthSoftwareService} from '../services/auth-software.service';
 import {NavigationService} from '../services/navigation.service';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-edit-supplier',
@@ -19,6 +21,8 @@ export class EditSupplierPage implements OnInit {
 
   logoPreview: string;
   tempLogo: File;
+
+  emailRegex = AuthSoftwareService.EMAIL_REGEX;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -78,36 +82,15 @@ export class EditSupplierPage implements OnInit {
 
   checkFields() {
 
-    if(!this.supplier.name) {
-      alert('יש להזין שם ספק');
-      return;
-    }
+    // Get all inputs inside the form
+    const inputs = document.querySelector('#forms').getElementsByTagName('input');
 
-    if(!this.supplier.companyId) {
-      alert('יש להזין מספר ח.פ');
-      return;
-    }
-
-    // TODO: Is it really required?
-    if(!this.logoPreview) {
-      alert('יש להעלות תמונה');
-      return;
-    }
-
-    if(!this.supplier.contacts[0].name || !this.supplier.contacts[0].email || !this.supplier.contacts[0].phone) {
-      alert('יש להזין פרטי איש קשר אחד לפחות');
-      return;
-    }
-
-    if(!(this.supplier.contacts[0].email || '').match(AuthSoftwareService.EMAIL_REGEX)) {
-      alert('כתובת אימייל לא תקינה');
-      return;
-    }
-
-    if(this.supplier.contacts[1] && !this.supplier.contacts[1].email.match(AuthSoftwareService.EMAIL_REGEX)) {
-      alert('כתובת אימייל של איש קשר נוסף לא תקינה');
-      return;
-    }
+    // Check their validity
+    for (let i = 0; i < inputs.length; i++)
+      if(!inputs[i].validity.valid) {
+        alert('יש למלא את כל השדות המסומנים ב-*');
+        return false;
+      }
 
     return true;
 

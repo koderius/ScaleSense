@@ -29,6 +29,16 @@ export class UsersPage implements OnInit {
 
   hasChanges: boolean;
 
+  // Get the selected permission as user document
+  get selectedUser() : UserDoc {
+    return this.selectedPermission as UserDoc;
+  }
+
+  // Get the selected permission as role
+  get selectedRole() : UserRole {
+    return this.selectedPermission as UserRole;
+  }
+
   constructor(
     private alerts: AlertsService,
     private userService: UsersService,
@@ -55,7 +65,7 @@ export class UsersPage implements OnInit {
 
 
   async restore() {
-    if(await this.alerts.areYouSure('האם לשחזר הרשאות מערכת ראשוניות עבור דרג זה?', 'השינוי יחול עבור המשתמשים בדרג')) {
+    if(await this.alerts.areYouSure('האם לשחזר הרשאות מערכת ראשוניות עבור דרג זה?', 'השינוי יחול עבור כל המשתמשים בדרג')) {
       if(await this.userService.restoreDefaults(this.selectedPermission as UserRole)) {
         this.selectedPermission = null;
         alert('שחזור הרשאות בוצע בהצלחה');

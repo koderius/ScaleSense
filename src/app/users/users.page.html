@@ -24,7 +24,7 @@
 
       <h3 class="ion-margin-bottom">רשימת משתמשים:</h3>
 
-      <app-users-list [selectedUser]="selectedPermission?.uid"
+      <app-users-list [selectedUser]="selectedUser?.uid"
                       [disabled]="hasChanges"
                       (onEditPermissions)="editPermissions($event)"
       ></app-users-list>
@@ -40,8 +40,8 @@
             <ion-col>{{role | roleName}}</ion-col>
             <ion-col>
               <ion-button shape="round"
-                          [fill]="selectedPermission == role ? 'solid' : 'outline'"
-                          [color]="selectedPermission == role ? 'secondary' : 'dark'"
+                          [fill]="selectedRole == role ? 'solid' : 'outline'"
+                          [color]="selectedRole == role ? 'secondary' : 'dark'"
                           [disabled]="hasChanges || role == UserRole.ADMIN"
                           (click)="editPermissions(role)">
                 <ion-icon slot="start" src="../../assets/svg/icon_pen.svg"></ion-icon>
@@ -60,13 +60,15 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center">
       <h3>
-        <ion-text>{{selectedPermission.uid ? 'הרשאות למשתמש: ' : 'הרשאות כלליות לדרג: '}}</ion-text>
-        <ion-text>{{selectedPermission.uid ? selectedPermission.displayName : (selectedPermission | roleName)}}</ion-text>
+        <ion-text>{{selectedUser.uid ? 'הרשאות למשתמש: ' : 'הרשאות כלליות לדרג: '}}</ion-text>
+        <ion-text>{{selectedUser.uid ? selectedUser.displayName : (selectedRole | roleName)}}</ion-text>
       </h3>
-      <ion-button shape="round" color="danger" size="small"
-                  *ngIf="selectedPermission && !selectedPermission.uid"
-                  (click)="restore()"
-      >שחזור הגדרות מערכת</ion-button>
+      <ion-button shape="round" color="dark" fill="outline" size="small"
+                  *ngIf="selectedPermission && !selectedUser.uid"
+                  (click)="restore()">
+        <ion-icon slot="start" name="alert-circle-outline" color="danger"></ion-icon>
+        <ion-text>שחזור הגדרות מערכת</ion-text>
+      </ion-button>
     </div>
 
     <app-permissions-list (onChange)="hasChanges = $event"

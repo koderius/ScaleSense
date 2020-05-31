@@ -60,7 +60,7 @@ export class UsersService {
 
   /** Whether the current user has a given permission */
   hasPermission(permission: UserPermission) {
-    return this.myDoc.role == UserRole.ADMIN || this.myDoc.permissions[permission];
+    return this.myDoc.role == UserRole.ADMIN || (this.myDoc.permissions && this.myDoc.permissions[permission]);
   }
 
 
