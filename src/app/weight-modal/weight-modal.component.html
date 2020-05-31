@@ -24,16 +24,16 @@
       <ion-col>
         <ion-item id="product-item" lines="none">
           <ion-thumbnail slot="start">
-            <img [src]="productData.image">
+            <img [src]="product.image">
           </ion-thumbnail>
           <ion-label>
             <h1>
-              <ion-text color="primary" style="font-weight: bold">{{productData.name}}</ion-text>
+              <ion-text color="primary" style="font-weight: bold">{{product.name}}</ion-text>
             </h1>
             <h2 style="display: flex; justify-content: space-between">
-              <p><b>מחיר לק"ג: </b><ion-text>{{product.pricePerUnit | price}}</ion-text></p>
-              <p><b>כמות שהוזמנה: </b><ion-text>{{product.amount | unitAmount : productData.type}}</ion-text></p>
-              <p><b>סה"כ מחיר: </b><ion-text>{{(product.amount * product.pricePerUnit) | price}}</ion-text></p>
+              <p><b>מחיר לק"ג: </b><ion-text>{{product.priceInOrder | price}}</ion-text></p>
+              <p><b>כמות שהוזמנה: </b><ion-text>{{product.amount | unitAmount : product.type}}</ion-text></p>
+              <p><b>סה"כ מחיר: </b><ion-text>{{(product.amount * product.priceInOrder) | price}}</ion-text></p>
             </h2>
           </ion-label>
         </ion-item>

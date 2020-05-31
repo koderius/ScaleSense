@@ -69,7 +69,7 @@
           <app-product-to-cart *ngFor="let product of (filteredSupplierProducts || supplierProducts)"
                                [product]="product"
                                [amount]="order.getProductById(product.id) ? order.getProductById(product.id).amount : 0"
-                               (addToCart)="order.setProductAmount(product.id, $event, product.price)"
+                               (addToCart)="order.setProductAmount(product, $event, product.price)"
           ></app-product-to-cart>
 
         </ion-list>
@@ -89,9 +89,8 @@
             <div *ngIf="order.products.length">
               <app-product-summery *ngFor="let product of sortProductsByName(order.products)"
                                    [productOrder]="product"
-                                   [productDetails]="findProductDetails(product.id)"
                                    [editProduct]="true"
-                                   (clearClicked)="order.setProductAmount(product.id, 0, null)"
+                                   (clearClicked)="order.setProductAmount(product, 0, null)"
                                    (editClicked)="selectProductInput(product.id)"
               ></app-product-summery>
 
@@ -135,7 +134,6 @@
         <app-product-summery
                 *ngFor="let product of sortProductsByName(order.products)"
                 [productOrder]="product"
-                [productDetails]="findProductDetails(product.id)"
                 [editProduct]="(customerEditMode || supplierEditMode)"
                 [showComment]="true"
                 [editComment]="customerEditMode"

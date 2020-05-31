@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {ProductsService} from '../services/products.service';
-import {FullProductDoc, ProductPublicDoc} from '../models/ProductI';
+import {ProductCustomerDoc, ProductPublicDoc} from '../models/ProductI';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc} from '../models/Business';
@@ -8,6 +8,8 @@ import {BusinessService} from '../services/business.service';
 import {XlsService} from '../services/xls.service';
 import {ModalController} from '@ionic/angular';
 import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
+import {AlertsService} from '../services/alerts.service';
+import {CustomersService} from '../services/customers.service';
 
 
 @Component({
@@ -22,27 +24,31 @@ export class ProductsListPage {
   q: string = '';
   bid: string;
 
+  favoriteOnly: boolean = true;
+
   numOfNewResults: number;
 
   isSearching: boolean;
 
   constructor(
     private productsService: ProductsService,
-    public suppliersService: SuppliersService,
+    private suppliersService: SuppliersService,
+    private customersService: CustomersService,
     public navService: NavigationService,
     public businessService: BusinessService,
     private excelService: XlsService,
     private modalCtrl: ModalController,
+    private alerts: AlertsService,
   ) { }
 
-  get productsList() : FullProductDoc[] {
+  get productsList() : ProductPublicDoc[] | ProductCustomerDoc[] {
     return this.productsService.loadedProducts;
   }
 
   ionViewDidEnter() {
 
-    // For customers, allow filter by supplier. for supplier allow filter by customer - TODO
-    this.businessList = this.businessService.side == 'c' ? this.suppliersService.mySuppliers : [];
+    // For customers, allow filter by supplier. for supplier allow filter by customer
+    this.businessList = this.businessService.side == 'c' ? this.suppliersService.mySuppliers : this.customersService.myCustomers;
 
     this.search();
 
@@ -62,6 +68,8 @@ export class ProductsListPage {
     const res = await this.productsService.queryMyProducts(
       this.q,
       this.bid,
+      !this.favoriteOnly,
+      true,
       movePage == 1 ? this.productsList.slice(-1)[0].name : null,
       movePage == -1 ? this.productsList[0].name : null,
     );
@@ -89,6 +97,16 @@ export class ProductsListPage {
       });
       m.present();
     }
+  }
+
+
+  async deleteProduct(product: ProductPublicDoc) {
+
+    if(await this.alerts.areYouSure('האם למחוק את המוצר ' + product.name + '?', 'פרטי המוצר יימחקו'))
+      await this.productsService.deleteProduct(product.id);
+
+    this.search();
+
   }
 
 

@@ -1,4 +1,4 @@
-import {ProductOrder} from '../models/OrderI';
+import {ProductOrder} from '../models/ProductI';
 
 export type ProductsChange = {
   productId: string,
@@ -43,10 +43,10 @@ export class ProductsListUtil {
           old: (oldProduct ? oldProduct.amount : null) || NaN,
           new: (newProduct ? newProduct.amount : null) || NaN,
         };
-      if(!newProduct || !oldProduct || newProduct.pricePerUnit != oldProduct.pricePerUnit)
+      if(!newProduct || !oldProduct || newProduct.priceInOrder != oldProduct.priceInOrder)
         change.price = {
-          old: (oldProduct ? oldProduct.pricePerUnit : null) || NaN,
-          new: (newProduct ? newProduct.pricePerUnit : null) || NaN,
+          old: (oldProduct ? oldProduct.priceInOrder : null) || NaN,
+          new: (newProduct ? newProduct.priceInOrder : null) || NaN,
         };
       if(!newProduct || !oldProduct || newProduct.comment != oldProduct.comment)
         change.comment = {

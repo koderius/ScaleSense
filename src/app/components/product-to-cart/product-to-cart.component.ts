@@ -12,14 +12,13 @@ export class ProductToCartComponent implements OnInit {
 
   private _amount = 0;
 
-  showBubble: boolean;
-
   @Input() product: ProductPublicDoc;
   @Output() addToCart = new EventEmitter();
 
   constructor(private unitPipe: UnitAmountPipe) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   get amount() : number {
     return this._amount || 0;
@@ -39,13 +38,6 @@ export class ProductToCartComponent implements OnInit {
 
   onInputChange(ev) {
     this.amount = +ev.target.value.split(' ')[0];
-  }
-
-  setAmount(amount: number) {
-    if(amount >= this.product.orderMin)
-      this.addToCart.emit(amount);
-    else
-      alert(`מינימום הזמנה עבור ${this.product.name}: ${this.unitPipe.transform(this.product.orderMin, this.product.type)}`);
   }
 
 }

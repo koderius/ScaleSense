@@ -99,14 +99,13 @@
             (onBack)="searchOrders(-1)"
     ></app-pagination>
 
-    <ion-spinner *ngIf="orderReturn && !orderProducts.length" color="primary" style="margin: auto"></ion-spinner>
+    <ion-spinner *ngIf="orderReturn && !orderReturn.products.length" color="primary" style="margin: auto"></ion-spinner>
 
-    <div class="table-section" *ngIf="pageMode == 'goods_return' && orderReturn && orderProducts.length">
+    <div class="table-section" *ngIf="pageMode == 'goods_return' && orderReturn && orderReturn.products.length">
       <h2 style="font-weight: bold">הזמנה מס. {{orderReturn.serial}}</h2>
       <ion-list id="return-list">
         <app-product-summery *ngFor="let product of orderReturn.products"
                              [productOrder]="product"
-                             [productDetails]="getProductToReturn(product.id)"
                              [returnBtn]="true"
                              (returnBtnClicked)="onProductReturn($event)"
         ></app-product-summery>

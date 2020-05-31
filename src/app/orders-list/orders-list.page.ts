@@ -3,15 +3,15 @@ import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
-import {OrderStatus, OrderStatusGroup, ProductOrder} from '../models/OrderI';
+import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
-import {FullProductDoc} from '../models/ProductI';
 import {ProductsService} from '../services/products.service';
 import {IonSearchbar, ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {ScreenMode} from '../app.component';
 import {OrderActionMode} from '../components/order-item/order-item.component';
+import {ProductOrder} from '../models/ProductI';
 
 @Component({
   selector: 'app-orders-list',
@@ -45,7 +45,6 @@ export class OrdersListPage implements OnInit, OnDestroy {
 
   /** The selected order for returning products, and the list of its products data */
   orderReturn: Order;
-  orderProducts: FullProductDoc[] = [];
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -135,13 +134,9 @@ export class OrdersListPage implements OnInit, OnDestroy {
   async openOrderProducts(order: Order) {
     if(this.pageMode == 'goods_return') {
       this.orderReturn = order;
-      this.orderProducts = await this.productService.loadProductsByIds(...order.products.map((p)=>p.id));
     }
   }
 
-  getProductToReturn(id: string) {
-    return this.orderProducts.find((p)=>p.id == id);
-  }
 
   async onProductReturn(product: ProductOrder) {
     const m = await this.modalCtrl.create({
@@ -152,9 +147,8 @@ export class OrdersListPage implements OnInit, OnDestroy {
           orderSerial: this.orderReturn.serial,
           sid: this.orderReturn.sid,
           product: {...product},
-          productName: this.getProductToReturn(product.id).name,
+          productName: product.name,
         },
-        productData: this.getProductToReturn(product.id),
       },
       backdropDismiss: false,
       cssClass: 'wide-modal',

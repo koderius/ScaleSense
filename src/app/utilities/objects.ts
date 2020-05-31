@@ -5,7 +5,7 @@ export class Objects {
     Object.getOwnPropertyNames(obj).forEach((p)=>{
       const value = obj[p];
 
-      // Don't try to delete 'length' property from arrays (throw error)
+      // Don't try to delete 'length' property from arrays (throws error)
       if(Array.isArray(obj) && p == 'length')
         return;
 

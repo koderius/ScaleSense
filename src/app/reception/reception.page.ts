@@ -2,9 +2,8 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {OrdersService} from '../services/orders.service';
 import {Order} from '../models/Order';
-import {OrderStatus, OrderStatusGroup, ProductOrder} from '../models/OrderI';
+import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {ProductsService} from '../services/products.service';
-import {FullProductDoc} from '../models/ProductI';
 import {AlertsService} from '../services/alerts.service';
 import {WeighService} from '../services/weigh.service';
 import {NavigationService} from '../services/navigation.service';
@@ -14,6 +13,7 @@ import {Calculator} from '../utilities/Calculator';
 import {isNumber} from 'util';
 import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
+import {FullCustomerOrderProductDoc, ProductOrder} from '../models/ProductI';
 
 @Component({
   selector: 'app-reception',
@@ -24,7 +24,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
   order: Order;
 
-  products: FullProductDoc[] = [];
+  products: FullCustomerOrderProductDoc[] = [];
 
   /** The product ID that is being edited now, and it's temporary values */
   editProduct: string;
@@ -96,8 +96,8 @@ export class ReceptionPage implements OnInit, OnDestroy {
       this.order = new Order(doc);
     }
 
-    // Load products data for this order
-    this.products = await this.productsService.loadProductsByIds(...this.order.products.map((p)=>p.id));
+    // Load the customer's data of each product
+    this.order.products.forEach(async (p)=>this.products.push(await this.productsService.extendWithCustomerData(p) as FullCustomerOrderProductDoc));
 
     // Auto save every second
     this.autoSave = setInterval(()=>{
@@ -114,24 +114,19 @@ export class ReceptionPage implements OnInit, OnDestroy {
   }
 
 
-  productData(id: string) : FullProductDoc {
-    return this.products.find((p)=>p.id == id) || {};
-  }
-
-
   /** Edit product mode */
   onEditClicked(product: ProductOrder) {
     this.editProduct = product.id;
     this.tempAmount = product.amount;
-    this.tempPrice = product.pricePerUnit;
+    this.tempPrice = product.priceInOrder;
   }
 
   /** Edit product done */
   onEditDone(product: ProductOrder) {
     // Mark changes in price and/or amount
-    if(product.pricePerUnit !== this.tempPrice) {
+    if(product.priceInOrder !== this.tempPrice) {
       product.priceChangedInReception = true;
-      product.pricePerUnit = this.tempPrice;
+      product.priceInOrder = this.tempPrice;
       this.hasChanges = true;
     }
     if(product.amount !== this.tempAmount) {
@@ -149,15 +144,15 @@ export class ReceptionPage implements OnInit, OnDestroy {
    * 2. Changed by the supplier, and has not got permission yet
    * */
   isPriceExceeded(product: ProductOrder) : boolean {
-    const productData = this.productData(product.id);
+    const fullProduct = this.products.find((p)=>p.id == product.id);
     return (product.priceChangedInReception || product.priceChangedInOrder == 's')
-      && (product.pricePerUnit < productData.minPrice || product.pricePerUnit > productData.maxPrice);
+      && (product.priceInOrder < fullProduct.minPrice || product.priceInOrder > fullProduct.maxPrice);
   }
 
 
   /** Open weight modal */
   async weightIconClicked(product: ProductOrder) {
-    const res = await this.weighService.openProductsWeightModal(product, this.productData(product.id));
+    const res = await this.weighService.openProductsWeightModal(product);
     if(res.role == 'ok')
       this.hasChanges = true;
   }
@@ -165,7 +160,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
   /** Calc the gap between the final weight and the expected weight according to the order amount */
   weightGap(product: ProductOrder) {
-    const expected = Calculator.ProductExpectedNetWeight(this.productData(product.id), product.amount);
+    const expected = Calculator.ProductExpectedNetWeight(product);
     return product.finalWeight - expected;
   }
 
@@ -173,7 +168,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
   async openManualWeightPopover(product: ProductOrder, ev) {
     const p = await this.popoverCtrl.create({
       component: ManualWeightPopoverComponent,
-      componentProps: {product: this.productData(product.id)},
+      componentProps: {product: product},
       backdropDismiss: true,
       event: this.platform.width() >= 600 ? ev : null,
     });
@@ -183,7 +178,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
       // Set amount manually
       if(res.role == ManualWeightPopoverComponent.ORDER_AMOUNT)
-        product.finalWeight = Calculator.ProductExpectedNetWeight(this.productData(product.id), product.amount);
+        product.finalWeight = Calculator.ProductExpectedNetWeight(product);
       if(res.role == ManualWeightPopoverComponent.NEW_WEIGHT)
         product.finalWeight = res.data;
 
@@ -191,8 +186,8 @@ export class ReceptionPage implements OnInit, OnDestroy {
       product.isManualWeight = product.finalWeight !== 0;
 
       // Check if match
-      const expected = Calculator.ProductExpectedNetWeight(this.productData(product.id), product.amount);
-      product.isWeightMatch = Calculator.IsTolerant(expected, product.finalWeight, this.productData(product.id).receiveWeightTolerance);
+      const expected = Calculator.ProductExpectedNetWeight(product);
+      product.isWeightMatch = Calculator.IsTolerant(expected, product.finalWeight, this.products.find((p)=>p.id == product.id).receiveWeightTolerance);
 
       this.hasChanges = true;
 

@@ -67,15 +67,19 @@ export class OrderChangeReportComponent implements OnInit {
 
       // Calc current price
       this.current.products.forEach((p)=>{
-        this.currentPrice += ((p.pricePerUnit || 0) * (p.amount || 0));
+        this.currentPrice += ((p.priceInOrder || 0) * (p.amount || 0));
       });
 
       // Calc old price
       this.old.products.forEach((p)=>{
-        this.oldPrice += ((p.pricePerUnit || 0) * (p.amount || 0));
+        this.oldPrice += ((p.priceInOrder || 0) * (p.amount || 0));
       });
 
-      this.productsData = await this.productService.loadProductsByIds(...this.productChanges.map((p)=>p.productId));
+      // Get the products data
+      this.productsData.splice(0);
+      this.productChanges.forEach(async (p)=>{
+        this.productsData.push(await this.productService.getProduct(p.productId));
+      });
 
     }
 

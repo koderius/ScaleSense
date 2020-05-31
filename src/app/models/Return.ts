@@ -1,4 +1,4 @@
-import {ProductOrder} from './OrderI';
+import {ProductOrder} from './ProductI';
 
 export interface ReturnDoc {
   id?: string,

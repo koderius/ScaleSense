@@ -1,4 +1,6 @@
-import {OrderDoc, OrderStatus, ProductOrder} from './OrderI';
+import {OrderDoc, OrderStatus} from './OrderI';
+import {ProductOrder, ProductPublicDoc} from './ProductI';
+import {ProductsService} from '../services/products.service';
 
 export class Order {
 
@@ -65,20 +67,22 @@ export class Order {
     return this.products.find((p) => p.id == id);
   }
 
-  setProductAmount(id: string, newAmount: number, pricePerUnit: number) {
+  // Add the product to the order's products list (product details + price + amount), or change the price & amount if already exist in the list.
+  // If the amount is 0, remove the product from the order
+  setProductAmount(productDoc: ProductPublicDoc, newAmount: number, priceInOrder: number) {
     if (newAmount > 0) {
-      const product: ProductOrder = this.getProductById(id);
+      const product: ProductOrder = this.getProductById(productDoc.id);
       if (product) {
         product.amount = newAmount;
-        product.pricePerUnit = pricePerUnit;
+        product.priceInOrder = priceInOrder;
       }
       else {
         if (!this._props.products)
           this._props.products = [];
-        this._props.products.push({id: id, amount: newAmount, pricePerUnit: pricePerUnit});
+        this._props.products.push({...ProductsService.ToPublic(productDoc), amount: newAmount, priceInOrder: priceInOrder});
       }
     } else if (newAmount === 0) {
-      const idx = this.products.findIndex((p) => p.id == id);
+      const idx = this.products.findIndex((p) => p.id == productDoc.id);
       if (idx > -1) {
         this._props.products.splice(idx, 1);
         if(!this._props.products.length)
@@ -94,7 +98,7 @@ export class Order {
   orderTotalPrice(): number {
     let sum = 0;
     this.products.forEach((p) => {
-      sum += (p.pricePerUnit * p.amount)
+      sum += (p.priceInOrder * p.amount)
     });
     return sum;
   }

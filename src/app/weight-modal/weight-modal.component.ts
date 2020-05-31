@@ -1,11 +1,11 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ModalController} from '@ionic/angular';
-import {ProductOrder} from '../models/OrderI';
-import {FullProductDoc} from '../models/ProductI';
 import {Calculator} from '../utilities/Calculator';
 import {AlertsService} from '../services/alerts.service';
 import {WeighService} from '../services/weigh.service';
 import {CameraService} from '../services/camera.service';
+import {ProductOrder} from '../models/ProductI';
+import {ProductsService} from '../services/products.service';
 
 @Component({
   selector: 'app-weight-modal',
@@ -15,7 +15,6 @@ import {CameraService} from '../services/camera.service';
 export class WeightModalComponent implements OnInit, OnDestroy {
 
   product: ProductOrder;
-  productData: FullProductDoc;
   productWeightTolerance: string;
 
   tara: number = 0;
@@ -44,18 +43,20 @@ export class WeightModalComponent implements OnInit, OnDestroy {
     private alerts: AlertsService,
     private weighService: WeighService,
     private cameraService: CameraService,
+    private productService: ProductsService,
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
 
     // Maximum number of weighs will be the number of boxes received
     this.numOfBoxes = this.product.boxes || 1;
 
     // Get the tara of the product, if there is
-    this.constTara = this.productData.tara;
+    this.constTara = this.product.tara;
     this.isKnownTara = !!this.constTara;
 
-    this.productWeightTolerance = (this.productData.receiveWeightTolerance || 0) + '%';
+    // Load the product's customer data for tolerance
+    this.productWeightTolerance = ((await this.productService.extendWithCustomerData(this.product)).receiveWeightTolerance || 0) + '%';
   }
 
 
@@ -93,7 +94,7 @@ export class WeightModalComponent implements OnInit, OnDestroy {
   }
 
   get expectedNet() {
-    return Calculator.ProductExpectedNetWeight(this.productData, this.product.amount);
+    return Calculator.ProductExpectedNetWeight(this.product);
   }
 
 

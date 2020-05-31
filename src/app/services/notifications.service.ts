@@ -149,8 +149,8 @@ export class NotificationsService {
         case 'd': newNotification.text = 'מוצר הוסר: '; break;
       }
       // Add the product's name
-      const product = await this.productService.loadProductsByIds(newNotification.content.productId);
-      newNotification.text += product[0].name;
+      const product = await this.productService.getProduct(newNotification.content.productId);
+      newNotification.text += product.name;
 
     }
 

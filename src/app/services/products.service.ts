@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {ProductCustomerDoc, ProductPublicDoc} from '../models/ProductI';
+import {FullCustomerOrderProductDoc, ProductCustomerDoc, ProductOrder, ProductPublicDoc} from '../models/ProductI';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import CollectionReference = firebase.firestore.CollectionReference;
@@ -48,7 +48,7 @@ export class ProductsService {
    * For suppliers, query from their products collection - can filter by customer belonging
    * For customers, query from their products collection - can filter by supplier
    * */
-  async queryMyProducts(q?: string, bid?: string, allSupplierProducts?: boolean, startAfterName?: string, endBeforeName?: string) : Promise<ProductPublicDoc[] | ProductCustomerDoc[]> {
+  async queryMyProducts(q?: string, bid?: string, allSupplierProducts?: boolean, pagination?: boolean, startAfterName?: string, endBeforeName?: string) : Promise<ProductPublicDoc[] | ProductCustomerDoc[]> {
 
     // Suppliers search in their products list.
     // Customers search in their list of products, or in the full supplier's list (if supplier's ID is specified)
@@ -77,12 +77,14 @@ export class ProductsService {
       ref = ref.where('cid', 'in', [this.businessService.myBid, ProductsService.PUBLIC_PRODUCT_CID_VALUE]);
 
     // Pagination
-    if(startAfterName)
-      ref = ref.startAfter(startAfterName);
-    if(endBeforeName)
-      ref = ref.endBefore(endBeforeName).limitToLast(10);
-    else
-      ref = ref.limit(10);
+    if(pagination) {
+      if(startAfterName)
+        ref = ref.startAfter(startAfterName);
+      if(endBeforeName)
+        ref = ref.endBefore(endBeforeName).limitToLast(10);
+      else
+        ref = ref.limit(10);
+    }
 
     // Get results
     try {
@@ -105,71 +107,44 @@ export class ProductsService {
   }
 
 
-  /** Load specific products according to a list of IDs */
-  async loadProductsByIds(...ids: string[]) : Promise<ProductPublicDoc[] | ProductCustomerDoc[]> {
+  /** Load product data. Each side loads the data from his collection */
+  async getProduct(productId: string) : Promise<ProductPublicDoc | ProductCustomerDoc> {
 
-    const promises = ids.map(async (id)=>{
-
-      // Check if already loaded
-      let product = this.loadedProducts.find((p)=>p.id == id);
-
-      // If has not loaded yet, load from server
-      if(!product) {
-        const collection = this.businessService.side == 's' ? this.allProductsRef : this.customerProductsRef;
-        product = (await collection.doc(id).get()).data();
-      }
-
+    // Check whether the product has already been loaded
+    const product = this.loadedProducts.find((p)=>p.id == productId);
+    if(product)
       return product;
 
-    });
-
-    // When done loading all of the products, return the list
-    this.loadedProducts = await Promise.all(promises);
-    return this.loadedProducts;
-
-  }
-
-
-  /** Save product private data and public data - by customers only */
-  async saveCustomerProduct(product: FullProductDoc, imageFile?: File) {
-
-    // Split the document into public data and private data
-    const splitProduct = ProductFactory.SplitProduct(product);
-
-    // Set the customer ID in the public part
-    product.cid = this.businessService.myBid;
-
-    // Save the public data
-    // TODO: When the customer cannot edit the public data anymore?
-    await this.saveProductPublicData(product, imageFile);
-
-    // Set update time
-    splitProduct.private.customerModified = Date.now();
-
-    // Save the private data
-    try {
-      await this.customerProductsRef.doc(product.id).set(splitProduct.private, {merge: true});
-    }
-    catch (e) {
-      console.error(e);
-    }
+    // Load from server
+    const collection = this.businessService.side == 's' ? this.allProductsRef : this.customerProductsRef;
+    const res = await collection.doc(productId).get();
+    return res.data() as ProductPublicDoc | ProductCustomerDoc;
 
   }
 
 
-  /** Save product public data - by suppliers and customers */
-  async saveProductPublicData(product: ProductPublicDoc, imageFile?: File) {
+  /** Save product's data
+   * The products changes will be saved in the supplier's collection OR in the customer's collection.
+   * New product that was created by the customer will be saved also in the supplier's collection.
+   * */
+  async saveProduct(product: ProductPublicDoc, imageFile?: File) : Promise<boolean> {
+
+    const isNew = !product.id;
+
+    // Set update info
+    product.modified = Date.now();
+    product.modifiedBy = this.businessService.myBid;
 
     // If new, create ID and stamp creation time
-    if(!product.id) {
+    if(isNew) {
       product.id = this.allProductsRef.doc().id;
-      product.created = Date.now();
+      product.created = product.modified;
     }
 
-    // Upload or delete product image
+    // Upload or delete product's image
     try {
 
-      // If there is no logo, delete the file (if exists)
+      // If there is no image, delete the file (will be deleted if exists)
       if(!product.image)
         this.filesService.deleteFile(product.id);
 
@@ -182,17 +157,91 @@ export class ProductsService {
       console.error(e);
     }
 
-    // Set update info
-    product.modified = Date.now();
-    product.modifiedBy = this.businessService.myBid;
-
-    // Save the public product's data
     try {
-      await this.allProductsRef.doc(product.id).set(product, {merge: true});
+
+      const batch = firebase.firestore().batch();
+
+      // For a customer, save the product in his collection TODO: Supplier suppose to change also the customer data (with alert)
+      if(this.businessService.side == 'c')
+        batch.set(this.customerProductsRef.doc(product.id), product, {merge: true});
+
+      // For a supplier, or for a new products created by the customer, save (also) in the products collection (only the public part)
+      if(this.businessService.side == 's' || isNew)
+        batch.set(this.allProductsRef.doc(product.id), ProductsService.ToPublic(product), {merge: true});
+
+      await batch.commit();
+      return true;
+
     }
     catch (e) {
       console.error(e);
     }
+
+  }
+
+
+  async deleteProduct(productId: string) {
+
+    // Delete product image
+    this.filesService.deleteFile(productId);
+
+    // Delete product data
+    const collection = this.businessService.side == 's' ? this.allProductsRef : this.customerProductsRef;
+    return await collection.doc(productId).delete();
+
+  }
+
+
+  /** Load product's customer's data and merge it to the product document*/
+  async extendWithCustomerData(product: ProductPublicDoc | ProductOrder) : Promise<ProductCustomerDoc | FullCustomerOrderProductDoc> {
+
+    const newData = await this.getProduct(product.id) as ProductCustomerDoc;
+
+    const extended = product as ProductCustomerDoc | FullCustomerOrderProductDoc;
+
+    // Get all the properties of the customer data
+    extended.category = newData.category;
+    extended.catalogNumC = newData.catalogNumC;
+    extended.orderWeightTolerance = newData.orderWeightTolerance;
+    extended.receiveWeightTolerance = newData.receiveWeightTolerance;
+    extended.minPrice = newData.minPrice;
+    extended.maxPrice = newData.maxPrice;
+
+    return extended;
+
+  }
+
+
+  /** Transform full data product (customer's or order's) into product public document*/
+  static ToPublic(productDoc: ProductCustomerDoc) : ProductPublicDoc {
+
+    // Get only the general properties
+    const product = {
+      id: productDoc.id,
+      cid: productDoc.cid,
+      sid: productDoc.sid,
+      name: productDoc.name,
+      catalogNumS: productDoc.catalogNumS,
+      image: productDoc.image,
+      description: productDoc.description,
+      type: productDoc.type,
+      tara: productDoc.tara,
+      unitWeight: productDoc.unitWeight,
+      isVeg: productDoc.isVeg,
+      agriLink: productDoc.agriLink,
+      orderMin: productDoc.orderMin,
+      barcode: productDoc.barcode,
+      created: productDoc.created,
+      modified: productDoc.modified,
+      price: productDoc.price,
+    } as ProductPublicDoc;
+
+    // Clear undefined fields
+    for(let p in product)
+      if(product[p] === undefined)
+        delete product[p];
+
+    return product;
 
   }
 

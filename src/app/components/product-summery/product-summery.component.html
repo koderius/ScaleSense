@@ -1,4 +1,4 @@
-<ion-item *ngIf="!productDetails">
+<ion-item *ngIf="!productOrder">
   <ion-thumbnail slot="start">
     <ion-skeleton-text animated></ion-skeleton-text>
   </ion-thumbnail>
@@ -7,30 +7,30 @@
   </h6>
 </ion-item>
 
-<ion-item lines="none" *ngIf="productDetails">
+<ion-item lines="none" *ngIf="productOrder">
   <ion-thumbnail slot="start">
-    <img [src]="productDetails.image || '../../assets/defaults/default_logo.png'">
+    <img [src]="productOrder.image || '../../assets/defaults/default_logo.png'">
   </ion-thumbnail>
   <ion-row class="inner-item">
 
     <ion-col size="3">
-      <h6 (click)="navService.goToEditProduct(productDetails.id)" style="cursor: pointer">{{productDetails.name}}</h6>
+      <h6 (click)="navService.goToEditProduct(productOrder.id)" style="cursor: pointer">{{productOrder.name}}</h6>
     </ion-col>
 
     <ion-col>
-      <h6 *ngIf="!edit || !hasPermissionToChangePrice">{{productOrder.pricePerUnit || productDetails.price | price}}</h6>
+      <h6 *ngIf="!edit || !hasPermissionToChangePrice">{{productOrder.priceInOrder || productOrder.price | price}}</h6>
       <ion-input *ngIf="edit && hasPermissionToChangePrice" type="number" step="any" [(ngModel)]="tempPrice" select-text></ion-input>
       <ion-text *ngIf="edit && hasPermissionToChangePrice" class="ion-margin-end">{{null | price}}</ion-text>
     </ion-col>
 
     <ion-col>
-      <h6 *ngIf="!edit">{{productOrder.amount | unitAmount : productDetails.type}}</h6>
+      <h6 *ngIf="!edit">{{productOrder.amount | unitAmount : productOrder.type}}</h6>
       <ion-input *ngIf="edit" type="number" step="any" [(ngModel)]="tempAmount" select-text></ion-input>
-      <ion-text *ngIf="edit" class="ion-margin-end">{{null | unitAmount : productDetails.type}}</ion-text>
+      <ion-text *ngIf="edit" class="ion-margin-end">{{null | unitAmount : productOrder.type}}</ion-text>
     </ion-col>
 
     <ion-col>
-      <h6>{{productOrder.amount * (productOrder.pricePerUnit || productDetails.price) | price}}</h6>
+      <h6>{{productOrder.amount * (productOrder.priceInOrder || productOrder.price) | price}}</h6>
     </ion-col>
 
     <ion-col [size]="showComment ? 1 : 2" *ngIf="editProduct">
@@ -66,7 +66,7 @@
 
     <ion-col *ngIf="returnBtn">
       <ion-button id="extra-btn" color="dark" fill="outline" shape="round" (click)="returnBtnClicked.emit(productOrder)" *ngIf="!productOrder.amountReturned">החזרת מוצר</ion-button>
-      <ion-label color="danger" *ngIf="productOrder.amountReturned">הוחזרו {{productOrder.amountReturned | unitAmount : productDetails.type}}</ion-label>
+      <ion-label color="danger" *ngIf="productOrder.amountReturned">הוחזרו {{productOrder.amountReturned | unitAmount : productOrder.type}}</ion-label>
     </ion-col>
 
   </ion-row>

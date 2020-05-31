@@ -19,16 +19,16 @@
       <ion-col>
         <ion-item id="product-item" lines="none">
           <ion-thumbnail slot="start">
-            <img [src]="productData?.image">
+            <img [src]="returnDoc.product?.image">
           </ion-thumbnail>
           <ion-label>
             <h1>
-              <ion-text color="primary" style="font-weight: bold">{{productData?.name}}</ion-text>
+              <ion-text color="primary" style="font-weight: bold">{{returnDoc.product?.name}}</ion-text>
             </h1>
             <h2 style="display: flex; justify-content: space-between">
-              <p><b>מחיר לק"ג: </b><ion-text>{{returnDoc.product.pricePerUnit | price}}</ion-text></p>
-              <p><b>כמות שהוזמנה: </b><ion-text>{{returnDoc.product.amount | unitAmount : productData?.type}}</ion-text></p>
-              <p><b>סה"כ מחיר: </b><ion-text>{{(returnDoc.product.amount * returnDoc.product.pricePerUnit) | price}}</ion-text></p>
+              <p><b>מחיר לק"ג: </b><ion-text>{{returnDoc.product.priceInOrder | price}}</ion-text></p>
+              <p><b>כמות שהוזמנה: </b><ion-text>{{returnDoc.product.amount | unitAmount : returnDoc.product?.type}}</ion-text></p>
+              <p><b>סה"כ מחיר: </b><ion-text>{{(returnDoc.product.amount * returnDoc.product.priceInOrder) | price}}</ion-text></p>
             </h2>
           </ion-label>
         </ion-item>
@@ -69,7 +69,7 @@
         <ion-button fill="outline" size="large" style="max-width: 8em" (click)="weigh()">שקילת מוצר</ion-button>
         <p style="margin: 0.5em">
           <b>כמות להחזרה: </b>
-          <ion-text>{{returnDoc.product.amountReturned ? (returnDoc.product.amountReturned | unitAmount : productData?.type) : 'טרם נשקל'}}</ion-text>
+          <ion-text>{{returnDoc.product.amountReturned ? (returnDoc.product.amountReturned | unitAmount : returnDoc.product?.type) : 'טרם נשקל'}}</ion-text>
         </p>
       </ion-col>
     </ion-row>

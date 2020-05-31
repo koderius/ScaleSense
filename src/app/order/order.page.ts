@@ -1,10 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {SuppliersService} from '../services/suppliers.service';
-import {OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
+import {OrderDoc, OrderStatus} from '../models/OrderI';
 import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
-import {FullProductDoc} from '../models/ProductI';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
 import {formatDate} from '@angular/common';
@@ -13,7 +12,7 @@ import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {NotificationsService} from '../services/notifications.service';
-import {UserPermission} from '../models/UserDoc';
+import {ProductCustomerDoc, ProductOrder} from '../models/ProductI';
 
 @Component({
   selector: 'app-order',
@@ -57,8 +56,8 @@ export class OrderPage implements OnInit {
   showAllSuppliers: boolean;
 
   /** The list of products of the order's supplier, and a filtered list while querying */
-  supplierProducts: FullProductDoc[] = [];
-  filteredSupplierProducts: FullProductDoc[] = null;
+  supplierProducts: ProductCustomerDoc[] = [];
+  filteredSupplierProducts: ProductCustomerDoc[] = null;
 
   /** Date and time inputs */
   dateFocus: boolean;
@@ -155,10 +154,10 @@ export class OrderPage implements OnInit {
 
     this._page = step;
 
-    // On page no. 2, load all the products of the current supplier
+    // On page no. 2, load the products of the current supplier
     if(this._page == 2) {
       this.supplierProducts = [];     // (Clear before to avoid flashing in the meanwhile)
-      this.productsService.loadAllProductsOfSupplier(this.order.sid).then((res)=>{
+      this.productsService.queryMyProducts(null, this.order.sid).then((res)=>{
         this.supplierProducts = res;
       });
     }
@@ -215,7 +214,7 @@ export class OrderPage implements OnInit {
     this.originalOrder = this.order.getDocument();
 
     // Load only the products that are in this order (if there are)
-    this.supplierProducts = await this.productsService.loadProductsByIds(...this.order.products.map((p)=>p.id));
+    this.supplierProducts = await this.order.products;
 
     // Start auto saving the order data on the local storage every 3 seconds for backup
     // Save as long as there are changes being made since the last save. clear the backup when saving or when leaving safely through a guard
@@ -269,12 +268,6 @@ export class OrderPage implements OnInit {
     }
     else
       this.order.supplyTime = null;
-  }
-
-
-  /** Get product content by its ID */
-  findProductDetails(id: string) {
-    return this.supplierProducts.find((p)=>p.id == id);
   }
 
 
@@ -359,10 +352,8 @@ export class OrderPage implements OnInit {
    * 1. Presenting the sorted products
    * 2. Having a constant order when comparing to products lists
    * */
-  sortProductsByName(products: ProductOrder[]) {
-    return (products || []).sort((a, b)=>{
-      const p1 = this.findProductDetails(a.id);
-      const p2 = this.findProductDetails(b.id);
+  sortProductsByName(products: ProductOrder[]): ProductOrder[] {
+    return (products || []).sort((p1, p2)=>{
       if(p1 && p2) {
         if(p1.name > p2.name)
           return 1;
@@ -382,7 +373,7 @@ export class OrderPage implements OnInit {
 
   async clearOrderFromList(product: ProductOrder) {
     if(this.businessService.side == 'c' || (this.order.products.length > 1 &&await this.alerts.areYouSure('האם לבטל פריט זה?')))
-      this.order.setProductAmount(product.id, 0, null);
+      this.order.setProductAmount(product, 0, null);
     if(!this.order.products.length)
       this.page = 2;
   }
@@ -432,9 +423,8 @@ export class OrderPage implements OnInit {
 
   // Check that all orders are not below minimum amount
   checkMinimumAmount() {
-    return !this.order.products.some((p)=>{
-      const product = this.findProductDetails(p.id);
-      if(product.orderMin && p.amount < product.orderMin) {
+    return !this.order.products.some((product)=>{
+      if(product.orderMin && product.amount < product.orderMin) {
         alert(`מינימום הזמנה עבור ${product.name}: ${this.unitPipe.transform(product.orderMin, product.type)}`);
         return true;
       }

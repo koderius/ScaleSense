@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import {ModalController, ToastController} from '@ionic/angular';
-import {FullProductDoc} from '../models/ProductI';
 import {ReturnDoc, ReturnStatus} from '../models/Return';
 import {ProductsService} from '../services/products.service';
 import {WeighService} from '../services/weigh.service';
@@ -16,7 +15,6 @@ import {NavigationService} from '../services/navigation.service';
 export class ReturnGoodModalComponent implements OnInit {
 
   returnDoc: ReturnDoc;
-  productData: FullProductDoc;
 
   ReturnStatus = ReturnStatus;
 
@@ -32,10 +30,6 @@ export class ReturnGoodModalComponent implements OnInit {
 
 
   async ngOnInit() {
-
-    // Load the product data if needed
-    if(!this.productData)
-      this.productData = (await this.productsService.loadProductsByIds(this.returnDoc.product.id))[0];
 
     // Generate ID according to the order and the product (for new documents)
     ReturnService.ReturnID(this.returnDoc);
@@ -54,7 +48,7 @@ export class ReturnGoodModalComponent implements OnInit {
 
   async weigh() {
     // Get net weight
-    await this.weighService.openProductsWeightModal(this.returnDoc.product, this.productData);
+    await this.weighService.openProductsWeightModal(this.returnDoc.product);
     // Pass the weight data from the final amount to the returned amount, and delete it
     this.returnDoc.product.amountReturned = this.returnDoc.product.finalWeight;
     delete this.returnDoc.product.finalWeight;

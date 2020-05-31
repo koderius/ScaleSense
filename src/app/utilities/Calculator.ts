@@ -1,13 +1,13 @@
-import {ProductPublicDoc} from '../models/ProductI';
+import {ProductOrder} from '../models/ProductI';
 
 export class Calculator {
 
   /** Calc the expected net weight according to a given amount (the amount that is written in the order) */
-  static ProductExpectedNetWeight(product: ProductPublicDoc, amount: number) : number {
+  static ProductExpectedNetWeight(product: ProductOrder) : number {
 
     // If the product is measured by weight (type = 0), keep the weight.
     // If measured by some unit (type > 0), take the number of units multiply unit weight
-    return amount * (product.type ? product.unitWeight : 1);
+    return product.amount * (product.type ? product.unitWeight : 1);
 
   }
 

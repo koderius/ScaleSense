@@ -1,3 +1,5 @@
+import {BusinessSide} from './Business';
+
 /** These are the product's public core properties */
 export interface ProductPublicDoc {
 
@@ -49,7 +51,7 @@ export interface ProductPublicDoc {
   /** Time of updating */
   modified?: number;
 
-  /** Last business that modified the product */
+  /** BID of the user who changed it */
   modifiedBy?: string;
 
   /** General price (until special prices are activated) */
@@ -77,13 +79,52 @@ export interface ProductCustomerDoc extends ProductPublicDoc{
   /** Max weight differences between final order to reception (in %) */
   receiveWeightTolerance?: number;
 
-  /** Time of updating the customer properties */
-  customerModified?: number;
-
   /** Special price that has been offered */
   price?: number;
 
 }
+
+
+export interface ProductOrder extends ProductPublicDoc {
+
+  /** The amount in the order */
+  amount?: number;
+
+  /** The price as it in the order */
+  priceInOrder?: number;
+
+  /** Product's comment (if there is) */
+  comment?: string;
+
+  /** Number of boxes for that product (edited by supplier in final approval) */
+  boxes?: number;
+
+  /** Weight after received and weighed by the customer (in Kg) */
+  finalWeight?: number;
+
+  /** Whether the final weight was entered manually during the reception */
+  isManualWeight?: boolean;
+
+  /** Whether the final weight matches the amount in the order (according to product's tolerance) */
+  isWeightMatch?: boolean;
+
+  /** Whether the price/amount was changed manually during the reception */
+  priceChangedInReception?: boolean;
+  amountChangedInReception?: boolean;
+
+  /** Flag whether the price was changed by one of the sides.
+   * If it was changed, the other side can remove the product from the order.
+   * When the other side approves the changes the property is being deleted */
+  priceChangedInOrder?: BusinessSide;
+
+  /** The amount that has been returned to the supplier */
+  amountReturned?: number;
+
+}
+
+
+/** Document contains all product data, including customer details and order details */
+export interface FullCustomerOrderProductDoc extends ProductCustomerDoc, ProductOrder {}
 
 
 export enum ProductType {

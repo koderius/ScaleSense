@@ -1,6 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ProductOrder} from '../../models/OrderI';
-import {ProductPublicDoc} from '../../models/ProductI';
+import {ProductOrder} from '../../models/ProductI';
 import {NavigationService} from '../../services/navigation.service';
 import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
 import {AlertsService} from '../../services/alerts.service';
@@ -17,7 +16,6 @@ import {UserPermission} from '../../models/UserDoc';
 export class ProductSummeryComponent implements OnInit {
 
   @Input() productOrder: ProductOrder;
-  @Input() productDetails: ProductPublicDoc;
   @Input() editProduct: boolean;
   @Input() showComment: boolean;
   @Input() editComment: boolean;
@@ -53,24 +51,24 @@ export class ProductSummeryComponent implements OnInit {
   async onEditClicked() {
     this.edit = true;
     this.tempAmount = this.productOrder.amount;
-    this.tempPrice = this.productOrder.pricePerUnit;
+    this.tempPrice = this.productOrder.priceInOrder;
     this.editClicked.emit();
   }
 
   async onAcceptChange() {
 
     // Alert for minimum amount
-    if(this.tempAmount < this.productDetails.orderMin) {
-      alert(`מינימום הזמנה עבור ${this.productDetails.name}: ${this.unitAmountPipe.transform(this.productDetails.orderMin, this.productDetails.type)}`);
+    if(this.tempAmount < this.productOrder.orderMin) {
+      alert(`מינימום הזמנה עבור ${this.productOrder.name}: ${this.unitAmountPipe.transform(this.productOrder.orderMin, this.productOrder.type)}`);
       return;
     }
 
     // Alert for changing price
-    if(this.tempPrice != this.productOrder.pricePerUnit && await this.alertsService.areYouSure('בוצע שינוי במחיר המוצר', 'האם לשנות את מחיר המוצר באופן קבוע או רק להזמנה זו?', 'באופן קבוע', 'להזמנה זו בלבד')) {
-      this.productService.saveProductPublicData({price: this.tempPrice}).then(()=>alert('מחיר מוצר התעדכן'));
+    if(this.tempPrice != this.productOrder.priceInOrder && await this.alertsService.areYouSure('בוצע שינוי במחיר המוצר', 'האם לשנות את מחיר המוצר באופן קבוע או רק להזמנה זו?', 'באופן קבוע', 'להזמנה זו בלבד')) {
+      this.productService.saveProduct({price: this.tempPrice}).then(()=>alert('מחיר מוצר התעדכן'));
     }
 
-    this.productOrder.pricePerUnit = this.tempPrice;
+    this.productOrder.priceInOrder = this.tempPrice;
     this.productOrder.amount = this.tempAmount;
     this.edit = false;
     this.doneEdit.emit();

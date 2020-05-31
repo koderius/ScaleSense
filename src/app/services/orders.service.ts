@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OrderChange, OrderDoc, OrderStatus, ProductOrder} from '../models/OrderI';
-import {ProductsService} from './products.service';
+import {OrderChange, OrderDoc, OrderStatus} from '../models/OrderI';
 import {formatNumber} from '@angular/common';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -14,8 +13,9 @@ import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
 import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
-import {Objects} from '../utilities/objects';
 import {Dictionary} from '../utilities/dictionary';
+import {ProductOrder} from '../models/ProductI';
+import {ProductsService} from './products.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +39,6 @@ export class OrdersService {
 
   constructor(
     private authService: AuthSoftwareService,
-    private productsService: ProductsService,
     private suppliersService: SuppliersService,
     private customersService: CustomersService,
     private businessService: BusinessService,

@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {FullProductDoc, ProductType} from '../models/ProductI';
+import {ProductCustomerDoc, ProductPublicDoc, ProductType} from '../models/ProductI';
 import {ActivatedRoute} from '@angular/router';
 import {ProductsService} from '../services/products.service';
 import {FilesService} from '../services/files.service';
@@ -11,9 +11,6 @@ import {BusinessService} from '../services/business.service';
 import {Objects} from '../utilities/objects';
 import {CameraService} from '../services/camera.service';
 import {FormControl, Validators} from '@angular/forms';
-import {UsersService} from '../services/users.service';
-import {UserPermission} from '../models/UserDoc';
-import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-edit-product',
@@ -22,15 +19,20 @@ import {NavigationService} from '../services/navigation.service';
 })
 export class EditProductPage implements OnInit {
 
-  product: FullProductDoc;
+  // Current product being edited
+  product: ProductCustomerDoc;
 
-  oldProduct: FullProductDoc;
+  // Product details before editing (for checking changes)
+  oldProduct: ProductPublicDoc | ProductCustomerDoc;
 
+  // Image file & file preview (base64) before uploading the image and getting its URL
   logoPreview: string;
   tempLogo: File;
 
+  // List of product types
   productTypes = Enum.ListEnum(ProductType);
 
+  // Form field whether the box included. Tara (box weight) will be entered only if not-included (false)
   taraIncluded: boolean = true;
 
   // Price field control
@@ -55,18 +57,20 @@ export class EditProductPage implements OnInit {
 
     // Get ID from URL. if 'new', start new empty product, else, get the product data by the ID
     const id = this.activatedRoute.snapshot.params['id'];
-    if(id == 'new') {
-      this.product = {};
-      // For suppliers, auto fill the supplier ID, and set the product to be public for all customers
-      if(this.businessService.side == 's') {
-        this.product.sid = this.businessService.myBid;
-        this.product.cid = ProductsService.PUBLIC_PRODUCT_CID_VALUE;
-      }
-    }
-    else {
-      this.product = (await this.productsService.loadProductsByIds(id))[0];
-    }
 
+    if(id == 'new') {
+      // New product
+      this.product = {};
+      // Fill creator ID
+      this.businessService.side == 'c' ? this.product.cid = this.businessService.myBid : this.product.sid = this.businessService.myBid;
+      // For suppliers, set the product to be public for all customers
+      if(this.businessService.side == 's')
+        this.product.cid = ProductsService.PUBLIC_PRODUCT_CID_VALUE;
+    }
+    else
+      this.product = await this.productsService.getProduct(id);
+
+    // Save a copy of current data
     this.oldProduct = {...this.product};
 
     // If no tara weight, it means that the tara included
@@ -125,29 +129,25 @@ export class EditProductPage implements OnInit {
 
     // Save the product (different methods for supplier and customer) - including upload the image file
     const l = this.alerts.loaderStart('שומר פרטי מוצר...');
-
-    if(this.businessService.side == 'c')
-      await this.productsService.saveCustomerProduct(this.product, this.tempLogo);
-    else
-      await this.productsService.saveProductPublicData(this.product, this.tempLogo);
-
+    if(await this.productsService.saveProduct(this.product, this.tempLogo)) {
+      this.oldProduct = {...this.product};
+      alert('נתוני מוצר נשמרו');
+    }
     this.alerts.loaderStop(l);
-
-    this.oldProduct = {...this.product};
-
-    alert('נתוני מוצר נשמרו');
 
   }
 
 
   checkFields() : boolean {
 
+    // All required fields
     if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.image || !this.product.barcode || !this.product.price) {
       alert('יש למלא את כל השדות המסומנים בכוכבית');
       return false;
     }
 
-    if(this.businessService.side == 'c' && (!this.product.catalogNumC || !this.product.category)) {
+    // All additional required fields for customers
+    if(this.businessService.side == 'c' && (!(this.product as ProductCustomerDoc).catalogNumC || !(this.product as ProductCustomerDoc).category)) {
       alert('יש למלא את כל השדות המסומנים בכוכבית');
       return false;
     }
@@ -174,15 +174,18 @@ export class EditProductPage implements OnInit {
 
   onPriceLimitChange() {
 
+    // Consider as customer's document
+    const product = this.product as ProductCustomerDoc;
+
     // Make sure limits are valid
-    if(this.product.minPrice > this.product.maxPrice)
-      this.product.minPrice = this.product.maxPrice;
+    if(product.minPrice > product.maxPrice)
+      product.minPrice = product.maxPrice;
 
     // Create a price validator within there limits
     this.priceFormControl.clearValidators();
     this.priceFormControl.setValidators([
-      Validators.min(this.product.minPrice),
-      Validators.max(this.product.maxPrice)
+      Validators.min(product.minPrice),
+      Validators.max(product.maxPrice)
     ]);
 
     this.priceFormControl.setValue(this.product.price);

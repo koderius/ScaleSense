@@ -52,19 +52,19 @@
               <ion-icon slot="icon-only" name="checkmark"></ion-icon>
             </ion-button>
           </ion-col>
-          <ion-col>{{productData(product.id).name}}</ion-col>
+          <ion-col>{{product.name}}</ion-col>
           <ion-col>
-            <ion-text *ngIf="editProduct != product.id">{{product.amount | unitAmount : productData(product.id).type}}</ion-text>
+            <ion-text *ngIf="editProduct != product.id">{{product.amount | unitAmount : product.type}}</ion-text>
             <ion-input *ngIf="editProduct == product.id" type="number" [(ngModel)]="tempAmount" select-text (keyup.enter)="onEditDone(product)"></ion-input>
-            <ion-text *ngIf="editProduct == product.id">{{null | unitAmount : productData(product.id).type}}</ion-text>
+            <ion-text *ngIf="editProduct == product.id">{{null | unitAmount : product.type}}</ion-text>
           </ion-col>
           <ion-col>
             <ion-icon *ngIf="editProduct != product.id && isPriceExceeded(product)" name="alert-circle" color="danger" style="position: absolute; left: 0;" matTooltip="שים לב, חריגה במחיר"></ion-icon>
-            <ion-text *ngIf="editProduct != product.id" [color]="isPriceExceeded(product) ? 'danger' : ''">{{product.pricePerUnit | price}}</ion-text>
+            <ion-text *ngIf="editProduct != product.id" [color]="isPriceExceeded(product) ? 'danger' : ''">{{product.priceInOrder | price}}</ion-text>
             <ion-input *ngIf="editProduct == product.id" type="number" [(ngModel)]="tempPrice" select-text (keyup.enter)="onEditDone(product)"></ion-input>
             <ion-text *ngIf="editProduct == product.id">{{null | price}}</ion-text>
           </ion-col>
-          <ion-col style="font-weight: bold">{{(product.pricePerUnit * product.amount) | price}}</ion-col>
+          <ion-col style="font-weight: bold">{{(product.priceInOrder * product.amount) | price}}</ion-col>
           <ion-col size="1" style="justify-content: space-around">
             <ion-button fill="clear" color="secondary" (click)="weightIconClicked(product)" title="פתח אשף שקילה">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_weight.svg"></ion-icon>
@@ -79,7 +79,7 @@
             <ion-icon *ngIf="product.finalWeight || product.finalWeight === 0" [name]="product.isWeightMatch ? 'checkmark-circle' : 'close-circle'" [color]="product.isWeightMatch ? 'success' : 'danger'" [title]="product.isWeightMatch ? 'תואם להזמנה' : 'לא תואם להזמנה'"></ion-icon>
           </ion-col>
           <ion-col>{{product.finalWeight ? (weightGap(product) | unitAmount : 0) : (product.finalWeight === 0 ? 'חוסר' : '-')}}</ion-col>
-<!--          <ion-col>{{product.finalWeight ? (product.pricePerUnit * (product.finalWeight - product.amount) | price) : '-'}}</ion-col>-->
+<!--          <ion-col>{{product.finalWeight ? (product.priceInOrder * (product.finalWeight - product.amount) | price) : '-'}}</ion-col>-->
         </ion-row>
 
       </ion-grid>

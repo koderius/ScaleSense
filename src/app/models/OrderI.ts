@@ -1,47 +1,5 @@
 import {BusinessSide} from './Business';
-
-export type ProductOrder = {
-
-  /** The product ID */
-  id?: string;
-
-  /** The product's properties, as they were when the order has finally approved (JSON) */
-  productDocSnapshot?: string;
-
-  /** The amount to order */
-  amount?: number;
-
-  /** Product's comment (if there is) */
-  comment?: string;
-
-  /** Product's unit price */
-  pricePerUnit?: number;
-
-  /** Number of boxes for that product (edited by supplier) */
-  boxes?: number;
-
-  /** Weight after received and weighed by the customer */
-  finalWeight?: number;
-
-  /** Whether the final amount matches the amount in the order (according to product's tolerance) */
-  isWeightMatch?: boolean;
-
-  /** Whether the weight was entered manually during the reception */
-  isManualWeight?: boolean;
-
-  /** Whether the price/amount was changed manually during the reception */
-  priceChangedInReception?: boolean;
-  amountChangedInReception?: boolean;
-
-  /** Flag whether the price was changed by one of the sides.
-   * If it was changed, the other side can remove the product from the order.
-   * When the other side approves the changes the property is being deleted */
-  priceChangedInOrder?: BusinessSide;
-
-  /** The amount that has been returned to the supplier */
-  amountReturned?: number;
-
-}
+import {ProductOrder} from './ProductI';
 
 export interface OrderChange {
 
