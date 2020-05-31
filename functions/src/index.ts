@@ -75,29 +75,40 @@ admin.initializeApp();
 //
 // });
 
-
+/** *
+ * Get user details as User Document + password and create/update the user in the firebase auth module + update the user document in firestore.
+ * If the user document contains UID, it will update an existed user, else it will create a new user with auto generated UID.
+ * The user document will be set with the business data (side + business ID) and the default permissions of his given role.
+ */
 export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc, password: string}, context) => {
 
   // Check admin
   const uid = context.auth ? context.auth.uid : '';
   const usersRef = admin.firestore().collection('users');
   const user = await usersRef.doc(uid).get();
-  if(user.get('role') < 3)
-    throw new HttpsError('permission-denied', 'Only admins can create users');
+  if(user.get('role') != 3 && !user.get('permissions.canPermit'))
+    throw new HttpsError('permission-denied', 'Only admins and permitted mangers can create / update users');
 
   // Check required data
   if(data.userDoc && data.password) {
 
     const userDoc = data.userDoc;
 
+    const userAuthDetails = {
+      displayName: userDoc.displayName || '',
+      email: userDoc.email || '',
+      password: data.password,
+    };
+
+    let userRec;
+
     try {
 
-      // Create user
-      const userRec = await admin.auth().createUser({
-        displayName: userDoc.displayName || '',
-        email: userDoc.email || '',
-        password: data.password,
-      });
+      // Create user with auto UID, or edit the user with the given UID
+      if(!userDoc.uid)
+        userRec = await admin.auth().createUser(userAuthDetails);
+      else
+        userRec = await admin.auth().updateUser(userDoc.uid, userAuthDetails);
 
       // Get business details
       const side = user.get('side');
@@ -115,7 +126,7 @@ export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc,
         side: side,
         permissions: permissions,
         exist: true,
-      });
+      }, {merge: true});
 
       return userDoc;
 

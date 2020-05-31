@@ -14,6 +14,8 @@ export class PermissionsListComponent implements OnInit {
   /** Permissions for role */
   role: UserRole;
 
+  UserPermission = UserPermission;
+
   @Input() set userOrRole(userOrRole: UserDoc | UserRole) {
 
     // Clear permissions to reset view
@@ -71,6 +73,9 @@ export class PermissionsListComponent implements OnInit {
   // Permissions that some users have different settings than role's default
   intermediate: string[] = [];
 
+  // Whether the permission to manage all permissions is checked
+  managePermissionsChecked: boolean;
+
   constructor (private usersService: UsersService) {}
 
   ngOnInit() {}
@@ -90,13 +95,34 @@ export class PermissionsListComponent implements OnInit {
     this.newPermissions[permission] = checked;
     // Report whether there are changes
     this.onChange.emit(this.hasChanges());
+
+    if(permission == UserPermission.MASTER)
+      this.managePermissionsChecked = checked;
+
   }
 
+
+  // Only secondary managers can get the mange permission
+  isShown(p: UserPermission) {
+    return p != UserPermission.MASTER || (this.userDoc && this.userDoc.role == UserRole.MANAGER);
+  }
+
+
+  // Disable all other permissions while the manage permission is checked
+  isDisabled(p: UserPermission) {
+    return this.managePermissionsChecked && p != UserPermission.MASTER;
+  }
 
 
   async save() {
 
     let success;
+
+    // Set all permissions to master
+    if(this.managePermissionsChecked)
+      this.allPermissions.forEach((p)=>{
+        this.newPermissions[p] = true;
+      });
 
     // Set the new permissions for the user
     if(this.userDoc)

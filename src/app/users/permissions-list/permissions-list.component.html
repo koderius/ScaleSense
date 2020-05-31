@@ -2,14 +2,23 @@
 
   <div id="grid">
 
-    <ion-item *ngFor="let p of allPermissions" lines="none">
+    <ion-item *ngFor="let p of allPermissions" lines="none"
+              [matTooltip]="p == UserPermission.MASTER ? 'הענק גישה לניהול משתמשים והתראות' : ''"
+              [ngClass]="isShown(p) ? '' : 'ion-hide'"
+    >
+
       <ion-checkbox slot="start"
                     [checked]="oldPermissions[p]"
                     [indeterminate]="intermediate.includes(p)"
                     [title]="intermediate.includes(p) ? 'קיימים משתמשים מדרג זה בעלי הגדרות שונות' : ''"
                     (ionChange)="onCheck(p, $event.detail.checked)"
+                    [disabled]="isDisabled(p)"
       ></ion-checkbox>
-      <ion-label>{{p | permissionName}}</ion-label>
+
+      <ion-label [color]="p == UserPermission.MASTER ? 'danger' : ''">
+        {{p | permissionName}}
+      </ion-label>
+
     </ion-item>
 
   </div>

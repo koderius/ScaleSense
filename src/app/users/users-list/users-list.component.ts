@@ -22,12 +22,15 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
   UserRole = UserRole;
 
+  // The edited user
+  userToEdit: UserDoc;
+
   get users() {
     return this.usersService.users;
   }
 
   constructor(
-    private usersService: UsersService,
+    public usersService: UsersService,
     private alerts: AlertsService,
   ) { }
 
@@ -51,26 +54,31 @@ export class UsersListComponent implements OnInit, OnDestroy {
   }
 
 
-  // Is current user is the admin
-  amIAdmin() {
-    return this.usersService.myDoc.role == UserRole.ADMIN;
+  // Everyone (who has permission to this page) can edit details for equal or lower roles
+  canEditDetails(user: UserDoc) {
+    return this.usersService.myDoc.role >= user.role;
   }
 
 
-  // Admin and the user himself can edit details
-  canEditDetails(user: UserDoc) {
-    return this.amIAdmin() || this.usersService.myDoc.uid == user.uid;
+  // Cannot edit permissions to admin or to myself
+  canEditPermissions(user: UserDoc) {
+    return user.role != UserRole.ADMIN && user.uid != this.usersService.myDoc.uid;
   }
 
 
   // When selection a user for permissions editing
   onPermissionClicked(user: UserDoc) {
+    this.userToEdit = null;
     this.onEditPermissions.emit(this.selectedUser == user.uid ? null : user);
   }
 
 
-  onEditUserClicked(user: UserDoc) {
-    alert('מה למשל אפשר לערוך פה חוץ משם מלא?');
+  async onEditUserClicked(user: UserDoc) {
+    if(this.userToEdit && this.userToEdit.uid == user.uid)
+      this.userToEdit = null;
+    else
+      this.userToEdit = user;
+    this.selectedUser = null;
   }
 
 

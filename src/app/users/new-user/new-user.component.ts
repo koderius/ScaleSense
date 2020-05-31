@@ -22,7 +22,10 @@ export class NewUserComponent implements OnInit {
 
   // Whether or not to be visible
   @Input() show: boolean;
+  // User to edit. If null, create new user
+  @Input() editUser: UserDoc;
 
+  // Emits when user has been created (or edited)
   @Output() userCreated = new EventEmitter();
 
   // Roles enum
@@ -35,6 +38,12 @@ export class NewUserComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    if(this.editUser) {
+      this.email.setValue(this.editUser.email);
+      this.fullName.setValue(this.editUser.displayName);
+      this.userName.setValue(this.editUser.username);
+      this.role.setValue(this.editUser.role);
+    }
   }
 
 
@@ -75,14 +84,18 @@ export class NewUserComponent implements OnInit {
       role: this.role.value,
     };
 
+    // If it's a user to edit, supply also his UID
+    if(this.editUser)
+      doc.uid = this.editUser.uid;
+
     // Create user
-    const l = this.alerts.loaderStart('יוצר משתמש חדש...');
+    const l = this.alerts.loaderStart(this.editUser ? 'שומר פרטי משתמש' : 'יוצר משתמש חדש...');
     const userDoc = await UsersService.CreateNewUser(doc, this.password.value);
     this.alerts.loaderStop(l);
 
     // On success
     if(userDoc) {
-      alert('משתמש חדש נוצר בהצלחה');
+      alert(this.editUser ? 'פרטי משתמש נשמרו' : 'משתמש חדש נוצר בהצלחה');
       // Emit data
       this.userCreated.emit(userDoc);
       // Clear all fields

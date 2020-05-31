@@ -14,7 +14,7 @@
       <ion-label>* סיסמה</ion-label>
       <mat-form-field aria-label="password">
         <input matInput [formControl]="password" name="password">
-        <mat-error *ngIf="password.hasError('minLength') && !password.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
+        <mat-error *ngIf="password.hasError('minlength') && !password.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
         <mat-error *ngIf="password.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>
     </div>
@@ -32,7 +32,7 @@
       <ion-label>* שם משתמש</ion-label>
       <mat-form-field aria-label="username">
         <input matInput [formControl]="userName" name="username">
-        <mat-error *ngIf="userName.hasError('minLength') && !userName.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
+        <mat-error *ngIf="userName.hasError('minlength') && !userName.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
         <mat-error *ngIf="userName.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>
     </div>
@@ -59,7 +59,7 @@
   </div>
 
   <div id="button">
-    <ion-button shape="round" color="dark" class="ion-float-end" (click)="createUser()" [disabled]="!allValid()">יצירת משתמש</ion-button>
+    <ion-button shape="round" color="dark" class="ion-float-end" (click)="createUser()" [disabled]="!allValid()">{{editUser ? 'שמירת פרטי משתמש' : 'יצירת משתמש'}}</ion-button>
   </div>
 
 

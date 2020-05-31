@@ -60,7 +60,7 @@ export class UsersService {
 
   /** Whether the current user has a given permission */
   hasPermission(permission: UserPermission) {
-    return this.myDoc.role == UserRole.ADMIN || (this.myDoc.permissions && this.myDoc.permissions[permission]);
+    return this.myDoc.role == UserRole.ADMIN || (this.myDoc.permissions && (this.myDoc.permissions[permission]));
   }
 
 
@@ -133,8 +133,8 @@ export class UsersService {
     for (let p in permissions)
       batch.update(this.permissionsMetadata, {[fieldName + '.' + p]: permissions[p]});
 
-    // Set permissions to all the users of that role (with the same batch
-    this.users.filter((user)=>user.role == role).forEach((user)=> {
+    // Set permissions to all the users (except those with MASTER permission) of that role (with the same batch)
+    this.users.filter((user)=>user.role == role && !user.permissions[UserPermission.MASTER]).forEach((user)=> {
       this.setUserPermissions(user.uid, permissions, batch);
     });
 

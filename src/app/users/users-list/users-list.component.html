@@ -2,7 +2,7 @@
 
   <ion-row>
 
-    <ion-col size="1" *ngIf="amIAdmin()"></ion-col>
+    <ion-col size="1"></ion-col>
     <ion-col>שם מלא</ion-col>
     <ion-col>שם משתמש</ion-col>
     <ion-col>דרג</ion-col>
@@ -13,8 +13,8 @@
 
   <ion-row *ngFor="let user of users">
 
-    <ion-col size="1" *ngIf="amIAdmin()">
-      <ion-button fill="clear" color="secondary" class="small-circle-btn" (click)="onDeleteUserClicked(user)">
+    <ion-col size="1">
+      <ion-button fill="clear" color="secondary" class="small-circle-btn" (click)="onDeleteUserClicked(user)" [disabled]="user.role == UserRole.ADMIN || usersService.myDoc.role != UserRole.ADMIN">
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-col>
@@ -25,7 +25,9 @@
 
     <ion-col>
       <ion-button
-              fill="outline" shape="round" color="dark"
+              shape="round"
+              [fill]="userToEdit?.uid == user.uid ? 'solid' : 'outline'"
+              [color]="userToEdit?.uid == user.uid ? 'secondary' : 'dark'"
               (click)="onEditUserClicked(user)"
               [disabled]="!canEditDetails(user) || disabled"
       >עריכת פרטים</ion-button>
@@ -36,11 +38,16 @@
                   [fill]="selectedUser == user.uid ? 'solid' : 'outline'"
                   [color]="selectedUser == user.uid ? 'secondary' : 'dark'"
                   (click)="onPermissionClicked(user)"
-                  [disabled]="!amIAdmin() || disabled || user.role == UserRole.ADMIN">
+                  [disabled]="!canEditPermissions(user) || disabled">
         <ion-icon slot="start" src="../../assets/svg/icon_pen.svg"></ion-icon>
         <ion-text>עריכת הרשאה</ion-text>
       </ion-button>
     </ion-col>
+
+    <app-new-user [show]="userToEdit?.uid == user.uid"
+                  [editUser]="user"
+                  (userCreated)="userToEdit = null"
+    ></app-new-user>
 
   </ion-row>
 

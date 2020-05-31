@@ -303,6 +303,7 @@ html.hide-background {
   }
 }
 
+// The camera weigh button on mobile device
 #camera-btn {
   display: none;
   justify-content: center;
@@ -320,4 +321,9 @@ html.hide-background {
   bottom: 3em;
   transform: translate(-50%, -50%);
   cursor: pointer;
+}
+
+// Material design tooltip font size
+.mat-tooltip {
+  font-size: small !important;
 }

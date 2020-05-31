@@ -45,6 +45,9 @@
             <ion-button fill="clear" color="dark" (click)="onEditClicked(product)" *ngIf="!editProduct">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
             </ion-button>
+            <ion-button fill="clear" color="danger" (click)="editProduct = tempAmount = tempPrice = null" *ngIf="editProduct == product.id">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
             <ion-button fill="clear" color="success" (click)="onEditDone(product)" *ngIf="editProduct == product.id">
               <ion-icon slot="icon-only" name="checkmark"></ion-icon>
             </ion-button>
@@ -52,13 +55,13 @@
           <ion-col>{{productData(product.id).name}}</ion-col>
           <ion-col>
             <ion-text *ngIf="editProduct != product.id">{{product.amount | unitAmount : productData(product.id).type}}</ion-text>
-            <ion-input *ngIf="editProduct == product.id" type="number" [(ngModel)]="tempAmount" select-text></ion-input>
+            <ion-input *ngIf="editProduct == product.id" type="number" [(ngModel)]="tempAmount" select-text (keyup.enter)="onEditDone(product)"></ion-input>
             <ion-text *ngIf="editProduct == product.id">{{null | unitAmount : productData(product.id).type}}</ion-text>
           </ion-col>
           <ion-col>
             <ion-icon *ngIf="editProduct != product.id && isPriceExceeded(product)" name="alert-circle" color="danger" style="position: absolute; left: 0;" matTooltip="שים לב, חריגה במחיר"></ion-icon>
             <ion-text *ngIf="editProduct != product.id" [color]="isPriceExceeded(product) ? 'danger' : ''">{{product.pricePerUnit | price}}</ion-text>
-            <ion-input *ngIf="editProduct == product.id" type="number" [(ngModel)]="tempPrice" select-text></ion-input>
+            <ion-input *ngIf="editProduct == product.id" type="number" [(ngModel)]="tempPrice" select-text (keyup.enter)="onEditDone(product)"></ion-input>
             <ion-text *ngIf="editProduct == product.id">{{null | price}}</ion-text>
           </ion-col>
           <ion-col style="font-weight: bold">{{(product.pricePerUnit * product.amount) | price}}</ion-col>

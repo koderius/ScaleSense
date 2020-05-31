@@ -196,11 +196,11 @@
         <p *ngIf="(supplierEditMode && isFinalApprove) || order.status >= OrderStatus.FINAL_APPROVE">
           <ion-text>מספר תעודת משלוח: </ion-text>
           <mat-form-field>
-            <input matInput type="number" [(ngModel)]="order.invoice" [readonly]="OrderStatus.FINAL_APPROVE">
+            <input matInput type="number" [(ngModel)]="order.invoice" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="invoice">
           </mat-form-field>
           <ion-text>שם נהג: </ion-text>
           <mat-form-field>
-            <input matInput [(ngModel)]="order.driverName" [readonly]="OrderStatus.FINAL_APPROVE">
+            <input matInput [(ngModel)]="order.driverName" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="driverName">
           </mat-form-field>
         </p>
 

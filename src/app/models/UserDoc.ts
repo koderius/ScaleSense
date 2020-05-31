@@ -14,6 +14,9 @@ export enum UserRole {
 // Cloud function - there is a server function which checks permissions
 export enum UserPermission {
 
+  // Has access to give permissions
+  MASTER = 'canPermit',
+
   // Can watch order - front-end only
   ORDER_STATUS = 'canWatch',
 

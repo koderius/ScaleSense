@@ -26,6 +26,6 @@ import {PermissionsListComponent} from './permissions-list/permissions-list.comp
     NewUserComponent,
     UsersListComponent,
     PermissionsListComponent,
-  ]
+  ],
 })
 export class UsersPageModule {}

@@ -30,10 +30,20 @@ export interface BaseNotificationDoc {
 
 
 export enum NotificationCode {
+
+  // The other side made changes in an order
   ORDER_CHANGE = 1,
+
+  // Server auto alert about an order
   ORDER_ALERT = 2,
+
+  // The other side made changes in a product
   PRODUCT_CHANGE = 3,
+
+  // The customer created a product return document
   PRODUCTS_RETURN = 4,
+
+  //
   PRICE_ALERT = 5,
 }
 

@@ -9,6 +9,7 @@ export class PermissionNamePipe implements PipeTransform {
   transform(value: UserPermission): string {
 
     switch (value) {
+      case UserPermission.MASTER: return 'הרשאות גישה';
       case UserPermission.EDIT_ORDER: return 'עריכת הזמנה';
       case UserPermission.MAIN_OFFICE: return 'משרד ראשי';
       case UserPermission.NEW_ORDER: return 'הזמנה חדשה';
