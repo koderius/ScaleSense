@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {ProductOrder} from '../models/OrderI';
-import {FullProductDoc} from '../models/Product';
+import {FullProductDoc} from '../models/ProductI';
 import {Calculator} from '../utilities/Calculator';
 import {AlertsService} from '../services/alerts.service';
 import {WeighService} from '../services/weigh.service';

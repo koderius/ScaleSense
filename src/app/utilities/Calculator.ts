@@ -1,4 +1,4 @@
-import {ProductPublicDoc} from '../models/Product';
+import {ProductPublicDoc} from '../models/ProductI';
 
 export class Calculator {
 

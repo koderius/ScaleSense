@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ModalController, ToastController} from '@ionic/angular';
-import {FullProductDoc} from '../models/Product';
+import {FullProductDoc} from '../models/ProductI';
 import {ReturnDoc, ReturnStatus} from '../models/Return';
 import {ProductsService} from '../services/products.service';
 import {WeighService} from '../services/weigh.service';

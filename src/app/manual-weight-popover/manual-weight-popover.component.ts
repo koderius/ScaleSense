@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {ProductPublicDoc} from '../models/Product';
+import {ProductPublicDoc} from '../models/ProductI';
 import {IonInput, PopoverController} from '@ionic/angular';
 
 @Component({

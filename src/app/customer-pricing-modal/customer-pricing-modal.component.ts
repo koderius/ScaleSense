@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {CustomersService} from '../services/customers.service';
-import {ProductPublicDoc} from '../models/Product';
+import {ProductPublicDoc} from '../models/ProductI';
 import {BusinessService} from '../services/business.service';
 import DocumentReference = firebase.firestore.DocumentReference;
 import * as firebase from 'firebase/app';

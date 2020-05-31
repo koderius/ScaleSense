@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {ProductsService} from '../services/products.service';
-import {FullProductDoc, ProductPublicDoc} from '../models/Product';
+import {FullProductDoc, ProductPublicDoc} from '../models/ProductI';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc} from '../models/Business';

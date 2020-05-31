@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ProductOrder} from '../../models/OrderI';
-import {ProductPublicDoc} from '../../models/Product';
+import {ProductPublicDoc} from '../../models/ProductI';
 import {NavigationService} from '../../services/navigation.service';
 import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
 import {AlertsService} from '../../services/alerts.service';

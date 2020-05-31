@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {BusinessService} from './business.service';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
-import {ProductCategory} from '../models/Product';
+import {ProductCategory} from '../models/ProductI';
 
 /**
  * This service is in charged of categories management (CRUD) (relevant for customer only)

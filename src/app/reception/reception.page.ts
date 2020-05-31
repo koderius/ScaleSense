@@ -4,7 +4,7 @@ import {OrdersService} from '../services/orders.service';
 import {Order} from '../models/Order';
 import {OrderStatus, OrderStatusGroup, ProductOrder} from '../models/OrderI';
 import {ProductsService} from '../services/products.service';
-import {FullProductDoc} from '../models/Product';
+import {FullProductDoc} from '../models/ProductI';
 import {AlertsService} from '../services/alerts.service';
 import {WeighService} from '../services/weigh.service';
 import {NavigationService} from '../services/navigation.service';

@@ -4,7 +4,7 @@ import {WeightCameraComponent} from '../weight-camera/weight-camera.component';
 import {CameraService} from './camera.service';
 import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 import {ProductOrder} from '../models/OrderI';
-import {FullProductDoc} from '../models/Product';
+import {FullProductDoc} from '../models/ProductI';
 import {UsersService} from './users.service';
 import {UserPermission} from '../models/UserDoc';
 

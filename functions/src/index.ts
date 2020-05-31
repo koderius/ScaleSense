@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import {OrderChange, OrderDoc, ProductOrder} from '../../src/app/models/OrderI';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {getNewOrderStatus, getRequestedPermission, sendNotification} from './inner_functions';
-import {ProductPublicDoc} from '../../src/app/models/Product';
+import {ProductPublicDoc} from '../../src/app/models/ProductI';
 import {BaseNotificationDoc} from '../../src/app/models/Notification';
 import {ProductsListUtil} from '../../src/app/utilities/productsList';
 import {MailForm} from '../../src/app/website/mail/MailForm';

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {OrderChange, OrderDoc, OrderStatus} from '../../models/OrderI';
 import {ProductsService} from '../../services/products.service';
-import {ProductPublicDoc} from '../../models/Product';
+import {ProductPublicDoc} from '../../models/ProductI';
 import {AuthSoftwareService} from '../../services/auth-software.service';
 import {ProductsChange, ProductsListUtil} from '../../utilities/productsList';
 

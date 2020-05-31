@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {ProductType} from '../models/Product';
+import {ProductType} from '../models/ProductI';
 import {formatNumber} from '@angular/common';
 
 @Pipe({

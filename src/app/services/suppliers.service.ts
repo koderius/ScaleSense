@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {SupplierDoc} from '../models/Business';
-import {ProductCustomerDoc} from '../models/Product';
+import {ProductCustomerDoc} from '../models/ProductI';
 import {BusinessService} from './business.service';
 import CollectionReference = firebase.firestore.CollectionReference;
 import * as firebase from 'firebase/app';

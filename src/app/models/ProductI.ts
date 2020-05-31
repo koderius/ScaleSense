@@ -1,11 +1,3 @@
-/**
- *
- * Each product has 3 documents:
- * 1) ProductPublicDoc - Main document contain the product's core properties. Can be created by both supplier and customer. Once the supplier approved it, the customer cannot change it anymore.
- * 2) ProductCustomerDoc - Contains product's data and conditions that each customer has of his own, and can be seen only by him.
- *
- */
-
 /** These are the product's public core properties */
 export interface ProductPublicDoc {
 
@@ -67,16 +59,7 @@ export interface ProductPublicDoc {
 
 
 /** These properties are being set for the product by each customer privately */
-export interface ProductCustomerDoc {
-
-  /** Server ID */
-  id?: string;
-
-  /** Supplier ID */
-  sid?: string;
-
-  /** Product name - similar to the Product Document name (for querying by name) */
-  name?: string;
+export interface ProductCustomerDoc extends ProductPublicDoc{
 
   /** Customer's catalog number */
   catalogNumC?: string;
@@ -103,42 +86,9 @@ export interface ProductCustomerDoc {
 }
 
 
-export type ProductOrderDoc = {
-
-  /** The product ID */
-  id?: string;
-
-  /** The product's properties, as they were when the order has finally approved (JSON) */
-  productDocSnapshot?: string;
-
-  /** The amount to order */
-  amount?: number;
-
-  /** Product's comment (if there is) */
-  comment?: string;
-
-  /** Product's unit price */
-  pricePerUnit?: number;
-
-  /** Number of boxes for that product (edited by supplier) */
-  boxes?: number;
-
-  /** Amount after received and weighed by the customer */
-  finalAmount?: number;
-
-  /** Whether the final amount matches the amount in the order (according to product's tolerance) */
-  isWeightMatch?: boolean;
-
-}
-
-
-/** Product's full data, as shown to the customer, contains both public and private data */
-export interface FullProductDoc extends ProductPublicDoc, ProductCustomerDoc {}
-
-
 export enum ProductType {
 
-  /** Default - the unit's weight is not relevant */
+  /** Default, unit is Kg - the unit's weight is not relevant */
   BY_WEIGHT = 0,
 
   /** For these, unitWeight should be set */
@@ -149,8 +99,14 @@ export enum ProductType {
 }
 
 
+/** *
+ * Each customer has his own categories list. Each customer's product's document contains a category
+ */
 export type ProductCategory = {
+  // Server ID
   id: string,
+  // Category title
   title: string;
+  // Is category in use
   checked: boolean;
 }

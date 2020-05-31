@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ProductPublicDoc} from '../../models/Product';
+import {ProductPublicDoc} from '../../models/ProductI';
 import {UnitAmountPipe} from '../../pipes/unit-amount.pipe';
 
 @Component({

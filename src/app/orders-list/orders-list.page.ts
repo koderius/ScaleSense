@@ -6,7 +6,7 @@ import {Order} from '../models/Order';
 import {OrderStatus, OrderStatusGroup, ProductOrder} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
-import {FullProductDoc} from '../models/Product';
+import {FullProductDoc} from '../models/ProductI';
 import {ProductsService} from '../services/products.service';
 import {IonSearchbar, ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
