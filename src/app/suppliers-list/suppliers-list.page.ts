@@ -13,7 +13,20 @@ import {XlsParseService} from '../services/xls-parse.service';
 })
 export class SuppliersListPage implements OnInit {
 
-  filteredSuppliers: BusinessDoc[];
+  query: string = '';
+
+  filteredSuppliers: SupplierDoc[];
+
+  page: number = 1;
+
+  get results() {
+    const res = (this.filteredSuppliers || this.suppliersService.mySuppliers).slice((this.page - 1) * 10, this.page * 10);
+    if(!res.length && this.page > 1) {
+      this.page--;
+      return this.results;
+    }
+    return res;
+  }
 
   constructor(
     public suppliersService: SuppliersService,
@@ -25,15 +38,9 @@ export class SuppliersListPage implements OnInit {
 
   ngOnInit() {}
 
-  search(q) {
-
-    if(q) {
-      q = q.toLocaleLowerCase();
-      this.filteredSuppliers = this.suppliersService.mySuppliers.filter((s)=>s.name.toLocaleLowerCase().includes(q))
-    }
-    else
-      this.filteredSuppliers = null;
-
+  search() {
+    const q = this.query ? this.query.toLocaleLowerCase() : '';
+    this.filteredSuppliers = this.suppliersService.mySuppliers.filter((s)=>s.name.toLocaleLowerCase().includes(q));
   }
 
   async deleteSupplier(supplier: BusinessDoc) {
@@ -41,6 +48,7 @@ export class SuppliersListPage implements OnInit {
       const l = this.alerts.loaderStart('מוחק ספק...');
       await this.suppliersService.deleteSupplier(supplier.id);
       this.alerts.loaderStop(l);
+      this.search();
     }
   }
 

@@ -19,6 +19,13 @@ export class PaginationComponent implements OnInit {
   @Output() onForward = new EventEmitter();
 
   _numOfResults: number;
+  _totalNumOfResults: number;
+
+  // If the total number of results is known
+  @Input() set totalNumOfResults(num: number) {
+    this._totalNumOfResults = num;
+    this.canGoForward = this.page < Math.ceil(num / this.MAX_RESULTS_IN_QUERY);
+  }
 
   @Input() set numOfResults(num: number) {
 
@@ -26,8 +33,9 @@ export class PaginationComponent implements OnInit {
     if(this.lastClicked === 0)
       this.page = 1;
 
-    // There might be more results only if the current number of results is the maximum per query
-    this.canGoForward = (num == this.MAX_RESULTS_IN_QUERY);
+    // If the total number of results is unknown, can go forward only if reached the maximum results per page
+    if(!this._totalNumOfResults)
+      this.canGoForward = (num == this.MAX_RESULTS_IN_QUERY);
 
     // If there are results, get them
     if(num) {
@@ -48,6 +56,9 @@ export class PaginationComponent implements OnInit {
 
     // Reset last click
     this.lastClicked = 0;
+
+    if(this._totalNumOfResults)
+      this.canGoForward = this.page < Math.ceil(this._totalNumOfResults / this.MAX_RESULTS_IN_QUERY);
 
   }
 

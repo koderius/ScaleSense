@@ -123,10 +123,7 @@ export class SuppliersService {
   async deleteSupplier(id: string) {
     try {
       this.filesService.deleteFile(id);
-      return await firebase.firestore().runTransaction(async (transaction)=>{
-        // transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(-1)}, {merge: true});
-        transaction.delete(this.mySuppliersRef.doc(id));
-      });
+      await this.mySuppliersRef.doc(id).delete();
     }
     catch (e) {
       console.error(e);

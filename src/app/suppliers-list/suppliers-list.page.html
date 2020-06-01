@@ -8,7 +8,7 @@
 
     <div id="upper-section">
 
-      <ion-searchbar placeholder="הקלד שם ספק" (ionChange)="search($event.detail.value)">
+      <ion-searchbar placeholder="הקלד שם ספק" (ionChange)="search()" [(ngModel)]="query">
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
 
@@ -42,7 +42,7 @@
           <ion-col size="3"></ion-col>
         </ion-row>
 
-        <ion-row *ngFor="let supplier of filteredSuppliers || suppliersService.mySuppliers">
+        <ion-row *ngFor="let supplier of results">
           <ion-col size="1">
             <ion-icon name="alert-circle" color="warning"
                       *ngIf="!hasAllRequired(supplier)"
@@ -70,6 +70,13 @@
         </ion-row>
 
       </ion-grid>
+
+      <app-pagination
+              [numOfResults]="results.length"
+              [totalNumOfResults]="(filteredSuppliers || suppliersService.mySuppliers).length"
+              (onForward)="page = page + 1"
+              (onBack)="page = page - 1"
+      ></app-pagination>
 
     </div>
 
