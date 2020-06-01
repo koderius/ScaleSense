@@ -51,8 +51,8 @@ export class ProductsService {
   async queryMyProducts(q?: string, bid?: string, allSupplierProducts?: boolean, pagination?: boolean, startAfterName?: string, endBeforeName?: string) : Promise<ProductPublicDoc[] | ProductCustomerDoc[]> {
 
     // Suppliers search in their products list.
-    // Customers search in their list of products, or in the full supplier's list (if supplier's ID is specified)
-    const suppliersList: boolean = (this.businessService.side == 's' || (allSupplierProducts && !!bid));
+    // Customers search in their list of products, or in the full supplier's list
+    const suppliersList: boolean = (this.businessService.side == 's' || allSupplierProducts);
 
     const collection = suppliersList ? this.allProductsRef : this.customerProductsRef;
 
@@ -165,7 +165,7 @@ export class ProductsService {
       if(this.businessService.side == 'c')
         batch.set(this.customerProductsRef.doc(product.id), product, {merge: true});
 
-      // For a supplier, or for a new products created by the customer, save (also) in the products collection (only the public part)
+      // For a supplier, or for a new products created by the customer, save (also) in the products collection (only the public part). This will notify the other side
       if(this.businessService.side == 's' || isNew)
         batch.set(this.allProductsRef.doc(product.id), ProductsService.ToPublic(product), {merge: true});
 
@@ -233,6 +233,7 @@ export class ProductsService {
       barcode: productDoc.barcode,
       created: productDoc.created,
       modified: productDoc.modified,
+      modifiedBy: productDoc.modifiedBy,
       price: productDoc.price,
     } as ProductPublicDoc;
 

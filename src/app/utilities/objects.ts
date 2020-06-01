@@ -1,6 +1,9 @@
 export class Objects {
 
-  static ClearFalsy(obj: object) {
+  static ClearFalsy(obj: object, noObjectChange?: boolean) {
+
+    if(noObjectChange)
+      obj = {...obj};
 
     Object.getOwnPropertyNames(obj).forEach((p)=>{
       const value = obj[p];
@@ -24,8 +27,8 @@ export class Objects {
     const bProps = Object.keys(b);
 
     // Clear undefined fields
-    Objects.ClearFalsy(a);
-    Objects.ClearFalsy(b);
+    Objects.ClearFalsy(a, true);
+    Objects.ClearFalsy(b, true);
 
     if (aProps.length != bProps.length)
       return false;

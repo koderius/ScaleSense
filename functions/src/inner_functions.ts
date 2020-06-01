@@ -21,8 +21,11 @@ export const sendNotification = (transaction: Transaction, side: BusinessSide, i
 export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, requestedStatus?: number) => {
 
   // If order has not been finally approved yet, it is possible to cancel it
-  if(requestedStatus == 400 && currentStatus && currentStatus < 80)
-    return 400 + (side == 'c' ? 1 : 2);
+  if(requestedStatus == 400)
+    if(currentStatus && currentStatus < 80)
+      return 400 + (side == 'c' ? 1 : 2);
+    else
+      throw new HttpsError('permission-denied', 'Cannot cancel this order');
 
   // Customer can update (or create) the order if it has not been finally approved yet (or cancelled, or closed)
   if(side == 'c') {
@@ -43,8 +46,11 @@ export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, req
   if(side == 's') {
 
     // The supplier can change the status to 'opened', if has not been opened yet
-    if(requestedStatus == 20 && currentStatus < 20)
-      return 20;
+    if(requestedStatus == 20)
+      if(currentStatus < 20)
+        return 20;
+      else
+        throw new HttpsError('permission-denied', 'Cannot set as "seen" twice');
 
     // If the order has not been finally approved yet, it can be approved or finally approved (changes will be checked further)
     if(currentStatus < 80 && currentStatus >= 20)

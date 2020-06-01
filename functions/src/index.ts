@@ -47,33 +47,47 @@ admin.initializeApp();
 //
 //
 //
-// export const offerSpecialPrice = functions.https.onCall((data: {productId: string, customerId: string, price: number}, context) => {
-//
-//   if(data && context && context.auth) {
-//
-//     admin.firestore().runTransaction(async transaction => {
-//
-//       const uid = context.auth ? context.auth.uid : '';
-//
-//       // Get the supplier ID according to the user who called the function
-//       const sid = (await transaction.get(admin.firestore().collection('users').doc(uid))).get('bid');
-//
-//       // Get the private customer data for the requested product
-//       const customerProductRef = admin.firestore().collection('customers').doc(data.customerId).collection('my_products').doc(data.productId);
-//       const productSid = (await transaction.get(customerProductRef)).get('sid');
-//
-//       // Check the user is the supplier who owned this product
-//       if(productSid != sid)
-//         throw new HttpsError('permission-denied', 'The supplier does not own this product');
-//
-//       // Set a special price in the customer private data of this product
-//       transaction.update(customerProductRef, {price: data.price});
-//
-//     });
-//
-//   }
-//
-// });
+export const offerSpecialPrice = functions.https.onCall((data: {productId: string, customerId: string, price: number}, context) => {
+
+  if(data && context && context.auth) {
+
+    return admin.firestore().runTransaction<boolean>(async transaction => {
+
+      const uid = context.auth ? context.auth.uid : '';
+
+      // Get the supplier ID according to the user who called the function
+      const sid = (await transaction.get(admin.firestore().collection('users').doc(uid))).get('bid');
+
+      // Get the private customer data for the requested product
+      const customerProductRef = admin.firestore().collection('customers').doc(data.customerId).collection('my_products').doc(data.productId);
+      const productDoc = await transaction.get(customerProductRef);
+
+      if(!productDoc.exists)
+        return false;
+
+      // Check the user is the supplier who owned this product
+      if(productDoc.get('sid') != sid)
+        throw new HttpsError('permission-denied', 'The supplier does not own this product');
+
+      // Set a special price in the customer private data of this product
+      transaction.update(customerProductRef, {price: data.price});
+
+      const note: BaseNotificationDoc = {
+        code: 5,
+        refSide: 's',
+        refBid: sid,
+        time: admin.firestore.Timestamp.now().toMillis(),
+        content: {productId: data.productId}
+      };
+      sendNotification(transaction, 'c', data.customerId, note);
+
+      return true;
+
+    });
+
+  }
+
+});
 
 /** *
  * Get user details as User Document + password and create/update the user in the firebase auth module + update the user document in firestore.
@@ -516,15 +530,24 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
 
   admin.firestore().runTransaction(async transaction=> {
 
-    // If change was made by the supplier, send notifications to all the customers that subscribe this product
+    // If change was made by the supplier, update the data for all customers that subscribe this product and send them notifications
     if(data.modifiedBy == data.sid) {
       notification.refSide = 's';
       const privateProductsRef = admin.firestore().collectionGroup('my_products').where('id', '==', data.id);
       const res = await transaction.get(privateProductsRef);
-      res.docs.map((d)=>d.ref.parent.parent).forEach((b)=>{
-        const bid = b ? b.id : '';
+
+      res.docs.forEach((doc)=>{
+
+        // Update the customer's product with the new data
+        transaction.update(doc.ref, data);
+
+        // Get the ID of the customer, and send him a notification
+        const customerRef = doc.ref.parent.parent;
+        const bid = customerRef ? customerRef.id : '';
         sendNotification(transaction, 'c', bid || '', notification);
+
       });
+
     }
     // If change was made by the customer, send notification to the supplier
     else {
