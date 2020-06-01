@@ -1,9 +1,22 @@
 export class Objects {
 
-  static ClearFalsy(obj: object, noObjectChange?: boolean) {
+  static ClearUndefined(obj: Object) {
 
-    if(noObjectChange)
-      obj = {...obj};
+    Object.getOwnPropertyNames(obj).forEach((p)=>{
+
+      // Delete undefined fields
+      if(obj[p] === undefined)
+        delete obj[p];
+
+      // Run on inner objects
+      if(typeof obj[p] == 'object' && obj[p])
+        Objects.ClearUndefined(obj[p]);
+
+    });
+
+  }
+
+  static ClearFalsy(obj: object) {
 
     Object.getOwnPropertyNames(obj).forEach((p)=>{
       const value = obj[p];
@@ -27,8 +40,8 @@ export class Objects {
     const bProps = Object.keys(b);
 
     // Clear undefined fields
-    Objects.ClearFalsy(a, true);
-    Objects.ClearFalsy(b, true);
+    Objects.ClearFalsy(a);
+    Objects.ClearFalsy(b);
 
     if (aProps.length != bProps.length)
       return false;

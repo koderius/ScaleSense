@@ -46,10 +46,6 @@ export class SuppliersService {
 
   }
 
-  get suppliersMetadata() {
-    return this.businessService.businessDocRef.collection('metadata').doc('suppliers');
-  }
-
   /** The reference to the firestore collection where the list of suppliers is stored */
   get mySuppliersRef() : CollectionReference {
     return this.businessService.businessDocRef.collection('my_suppliers');
@@ -128,7 +124,7 @@ export class SuppliersService {
     try {
       this.filesService.deleteFile(id);
       return await firebase.firestore().runTransaction(async (transaction)=>{
-        transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(-1)}, {merge: true});
+        // transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(-1)}, {merge: true});
         transaction.delete(this.mySuppliersRef.doc(id));
       });
     }
@@ -141,10 +137,31 @@ export class SuppliersService {
   /** Upload supplier data, and upload its logo */
   async saveSupplierDoc(supplierDoc: SupplierDoc, logoFile?: File) {
 
-    // If new, create ID and stamp creation time
-    if(!supplierDoc.id) {
+    // If NID supplied, and it belong to an existing supplier, edit this supplier
+    if(supplierDoc.nid)
+      supplierDoc = this.mySuppliers.find((s)=>s.nid == supplierDoc.nid) || supplierDoc;
+
+    // Check whether it's a new supplier by having server ID
+    const isNew = !supplierDoc.id;
+
+    // Set modification time
+    supplierDoc.modified = Date.now();
+
+    // For new suppliers
+    if(isNew) {
+
+      // Set new ID and creation time
       supplierDoc.id = this.mySuppliersRef.doc().id;
-      supplierDoc.created = Date.now();
+      supplierDoc.created = supplierDoc.modified;
+
+      // Find available serial number (NID), if not defined
+      if(!supplierDoc.nid) {
+        let serial = 1;
+        while (this.mySuppliers.some((s)=>s.nid == serial))
+          serial++;
+        supplierDoc.nid = serial;
+      }
+
     }
 
     // Upload or delete logo image
@@ -163,19 +180,9 @@ export class SuppliersService {
       console.error(e);
     }
 
-    // Save the supplier with an updated serial number
+    // Save the supplier
     try {
-      await firebase.firestore().runTransaction(async transaction =>{
-        // TODO: Make rules
-        const serial = (await transaction.get(this.suppliersMetadata)).get('numOfSuppliers') || 0;
-        supplierDoc.nid = serial + 1;
-
-        supplierDoc.modified = Date.now();
-        await transaction.set(this.mySuppliersRef.doc(supplierDoc.id), supplierDoc, {merge: true});
-
-        transaction.set(this.suppliersMetadata, {numOfSuppliers: firebase.firestore.FieldValue.increment(1)}, {merge: true});
-
-      });
+      await this.mySuppliersRef.doc(supplierDoc.id).set(supplierDoc, {merge: true});
     }
     catch (e) {
       console.error(e);

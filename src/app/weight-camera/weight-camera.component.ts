@@ -65,8 +65,25 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   }
 
   async getWeightSnapshot() : Promise<number> {
-    // Get weight TODO
-    return await Math.random()*20;
+
+    // Get weight
+    // const clientSocket = new WebSocket("ws://localhost:8080?scale=1234");
+    //
+    // clientSocket.onopen = function (evt) {
+    //   console.log("Client: Connection open ... (press scale)");
+    //   this.send('scale:1234');
+    // };
+    //
+    // clientSocket.onmessage = function (evt) {
+    //   console.log("Client: Received Message: " + evt.data);
+    // };
+    //
+    // clientSocket.onclose = function (evt) {
+    //   console.log("Client:Connection closed.");
+    // };
+
+    return Math.random()*20;
+
   }
 
   /** Return the weight snapshot */

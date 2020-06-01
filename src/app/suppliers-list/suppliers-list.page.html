@@ -17,7 +17,8 @@
           <ion-icon slot="start" name="add"></ion-icon>
           <ion-text>הקמת ספק חדש</ion-text>
         </ion-button>
-        <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize">טעינת קובץ Excel</ion-button>
+        <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
+        <input type="file" class="ion-hide" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event)">
       </div>
 
     </div>
@@ -42,7 +43,12 @@
         </ion-row>
 
         <ion-row *ngFor="let supplier of filteredSuppliers || suppliersService.mySuppliers">
-          <ion-col size="1"></ion-col>
+          <ion-col size="1">
+            <ion-icon name="alert-circle" color="warning"
+                      *ngIf="!hasAllRequired(supplier)"
+                      matTooltip="חסרים פרטים"
+            ></ion-icon>
+          </ion-col>
           <ion-col>
             <ion-img [src]="supplier.logo" class="ion-margin-end"></ion-img>
             <ion-text>{{supplier.name}}</ion-text>

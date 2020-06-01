@@ -24,6 +24,9 @@ export class FilesService {
   /** Upload a file and get it's URL */
   async uploadFile(file: File, fileName: string) : Promise<string> {
 
+    if(!file)
+      return;
+
     // Store the file under its Object's ID
     const ref = this.storageRef.child(fileName);
 
@@ -56,7 +59,9 @@ export class FilesService {
     try {
       await ref.delete();
     }
-    catch (e) {}
+    catch (e) {
+      console.log('No file to delete')
+    }
 
   }
 

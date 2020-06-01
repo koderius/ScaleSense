@@ -6,8 +6,6 @@ import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
 import {AuthSoftwareService} from '../services/auth-software.service';
 import {NavigationService} from '../services/navigation.service';
-import {UsersService} from '../services/users.service';
-import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-edit-supplier',

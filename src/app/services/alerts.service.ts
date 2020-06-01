@@ -11,7 +11,6 @@ import {AlertController, LoadingController} from '@ionic/angular';
 export class AlertsService {
 
   loaders = new Map<string,string>();
-  isLoader: boolean;
 
   constructor(
     private loadCtrl: LoadingController,

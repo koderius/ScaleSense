@@ -82,7 +82,7 @@ export class ProductsListPage {
   }
 
 
-  async readExcel(evt) {
+  async importFromExcel(evt) {
     await this.excelService.readExcelWorkbook(evt);
     console.log(this.excelService.readSheetData());
   }
