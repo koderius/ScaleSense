@@ -44,7 +44,7 @@ export enum NotificationCode {
   PRODUCTS_RETURN = 4,
 
   //
-  PRICE_ALERT = 5,
+  PRICE_OFFER = 5,
 }
 
 

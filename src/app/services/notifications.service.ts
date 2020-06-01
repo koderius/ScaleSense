@@ -164,6 +164,15 @@ export class NotificationsService {
 
     }
 
+
+    if(newNotification.code == NotificationCode.PRICE_OFFER) {
+
+      newNotification.orderSerial = '-';
+      newNotification.text = 'ספק הציע מחיר עבור מוצר';
+
+    }
+
+
     // Push notification to the list, and make sure is sorted by time
     this._notifications.push(newNotification);
     this._notifications.sort((a, b) => b.time - a.time);

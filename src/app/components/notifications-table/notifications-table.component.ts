@@ -39,7 +39,7 @@ export class NotificationsTableComponent implements OnInit {
       if(!this.userService.hasPermission(UserPermission.ORDER_STATUS))
         alert('אין הרשאה להכנס להזמנה');
     }
-    if(notification.code == NotificationCode.PRODUCT_CHANGE) {
+    if(notification.code == NotificationCode.PRODUCT_CHANGE || notification.code == NotificationCode.PRICE_OFFER) {
       this.navService.goToEditProduct(notification.content.productId);
     }
     if(notification.code == NotificationCode.PRODUCTS_RETURN) {

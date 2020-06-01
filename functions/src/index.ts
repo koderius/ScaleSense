@@ -47,11 +47,11 @@ admin.initializeApp();
 //
 //
 //
-export const offerSpecialPrice = functions.https.onCall((data: {productId: string, customerId: string, price: number}, context) => {
+export const offerSpecialPrice = functions.https.onCall((data: {product: ProductPublicDoc, customerId: string, price: number}, context) => {
 
   if(data && context && context.auth) {
 
-    return admin.firestore().runTransaction<boolean>(async transaction => {
+    return admin.firestore().runTransaction(async transaction => {
 
       const uid = context.auth ? context.auth.uid : '';
 
@@ -59,33 +59,39 @@ export const offerSpecialPrice = functions.https.onCall((data: {productId: strin
       const sid = (await transaction.get(admin.firestore().collection('users').doc(uid))).get('bid');
 
       // Get the private customer data for the requested product
-      const customerProductRef = admin.firestore().collection('customers').doc(data.customerId).collection('my_products').doc(data.productId);
+      const customerProductRef = admin.firestore().collection('customers').doc(data.customerId).collection('my_products').doc(data.product ? (data.product.id as string) : '');
       const productDoc = await transaction.get(customerProductRef);
 
-      if(!productDoc.exists)
-        return false;
+      if(productDoc.exists) {
+        // Check the user is the supplier who owned this product
+        if(productDoc.get('sid') != sid)
+          throw new HttpsError('permission-denied', 'The supplier does not own this product');
+        // Set a special price in the customer private data of this product
+        transaction.update(customerProductRef, {price: data.price});
+      }
+      else {
+        // Add product to the customer (with the offered price)
+        const product = data.product;
+        product.price = data.price;
+        transaction.set(customerProductRef, product);
+      }
 
-      // Check the user is the supplier who owned this product
-      if(productDoc.get('sid') != sid)
-        throw new HttpsError('permission-denied', 'The supplier does not own this product');
-
-      // Set a special price in the customer private data of this product
-      transaction.update(customerProductRef, {price: data.price});
-
+      // Send alert notification
       const note: BaseNotificationDoc = {
         code: 5,
         refSide: 's',
         refBid: sid,
         time: admin.firestore.Timestamp.now().toMillis(),
-        content: {productId: data.productId}
+        content: {productId: data.product.id}
       };
       sendNotification(transaction, 'c', data.customerId, note);
-
-      return true;
 
     });
 
   }
+
+  else
+    throw new HttpsError('aborted', 'No data');
 
 });
 
