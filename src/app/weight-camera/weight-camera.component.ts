@@ -28,19 +28,17 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     private businessService: BusinessService,
   ) {
 
-    const scaleSocket = new WebSocket("ws://136.243.189.206:8080?id=1234");
-
+    // TODO: Delete this
+    const scaleSocket = new WebSocket("ws://136.243.189.206:8080?id=12345");
     scaleSocket.onopen = function (evt) {
       console.log("Scale: Connection open ...");
     };
-
     scaleSocket.onmessage = function (evt) {
       console.log("Received Message From Client: " + evt.data);
       if (evt.data === 'scale') {
-        this.send('1234:40.41');
+        this.send('12345:40.41:' + Date.now());
       }
     };
-
     scaleSocket.onclose = function (evt) {
       alert("Scale: Connection closed.");
     };
@@ -48,7 +46,8 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Set the size of the picture screen
+
+    // Set the size of the picture
     document.body.style.setProperty('--video-width', (this.cameraService.videoSize.width) + 'px');
     document.body.style.setProperty('--video-height', (this.cameraService.videoSize.height) + 'px');
 
@@ -88,21 +87,35 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   async getWeightSnapshot() : Promise<number> {
 
     // Get IP + port and scale ID
-    const scaleId = this.businessService.businessDoc.scalesId;
+    const scaleId = this.businessService.businessDoc.scalesId || 12345;
     const ipPort = MetadataService.SCALE_IP;
 
     return new Promise((resolve, reject) => {
 
+      if(!scaleId || !ipPort) {
+        reject('No scale data');
+        return;
+      }
+
       const clientSocket = new WebSocket(`ws://${ipPort}?scale=${scaleId}`);
 
       clientSocket.onopen = function (evt) {
-        console.log("Client: Connection open ... (press scale)");
+        console.log("Client: Connection open");
         this.send('scale:'+scaleId);
       };
 
       clientSocket.onmessage = function (evt) {
-        console.log("Client: Received Message: " + evt.data);
-        resolve(+evt.data.split(':')[1]);
+        console.log(evt.data);
+        const dataStr = (evt.data as string).split(':');
+        const data = {
+          id: dataStr[0],
+          weight: +dataStr[1],
+          time: +dataStr[2],
+        };
+        if(data.id == scaleId)
+          resolve(data.weight);
+        if(Date.now() - data.time > 1000)
+          throw new Error('Scale timeout');
       };
 
       clientSocket.onclose = function (evt) {

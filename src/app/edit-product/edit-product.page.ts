@@ -164,7 +164,7 @@ export class EditProductPage implements OnInit {
 
     if(this.priceFormControl.hasError('min') || this.priceFormControl.hasError('max')) {
       alert('מחיר מחוץ לטוווח שהוגדר');
-      return;
+      return false;
     }
 
     return true;

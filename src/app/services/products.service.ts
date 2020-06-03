@@ -108,7 +108,8 @@ export class ProductsService {
 
   /** Get product's data. Each side loads the data from his collection */
   async getProduct(productId: string) : Promise<ProductPublicDoc | ProductCustomerDoc> {
-    return this.myProducts.find((p)=>p.id == productId);
+    const product = this.myProducts.find((p)=>p.id == productId);
+    return {...product};
   }
 
 
