@@ -15,7 +15,7 @@ import * as XLSX from 'xlsx';
 export class XlsService {
 
   /** Last workbook that was read */
-  private workbook: XLSX.WorkBook;
+  public workbook: XLSX.WorkBook;
 
   /** Last data that was read out of some sheet */
   public data;

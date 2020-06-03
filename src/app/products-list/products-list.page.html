@@ -18,7 +18,7 @@
           <ion-text>הוספת מוצר</ion-text>
         </ion-button>
         <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
-        <input class="ion-hide" type="file" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event)">
+        <input class="ion-hide" type="file" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event); excel.value = null">
       </div>
 
     </div>
@@ -57,6 +57,7 @@
 
         <ion-row *ngIf="productsList.length">
           <ion-col size="0.5"></ion-col>
+          <ion-col size="0.5"></ion-col>
           <ion-col size="1.5"></ion-col>
           <ion-col size="3">שם המוצר</ion-col>
           <ion-col>מק"ט</ion-col>
@@ -67,7 +68,18 @@
 
         <ion-row *ngFor="let product of productsList">
           <ion-col size="0.5">
-            <ion-button class="small-circle-btn" color="secondary" fill="clear" (click)="deleteProduct(product)" *ngIf="businessService.side == 'c' && favoriteOnly">
+            <ion-icon name="warning" color="warning"
+                      *ngIf="favoriteOnly && !hasAllRequired(product)"
+                      matTooltip="חסרים פרטי מוצר"
+            ></ion-icon>
+            <ion-icon name="alert-circle" color="danger"
+                      *ngIf="favoriteOnly && !priceInLimits(product)"
+                      matTooltip="מחיר מחוץ לטווח"
+            ></ion-icon>
+          </ion-col>
+          <ion-col size="0.5">
+            <ion-checkbox *ngIf="!favoriteOnly"></ion-checkbox>
+            <ion-button class="small-circle-btn" color="secondary" fill="clear" (click)="deleteProduct(product)" *ngIf="favoriteOnly">
               <ion-icon name="close" slot="icon-only"></ion-icon>
             </ion-button>
           </ion-col>
@@ -80,7 +92,7 @@
           <ion-col>{{product.catalogNumS}}</ion-col>
           <ion-col>{{product.price | price}} / {{null | unitAmount : product.type}}</ion-col>
           <ion-col>
-            <ion-button fill="outline" color="dark" shape="round" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
+            <ion-button fill="outline" color="dark" shape="round" *ngIf="favoriteOnly" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
           </ion-col>
           <ion-col>
             <ion-button fill="outline" color="dark" shape="round" *ngIf="businessService.side == 's'" (click)="customerPricing(product)">תמחור לקוחות</ion-button>

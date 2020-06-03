@@ -127,15 +127,24 @@ export class ProductsService {
    * The products changes will be saved in the supplier's collection OR in the customer's collection.
    * New product that was created by the customer will be saved also in the supplier's collection.
    * */
-  async saveProduct(product: ProductPublicDoc, imageFile?: File) : Promise<boolean> {
-
-    const isNew = !product.id;
+  async saveProduct(product: ProductPublicDoc | ProductCustomerDoc, imageFile?: File) : Promise<boolean> {
 
     // Set update info
     product.modified = Date.now();
     product.modifiedBy = this.businessService.myBid;
 
+    // Find whether there is some product with the same catalog number and override it
+    let res;
+    const catalogNumC = (product as ProductCustomerDoc).catalogNumC;
+    if(catalogNumC)
+      res = await this.customerProductsRef.where('catalogNumC', '==', catalogNumC).get();
+    if(product.catalogNumS && this.businessService.side == 's')
+      res = await this.allProductsRef.where('catalogNumS', '==', product.catalogNumS).where('sid', '==', this.businessService.myBid).get();
+    if(res.docs && res.docs.length)
+      product.id = res.docs[0].id;
+
     // If new, create ID and stamp creation time
+    const isNew = !product.id;
     if(isNew) {
       product.id = this.allProductsRef.doc().id;
       product.created = product.modified;
@@ -161,7 +170,7 @@ export class ProductsService {
 
       const batch = firebase.firestore().batch();
 
-      // For a customer, save the product in his collection TODO: Supplier suppose to change also the customer data (with alert)
+      // For a customer, save the product in his collection
       if(this.businessService.side == 'c')
         batch.set(this.customerProductsRef.doc(product.id), product, {merge: true});
 

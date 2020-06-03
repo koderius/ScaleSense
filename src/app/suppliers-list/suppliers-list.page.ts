@@ -59,7 +59,8 @@ export class SuppliersListPage implements OnInit {
     const table = this.xlsReader.readSheetData();
     // Parse file and set suppliers
     const numOfSuppliers = await this.xlsParse.setSuppliers(table);
-    alert('פרטי ' + numOfSuppliers + ' ספקים הוגדרו מתוך מטבלה');
+    if(numOfSuppliers)
+      alert('פרטי ' + numOfSuppliers + ' ספקים הוגדרו מתוך מטבלה');
   }
 
 

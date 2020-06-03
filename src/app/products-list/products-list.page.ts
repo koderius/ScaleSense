@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {ProductsService} from '../services/products.service';
-import {ProductCustomerDoc, ProductPublicDoc} from '../models/ProductI';
+import {ProductCustomerDoc, ProductPublicDoc, ProductType} from '../models/ProductI';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc} from '../models/Business';
@@ -10,6 +10,7 @@ import {ModalController} from '@ionic/angular';
 import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
 import {AlertsService} from '../services/alerts.service';
 import {CustomersService} from '../services/customers.service';
+import {XlsParseService} from '../services/xls-parse.service';
 
 
 @Component({
@@ -24,6 +25,8 @@ export class ProductsListPage {
   q: string = '';
   bid: string;
 
+  // For supplier, always true.
+  // For customer, setting to false will show all the supplier's products (and not only those he has in his list)
   favoriteOnly: boolean = true;
 
   numOfNewResults: number;
@@ -37,6 +40,7 @@ export class ProductsListPage {
     public navService: NavigationService,
     public businessService: BusinessService,
     private excelService: XlsService,
+    private excelParse: XlsParseService,
     private modalCtrl: ModalController,
     private alerts: AlertsService,
   ) { }
@@ -84,7 +88,11 @@ export class ProductsListPage {
 
   async importFromExcel(evt) {
     await this.excelService.readExcelWorkbook(evt);
-    console.log(this.excelService.readSheetData());
+    const table = this.excelService.readSheetData();
+    const number = await this.excelParse.setProducts(table);
+    if(number)
+      alert('פרטי ' + number + ' מוצרים הוגדרו מתוך מטבלה');
+
   }
 
 
@@ -107,6 +115,26 @@ export class ProductsListPage {
 
     this.search();
 
+  }
+
+
+  hasAllRequired(product: ProductCustomerDoc) {
+    // All basic required fields
+    let hasAll = !!(product.name && product.sid && product.catalogNumS && product.image && product.barcode && product.price);
+    // Required field for unit types
+    if(product.type > ProductType.BY_WEIGHT)
+      hasAll = hasAll && !!product.unitWeight;
+    // Required for customers
+    if(this.businessService.side == 'c')
+      hasAll = hasAll && !!product.category && !!product.catalogNumC;
+    return hasAll;
+  }
+
+  priceInLimits(product: ProductCustomerDoc) {
+    if(this.businessService.side == 'c')
+      return (!product.minPrice || product.price >= product.minPrice) && (!product.maxPrice || product.price <= product.maxPrice);
+    else
+      return true;
   }
 
 

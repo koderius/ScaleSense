@@ -135,8 +135,11 @@ export class SuppliersService {
   async saveSupplierDoc(supplierDoc: SupplierDoc, logoFile?: File) {
 
     // If NID supplied, and it belong to an existing supplier, edit this supplier
-    if(supplierDoc.nid)
-      supplierDoc = this.mySuppliers.find((s)=>s.nid == supplierDoc.nid) || supplierDoc;
+    if(supplierDoc.nid) {
+       const supplier = this.mySuppliers.find((s)=>s.nid == supplierDoc.nid);
+       if(supplier)
+         supplierDoc.id = supplier.id;
+    }
 
     // Check whether it's a new supplier by having server ID
     const isNew = !supplierDoc.id;
