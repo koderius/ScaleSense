@@ -168,8 +168,10 @@ export class NotificationsService {
     if(newNotification.code == NotificationCode.PRICE_OFFER) {
 
       newNotification.orderSerial = '-';
-      newNotification.text = 'ספק הציע מחיר עבור מוצר';
-
+      newNotification.text = 'ספק הציע מחיר חדש עבור המוצר: ';
+      // Add the product's name
+      const product = await this.productService.getProduct(newNotification.content.productId);
+      newNotification.text += product.name;
     }
 
 

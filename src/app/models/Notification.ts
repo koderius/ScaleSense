@@ -24,6 +24,7 @@ export interface BaseNotificationDoc {
     orderStatus?: OrderStatus;
     productId?: string;
     adminData?: string;
+    data?: any;
   }
 
 }
