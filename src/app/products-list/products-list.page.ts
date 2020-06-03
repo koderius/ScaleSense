@@ -20,21 +20,27 @@ import {XlsParseService} from '../services/xls-parse.service';
 })
 export class ProductsListPage {
 
+  filteredList: (ProductPublicDoc | ProductCustomerDoc)[];
+
+  get results() {
+    return (this.filteredList || this.productsService.myProducts).slice((this.page - 1) * 10, this.page * 10);
+  }
+
   businessList: BusinessDoc[] = [];
 
   q: string = '';
   bid: string;
 
-  // For supplier, always true.
-  // For customer, setting to false will show all the supplier's products (and not only those he has in his list)
-  favoriteOnly: boolean = true;
-
-  numOfNewResults: number;
+  // For supplier, always false.
+  // For customer, setting to true will show all the supplier's products (and not only those he has in his list)
+  showAllProducts: boolean = false;
 
   isSearching: boolean;
 
+  page: number = 1;
+
   constructor(
-    private productsService: ProductsService,
+    public productsService: ProductsService,
     private suppliersService: SuppliersService,
     private customersService: CustomersService,
     public navService: NavigationService,
@@ -45,16 +51,10 @@ export class ProductsListPage {
     private alerts: AlertsService,
   ) { }
 
-  get productsList() : ProductPublicDoc[] | ProductCustomerDoc[] {
-    return this.productsService.loadedProducts;
-  }
-
   ionViewDidEnter() {
 
     // For customers, allow filter by supplier. for supplier allow filter by customer
     this.businessList = this.businessService.side == 'c' ? this.suppliersService.mySuppliers : this.customersService.myCustomers;
-
-    this.search();
 
   }
 
@@ -66,22 +66,32 @@ export class ProductsListPage {
    * */
   async search(movePage : number = 0) {
 
-    this.isSearching = true;
+    // On new search, go back to first page
+    if(movePage === 0)
+      this.page = 1;
 
-    // Get results
-    const res = await this.productsService.queryMyProducts(
-      this.q,
-      this.bid,
-      !this.favoriteOnly,
-      true,
-      movePage == 1 ? this.productsList.slice(-1)[0].name : null,
-      movePage == -1 ? this.productsList[0].name : null,
-    );
+    // Filter my products by name and/or other side ID
+    if(!this.showAllProducts) {
+      this.page += movePage;
+      this.filteredList = this.productsService.myProducts
+        .filter((p)=>!this.bid || this.bid == (this.businessService.side == 'c' ? p.sid : p.cid))
+        .filter((p)=>p.name.includes(this.q))
+    }
 
-    // Report to pagination
-    this.numOfNewResults = res ? res.length : 0;
-
-    this.isSearching = false;
+    // Query all products from server, when customer choose to get not only his products
+    else {
+      this.isSearching = true;
+      // Get results
+      const res = await this.productsService.querySuppliersProducts(
+        this.q,
+        this.bid,
+        movePage == 1 ? this.filteredList.slice(-1)[0].name : null,
+        movePage == -1 ? this.filteredList[0].name : null,
+      );
+      if(res)
+        this.filteredList = res;
+      this.isSearching = false;
+    }
 
   }
 
@@ -110,10 +120,26 @@ export class ProductsListPage {
 
   async deleteProduct(product: ProductPublicDoc) {
 
-    if(await this.alerts.areYouSure('האם למחוק את המוצר ' + product.name + '?', 'פרטי המוצר יימחקו'))
+    if(await this.alerts.areYouSure('האם למחוק את המוצר ' + product.name + ' מהרשימה שלך?', 'פרטי המוצר יימחקו')) {
       await this.productsService.deleteProduct(product.id);
+      this.search();
+      return true;
+    }
 
-    this.search();
+  }
+
+  customerHasProduct(product) {
+    return this.productsService.myProducts.some((p)=>p.id == product.id);
+  }
+
+  async onCheckProduct(product: ProductPublicDoc, evt) {
+    // Save the product in the customer's private list
+    if(evt.target.checked)
+      await this.productsService.saveProduct(product);
+    // Delete the product (if chose not to, check the checkbox back)
+    else
+      if(!await this.deleteProduct(product))
+        evt.target.checked = true;
 
   }
 

@@ -21,6 +21,9 @@ export interface BusinessDoc {
   created?: number;
   modified?: number;
 
+  /** Scales ID - for customers only */
+  scalesId?: string;
+
 }
 
 /** Contains also the private data that each customer has for his supplier */
@@ -34,7 +37,6 @@ export interface SupplierDoc extends BusinessDoc {
 
   /** List of contacts for this supplier */
   contacts?: ContactInfo[];
-
 
 }
 

@@ -1,6 +1,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {CameraService} from '../services/camera.service';
+import {BusinessService} from '../services/business.service';
+import {MetadataService} from '../services/metadata.service';
 
 @Component({
   selector: 'app-weight-camera',
@@ -23,7 +25,26 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   constructor(
     private cameraService: CameraService,
     private modalCtrl: ModalController,
+    private businessService: BusinessService,
   ) {
+
+    const scaleSocket = new WebSocket("ws://136.243.189.206:8080?id=1234");
+
+    scaleSocket.onopen = function (evt) {
+      console.log("Scale: Connection open ...");
+    };
+
+    scaleSocket.onmessage = function (evt) {
+      console.log("Received Message From Client: " + evt.data);
+      if (evt.data === 'scale') {
+        this.send('1234:40.41');
+      }
+    };
+
+    scaleSocket.onclose = function (evt) {
+      alert("Scale: Connection closed.");
+    };
+
   }
 
   ngOnInit() {
@@ -66,23 +87,28 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
 
   async getWeightSnapshot() : Promise<number> {
 
-    // Get weight
-    // const clientSocket = new WebSocket("ws://localhost:8080?scale=1234");
-    //
-    // clientSocket.onopen = function (evt) {
-    //   console.log("Client: Connection open ... (press scale)");
-    //   this.send('scale:1234');
-    // };
-    //
-    // clientSocket.onmessage = function (evt) {
-    //   console.log("Client: Received Message: " + evt.data);
-    // };
-    //
-    // clientSocket.onclose = function (evt) {
-    //   console.log("Client:Connection closed.");
-    // };
+    // Get IP + port and scale ID
+    const scaleId = this.businessService.businessDoc.scalesId;
+    const ipPort = MetadataService.SCALE_IP;
 
-    return Math.random()*20;
+    return new Promise((resolve, reject) => {
+
+      const clientSocket = new WebSocket(`ws://${ipPort}?scale=${scaleId}`);
+
+      clientSocket.onopen = function (evt) {
+        console.log("Client: Connection open ... (press scale)");
+        this.send('scale:'+scaleId);
+      };
+
+      clientSocket.onmessage = function (evt) {
+        console.log("Client: Received Message: " + evt.data);
+        resolve(+evt.data.split(':')[1]);
+      };
+
+      clientSocket.onclose = function (evt) {
+        console.log("Client:Connection closed.");
+      };
+    });
 
   }
 

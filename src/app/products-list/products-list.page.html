@@ -37,8 +37,8 @@
         ></app-autocomplete-field>
 
         <ion-item lines="none" *ngIf="businessService.side == 'c'">
-          <ion-checkbox slot="start" [(ngModel)]="favoriteOnly" (ionChange)="search()"></ion-checkbox>
-          <ion-label>מוצרים מועדפים בלבד</ion-label>
+          <ion-checkbox slot="start" [(ngModel)]="showAllProducts" (ionChange)="search()"></ion-checkbox>
+          <ion-label>צפייה בכל המוצרים</ion-label>
         </ion-item>
 
       </div>
@@ -49,13 +49,13 @@
           <ion-spinner style="margin: auto" color="primary"></ion-spinner>
         </div>
 
-        <div *ngIf="!isSearching && !productsList.length">
+        <div *ngIf="!isSearching && !results.length">
           <h4 class="ion-text-center">
             <ion-text color="medium">- לא קיימים מוצרים -</ion-text>
           </h4>
         </div>
 
-        <ion-row *ngIf="productsList.length">
+        <ion-row *ngIf="results.length">
           <ion-col size="0.5"></ion-col>
           <ion-col size="0.5"></ion-col>
           <ion-col size="1.5"></ion-col>
@@ -66,20 +66,20 @@
           <ion-col></ion-col>
         </ion-row>
 
-        <ion-row *ngFor="let product of productsList">
+        <ion-row *ngFor="let product of results">
           <ion-col size="0.5">
             <ion-icon name="warning" color="warning"
-                      *ngIf="favoriteOnly && !hasAllRequired(product)"
+                      *ngIf="!showAllProducts && !hasAllRequired(product)"
                       matTooltip="חסרים פרטי מוצר"
             ></ion-icon>
             <ion-icon name="alert-circle" color="danger"
-                      *ngIf="favoriteOnly && !priceInLimits(product)"
+                      *ngIf="!showAllProducts && !priceInLimits(product)"
                       matTooltip="מחיר מחוץ לטווח"
             ></ion-icon>
           </ion-col>
           <ion-col size="0.5">
-            <ion-checkbox *ngIf="!favoriteOnly"></ion-checkbox>
-            <ion-button class="small-circle-btn" color="secondary" fill="clear" (click)="deleteProduct(product)" *ngIf="favoriteOnly">
+            <ion-checkbox *ngIf="showAllProducts" [checked]="customerHasProduct(product)" (ionChange)="onCheckProduct(product, $event)"></ion-checkbox>
+            <ion-button class="small-circle-btn" color="secondary" fill="clear" (click)="deleteProduct(product)" *ngIf="!showAllProducts">
               <ion-icon name="close" slot="icon-only"></ion-icon>
             </ion-button>
           </ion-col>
@@ -92,7 +92,7 @@
           <ion-col>{{product.catalogNumS}}</ion-col>
           <ion-col>{{product.price | price}} / {{null | unitAmount : product.type}}</ion-col>
           <ion-col>
-            <ion-button fill="outline" color="dark" shape="round" *ngIf="favoriteOnly" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
+            <ion-button fill="outline" color="dark" shape="round" *ngIf="!showAllProducts" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
           </ion-col>
           <ion-col>
             <ion-button fill="outline" color="dark" shape="round" *ngIf="businessService.side == 's'" (click)="customerPricing(product)">תמחור לקוחות</ion-button>
@@ -104,7 +104,8 @@
     </div>
 
     <app-pagination
-            [numOfResults]="numOfNewResults"
+            [numOfResults]="results.length"
+            [totalNumOfResults]="!showAllProducts ? (filteredList || productsService.myProducts).length : null"
             (onForward)="search(1)"
             (onBack)="search(-1)"
     ></app-pagination>

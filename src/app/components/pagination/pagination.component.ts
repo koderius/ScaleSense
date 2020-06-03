@@ -24,7 +24,7 @@ export class PaginationComponent implements OnInit {
   // If the total number of results is known
   @Input() set totalNumOfResults(num: number) {
     this._totalNumOfResults = num;
-    this.canGoForward = this.page < Math.ceil(num / this.MAX_RESULTS_IN_QUERY);
+    this.canGoForward = num ? this.page < Math.ceil(num / this.MAX_RESULTS_IN_QUERY) : (this._numOfResults == this.MAX_RESULTS_IN_QUERY);
   }
 
   @Input() set numOfResults(num: number) {

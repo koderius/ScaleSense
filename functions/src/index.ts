@@ -373,57 +373,6 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
 
 
 
-// export const onOrderChange = functions.firestore.document('orders/{orderId}').onWrite((change, context) => {
-//
-//   const orderData = change.after.data() as OrderDoc;
-//   const oldData = change.before.data() as OrderDoc;
-//
-//   if(orderData) {
-//
-//     // Don't do anything when:
-//     // 1. The changes made by the customer before the supplier opened the order
-//     // 2. The supplier opened the order
-//     if(orderData.status == 11 || orderData.status == 20)
-//       return;
-//
-//     // Get last change report
-//     const changeReport = (orderData.changes || []).slice(-1)[0] as OrderChange;
-//
-//     /** Prepare change notification to the other side */
-//     // If the changes were made by the customer, send a notification to the supplier, and v.v.
-//     const sendToId = orderData[changeReport.side == 'c' ? 'sid' : 'cid'] as string;
-//
-//     // Create notification based on the order change report
-//     const noteContent: BaseNotificationDoc = {
-//       code: 1,
-//       time: changeReport.time,
-//       refSide: changeReport.side,
-//       refBid: orderData[changeReport.side == 'c' ? 'cid' : 'sid'] as string,
-//       content: {
-//         orderId: change.after.id,
-//         orderStatus: changeReport.status,
-//       }
-//     };
-//
-//     sendNotification(transaction, changeReport.side == 'c' ? 's' : 'c', sendToId, noteContent);
-//
-//
-//     const productChanges = ProductsListUtil.CompareLists(oldData.products || [], orderData.products || []);
-//
-//     productChanges.forEach((pc)=>{
-//       if(pc.price && pc.price.old != pc.price.new) {
-//
-//         const product =
-//
-//       }
-//     });
-//
-//   }
-//
-// });
-
-
-
 /**
  * Cloud function that runs every 5 minutes TODO: Update to every minute?
  * */

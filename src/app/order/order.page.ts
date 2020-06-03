@@ -154,13 +154,9 @@ export class OrderPage implements OnInit {
 
     this._page = step;
 
-    // On page no. 2, load the products of the current supplier
-    if(this._page == 2) {
-      this.supplierProducts = [];     // (Clear before to avoid flashing in the meanwhile)
-      this.productsService.queryMyProducts(null, this.order.sid).then((res)=>{
-        this.supplierProducts = res;
-      });
-    }
+    // On page no. 2, get the products of the current supplier
+    if(this._page == 2)
+      this.supplierProducts = this.productsService.myProducts.filter((p)=>p.sid == this.order.sid);
 
   }
 

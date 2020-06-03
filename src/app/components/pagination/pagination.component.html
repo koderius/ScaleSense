@@ -1,4 +1,4 @@
-<ion-row id="pages-btns" dir="ltr" *ngIf="_numOfResults">
+<ion-row id="pages-btns" dir="ltr" *ngIf="_numOfResults || _totalNumOfResults">
   <ion-button fill="clear" (click)="previousClicked()" title="הקודם" [disabled]="page <= 1" [color]="page <= 1 ? 'dark' : 'primary'">
     <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
   </ion-button>

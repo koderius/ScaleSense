@@ -23,14 +23,12 @@ export class ProductsService {
 
   static readonly PUBLIC_PRODUCT_CID_VALUE = 'G';
 
-  /** List of products data */
-  loadedProducts: (ProductCustomerDoc | ProductPublicDoc)[] = [];
+  private _myCustomerProducts: ProductCustomerDoc[] = [];
+  private _mySupplierProducts: ProductPublicDoc[] = [];
 
-  constructor(
-    private businessService: BusinessService,
-    private filesService: FilesService,
-  ) {}
-
+  get myProducts() {
+    return this.businessService.side == 'c' ? this._myCustomerProducts : this._mySupplierProducts;
+  }
 
   /** The reference to the firestore collection where the list of customer's products is stored */
   get customerProductsRef() : CollectionReference {
@@ -42,49 +40,51 @@ export class ProductsService {
     return firebase.firestore().collection('products');
   }
 
+  constructor(
+    private businessService: BusinessService,
+    private filesService: FilesService,
+  ) {
+
+    // Subscribe user's products (for supplier - all his owned products. For customer - all products in his private list)
+    if(this.businessService.side == 'c')
+      this.customerProductsRef.onSnapshot((snapshot)=>{
+        this._myCustomerProducts = snapshot.docs.map((d)=>d.data() as ProductCustomerDoc);
+      });
+    else
+      this.allProductsRef.where('sid', '==', this.businessService.myBid).onSnapshot((snapshot)=>{
+        this._mySupplierProducts = snapshot.docs.map((d)=>d.data() as ProductPublicDoc);
+      });
+
+  }
+
 
   /**
-   * Query products by name, limit to 10 results + pagination
-   * For suppliers, query from their products collection - can filter by customer belonging
-   * For customers, query from their products collection - can filter by supplier
+   * For customers use only, for querying products out of their private list
+   * Query products by name and/or supplier, limit to 10 results + pagination
    * */
-  async queryMyProducts(q?: string, bid?: string, allSupplierProducts?: boolean, pagination?: boolean, startAfterName?: string, endBeforeName?: string) : Promise<ProductPublicDoc[] | ProductCustomerDoc[]> {
-
-    // Suppliers search in their products list.
-    // Customers search in their list of products, or in the full supplier's list
-    const suppliersList: boolean = (this.businessService.side == 's' || allSupplierProducts);
-
-    const collection = suppliersList ? this.allProductsRef : this.customerProductsRef;
+  async querySuppliersProducts(q?: string, sid?: string, startAfterName?: string, endBeforeName?: string) : Promise<ProductPublicDoc[]> {
 
     // Sort products by name
-    let ref = collection.orderBy('name');
+    let ref = this.allProductsRef.orderBy('name');
 
-    // For suppliers, query only the products they own
-    if(this.businessService.side == 's')
-      ref = ref.where('sid', '==', this.businessService.myBid);
+    // May filter by supplier
+    if(sid)
+      ref = ref.where('sid', '==', sid);
 
     // May filter by name
     if(q)
       ref = ref.where('name', '>=', q).where('name', '<', Dictionary.NextLastLetter(q));
 
-    // May filter by other side ID
-    const side = this.businessService.side == 'c' ? 'sid' : 'cid';
-    if(bid)
-      ref = ref.where(side, '==', bid);
-
-    // If a customer search within list of a supplier, he can get only the products that he has created, or that have been defined as public
-    if(this.businessService.side == 'c' && allSupplierProducts)
-      ref = ref.where('cid', 'in', [this.businessService.myBid, ProductsService.PUBLIC_PRODUCT_CID_VALUE]);
+    // Customer can get only the products that he has created, or that have been defined as public
+    ref = ref.where('cid', 'in', [this.businessService.myBid, ProductsService.PUBLIC_PRODUCT_CID_VALUE]);
 
     // Pagination
-    if(pagination) {
-      if(startAfterName)
-        ref = ref.startAfter(startAfterName);
-      if(endBeforeName)
-        ref = ref.endBefore(endBeforeName).limitToLast(10);
-      else
-        ref = ref.limit(10);
-    }
+    if(startAfterName)
+      ref = ref.startAfter(startAfterName);
+    if(endBeforeName)
+      ref = ref.endBefore(endBeforeName).limitToLast(10);
+    else
+      ref = ref.limit(10);
 
     // Get results
     try {
@@ -96,8 +96,7 @@ export class ProductsService {
         return null;
 
       // Save the product's list temporally and return the list
-      this.loadedProducts = res.docs.map((doc)=>doc.data() as ProductPublicDoc | ProductPublicDoc);
-      return this.loadedProducts;
+      return res.docs.map((doc)=>doc.data() as ProductPublicDoc);
 
     }
     catch (e) {
@@ -107,19 +106,9 @@ export class ProductsService {
   }
 
 
-  /** Load product data. Each side loads the data from his collection */
+  /** Get product's data. Each side loads the data from his collection */
   async getProduct(productId: string) : Promise<ProductPublicDoc | ProductCustomerDoc> {
-
-    // Check whether the product has already been loaded
-    const product = this.loadedProducts.find((p)=>p.id == productId);
-    if(product)
-      return product;
-
-    // Load from server
-    const collection = this.businessService.side == 's' ? this.allProductsRef : this.customerProductsRef;
-    const res = await collection.doc(productId).get();
-    return res.data() as ProductPublicDoc | ProductCustomerDoc;
-
+    return this.myProducts.find((p)=>p.id == productId);
   }
 
 
@@ -134,14 +123,14 @@ export class ProductsService {
     product.modifiedBy = this.businessService.myBid;
 
     // Find whether there is some product with the same catalog number and override it
-    let res;
+    let existProduct;
     const catalogNumC = (product as ProductCustomerDoc).catalogNumC;
     if(catalogNumC)
-      res = await this.customerProductsRef.where('catalogNumC', '==', catalogNumC).get();
+      existProduct = this.myProducts.find((p: ProductCustomerDoc)=>p.catalogNumC == catalogNumC);
     if(product.catalogNumS && this.businessService.side == 's')
-      res = await this.allProductsRef.where('catalogNumS', '==', product.catalogNumS).where('sid', '==', this.businessService.myBid).get();
-    if(res.docs && res.docs.length)
-      product.id = res.docs[0].id;
+      existProduct = this.myProducts.find((p)=>p.catalogNumS == product.catalogNumS);
+    if(existProduct)
+      product.id = existProduct.id;
 
     // If new, create ID and stamp creation time
     const isNew = !product.id;
