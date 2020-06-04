@@ -36,41 +36,47 @@ export class SettingsPage implements OnInit {
   }
 
 
-  async setEmails() {
+  // async setEmails() {
+  //
+  //   // Get users snapshot
+  //   this.usersService.users = (await this.usersService.myUsersRef.get()).docs
+  //   .map((d)=>d.data() as UserDoc)
+  //   .sort((a, b)=>b.role - a.role);
+  //
+  //   const a = await this.alertCtrl.create({
+  //     header: 'הגדרות שליחת דוא"ל',
+  //     subHeader: 'התראות במייל תשלחנה למשתמשים הבאים:',
+  //     inputs: this.usersService.users.map((user)=>{return {
+  //       type: 'checkbox',
+  //       label: user.displayName,
+  //       value: user.uid,
+  //       name: user.uid,
+  //       checked: user.emailNotes,
+  //     }}),
+  //     buttons: [
+  //       {
+  //         text: 'אישור',
+  //
+  //         // Update users email notifications settings (true/false) according to the alert's checkboxes
+  //         handler: (data: string[])=>{this.usersService.users.forEach((user)=>{
+  //           this.usersService.usersCollectionRef.doc(user.uid).update({emailNotes: data.includes(user.uid)});
+  //         })},
+  //
+  //       },
+  //       {
+  //         text: 'ביטול',
+  //         role: 'cancel'
+  //       }
+  //     ],
+  //     backdropDismiss: false,
+  //   });
+  //   a.present();
+  // }
 
-    // Get users snapshot
-    this.usersService.users = (await this.usersService.myUsersRef.get()).docs
-    .map((d)=>d.data() as UserDoc)
-    .sort((a, b)=>b.role - a.role);
+  editBusiness() {
 
-    const a = await this.alertCtrl.create({
-      header: 'הגדרות שליחת דוא"ל',
-      subHeader: 'התראות במייל תשלחנה למשתמשים הבאים:',
-      inputs: this.usersService.users.map((user)=>{return {
-        type: 'checkbox',
-        label: user.displayName,
-        value: user.uid,
-        name: user.uid,
-        checked: user.emailNotes,
-      }}),
-      buttons: [
-        {
-          text: 'אישור',
 
-          // Update users email notifications settings (true/false) according to the alert's checkboxes
-          handler: (data: string[])=>{this.usersService.users.forEach((user)=>{
-            this.usersService.usersCollectionRef.doc(user.uid).update({emailNotes: data.includes(user.uid)});
-          })},
 
-        },
-        {
-          text: 'ביטול',
-          role: 'cancel'
-        }
-      ],
-      backdropDismiss: false,
-    });
-    a.present();
   }
 
 }

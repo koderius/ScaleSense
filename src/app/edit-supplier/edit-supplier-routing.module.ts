@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import { EditSupplierPage } from './edit-supplier.page';
 
 const routes: Routes = [
@@ -11,7 +10,7 @@ const routes: Routes = [
   {
     path: '',
     redirectTo: 'new'
-  }
+  },
 ];
 
 @NgModule({

@@ -52,13 +52,10 @@
         </div>
 
         <ion-list *ngIf="generalOpen">
-          <ion-item (click)="setEmails()">
-            <p>הגדרות שליחת דוא"ל</p>
-          </ion-item>
           <ion-item>
-            <p>הגדרות שליחת SMS</p>
+            <p>הגדרות שליחת הודעות</p>
           </ion-item>
-          <ion-item lines="none">
+          <ion-item lines="none" (click)="navService.goToEditBusiness()">
             <p>עריכת פרטי עסק</p>
           </ion-item>
         </ion-list>

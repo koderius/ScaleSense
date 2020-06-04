@@ -12,7 +12,7 @@
         <p class="form-title">פרטי ספק</p>
         <div class="inputs">
 
-          <ion-row class="input-div">
+          <ion-row class="input-div" *ngIf="!myBusinessMode">
             <ion-col size="3" required>מספר ספק</ion-col>
             <ion-col>
               <mat-form-field aria-label="Supplier serial">
@@ -22,7 +22,7 @@
           </ion-row>
 
           <ion-row class="input-div">
-            <ion-col size="3" required>שם הספק</ion-col>
+            <ion-col size="3" required>{{myBusinessMode ? 'שם העסק' : 'שם הספק'}}</ion-col>
             <ion-col>
               <mat-form-field aria-label="Supplier name">
                 <input matInput [(ngModel)]="supplier.name" required name="supplierName">

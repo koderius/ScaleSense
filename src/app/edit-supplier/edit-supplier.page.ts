@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Route} from '@angular/router';
 import {SupplierDoc} from '../models/Business';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
 import {AuthSoftwareService} from '../services/auth-software.service';
 import {NavigationService} from '../services/navigation.service';
+import {BusinessService} from '../services/business.service';
 
 @Component({
   selector: 'app-edit-supplier',
@@ -22,14 +23,18 @@ export class EditSupplierPage implements OnInit {
 
   emailRegex = AuthSoftwareService.EMAIL_REGEX;
 
+  myBusinessMode: boolean;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private suppliersService: SuppliersService,
     private alerts: AlertsService,
     private navService: NavigationService,
+    private businessService: BusinessService,
   ) { }
 
   async ngOnInit() {
+
 
     // Create new supplier document or get existed one, according to the ID in the URL
     const id = this.activatedRoute.snapshot.params['id'];
@@ -37,6 +42,18 @@ export class EditSupplierPage implements OnInit {
       this.supplier = {};
     else
       this.supplier = await this.suppliersService.loadSupplier(id);
+
+    // For editing current business
+    if(id == 'edit' && window.location.pathname.endsWith('/my-business/edit')) {
+      this.supplier = this.businessService.businessDoc;
+      this.myBusinessMode = true;
+    }
+
+    // Go back if no supplier
+    if(!this.supplier) {
+      this.navService.goBack();
+      return;
+    }
 
     // Set one empty contact info, if no contact exist
     if(!this.supplier.contacts)
@@ -51,8 +68,12 @@ export class EditSupplierPage implements OnInit {
   }
 
   get pageTitle() {
-    if(this.supplier)
-      return this.supplier.id ? 'עריכת ספק' : 'הקמת ספק חדש';
+    if(this.supplier) {
+      if(this.myBusinessMode)
+        return 'עריכת פרטי עסק';
+      else
+        return this.supplier.id ? 'עריכת ספק' : 'הקמת ספק חדש';
+    }
   }
 
   get temporalSerial() {
@@ -98,12 +119,22 @@ export class EditSupplierPage implements OnInit {
     if(!this.checkFields())
       return;
 
-    // Save the supplier. If there is a temporary file, upload it. If the supplier has a logo but it was clear, delete the logo from server
-    const l = this.alerts.loaderStart('שומר פרטי ספק...');
-    await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo);
-    this.alerts.loaderStop(l);
-    alert('פרטי ספק נשמרו בהצלחה');
-    this.navService.goToSuppliersList();
+    // Save my business data
+    if(this.myBusinessMode) {
+      const l = this.alerts.loaderStart('שומר פרטי עסק...');
+      this.businessService.businessDocRef.update(this.supplier);
+      this.alerts.loaderStop(l);
+      alert('פרטי עסק נשמרו בהצלחה');
+    }
+
+    // Save the supplier
+    else {
+      const l = this.alerts.loaderStart('שומר פרטי ספק...');
+      await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo);
+      this.alerts.loaderStop(l);
+      alert('פרטי ספק נשמרו בהצלחה');
+      this.navService.goToSuppliersList();
+    }
 
   }
 

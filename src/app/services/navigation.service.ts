@@ -70,7 +70,7 @@ export class NavigationService {
     this.navCtrl.navigateForward('settings/suppliers-list');
   }
 
-  goToEditSupplier(supplierId: string) {
+  goToEditSupplier(supplierId: string = 'new') {
     this.navCtrl.navigateForward('settings/edit-supplier/' + supplierId)
   }
 
@@ -84,6 +84,10 @@ export class NavigationService {
 
   goToUsers() {
     this.navCtrl.navigateForward('settings/users');
+  }
+
+  goToEditBusiness() {
+    this.navCtrl.navigateForward('settings/my-business/edit');
   }
 
   goToCategoriesList() {

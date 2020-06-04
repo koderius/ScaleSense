@@ -36,7 +36,12 @@ const routes: Routes = [
   {
     path: 'users',
     loadChildren: () => import('../users/users.module').then( m => m.UsersPageModule),
-    data: {adminOnly: true}
+    data: {permissions: [UserPermission.MASTER]}
+  },
+  {
+    path: 'my-business',
+    loadChildren: () => import('../edit-supplier/edit-supplier.module').then( m => m.EditSupplierPageModule),
+    data: {permissions: [UserPermission.MASTER]}
   },
 ];
 
