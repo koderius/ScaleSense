@@ -12,8 +12,8 @@
 
 <!--  BusinessData-->
   <ion-col>
-    <ion-img [src]="businessData.logo" class="ion-margin-end" *ngIf="businessService.side == 'c'"></ion-img>
-    <ion-text>{{businessData.name}}</ion-text>
+    <ion-img [src]="businessData?.logo" class="ion-margin-end" *ngIf="businessService.side == 'c'"></ion-img>
+    <ion-text>{{businessData?.name}}</ion-text>
   </ion-col>
 
 <!--  Status-->

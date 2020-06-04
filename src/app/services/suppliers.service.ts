@@ -119,7 +119,7 @@ export class SuppliersService {
 
   }
 
-  /** Delete the supplier, and reduce the number of supplier in the metadata */
+  /** Delete the supplier */
   async deleteSupplier(id: string) {
     try {
       this.filesService.deleteFile(id);

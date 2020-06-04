@@ -63,7 +63,7 @@
         <ion-list id="products-list">
 
           <ion-list-header>
-            <ion-title color="secondary">{{getSelectedSupplier().name}}</ion-title>
+            <ion-title color="secondary">{{getSelectedSupplier()?.name}}</ion-title>
           </ion-list-header>
 
           <app-product-to-cart *ngFor="let product of (filteredSupplierProducts || supplierProducts)"
@@ -125,7 +125,7 @@
     <h1 class="ion-text-center" id="title-with-logo">
       <ion-text>פרטי הזמנה</ion-text>
       <ion-text *ngIf="page == 3" [title]="newSerialMsg"> מס. {{order.serial}}</ion-text>
-      <ion-img [src]="getSelectedSupplier().logo" style="position: absolute"></ion-img>
+      <ion-img [src]="getSelectedSupplier()?.logo" style="position: absolute"></ion-img>
     </h1>
     <h4 *ngIf="notification" class="ion-text-center" style="margin: 1em">{{notification}}</h4>
 

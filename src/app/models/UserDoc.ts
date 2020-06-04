@@ -78,4 +78,7 @@ export interface UserDoc extends Partial<UserInfo> {
   role: UserRole;
   permissions: Permissions;
 
+  /** Get notifications by email */
+  emailNotes: boolean;
+
 }

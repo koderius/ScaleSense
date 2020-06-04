@@ -87,21 +87,21 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   async getWeightSnapshot() : Promise<number> {
 
     // Get IP + port and scale ID
-    const scaleId = this.businessService.businessDoc.scalesId || 12345;
+    const scalesId = this.businessService.businessDoc.scalesId;
     const ipPort = MetadataService.SCALE_IP;
 
     return new Promise((resolve, reject) => {
 
-      if(!scaleId || !ipPort) {
+      if(!scalesId || !ipPort) {
         reject('No scale data');
         return;
       }
 
-      const clientSocket = new WebSocket(`ws://${ipPort}?scale=${scaleId}`);
+      const clientSocket = new WebSocket(`ws://${ipPort}?scale=${scalesId}`);
 
       clientSocket.onopen = function (evt) {
         console.log("Client: Connection open");
-        this.send('scale:'+scaleId);
+        this.send('scale:'+scalesId);
       };
 
       clientSocket.onmessage = function (evt) {
@@ -112,7 +112,7 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
           weight: +dataStr[1],
           time: +dataStr[2],
         };
-        if(data.id == scaleId)
+        if(data.id == scalesId)
           resolve(data.weight);
         if(Date.now() - data.time > 1000)
           throw new Error('Scale timeout');

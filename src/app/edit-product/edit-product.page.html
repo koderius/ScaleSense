@@ -19,6 +19,7 @@
             <ion-col>
               <mat-form-field aria-label="Product Name">
                 <input matInput [(ngModel)]="product.name" name="title" required>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -28,6 +29,7 @@
             <ion-col>
               <mat-form-field aria-label="Catalog number (customer)">
                 <input matInput type="number" [(ngModel)]="product.catalogNumC" name="catalogCustomer" required>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -37,6 +39,7 @@
             <ion-col>
               <mat-form-field aria-label="Catalog number (supplier)">
                 <input matInput type="number" [(ngModel)]="product.catalogNumS" name="catalogSupplier" required>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -93,6 +96,7 @@
               <mat-form-field aria-label="Supplier Serial">
                 <mat-label></mat-label>
                 <input matInput type="number" [value]="suppliersService.getSupplierById(product.sid)?.nid || ''" placeholder="אוטומטי" readonly required>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -105,6 +109,8 @@
                                       displayProp="title"
                                       valueProp="title"
                                       [selected]="product.category"
+                                      [required]="true"
+                                      name="category"
                                       (onSelect)="product.category = $event"
               ></app-autocomplete-field>
             </ion-col>
@@ -113,25 +119,27 @@
           <ion-row class="input-div">
             <ion-col size="4" required>סוג יחידה</ion-col>
             <ion-col>
-              <mat-form-field aria-label="Category">
+              <mat-form-field aria-label="Type">
                 <mat-label></mat-label>
-                <mat-select [(ngModel)]="product.type" required name="category">
+                <mat-select [(ngModel)]="product.type" name="type">
                   <mat-option *ngFor="let type of productTypes" [value]="type">{{null | unitAmount : type}}</mat-option>
                 </mat-select>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
 
           <ion-row class="input-div" *ngIf="product.type">
             <ion-col size="4" required>משקל {{null | unitAmount : product.type}}</ion-col>
-            <ion-col>
-              <mat-form-field aria-label="Type">
-                <input matInput type="number" [(ngModel)]="product.unitWeight" name="type" required>
+            <ion-col size="6">
+              <mat-form-field aria-label="Unit Weight">
+                <input matInput type="number" [(ngModel)]="product.unitWeight" name="unitWeight" step="any" required>
                 <ion-text matSuffix>{{null | unitAmount : 0}}</ion-text>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
-            <ion-col size="4" style="padding: 0">
-              <ion-button fill="clear" color="secondary" class="ion-float-end" title="שקילה">
+            <ion-col size="2" style="padding: 0">
+              <ion-button fill="clear" color="secondary" class="ion-float-end" title="שקילה" (click)="weigh('unitWeight')">
                 <ion-icon slot="icon-only" src="../../assets/svg/icon_weight.svg"></ion-icon>
               </ion-button>
             </ion-col>
@@ -146,14 +154,14 @@
             <ion-col>
               <mat-form-field aria-label="Price">
                 <input matInput type="number" step="any"
-                       [formControl]="priceFormControl"
                        [min]="product.minPrice"
                        [max]="product.maxPrice"
                        [(ngModel)]="product.price"
                        name="price"
+                       #price
                        required>
                 <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
-                <mat-error *ngIf="priceFormControl.hasError('min') || priceFormControl.hasError('max')">מחיר מחוץ לטווח</mat-error>
+                <mat-error *ngIf="price.validity.valueMissing">שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>
@@ -163,19 +171,20 @@
             <ion-col size="3.75">
               <mat-form-field aria-label="Min price">
                 <mat-label>מינימום</mat-label>
-                <input matInput type="number" step="any" [(ngModel)]="product.minPrice" (blur)="onPriceLimitChange()" name="minPrice">
+                <input matInput type="number" step="any" [(ngModel)]="product.minPrice" name="minPrice"
+                       (blur)="product.maxPrice && product.maxPrice < product.minPrice ? product.maxPrice = product.minPrice : ''">
               </mat-form-field>
             </ion-col>
             <ion-col size="0.5"></ion-col>
             <ion-col size="3.75">
               <mat-form-field aria-label="Max price">
                 <mat-label>מקסימום</mat-label>
-                <input matInput type="number" step="any" [(ngModel)]="product.maxPrice" (blur)="onPriceLimitChange()" name="maxPrice">
+                <input matInput type="number" step="any" [(ngModel)]="product.maxPrice" name="maxPrice"
+                       (blur)="product.minPrice && product.maxPrice < product.minPrice ? product.minPrice = product.maxPrice : ''">
                 <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
               </mat-form-field>
             </ion-col>
           </ion-row>
-
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">אפיצות משקל בהזמנה</ion-col>
             <ion-col>
@@ -206,11 +215,17 @@
 
           <ion-row class="input-div" *ngIf="!taraIncluded">
             <ion-col size="4" required>משקל אריזה</ion-col>
-            <ion-col>
+            <ion-col size="6">
               <mat-form-field aria-label="Tara">
-                <input matInput type="number" step="any" [(ngModel)]="product.tara" name="tara">
+                <input matInput type="number" step="any" [(ngModel)]="product.tara" name="tara" required>
                 <ion-text matSuffix>{{null | unitAmount : 0}}</ion-text>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
+            </ion-col>
+            <ion-col size="2" style="padding: 0">
+              <ion-button fill="clear" color="secondary" class="ion-float-end" title="שקילה" (click)="weigh('tara')">
+                <ion-icon slot="icon-only" src="../../assets/svg/icon_weight.svg"></ion-icon>
+              </ion-button>
             </ion-col>
           </ion-row>
 
@@ -228,7 +243,8 @@
             <ion-col size="4" required>ברקוד</ion-col>
             <ion-col>
               <mat-form-field aria-label="Barcode">
-                <input matInput type="number" [(ngModel)]="product.barcode" name="barcode">
+                <input matInput type="number" [(ngModel)]="product.barcode" name="barcode" required>
+                <mat-error>שדה חובה</mat-error>
               </mat-form-field>
             </ion-col>
           </ion-row>

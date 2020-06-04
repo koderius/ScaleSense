@@ -28,17 +28,17 @@
 
       <h1 class="reset-password-msg" *ngIf="subheaderToShow()">{{subheaderToShow()}}</h1>
 
-      <ion-input placeholder="שם העסק" *ngIf="inputToShow('businessName')" [(ngModel)]="businessName"></ion-input>
+      <ion-input placeholder="שם העסק" *ngIf="inputToShow('businessName')" [(ngModel)]="businessName" required></ion-input>
 
-      <ion-input placeholder="שם מלא" *ngIf="inputToShow('name')" [(ngModel)]="fullName"></ion-input>
+      <ion-input placeholder="שם מלא" *ngIf="inputToShow('name')" [(ngModel)]="fullName" required></ion-input>
 
-      <ion-input placeholder="דוא&quot;ל" type="email" *ngIf="inputToShow('email')" [(ngModel)]="email"></ion-input>
+      <ion-input placeholder="דוא&quot;ל" type="email" *ngIf="inputToShow('email')" [(ngModel)]="email" required [pattern]="EmailRegex"></ion-input>
 
-      <ion-input placeholder="טלפון" type="tel" *ngIf="inputToShow('phone')" [(ngModel)]="phone"></ion-input>
+      <ion-input placeholder="טלפון" type="tel" *ngIf="inputToShow('phone')" [(ngModel)]="phone" required></ion-input>
 
-      <ion-input placeholder="סיסמה חדשה" type="password" [(ngModel)]="password" *ngIf="inputToShow('password')"></ion-input>
+      <ion-input placeholder="סיסמה חדשה" type="password" [(ngModel)]="password" *ngIf="inputToShow('password')" required></ion-input>
 
-      <ion-input placeholder="אימות סיסמה" type="password" [(ngModel)]="passwordV" *ngIf="inputToShow('passwordV')"></ion-input>
+      <ion-input placeholder="אימות סיסמה" type="password" [(ngModel)]="passwordV" *ngIf="inputToShow('passwordV')" required></ion-input>
 
     </div>
 

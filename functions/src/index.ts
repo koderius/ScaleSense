@@ -203,7 +203,6 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
   if(res.success) {
 
     const mailContent = {
-      from: 'noa@scale-sense.com',
       to: 'mestroti@gmail.com', //'support@scale-sense.com', TODO
       template: {
         name: 'web-contact',

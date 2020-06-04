@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {FullCustomerOrderProductDoc, ProductCustomerDoc, ProductOrder, ProductPublicDoc} from '../models/ProductI';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -23,11 +23,13 @@ export class ProductsService {
 
   static readonly PUBLIC_PRODUCT_CID_VALUE = 'G';
 
-  private _myCustomerProducts: ProductCustomerDoc[] = [];
-  private _mySupplierProducts: ProductPublicDoc[] = [];
+  private _myCustomerProducts: ProductCustomerDoc[];
+  private _mySupplierProducts: ProductPublicDoc[];
+
+  private isDataReady: boolean;
 
   get myProducts() {
-    return this.businessService.side == 'c' ? this._myCustomerProducts : this._mySupplierProducts;
+    return (this.businessService.side == 'c' ? this._myCustomerProducts : this._mySupplierProducts) || [];
   }
 
   /** The reference to the firestore collection where the list of customer's products is stored */
@@ -49,10 +51,12 @@ export class ProductsService {
     if(this.businessService.side == 'c')
       this.customerProductsRef.onSnapshot((snapshot)=>{
         this._myCustomerProducts = snapshot.docs.map((d)=>d.data() as ProductCustomerDoc);
+        this.isDataReady = true;
       });
     else
       this.allProductsRef.where('sid', '==', this.businessService.myBid).onSnapshot((snapshot)=>{
         this._mySupplierProducts = snapshot.docs.map((d)=>d.data() as ProductPublicDoc);
+        this.isDataReady = true;
       });
 
   }
@@ -108,8 +112,15 @@ export class ProductsService {
 
   /** Get product's data. Each side loads the data from his collection */
   async getProduct(productId: string) : Promise<ProductPublicDoc | ProductCustomerDoc> {
-    const product = this.myProducts.find((p)=>p.id == productId);
-    return {...product};
+    if(this.isDataReady) {
+      const product = this.myProducts.find((p)=>p.id == productId);
+      return product ? {...product} : null;
+    }
+    // If the list is not ready yet, load the item directly
+    else{
+      const res = await (this.businessService.side == 'c' ? this.customerProductsRef : this.allProductsRef).doc(productId).get();
+      return res.data() as ProductCustomerDoc | ProductPublicDoc;
+    }
   }
 
 

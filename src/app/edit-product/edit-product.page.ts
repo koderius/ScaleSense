@@ -10,7 +10,7 @@ import {CategoriesService} from '../services/categories.service';
 import {BusinessService} from '../services/business.service';
 import {Objects} from '../utilities/objects';
 import {CameraService} from '../services/camera.service';
-import {FormControl, Validators} from '@angular/forms';
+import {WeighService} from '../services/weigh.service';
 
 @Component({
   selector: 'app-edit-product',
@@ -35,9 +35,6 @@ export class EditProductPage implements OnInit {
   // Form field whether the box included. Tara (box weight) will be entered only if not-included (false)
   taraIncluded: boolean = true;
 
-  // Price field control
-  priceFormControl = new FormControl();
-
   constructor(
     private activatedRoute: ActivatedRoute,
     private productsService: ProductsService,
@@ -46,6 +43,7 @@ export class EditProductPage implements OnInit {
     public categoriesService: CategoriesService,
     public businessService: BusinessService,
     private cameraService: CameraService,
+    private weighService: WeighService,
   ) {}
 
   get pageTitle() {
@@ -60,7 +58,7 @@ export class EditProductPage implements OnInit {
 
     if(id == 'new') {
       // New product
-      this.product = {};
+      this.product = {type: ProductType.BY_WEIGHT};
       // Fill creator ID
       this.businessService.side == 'c' ? this.product.cid = this.businessService.myBid : this.product.sid = this.businessService.myBid;
       // For suppliers, set the product to be public for all customers
@@ -78,8 +76,6 @@ export class EditProductPage implements OnInit {
 
     // Show the product image
     this.logoPreview = this.product.image;
-
-    this.onPriceLimitChange();
 
   }
 
@@ -140,56 +136,30 @@ export class EditProductPage implements OnInit {
 
   checkFields() : boolean {
 
-    // All required fields
-    if(!this.product.name || !this.product.sid || !this.product.catalogNumS || !this.product.image || !this.product.barcode || !this.product.price) {
-      alert('יש למלא את כל השדות המסומנים בכוכבית');
-      return false;
-    }
-
-    // All additional required fields for customers
-    if(this.businessService.side == 'c' && (!(this.product as ProductCustomerDoc).catalogNumC || !(this.product as ProductCustomerDoc).category)) {
-      alert('יש למלא את כל השדות המסומנים בכוכבית');
-      return false;
-    }
-
-    if(!this.taraIncluded && !this.product.tara) {
-      alert('אם משקל האריזה אינו כלול במשקל המוצר, יש למלא את משקל האריזה');
-      return false;
-    }
-
-    if(this.product.type && !this.product.unitWeight) {
-      alert('אם סוג המוצר אינו לפי משקל, יש למלא את משקל היחידה');
-      return false;
-    }
-
-    if(this.priceFormControl.hasError('min') || this.priceFormControl.hasError('max')) {
+    // Check fields limits
+    if((this.product.minPrice && this.product.minPrice > this.product.price) || (this.product.maxPrice && this.product.maxPrice < this.product.price)) {
       alert('מחיר מחוץ לטוווח שהוגדר');
       return false;
     }
+
+    // Check all other fields validity (required fields)
+    const inputs = document.querySelector('.form').getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++)
+      if(!inputs.item(i).validity.valid) {
+        alert('יש למלא את כל השדות המסומנים בכוכבית');
+        console.log(inputs.item(i));
+        return false;
+      }
 
     return true;
 
   }
 
 
-  onPriceLimitChange() {
-
-    // Consider as customer's document
-    const product = this.product as ProductCustomerDoc;
-
-    // Make sure limits are valid
-    if(product.minPrice > product.maxPrice)
-      product.minPrice = product.maxPrice;
-
-    // Create a price validator within there limits
-    this.priceFormControl.clearValidators();
-    this.priceFormControl.setValidators([
-      Validators.min(product.minPrice),
-      Validators.max(product.maxPrice)
-    ]);
-
-    this.priceFormControl.setValue(this.product.price);
-
+  async weigh(fieldName: string) {
+    const weight = await this.weighService.openWeightModal(true);
+    if(weight)
+      this.product[fieldName] = weight;
   }
 
 }

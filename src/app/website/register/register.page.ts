@@ -5,6 +5,7 @@ import {NavController} from '@ionic/angular';
 import {UserDoc} from '../../models/UserDoc';
 import {MailService} from '../mail/mail.service';
 import {MailForm} from '../mail/MailForm';
+import * as libphonenumber from 'google-libphonenumber';
 
 enum PageStatus {
 
@@ -45,6 +46,7 @@ export class RegisterPage implements OnInit {
 
   userDoc: UserDoc = {} as UserDoc;
 
+  readonly EmailRegex = AuthWebsiteService.EMAIL_REGEX;
 
   constructor(
     private authService: AuthWebsiteService,
@@ -160,31 +162,22 @@ export class RegisterPage implements OnInit {
   // Check all required fields are filled and well formatted
   checkFields() : boolean {
 
-    // Must enter business name
-    if(this.inputToShow('businessName') && !this.businessName) {
-      alert('יש להזין שם עסק');
-      return false;
+    const inputs = document.querySelector('.form').getElementsByTagName('input');
+    for (let i = 0; i < inputs.length; i++) {
+      if(inputs.item(i).validity.valueMissing) {
+        alert('יש להזין את כל שדות החובה');
+        return false;
+      }
     }
 
-    // Must enter name
-    if(this.inputToShow('name') && !this.fullName) {
-      alert('יש להזין שם מלא');
-      return false;
-    }
-
-    // Must enter email
-    if(this.inputToShow('email') && !this.email) {
-      alert('יש להזין כתובת דוא"ל');
-      return false;
-    }
 
     // Check email is well formatted
-    if(this.inputToShow('email') && !this.email.match(AuthWebsiteService.EMAIL_REGEX)) {
+    if(this.inputToShow('email') && !this.email.match(this.EmailRegex)) {
       alert('כתובת דוא"ל אינה תקינה');
       return false;
     }
 
-    // Check email is well formatted
+    // Check phone is well formatted
     if(this.inputToShow('phone') && !+this.phone) {
       alert('מספר טלפון אינו תקין');
       return false;
@@ -208,7 +201,7 @@ export class RegisterPage implements OnInit {
       return false;
     }
 
-    return true;
+    // return true;
 
   }
 

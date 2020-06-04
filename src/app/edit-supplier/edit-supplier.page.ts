@@ -33,12 +33,10 @@ export class EditSupplierPage implements OnInit {
 
     // Create new supplier document or get existed one, according to the ID in the URL
     const id = this.activatedRoute.snapshot.params['id'];
-    if(id == 'new') {
+    if(id == 'new')
       this.supplier = {};
-    }
-    else {
+    else
       this.supplier = await this.suppliersService.loadSupplier(id);
-    }
 
     // Set one empty contact info, if no contact exist
     if(!this.supplier.contacts)
