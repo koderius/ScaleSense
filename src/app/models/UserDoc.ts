@@ -14,16 +14,18 @@ export enum UserRole {
 // Cloud function - there is a server function which checks permissions
 export enum UserPermission {
 
-  // Has access to give permissions
+  // Has access to give permissions, like admin
   MASTER = 'canPermit',
 
   // Can watch order - front-end only
   ORDER_STATUS = 'canWatch',
 
-  // Permission in cloud function 'updateOrder'
+  // Permission checked in cloud function 'updateOrder'
   NEW_ORDER = 'canCreate',
   EDIT_ORDER = 'canEdit',
   ORDER_RECEIVE = 'canReceive',
+  ORDER_APPROVE = 'canApproveOrder',
+  ORDER_FINAL_APPROVE = 'canFinalApproveOrder',
 
   // Order receive conditions - checked on front end only
   ORDER_RECEIVE_EARLY = 'canReceiveEarly',
@@ -53,10 +55,8 @@ export enum UserPermission {
   STOCK = 'canStock',
   MAIN_OFFICE = 'canMainOffice',
 
+  // Checked in a cloud function 'offerSpecialPrice'
   OFFER_PRICE = 'canOfferPrice',
-  ORDER_APPROVE = 'canApproveOrder',
-  ORDER_FINAL_APPROVE = 'canFinalApproveOrder',
-
 
 }
 
