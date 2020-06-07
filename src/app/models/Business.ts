@@ -17,12 +17,18 @@ export interface BusinessDoc {
   companyId?: string;
   accountancyEmail?: string;
 
+  /** List of contacts for this supplier */
+  contacts?: ContactInfo[];
+
   /** Time created and edited */
   created?: number;
   modified?: number;
 
   /** Scales ID - for customers only */
   scalesId?: string;
+
+  /** Notifications settings for each contact */
+  notificationsSettings?: NotesSettings[];
 
 }
 
@@ -35,9 +41,6 @@ export interface SupplierDoc extends BusinessDoc {
   /** Number of orders made to this supplier. used for finding the most common suppliers */
   numOfOrders?: number;
 
-  /** List of contacts for this supplier */
-  contacts?: ContactInfo[];
-
 }
 
 export type ContactInfo = {
@@ -46,3 +49,8 @@ export type ContactInfo = {
   phone?: string;
 }
 
+export type NotesSettings = {[noteType: string]: {
+    email: boolean,
+    sms: boolean,
+  }
+}

@@ -28,6 +28,9 @@ export class PermissionNamePipe implements PipeTransform {
       case UserPermission.SETTINGS_SUPPLIERS: return 'עריכת ספקים';
       case UserPermission.STOCK: return 'מלאי';
       case UserPermission.USE_SCALES: return 'שקילה';
+      case UserPermission.OFFER_PRICE: return 'תמחור לקוחות';
+      case UserPermission.ORDER_APPROVE: return 'אישור ראשוני';
+      case UserPermission.ORDER_FINAL_APPROVE: return 'אישור סופי';
       // If name is missing
       default: return value;
     }

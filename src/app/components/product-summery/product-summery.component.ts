@@ -55,6 +55,13 @@ export class ProductSummeryComponent implements OnInit {
     this.editClicked.emit();
   }
 
+
+  goToEditProduct(id: string) {
+    if(this.usersService.hasPermission(UserPermission.SETTINGS_PRODUCTS))
+      this.navService.goToEditProduct(id);
+  }
+
+
   async onAcceptChange() {
 
     // Alert for minimum amount

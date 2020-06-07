@@ -52,7 +52,7 @@
         </div>
 
         <ion-list *ngIf="generalOpen">
-          <ion-item>
+          <ion-item (click)="setNotifications()">
             <p>הגדרות שליחת הודעות</p>
           </ion-item>
           <ion-item lines="none" (click)="navService.goToEditBusiness()">

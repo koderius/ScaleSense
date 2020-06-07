@@ -95,7 +95,11 @@
             <ion-button fill="outline" color="dark" shape="round" *ngIf="!showAllProducts" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
           </ion-col>
           <ion-col>
-            <ion-button fill="outline" color="dark" shape="round" *ngIf="businessService.side == 's'" (click)="customerPricing(product)">תמחור לקוחות</ion-button>
+            <ion-button fill="outline" color="dark" shape="round"
+                        *ngIf="businessService.side == 's'"
+                        (click)="customerPricing(product)"
+                        [disabled]="!canOfferPrice"
+            >תמחור לקוחות</ion-button>
           </ion-col>
         </ion-row>
 

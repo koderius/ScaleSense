@@ -34,9 +34,16 @@ export enum NotificationCode {
 
   // The other side made changes in an order
   ORDER_CHANGE = 1,
+  ORDER_CHANGE_NEW = 1.10,
+  ORDER_CHANGE_OPENED = 1.20,
+  ORDER_CHANGE_APPROVED = 1.30,
+  ORDER_CHANGE_FINAL_APPROVED = 1.80,
+  ORDER_CHANGE_CANCELLED = 1.400,
 
   // Server auto alert about an order
   ORDER_ALERT = 2,
+  ORDER_ALERT_AFTER24 = 2.1,
+  ORDER_ALERT_24BEFORE = 2.2,
 
   // The other side made changes in a product
   PRODUCT_CHANGE = 3,

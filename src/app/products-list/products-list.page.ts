@@ -11,6 +11,8 @@ import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-
 import {AlertsService} from '../services/alerts.service';
 import {CustomersService} from '../services/customers.service';
 import {XlsParseService} from '../services/xls-parse.service';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
 
 
 @Component({
@@ -49,7 +51,13 @@ export class ProductsListPage {
     private excelParse: XlsParseService,
     private modalCtrl: ModalController,
     private alerts: AlertsService,
+    private usersService: UsersService,
   ) { }
+
+
+  get canOfferPrice() {
+    return this.usersService.hasPermission(UserPermission.OFFER_PRICE);
+  }
 
   ionViewDidEnter() {
 

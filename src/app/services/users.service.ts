@@ -6,7 +6,12 @@ import 'firebase/firestore';
 import {BusinessService} from './business.service';
 import {AuthSoftwareService} from './auth-software.service';
 import {Enum} from '../utilities/enum';
-import {DefaultManager, DefaultWorker} from '../../assets/defaults/permissions';
+import {
+  DefaultManagerCustomer,
+  DefaultManagerSupplier,
+  DefaultWorkerCustomer,
+  DefaultWorkerSupplier
+} from '../../assets/defaults/permissions';
 import WriteBatch = firebase.firestore.WriteBatch;
 
 /**
@@ -28,7 +33,7 @@ export class UsersService {
   readonly permissionsMetadata = this.businessService.businessDocRef.collection('metadata').doc('permissions');
 
   /** The list of all available permissions */
-  readonly permissionsList = Enum.ListEnum(UserPermission);
+  readonly permissionsList: UserPermission[] = [];
 
   /** Shared users list */
   public users: UserDoc[] = [];
@@ -37,6 +42,10 @@ export class UsersService {
     private businessService: BusinessService,
     private authService: AuthSoftwareService,
   ) {
+
+    // Get full list of permissions, based on the defaults lists (get only the keys, values does not matter)
+    for (let p in this.businessService.side == 'c' ? DefaultManagerCustomer : DefaultManagerSupplier)
+      this.permissionsList.push(p as UserPermission);
 
     // Make sure the permissions document exist. It is not exist on the first time the business account runs, then the default permissions should be set
     this.permissionsMetadata.get().then(async (doc)=>{
@@ -155,10 +164,14 @@ export class UsersService {
 
     // Get default permissions
     let def;
-    if(role == UserRole.MANAGER)
-      def = DefaultManager;
-    if(role == UserRole.WORKER)
-      def = DefaultWorker;
+    if(role == UserRole.MANAGER && this.businessService.side == 'c')
+      def = DefaultManagerCustomer;
+    if(role == UserRole.WORKER && this.businessService.side == 'c')
+      def = DefaultWorkerCustomer;
+    if(role == UserRole.MANAGER && this.businessService.side == 's')
+      def = DefaultManagerSupplier;
+    if(role == UserRole.WORKER && this.businessService.side == 's')
+      def = DefaultWorkerSupplier;
 
     // Set default permissions
     if(def)

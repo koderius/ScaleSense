@@ -31,10 +31,9 @@ export class EditSupplierPage implements OnInit {
     private alerts: AlertsService,
     private navService: NavigationService,
     private businessService: BusinessService,
-  ) { }
+  ) {}
 
   async ngOnInit() {
-
 
     // Create new supplier document or get existed one, according to the ID in the URL
     const id = this.activatedRoute.snapshot.params['id'];

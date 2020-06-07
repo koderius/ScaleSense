@@ -10,6 +10,7 @@ import {MailForm} from '../../src/app/website/mail/MailForm';
 import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
 import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
+import {ContactInfo, NotesSettings} from '../../src/app/models/Business';
 
 admin.initializeApp();
 
@@ -47,29 +48,39 @@ admin.initializeApp();
 //
 //
 //
-export const offerSpecialPrice = functions.https.onCall((data: {product: ProductPublicDoc, customerId: string, price: number}, context) => {
 
-  if(data && context && context.auth) {
+/** *
+ * This function changes the price of product inside the customer's products list.
+ * If the product does not exist in the customer's products list, it will be created there (with the special price).
+ */
+export const offerSpecialPrice = functions.https.onCall((data: { product: ProductPublicDoc, customerId: string, price: number }, context) => {
+
+  if (data && context && context.auth) {
 
     return admin.firestore().runTransaction(async transaction => {
 
       const uid = context.auth ? context.auth.uid : '';
 
       // Get the supplier ID according to the user who called the function
-      const sid = (await transaction.get(admin.firestore().collection('users').doc(uid))).get('bid');
+      const supplierSnapshot = (await transaction.get(admin.firestore().collection('users').doc(uid)));
+      const permissions = supplierSnapshot.get('permissions');
+      const sid = supplierSnapshot.get('bid');
+      // Check the user has permission
+      if ((!permissions || !permissions['canOfferPrice']) && supplierSnapshot.get('role') != 3)
+        throw new HttpsError('permission-denied', 'The user has no permissions to offer a price');
 
       // Get the private customer data for the requested product
       const customerProductRef = admin.firestore().collection('customers').doc(data.customerId).collection('my_products').doc(data.product ? (data.product.id as string) : '');
       const productDoc = await transaction.get(customerProductRef);
 
-      if(productDoc.exists) {
+      if (productDoc.exists) {
         // Check the user is the supplier who owned this product
-        if(productDoc.get('sid') != sid)
+        if (productDoc.get('sid') != sid) {
           throw new HttpsError('permission-denied', 'The supplier does not own this product');
+        }
         // Set a special price in the customer private data of this product
         transaction.update(customerProductRef, {price: data.price});
-      }
-      else {
+      } else {
         // Add product to the customer (with the offered price)
         const product = data.product;
         product.price = data.price;
@@ -88,10 +99,9 @@ export const offerSpecialPrice = functions.https.onCall((data: {product: Product
 
     });
 
-  }
-
-  else
+  } else {
     throw new HttpsError('aborted', 'No data');
+  }
 
 });
 
@@ -100,17 +110,18 @@ export const offerSpecialPrice = functions.https.onCall((data: {product: Product
  * If the user document contains UID, it will update an existed user, else it will create a new user with auto generated UID.
  * The user document will be set with the business data (side + business ID) and the default permissions of his given role.
  */
-export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc, password: string}, context) => {
+export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc, password: string }, context) => {
 
   // Check admin
   const uid = context.auth ? context.auth.uid : '';
   const usersRef = admin.firestore().collection('users');
   const user = await usersRef.doc(uid).get();
-  if(user.get('role') != 3 && !user.get('permissions.canPermit'))
+  if (user.get('role') != 3 && !user.get('permissions.canPermit')) {
     throw new HttpsError('permission-denied', 'Only admins and permitted mangers can create / update users');
+  }
 
   // Check required data
-  if(data.userDoc && data.password) {
+  if (data.userDoc && data.password) {
 
     const userDoc = data.userDoc;
 
@@ -125,10 +136,11 @@ export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc,
     try {
 
       // Create user with auto UID, or edit the user with the given UID
-      if(!userDoc.uid)
+      if (!userDoc.uid) {
         userRec = await admin.auth().createUser(userAuthDetails);
-      else
+      } else {
         userRec = await admin.auth().updateUser(userDoc.uid, userAuthDetails);
+      }
 
       // Get business details
       const side = user.get('side');
@@ -150,14 +162,13 @@ export const createUser = functions.https.onCall(async (data: {userDoc: UserDoc,
 
       return userDoc;
 
-    }
-    catch (e) {
-      throw new HttpsError('internal', 'Could not create user', e);
+    } catch (e) {
+      throw new HttpsError('internal', e);
     }
 
+  } else {
+    throw new HttpsError('invalid-argument', 'Must contain user document and password');
   }
-  else
-    throw new HttpsError('invalid-argument', 'Must contain user document and password')
 
 });
 
@@ -167,16 +178,16 @@ export const deleteUser = functions.https.onCall(async (data: string, context) =
   const uid = context.auth ? context.auth.uid : '';
   const usersRef = admin.firestore().collection('users');
   const user = await usersRef.doc(uid).get();
-  if(user.get('role') < 3)
+  if (user.get('role') < 3) {
     throw new HttpsError('permission-denied', 'Only admins can delete users');
+  }
 
   try {
     // Delete the user
     await admin.auth().deleteUser(data);
     // Keep the user's document (for history details), but mark him as not exist
     return await admin.firestore().collection('users').doc(data).update({exist: false});
-  }
-  catch (e) {
+  } catch (e) {
     throw new HttpsError('internal', 'Could not delete user', e);
   }
 
@@ -187,7 +198,7 @@ export const deleteUser = functions.https.onCall(async (data: string, context) =
  * This function sends email to the support, after verifying reCAPTCHA
  * If the user asked to register, it handles the registration request
  * */
-export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm, recaptcha: string}) => {
+export const sendEmail = functions.https.onCall(async (data: { mailForm: MailForm, recaptcha: string }) => {
 
   // Recaptcha secret server-side key
   const secret = '6LeDYvUUAAAAALxLMZzV0IXYIjxSaVhUwAxOPQ8D';
@@ -200,7 +211,7 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
   const res = (await axios.default.post(url)).data;
 
   // On recaptcha success, send the requested email to the support by adding a document to the mails collection
-  if(res.success) {
+  if (res.success) {
 
     const mailContent = {
       to: 'mestroti@gmail.com', //'support@scale-sense.com', TODO
@@ -212,8 +223,7 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
 
     await admin.firestore().collection('mails').add(mailContent);
 
-  }
-  else {
+  } else {
     throw new HttpsError('failed-precondition', 'Recaptcha failed');
   }
 
@@ -231,7 +241,7 @@ export const sendEmail = functions.https.onCall(async (data: {mailForm: MailForm
  * */
 export const updateOrder = functions.https.onCall(async (order: OrderDoc, context) => {
 
-  if(order && context && context.auth) {
+  if (order && context && context.auth) {
 
     return admin.firestore().runTransaction<OrderChange>(async transaction => {
 
@@ -256,28 +266,32 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       };
 
       // Check whether the user's business ID is equal to the order CID or SID (if it's an existing order)
-      if(orderSnapshot.exists && userDoc.bid != orderSnapshot.get(userDoc.side + 'id'))
-        throw new HttpsError('permission-denied','The user is not linked to this order','The user is not under the supplier or the customer account of this order');
+      if (orderSnapshot.exists && userDoc.bid != orderSnapshot.get(userDoc.side + 'id')) {
+        throw new HttpsError('permission-denied', 'The user is not linked to this order', 'The user is not under the supplier or the customer account of this order');
+      }
 
       // Get requested permission for each order status change
       const requestedPermission = getRequestedPermission(changeReport.status || NaN);
 
       // Check whether the user is an admin or has that permission
-      if(requestedPermission && userDoc.role !== 3 && !userDoc.permissions[requestedPermission])
-        throw new HttpsError('permission-denied','The user has no permission','The user has no permission to perform the requested operation');
+      if (requestedPermission && userDoc.role !== 3 && !userDoc.permissions[requestedPermission]) {
+        throw new HttpsError('permission-denied', 'The user has no permission', 'The user has no permission to perform the requested operation');
+      }
 
 
       /** PART 2: Set changes */
 
         // The fields that are allowed to be change
       let newData: OrderDoc = {
-        products: order.products || [],
-        supplyTime: order.supplyTime || 0,
-      };
-      if(changeReport.side == 'c')
+          products: order.products || [],
+          supplyTime: order.supplyTime || 0,
+        };
+      if (changeReport.side == 'c') {
         newData.comment = order.comment || '';
-      if(changeReport.side == 's')
+      }
+      if (changeReport.side == 's') {
         newData.supplierComment = order.supplierComment || '';
+      }
 
       // Take a snapshot of these changes for comparing changes history
       changeReport.data = JSON.stringify(newData);
@@ -287,13 +301,13 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       newData.driverName = order.driverName || '';
 
       // If the order is new, just take the new order as is, and set additional fields:
-      if(isNew) {
+      if (isNew) {
         newData = order;
         // Stamp the customer ID who created the order and the time
         order.created = changeReport.time;
         order.cid = userDoc.bid;
         // Create a document for this customers in the supplier's customers list
-        transaction.set(admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_customers').doc(order.cid ||''), {id: order.cid}, {merge: true});
+        transaction.set(admin.firestore().collection('suppliers').doc(order.sid || '').collection('my_customers').doc(order.cid || ''), {id: order.cid}, {merge: true});
       }
 
       // For an existing order,
@@ -303,20 +317,21 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         const productChanges = ProductsListUtil.CompareLists(orderSnapshot.get('products'), newData.products);
 
         // Check whether there are changes (in supply time, comments & products list)
-        if(newData.comment != (oldData.comment || '') || newData.supplierComment != (oldData.supplierComment || '') || newData.supplyTime != oldData.supplyTime || productChanges.length) {
+        if (newData.comment != (oldData.comment || '') || newData.supplierComment != (oldData.supplierComment || '') || newData.supplyTime != oldData.supplyTime || productChanges.length) {
           // Set to approved with changes / final approved with changes (from 30 or 80 to 31 or 81)
-          if(changeReport.side == 's' && (changeReport.status == 30 || changeReport.status == 80))
+          if (changeReport.side == 's' && (changeReport.status == 30 || changeReport.status == 80)) {
             changeReport.status++;
+          }
         }
         // If there are no changes when changes should be made, throw an error
-        else
-          if(changeReport.status == 11 || changeReport.status == 21 || (changeReport.status == 30 && orderSnapshot.get('status') >= 30))
-            throw new HttpsError('permission-denied','No changes has been made');
+        else if (changeReport.status == 11 || changeReport.status == 21 || (changeReport.status == 30 && orderSnapshot.get('status') >= 30)) {
+          throw new HttpsError('permission-denied', 'No changes has been made');
+        }
 
         // Price alerts
-        productChanges.forEach((pc)=>{
-          if(pc.price && pc.price.old != pc.price.new) {
-            const product = (newData.products || []).find((p)=>p.id == pc.productId) as ProductOrder;
+        productChanges.forEach((pc) => {
+          if (pc.price && pc.price.old != pc.price.new) {
+            const product = (newData.products || []).find((p) => p.id == pc.productId) as ProductOrder;
             product.priceChangedInOrder = changeReport.side;
           }
         });
@@ -339,8 +354,9 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       // Don't sent notification when:
       // 1. If the changes made by the customer before the supplier opened the order
       // 2. When the supplier open the order
-      if(newData.status == 11 || newData.status == 20)
+      if (newData.status == 11 || newData.status == 20) {
         return changeReport;
+      }
 
       // If the changes were made by the customer, send a notification to the supplier, and v.v.
       const bidProp = changeReport.side == 'c' ? 'sid' : 'cid';
@@ -371,7 +387,6 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
 });
 
 
-
 /**
  * Cloud function that runs every 5 minutes TODO: Update to every minute?
  * */
@@ -380,22 +395,22 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
   // Current server time
   const now = admin.firestore.Timestamp.now().toMillis();
   // The value of 24 hours in milliseconds
-  const h24 = 24*60*60*1000;
+  const h24 = 24 * 60 * 60 * 1000;
 
   // Get all orders that were sent to the supplier but has not been approved after 24 hours
   const unApprovedOrders = await admin.firestore().collection('orders')
-    .where('status', 'in', [10,11,20,21])
-    .where('created', '<', now - h24)
-    .where('adminAlerts.nAfter24', '==', false)
-    .get();
+  .where('status', 'in', [10, 11])                   // Have not opened yet
+  .where('created', '<', now - h24)              // Created before yesterday
+  .where('adminAlerts.nAfter24', '==', false)     // Alert has not been sent yet
+  .get();
 
-  unApprovedOrders.docs.forEach((doc)=>{
+  unApprovedOrders.docs.forEach((doc) => {
 
     const data = doc.data() as OrderDoc;
 
     // Notification content
     const notification: BaseNotificationDoc = {
-      code: 2,
+      code: 2.1,
       time: now,
       refSide: 'c',
       refBid: data.cid,
@@ -417,18 +432,18 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 
   // Get all orders that were not finally approved 24 before supply time
   const supplyTimeOrders = await admin.firestore().collection('orders')
-    .where('status', 'in', [10,11,20,21,30,31])
-    .where('supplyTime', '<', now + h24)
-    .where('adminAlerts.n24Before', '==', false)
-    .get();
+  .where('status', 'in', [10, 11, 20, 21, 30, 31])
+  .where('supplyTime', '<', now + h24)
+  .where('adminAlerts.n24Before', '==', false)
+  .get();
 
-  supplyTimeOrders.docs.forEach((doc)=>{
+  supplyTimeOrders.docs.forEach((doc) => {
 
     const data = doc.data() as OrderDoc;
 
     // Notification content
     const notification: BaseNotificationDoc = {
-      code: 2,
+      code: 2.2,
       time: now,
       content: {
         adminData: 'n24Before',
@@ -456,7 +471,6 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 });
 
 
-
 export const onProductWrite = functions.firestore.document('products/{pid}').onWrite((change, context) => {
 
   // Product new data
@@ -473,24 +487,27 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
   };
 
   // Add notification admin data (product created/updated/deleted)
-  if(notification.content) {
-    if(change.after.data() && change.before.data())
+  if (notification.content) {
+    if (change.after.data() && change.before.data()) {
       notification.content.adminData = 'u';
-    if(change.after.data() && !change.before.data())
+    }
+    if (change.after.data() && !change.before.data()) {
       notification.content.adminData = 'c';
-    if(!change.after.data() && change.before.data())
+    }
+    if (!change.after.data() && change.before.data()) {
       notification.content.adminData = 'd';
+    }
   }
 
-  admin.firestore().runTransaction(async transaction=> {
+  admin.firestore().runTransaction(async transaction => {
 
     // If change was made by the supplier, update the data for all customers that subscribe this product and send them notifications
-    if(data.modifiedBy == data.sid) {
+    if (data.modifiedBy == data.sid) {
       notification.refSide = 's';
       const privateProductsRef = admin.firestore().collectionGroup('my_products').where('id', '==', data.id);
       const res = await transaction.get(privateProductsRef);
 
-      res.docs.forEach((doc)=>{
+      res.docs.forEach((doc) => {
 
         // Update the customer's product with the new data
         transaction.update(doc.ref, data);
@@ -518,25 +535,26 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
  * When a return document is being created, this function update the product that inside the order with the return data, and send a notification to the supplier.
  * (Notifications are being sent once for a numerous documents creation within 10 seconds)
  */
-export const onReturnCreated = functions.firestore.document('returns/{returnId}').onCreate(async (change, context)=>{
+export const onReturnCreated = functions.firestore.document('returns/{returnId}').onCreate(async (change, context) => {
 
   const data = change.data() as ReturnDoc;
 
   // Update the product that inside the order about his returned amount
-  admin.firestore().runTransaction(async transaction=> {
+  admin.firestore().runTransaction(async transaction => {
 
     const idParts = change.id.split('_');
     const orderRef = admin.firestore().collection('orders').doc(idParts[0]);
     const products = (await transaction.get(orderRef)).get('products') as ProductOrder[];
-    const idx = products.findIndex((p)=>p.id == idParts[1]);
+    const idx = products.findIndex((p) => p.id == idParts[1]);
     products[idx].amountReturned = (data.product || {}).amountReturned;
     transaction.update(orderRef, {products: products});
 
   });
 
   // Don't send notification for 'trash' status
-  if(!data.status)
+  if (!data.status) {
     return;
+  }
 
   // Current server time
   const now = admin.firestore.Timestamp.now().toMillis();
@@ -545,8 +563,9 @@ export const onReturnCreated = functions.firestore.document('returns/{returnId}'
   const supplierNotificationsRef = admin.firestore().collection('suppliers').doc(data.sid || '').collection('my_notifications');
   const res = await supplierNotificationsRef.orderBy('time', 'desc').limit(1).get();
   const lastNote = res.docs[0];
-  if(lastNote.get('code') == 4 && (now - lastNote.createTime.toMillis()) < 10000)
+  if (lastNote.get('code') == 4 && (now - lastNote.createTime.toMillis()) < 10000) {
     return;
+  }
 
   // Create notification
   const notification: BaseNotificationDoc = {
@@ -558,5 +577,46 @@ export const onReturnCreated = functions.firestore.document('returns/{returnId}'
 
   // Send it to the supplier
   supplierNotificationsRef.add(notification);
+
+});
+
+
+export const onNotificationCreated = functions.firestore.document('{businessCol}/{bid}/my_notifications/{noteId}').onCreate(async (snapshot, context) => {
+
+  // Get business notifications settings & contacts info
+  const businessRef = snapshot.ref.parent.parent;
+  if (businessRef) {
+
+    const businessSnapshot = await businessRef.get();
+    const notificationsSettings: NotesSettings[] = businessSnapshot.get('notificationsSettings') || [];
+    const contacts: ContactInfo[] = businessSnapshot.get('contacts') || [];
+
+    // The notification to send
+    const notification: BaseNotificationDoc = snapshot.data() as BaseNotificationDoc;
+
+    // Each settings object belongs to one contact
+    notificationsSettings.forEach(async (settings, index) => {
+
+      // Contact info for this settings object
+      const contact = contacts[index];
+      const code = '' + notification.code;
+
+      // Send notification by email, if set to true for this code
+      if (settings[code].email && contact.email) {
+        const mailContent = {
+          to: contact.email,
+          // TODO
+        };
+        await admin.firestore().collection('mails').add(mailContent);
+      }
+
+      // Send notification by SMS, if set to true for this code
+      if (settings[code].sms && contact.phone) {
+        // TODO
+      }
+
+    });
+
+  }
 
 });

@@ -8,6 +8,7 @@ import { SettingsPageRoutingModule } from './settings-routing.module';
 
 import { SettingsPage } from './settings-page.component';
 import {ComponentsModule} from '../components/components.module';
+import {NotificationsSettingsModalComponent} from './notifications-settings-modal/notifications-settings-modal.component';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import {ComponentsModule} from '../components/components.module';
     SettingsPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [SettingsPage]
+  declarations: [SettingsPage, NotificationsSettingsModalComponent],
+  entryComponents: [NotificationsSettingsModalComponent],
 })
 export class SettingsPageModule {}

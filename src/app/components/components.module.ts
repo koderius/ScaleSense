@@ -32,6 +32,7 @@ import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-
 import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
 import {RoleNamePipe} from '../pipes/role-name.pipe';
 import {PermissionNamePipe} from '../pipes/permission-name.pipe';
+import {NotificationCodeNamePipe} from '../pipes/notification-code-name.pipe';
 
 @NgModule({
   imports: [
@@ -66,6 +67,7 @@ import {PermissionNamePipe} from '../pipes/permission-name.pipe';
     PricePipe,
     RoleNamePipe,
     PermissionNamePipe,
+    NotificationCodeNamePipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,
@@ -98,6 +100,7 @@ import {PermissionNamePipe} from '../pipes/permission-name.pipe';
     PricePipe,
     RoleNamePipe,
     PermissionNamePipe,
+    NotificationCodeNamePipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,

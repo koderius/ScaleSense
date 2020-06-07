@@ -13,6 +13,8 @@ import {BusinessService} from '../services/business.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {NotificationsService} from '../services/notifications.service';
 import {ProductCustomerDoc, ProductOrder} from '../models/ProductI';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
 
 @Component({
   selector: 'app-order',
@@ -84,6 +86,7 @@ export class OrderPage implements OnInit {
     private navService: NavigationService,
     private unitPipe: UnitAmountPipe,
     private notificationService: NotificationsService,
+    private usersService: UsersService,
   ) {}
 
   /** Whether in mode of draft (with wizard) */
@@ -96,8 +99,13 @@ export class OrderPage implements OnInit {
     return !this.order.id;
   }
 
+  /** Edit mode for suppliers - When it's a supplier that has permission and the order has not been final approved (or cancelled or closed) yet */
   get supplierEditMode() {
-    return this.businessService.side == 's' && this.order.status < OrderStatus.FINAL_APPROVE;
+    return this.businessService.side == 's' && this.order.status < OrderStatus.FINAL_APPROVE && this.usersService.hasPermission(UserPermission.ORDER_APPROVE);
+  }
+
+  get canFinalApprove() {
+    return this.usersService.hasPermission(UserPermission.ORDER_FINAL_APPROVE);
   }
 
   get newSerialMsg() {

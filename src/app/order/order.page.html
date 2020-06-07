@@ -105,7 +105,9 @@
           <p id="price-comment" *ngIf="order.products.length">המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
 
           <ion-row class="ion-padding ion-justify-content-between">
-            <ion-button shape="round" (click)="page = 3" [disabled]="!order.products.length" [color]="order.products.length ? 'primary' : 'dark'" style="margin: auto">
+            <ion-button shape="round" [color]="order.products.length ? 'primary' : 'dark'" style="margin: auto"
+                        (click)="page = 3"
+                        [disabled]="!order.products.length">
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
@@ -184,7 +186,11 @@
         </div>
 
         <ion-item lines="none" *ngIf="supplierEditMode">
-          <ion-checkbox slot="start" [value]="order.status >= OrderStatus.APPROVED" [(ngModel)]="isFinalApprove"></ion-checkbox>
+          <ion-checkbox slot="start"
+                        [value]="order.status >= OrderStatus.APPROVED"
+                        [(ngModel)]="isFinalApprove"
+                        [disabled]="!canFinalApprove"
+          ></ion-checkbox>
           <ion-label>
             <h2>אישור סופי</h2>
             <h6>לקראת יציאה למשלוח. יש למלא כמות ארגזים לכל מוצר ומספר ת. משלוח</h6>
@@ -237,7 +243,9 @@
           <ion-button shape="round" color="dark" *ngIf="!isDraft && (customerEditMode || supplierEditMode)" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
-          <ion-button shape="round" strong="true" *ngIf="customerEditMode || supplierEditMode" (click)="businessService.side == 'c' ? sendOrder() : approveOrder()">
+          <ion-button shape="round" strong="true"
+                      *ngIf="customerEditMode || supplierEditMode"
+                      (click)="businessService.side == 'c' ? sendOrder() : approveOrder()">
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="(!isDraft && customerEditMode) || supplierEditMode">שמירת שינויים ו</ion-text>
             <ion-text *ngIf="customerEditMode">שליחת הזמנה לספק</ion-text>

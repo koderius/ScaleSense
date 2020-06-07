@@ -1,0 +1,54 @@
+<ion-header *ngIf="contacts">
+
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button shape="round" fill="clear" color="primary" (click)="close()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title color="primary">הגדרות שליחת הודעות</ion-title>
+  </ion-toolbar>
+
+  <ion-grid id="header-grid">
+    <ion-row>
+      <ion-col></ion-col>
+      <ion-col size="3">{{contacts[0]?.name}}</ion-col>
+      <ion-col size="3">{{contacts[1]?.name}}</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col></ion-col>
+      <ion-col size="1.5" [matTooltip]="contacts[0]?.email">Email</ion-col>
+      <ion-col size="1.5" [matTooltip]="contacts[0]?.phone">SMS</ion-col>
+      <ion-col size="1.5" [matTooltip]="contacts[1]?.email">{{contacts[1] ? 'Email' : ''}}</ion-col>
+      <ion-col size="1.5" [matTooltip]="contacts[1]?.phone">{{contacts[1] ? 'SMS' : ''}}</ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-header>
+
+<ion-content *ngIf="contacts && settings">
+
+  <ion-grid>
+    <ion-row *ngFor="let code of allNotificationsCodes">
+      <ion-col class="text-col" [ngStyle]="{fontWeight: isSubHeader(code) ? 'bold' : 'normal'}">{{code | notificationCodeName}}</ion-col>
+      <ion-col size="1.5" *ngIf="!isSubHeader(code)">
+        <ion-checkbox [(ngModel)]="settings[0][code].email"></ion-checkbox>
+      </ion-col>
+      <ion-col size="1.5" *ngIf="!isSubHeader(code)">
+        <ion-checkbox [(ngModel)]="settings[0][code].sms"></ion-checkbox>
+      </ion-col>
+      <ion-col size="1.5" *ngIf="!isSubHeader(code)">
+        <ion-checkbox *ngIf="contacts[1]" [(ngModel)]="settings[1][code].email"></ion-checkbox>
+      </ion-col>
+      <ion-col size="1.5" *ngIf="!isSubHeader(code)">
+        <ion-checkbox *ngIf="contacts[1]" [(ngModel)]="settings[1][code].sms"></ion-checkbox>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+</ion-content>
+
+<ion-footer>
+  <ion-button shape="round" (click)="close(true)">שמירה</ion-button>
+</ion-footer>

@@ -117,6 +117,7 @@ export class NotificationsService {
     const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
     newNotification.businessName = business.name;
 
+    newNotification.code = Math.floor(newNotification.code);
 
     // For notifications about order
     if(newNotification.code == NotificationCode.ORDER_CHANGE || newNotification.code == NotificationCode.ORDER_ALERT) {

@@ -71,18 +71,16 @@ export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, req
 /** Required permission for each status change */
 export const getRequestedPermission = (status: number) : string =>{
   switch (status) {
-
     // Creation of order
     case 10: return 'canCreate';
-
     // Editing / cancelling an order
     case 11: case 21: case 401: case 402: return 'canEdit';
-
     // Receive order
     case 100: return 'canReceive';
-
-    //TODO: What about approving an order? (for suppliers)
-
+    // Approve order
+    case 30: case 31: return 'canApproveOrder';
+    // Final approve order
+    case 80: case 81: return 'canFinalApproveOrder';
     // No permission needed
     default: return '';
   }

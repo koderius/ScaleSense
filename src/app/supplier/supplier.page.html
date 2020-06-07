@@ -8,13 +8,22 @@
 
     <div class="buttons-row">
       <div class="circle-btn primary">
-        <ion-button size="large" fill="clear" strong="true" shape="round" (click)="navService.goToProductsList()">מוצרים</ion-button>
+        <ion-button size="large" fill="clear" strong="true" shape="round"
+                    (click)="navService.goToProductsList()"
+                    [disabled]="!userService.hasPermission(UserPermissions.SETTINGS_PRODUCTS)"
+        >מוצרים</ion-button>
       </div>
       <div class="circle-btn primary">
-        <ion-button size="large" fill="clear" strong="true" shape="round" (click)="navService.goToOrdersList()">הזמנות</ion-button>
+        <ion-button size="large" fill="clear" strong="true" shape="round"
+                    (click)="navService.goToOrdersList()"
+                    [disabled]="!userService.hasPermission(UserPermissions.ORDER_STATUS)"
+        >הזמנות</ion-button>
       </div>
       <div class="circle-btn primary">
-        <ion-button size="large" fill="clear" strong="true" shape="round" (click)="navService.goToReturnsList()">החזרות</ion-button>
+        <ion-button size="large" fill="clear" strong="true" shape="round"
+                    (click)="navService.goToReturnsList()"
+                    [disabled]="!userService.hasPermission(UserPermissions.ORDER_RETURN)"
+        >החזרות</ion-button>
       </div>
     </div>
     <div class="buttons-row">
@@ -22,7 +31,9 @@
         <ion-button size="large" fill="clear" strong="true" shape="round" (click)="navService.goToSettings()">הגדרות</ion-button>
       </div>
       <div class="circle-btn primary">
-        <ion-button size="large" fill="clear" strong="true" shape="round">דוחות</ion-button>
+        <ion-button size="large" fill="clear" strong="true" shape="round"
+                    [disabled]="!userService.hasPermission(UserPermissions.REPORTS)"
+        >דוחות</ion-button>
       </div>
     </div>
 

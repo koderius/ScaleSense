@@ -53,6 +53,10 @@ export enum UserPermission {
   STOCK = 'canStock',
   MAIN_OFFICE = 'canMainOffice',
 
+  OFFER_PRICE = 'canOfferPrice',
+  ORDER_APPROVE = 'canApproveOrder',
+  ORDER_FINAL_APPROVE = 'canFinalApproveOrder',
+
 
 }
 
@@ -77,8 +81,5 @@ export interface UserDoc extends Partial<UserInfo> {
   /** The role of the user, and a list of his permissions */
   role: UserRole;
   permissions: Permissions;
-
-  /** Get notifications by email */
-  emailNotes: boolean;
 
 }
