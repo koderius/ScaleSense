@@ -54,11 +54,6 @@ export enum NotificationCode {
 
 export interface AppNotification extends BaseNotificationDoc{
 
-  /** Business/Order/Product name after read from server according to the IDs in the base notification content */
-  businessName?: string;
-  orderSerial?: string;
-  productName?: string;
-
   /** Notification content text after translated from data */
   text?: string;
 

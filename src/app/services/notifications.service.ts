@@ -122,16 +122,14 @@ export class NotificationsService {
     const newNotification: AppNotification = notificationDoc.data() as BaseNotificationDoc;
     newNotification.id = notificationDoc.id;
 
-    // Get the business according to the base notification data
-    const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
-    newNotification.businessName = business.name;
+    // If business name is missing (can be when the notification has been just created), get his name
+    if(!newNotification.content.businessName) {
+      const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
+      newNotification.content.businessName = business.name;
+    }
 
     // For notifications about order
     if(newNotification.code == NotificationCode.ORDER_CHANGE || newNotification.code == NotificationCode.ORDER_ALERT) {
-
-      // Load the order data
-      const order = await this.orderService.getOrderById(newNotification.content.orderId, false);
-      newNotification.orderSerial = order.serial;
 
       switch (newNotification.content.adminData) {
         // Text for different alerts
@@ -148,7 +146,7 @@ export class NotificationsService {
     if(newNotification.code == NotificationCode.PRODUCT_CHANGE) {
 
       // It's not about order
-      newNotification.orderSerial = '-';
+      newNotification.content.orderSerial = '-';
 
       // Notification text
       switch (newNotification.content.adminData) {
@@ -167,7 +165,7 @@ export class NotificationsService {
     if(newNotification.code == NotificationCode.PRODUCTS_RETURN) {
 
       // Can be from multiple orders
-      newNotification.orderSerial = '-';
+      newNotification.content.orderSerial = '-';
       newNotification.text = 'החזרת מוצר/ים מהלקוח';
 
     }
@@ -175,7 +173,7 @@ export class NotificationsService {
 
     if(newNotification.code == NotificationCode.PRICE_OFFER) {
 
-      newNotification.orderSerial = '-';
+      newNotification.content.orderSerial = '-';
       newNotification.text = 'ספק הציע מחיר חדש עבור המוצר: ';
       // Add the product's name
       const product = await this.productService.getProduct(newNotification.content.productId);
