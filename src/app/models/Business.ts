@@ -49,7 +49,7 @@ export type ContactInfo = {
   phone?: string;
 }
 
-export type NotesSettings = {[noteType: string]: {
+export type NotesSettings = {[noteType: number]: {
     email: boolean,
     sms: boolean,
   }

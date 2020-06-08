@@ -1,17 +1,23 @@
 import {UserInfo} from 'firebase';
 import {BusinessSide} from './Business';
 
-/** */
+/**
+ * Admin is the account owner. Can do everything, permissions list is not required. Can manage other users.
+ * Manager & worker has list of permissions, each of them has it's own default list that can be customized.
+ * A manager can get a MASTER ('canPermit') permission that gives him permissions as he was the admin
+ * */
 export enum UserRole {
   WORKER = 1,
   MANAGER = 2,
   ADMIN = 3,
 }
 
-// List of available permissions.
-// Front-end - means only UI prevent the action
-// Firestore rules - changing documents is protected by server (in addition to UI)
-// Cloud function - there is a server function which checks permissions
+/**
+ * List of available permissions. Each permission is protected at least by UI, and some has also protection by server rules or by cloud functions
+ * Front-end - means only UI prevent the action
+ * Firestore rules - changing documents is protected by server (in addition to UI)
+ * Cloud function - there is a server function which checks permissions
+ * */
 export enum UserPermission {
 
   // Has access to give permissions, like admin

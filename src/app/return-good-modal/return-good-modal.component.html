@@ -45,7 +45,7 @@
       <ion-col>
         <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.REFUND" [ngClass]="returnDoc.status == ReturnStatus.REFUND ? 'selected' : ''">{{ReturnStatus.REFUND | returnStatusText}}</ion-button>
         <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.CHANGE" [ngClass]="returnDoc.status == ReturnStatus.CHANGE ? 'selected' : ''">{{ReturnStatus.CHANGE | returnStatusText}}</ion-button>
-        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.TRASH" [ngClass]="returnDoc.status == ReturnStatus.TRASH ? 'selected' : ''">{{ReturnStatus.TRASH | returnStatusText}}</ion-button>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.TRASH" [ngClass]="returnDoc.status === ReturnStatus.TRASH ? 'selected' : ''">{{ReturnStatus.TRASH | returnStatusText}}</ion-button>
       </ion-col>
     </ion-row>
 

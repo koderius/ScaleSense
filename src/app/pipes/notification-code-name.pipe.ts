@@ -8,18 +8,13 @@ export class NotificationCodeNamePipe implements PipeTransform {
 
   transform(value: NotificationCode): string {
 
-    switch (value) {
+    switch (+value) {
 
       case NotificationCode.ORDER_CHANGE: return 'סטטוס הזמנות';
-      case NotificationCode.ORDER_CHANGE_NEW: return 'הזמנה חדשה נשלחה';
-      case NotificationCode.ORDER_CHANGE_OPENED: return 'פתיחת הזמנה ע"י הספק';
-      case NotificationCode.ORDER_CHANGE_APPROVED: return 'אישור ראשוני';
-      case NotificationCode.ORDER_CHANGE_FINAL_APPROVED: return 'אישור סופי';
-      case NotificationCode.ORDER_CHANGE_CANCELLED: return 'ביטול הזמנה';
-
       case NotificationCode.ORDER_ALERT: return 'התראות אוטומטיות';
-      case NotificationCode.ORDER_ALERT_24BEFORE: return 'הזמנה טרם אושרה סופית (24 שעות לפני)';
-      case NotificationCode.ORDER_ALERT_AFTER24: return 'הזמנה לא נפתחה לאחר 24 שעות';
+      case NotificationCode.PRODUCT_CHANGE: return 'שינוי בפרטי מוצר';
+      case NotificationCode.PRODUCTS_RETURN: return 'החזרת מוצר';
+      case NotificationCode.PRICE_OFFER: return 'הצעת מחיר מספק';
 
       default: return ''+value;
     }

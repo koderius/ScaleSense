@@ -375,7 +375,6 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       };
 
       sendNotification(transaction, changeReport.side == 'c' ? 's' : 'c', sendToId, noteContent);
-
       return changeReport;
 
     });

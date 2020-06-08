@@ -56,7 +56,7 @@ export class ReturnGoodModalComponent implements OnInit {
 
   checkFields() {
 
-    if(!this.returnDoc.status) {
+    if(!this.returnDoc.status && this.returnDoc.status !== 0) {
       alert('יש למלא סטטוס החזרה');
       return;
     }

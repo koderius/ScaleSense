@@ -7,6 +7,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 import {AppNotification, BaseNotificationDoc, NotificationCode} from '../models/Notification';
 import {ProductsService} from './products.service';
+import {DefaultNotificationsCustomer, DefaultNotificationsSupplier} from '../../assets/defaults/notifications';
 
 
 @Injectable({
@@ -48,6 +49,14 @@ export class NotificationsService {
       this.noMoreNotes = snapshot.docChanges().length < this.NOTES_PER_LOAD;
 
     });
+
+    // If the account does not have notifications settings yet (on first run), set the default
+    setTimeout(()=>{
+      if(!this.businessService.businessDoc.notificationsSettings) {
+        const defaultList = this.businessService.side == 'c' ? DefaultNotificationsCustomer : DefaultNotificationsSupplier;
+        this.businessService.businessDocRef.update({notificationsSettings: [defaultList, defaultList]});
+      }
+    }, 3000);
 
   }
 
@@ -116,8 +125,6 @@ export class NotificationsService {
     // Get the business according to the base notification data
     const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
     newNotification.businessName = business.name;
-
-    newNotification.code = Math.floor(newNotification.code);
 
     // For notifications about order
     if(newNotification.code == NotificationCode.ORDER_CHANGE || newNotification.code == NotificationCode.ORDER_ALERT) {
