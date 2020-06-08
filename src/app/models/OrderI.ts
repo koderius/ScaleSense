@@ -110,8 +110,8 @@ export interface OrderDoc {
 
 export type AdminAlerts = {
 
-  /** Flag that notification has already sent to the supplier 24 hours after the order was sent, and has not been opened yet */
-  nAfter24?: boolean;
+  /** Last time that a notification of "has not been opened yet" has been sent (Before notification sent, it's the creation time)*/
+  nAfter24?: number;
 
   /** Flag that notification has already sent to the supplier 24 hours before the order supply time, and has not been finally approved yet */
   n24Before?: boolean;

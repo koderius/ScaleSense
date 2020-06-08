@@ -16,7 +16,7 @@ export class Order {
 
     this._props.adminAlerts = {
       n24Before: false,
-      nAfter24: false,
+      nAfter24: this._props.created,
     }
 
   }

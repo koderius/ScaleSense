@@ -94,7 +94,10 @@ export const offerSpecialPrice = functions.https.onCall((data: { product: Produc
         refSide: 's',
         refBid: sid,
         time: admin.firestore.Timestamp.now().toMillis(),
-        content: {productId: data.product.id}
+        content: {
+          productId: data.product.id,
+          productName: data.product.name,
+        }
       };
       sendNotification(transaction, 'c', data.customerId, note);
 
@@ -400,23 +403,20 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
   // The value of 24 hours in milliseconds
   const h24 = 24 * 60 * 60 * 1000;
 
-  // Get all orders that were sent to the supplier but has not been approved after 24 hours
-  const unApprovedOrders = await admin.firestore().collection('orders')
-  .where('status', 'in', [10, 11])                   // Have not opened yet
-  .where('created', '<', now - h24)              // Created before yesterday
-  .where('adminAlerts.nAfter24', '==', false)     // Alert has not been sent yet
+  // Get all orders that were sent to the supplier but has not been opened after 24 hours
+  const unOpenedOrders = await admin.firestore().collection('orders')
+  .where('status', 'in', [10, 11])                       // Have not been opened yet
+  .where('adminAlerts.nAfter24', '<', now - h24)     // Alert has been sent more than 24 hours ago (or has'nt been sent yet)
   .get();
 
-  unApprovedOrders.docs.forEach((doc) => {
+  unOpenedOrders.docs.forEach((doc) => {
 
     const data = doc.data() as OrderDoc;
 
     // Notification content
     const notification: BaseNotificationDoc = {
-      code: 2.1,
+      code: 2,
       time: now,
-      refSide: 'c',
-      refBid: data.cid,
       content: {
         adminData: 'nAfter24',
         orderId: doc.id,
@@ -425,10 +425,11 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
       }
     };
 
-    // Send notifications to the supplier, and update the order flag that notification has been sent
+    // Send notifications to both customer and supplier, and update the order notification time to now
     admin.firestore().runTransaction(async transaction => {
-      sendNotification(transaction, 's', data.sid || '', notification);
-      transaction.update(doc.ref, {'adminAlerts.nAfter24': true});
+      sendNotification(transaction, 'c', data.cid || '', {...notification, refSide: 's', refBid: data.sid});
+      sendNotification(transaction, 's', data.sid || '', {...notification, refSide: 'c', refBid: data.cid});
+      transaction.update(doc.ref, {'adminAlerts.nAfter24': now});
     });
 
   });
@@ -447,7 +448,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 
     // Notification content
     const notification: BaseNotificationDoc = {
-      code: 2.2,
+      code: 2,
       time: now,
       content: {
         adminData: 'n24Before',
@@ -459,15 +460,8 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 
     // Send notifications to the supplier and the customer, and update the order flag that notification has been sent
     admin.firestore().runTransaction(async transaction => {
-      // For the supplier (carries the customer ID)
-      notification.refSide = 'c';
-      notification.refBid = data.cid;
-      sendNotification(transaction, 's', data.sid || '', notification);
-      // For the customer (carries the supplier ID)
-      notification.refSide = 's';
-      notification.refBid = data.sid;
-      sendNotification(transaction, 'c', data.cid || '', notification);
-      // Flag the order
+      sendNotification(transaction, 'c', data.cid || '', {...notification, refSide: 's', refBid: data.sid});
+      sendNotification(transaction, 's', data.sid || '', {...notification, refSide: 'c', refBid: data.cid});
       transaction.update(doc.ref, {'adminAlerts.n24Before': true});
     });
 
@@ -609,7 +603,7 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
     // Update the business name who is related to this notification inside the notification content
     const senderSnapshot = await admin.firestore().collection(notification.refSide == 'c' ? 'customers' : 'suppliers').doc(notification.refBid || '').get();
     if(notification.content)
-      notification.content.businessName = senderSnapshot.get('name');
+      notification.content.businessName = senderSnapshot.get('name') || '';
     await snapshot.ref.update({'content.businessName': senderSnapshot.get('name') || ''});
 
     // Each settings object belongs to one contact

@@ -1,6 +1,7 @@
 import {BaseNotificationDoc, ExternalNotification} from '../../src/app/models/Notification';
 import * as admin from 'firebase-admin';
 import {DicOrderStatus} from '../../src/assets/dictionaries/orderStatus';
+import {DicNotifications} from '../../src/assets/dictionaries/notificaions';
 
 export const translateNoteContent = async (note: BaseNotificationDoc, lang: string) : Promise<ExternalNotification> => {
 
@@ -19,6 +20,10 @@ export const translateNoteContent = async (note: BaseNotificationDoc, lang: stri
       const side = note.refSide == 'c' ? 's' : 'c';
       extNote.text.orderStatusStr = DicOrderStatus[lang][side + note.content.orderStatus];
     }
+
+    // Add admin data text
+    if(note.content.adminData)
+      extNote.text.noteText = DicNotifications[lang][note.content.adminData];
 
   }
 

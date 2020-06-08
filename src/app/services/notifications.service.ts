@@ -8,6 +8,8 @@ import 'firebase/firestore';
 import {AppNotification, BaseNotificationDoc, NotificationCode} from '../models/Notification';
 import {ProductsService} from './products.service';
 import {DefaultNotificationsCustomer, DefaultNotificationsSupplier} from '../../assets/defaults/notifications';
+import {LangService} from './lang.service';
+import {DicNotifications} from '../../assets/dictionaries/notificaions';
 
 
 @Injectable({
@@ -33,6 +35,7 @@ export class NotificationsService {
     private orderService: OrdersService,
     private productService: ProductsService,
     private statusText: OrderStatusTextPipe,
+    private langService: LangService,
   ) {
 
     // Subscribe 5 last notifications
@@ -125,19 +128,18 @@ export class NotificationsService {
     // If business name is missing (can be when the notification has been just created), get his name
     if(!newNotification.content.businessName) {
       const business = await this.businessService.getBusinessDoc(newNotification.refSide, newNotification.refBid);
-      newNotification.content.businessName = business.name;
+      newNotification.content.businessName = business ? business.name : '';
     }
 
     // For notifications about order
     if(newNotification.code == NotificationCode.ORDER_CHANGE || newNotification.code == NotificationCode.ORDER_ALERT) {
 
-      switch (newNotification.content.adminData) {
-        // Text for different alerts
-        case 'nAfter24': newNotification.text = 'נשלחה לפני 24 שעות וטרם נפתחה'; break;
-        case 'n24Before': newNotification.text = 'מועד אספקה מתקרב וטרם אושרה סופית'; break;
-        // The text for order change will be the order's new status
-        default: newNotification.text = this.statusText.transform(newNotification.content.orderStatus);
-      }
+      // Text for different alerts
+      if(newNotification.content.adminData)
+        newNotification.text = DicNotifications[this.langService.lang][newNotification.content.adminData];
+      // The text for order change will be the order's new status
+      else
+        newNotification.text = this.statusText.transform(newNotification.content.orderStatus);
 
     }
 
@@ -149,14 +151,7 @@ export class NotificationsService {
       newNotification.content.orderSerial = '-';
 
       // Notification text
-      switch (newNotification.content.adminData) {
-        case 'c': newNotification.text = 'מוצר חדש: '; break;
-        case 'u': newNotification.text = 'עדכון מוצר: '; break;
-        case 'd': newNotification.text = 'מוצר הוסר: '; break;
-      }
-      // Add the product's name
-      const product = await this.productService.getProduct(newNotification.content.productId);
-      newNotification.text += product.name;
+      newNotification.text = DicNotifications[this.langService.lang][newNotification.content.adminData] + ': ' + newNotification.content.productName;
 
     }
 
@@ -174,10 +169,7 @@ export class NotificationsService {
     if(newNotification.code == NotificationCode.PRICE_OFFER) {
 
       newNotification.content.orderSerial = '-';
-      newNotification.text = 'ספק הציע מחיר חדש עבור המוצר: ';
-      // Add the product's name
-      const product = await this.productService.getProduct(newNotification.content.productId);
-      newNotification.text += product.name;
+      newNotification.text = 'ספק הציע מחיר חדש עבור המוצר: ' + newNotification.content.productName;
     }
 
 

@@ -69,6 +69,7 @@ export interface ExternalNotification extends BaseNotificationDoc {
     appDomain?: string
     timeStr?: string;
     orderStatusStr?: string;
+    noteText?: string
   }
 
 }
