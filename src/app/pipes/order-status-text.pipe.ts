@@ -1,9 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {BusinessService} from '../services/business.service';
+import {DicOrderStatus} from '../../assets/dictionaries/orderStatus';
+import {LangService} from '../services/lang.service';
 
 /**
- * This pipe translate order's statuses for customer side and for supplier side
+ * This pipe translate order's statuses for customer side and for supplier side using the status dictionary
  */
 
 @Pipe({
@@ -13,55 +15,18 @@ export class OrderStatusTextPipe implements PipeTransform {
 
   constructor(
     private businessService: BusinessService,
+    private langService: LangService,
   ) {}
 
   transform(value: OrderStatus, groupName?: boolean): string {
 
     if(groupName) {
       const idx = OrderStatusGroup.findIndex((group)=>group.includes(value));
-      switch (idx) {
-        case 0: return 'פתוחה';
-        case 1: return 'מאושרת סופית';
-        case 2: return 'סגורה';
-        case 3: return 'מבוטלת';
-        default: return '';
-      }
+      return DicOrderStatus[this.langService.lang]['g'+idx] || '';
     }
 
-    if(this.businessService.side == 'c') {
+    return DicOrderStatus[this.langService.lang][this.businessService.side + value] || '';
 
-      switch (value) {
-        case OrderStatus.DRAFT: return 'טיוטה';
-        case OrderStatus.SENT: return 'נשלחה לספק';
-        case OrderStatus.EDITED: return 'נשלחה לספק (נערכה)';
-        case OrderStatus.OPENED: return 'נפתחה ע"י הספק וטרם אושרה';
-        case OrderStatus.APPROVED: return 'אישור ראשוני';
-        case OrderStatus.APPROVED_WITH_CHANGES: return 'אישור ראשוני עם שינויים';
-        case OrderStatus.CHANGED: return 'נערכה ע"י הלקוח לאחר אישור ראשוני';
-        case OrderStatus.FINAL_APPROVE: return 'אושרה סופית';
-        case OrderStatus.FINAL_APPROVE_WITH_CHANGES: return 'אושרה סופית עם שינויים';
-        case OrderStatus.CANCELED_BY_SUPPLIER: return 'בוטלה ע"י הספק';
-        case OrderStatus.CANCELED_BY_CUSTOMER: return 'בוטלה ע"י הלקוח';
-        case OrderStatus.CLOSED: return 'סגורה';
-      }
-
-    }
-
-    if(this.businessService.side == 's') {
-
-      switch (value) {
-        case OrderStatus.SENT: case OrderStatus.EDITED: case OrderStatus.OPENED: return 'הזמנה חדשה';
-        case OrderStatus.APPROVED: return 'אישור ראשוני';
-        case OrderStatus.APPROVED_WITH_CHANGES: return 'אישור ראשוני עם שינויים';
-        case OrderStatus.CHANGED: return 'שונתה ע"י הלקוח';
-        case OrderStatus.FINAL_APPROVE: return 'אושרה סופית';
-        case OrderStatus.FINAL_APPROVE_WITH_CHANGES: return 'אושרה סופית עם שינויים';
-        case OrderStatus.CANCELED_BY_SUPPLIER: return 'בוטלה ע"י הספק';
-        case OrderStatus.CANCELED_BY_CUSTOMER: return 'בוטלה ע"י הלקוח';
-        case OrderStatus.CLOSED: return 'סגורה';
-      }
-
-    }
   }
 
 }

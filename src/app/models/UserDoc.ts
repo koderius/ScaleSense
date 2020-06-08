@@ -88,4 +88,6 @@ export interface UserDoc extends Partial<UserInfo> {
   role: UserRole;
   permissions: Permissions;
 
+  lang: string;
+
 }

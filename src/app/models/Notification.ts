@@ -20,9 +20,12 @@ export interface BaseNotificationDoc {
 
   /** Notification content data */
   content?: {
+    businessName?: string;
     orderId?: string;
     orderStatus?: OrderStatus;
+    orderSerial?: string;
     productId?: string;
+    productName?: string;
     adminData?: string;
     data?: any;
   }
@@ -61,5 +64,16 @@ export interface AppNotification extends BaseNotificationDoc{
 
   /** List of UIDs that opened the notifications */
   readBy?: string[];
+
+}
+
+
+export interface ExternalNotification extends BaseNotificationDoc {
+
+  text?: {
+    appDomain?: string
+    timeStr?: string;
+    orderStatusStr?: string;
+  }
 
 }

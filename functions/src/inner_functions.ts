@@ -8,8 +8,9 @@ import {BaseNotificationDoc} from '../../src/app/models/Notification';
 
 
 
-export const sendNotification = (transaction: Transaction, side: BusinessSide, id: string, note: BaseNotificationDoc) => {
+export const sendNotification = async (transaction: Transaction, side: BusinessSide, id: string, note: BaseNotificationDoc) => {
 
+  // Send the notification to the address
   const noteRef = admin.firestore().collection(side == 'c' ? 'customers' : 'suppliers').doc(id).collection('my_notifications').doc();
   transaction.create(noteRef, note);
 

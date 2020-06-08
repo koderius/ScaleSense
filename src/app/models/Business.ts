@@ -30,6 +30,9 @@ export interface BusinessDoc {
   /** Notifications settings for each contact */
   notificationsSettings?: NotesSettings[];
 
+  /** The language of the business */
+  lang?: string;
+
 }
 
 /** Contains also the private data that each customer has for his supplier */

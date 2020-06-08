@@ -11,6 +11,7 @@ import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
 import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
 import {ContactInfo, NotesSettings} from '../../src/app/models/Business';
+import {translateNoteContent} from './translate';
 
 admin.initializeApp();
 
@@ -145,6 +146,7 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
       // Get business details
       const side = user.get('side');
       const bid = user.get('bid');
+      const lang = user.get('lang') || '';
 
       // Get default permissions from the business metadata (Each role has array of permission under the field: role{number})
       const defaultPermissions = await admin.firestore().collection(side == 'c' ? 'customers' : 'suppliers').doc(bid).collection('metadata').doc('permissions').get();
@@ -157,6 +159,7 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
         bid: bid,
         side: side,
         permissions: permissions,
+        lang: lang,
         exist: true,
       }, {merge: true});
 
@@ -371,6 +374,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         content: {
           orderId: orderSnapshot.get('id') || order.id,
           orderStatus: changeReport.status,
+          orderSerial: order.serial,
         }
       };
 
@@ -417,6 +421,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
         adminData: 'nAfter24',
         orderId: doc.id,
         orderStatus: data.status,
+        orderSerial: data.serial,
       }
     };
 
@@ -448,6 +453,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
         adminData: 'n24Before',
         orderId: doc.id,
         orderStatus: data.status,
+        orderSerial: data.serial,
       }
     };
 
@@ -482,6 +488,7 @@ export const onProductWrite = functions.firestore.document('products/{pid}').onW
     refBid: data.modifiedBy,
     content: {
       productId: data.id || '',
+      productName: data.name,
     }
   };
 
@@ -580,33 +587,48 @@ export const onReturnCreated = functions.firestore.document('returns/{returnId}'
 });
 
 
+/**
+ * This function is being called whenever a notification is being created for some business.
+ * The function send email / SMS to the business contacts according to the business notifications settings.
+ * Each notification code has it's own template, which the notification data is being parsed into
+ * */
 export const onNotificationCreated = functions.firestore.document('{businessCol}/{bid}/my_notifications/{noteId}').onCreate(async (snapshot, context) => {
 
-  // Get business notifications settings & contacts info
+  // Get business notifications settings, language & contacts info
   const businessRef = snapshot.ref.parent.parent;
   if (businessRef) {
 
     const businessSnapshot = await businessRef.get();
     const notificationsSettings: NotesSettings[] = businessSnapshot.get('notificationsSettings') || [];
     const contacts: ContactInfo[] = businessSnapshot.get('contacts') || [];
+    const lang = businessSnapshot.get('lang');
 
-    // The notification to send
+    // The notification that has been just created
     const notification: BaseNotificationDoc = snapshot.data() as BaseNotificationDoc;
 
+    // Update the business name who is related to this notification inside the notification content
+    const senderSnapshot = await admin.firestore().collection(notification.refSide == 'c' ? 'customers' : 'suppliers').doc(notification.refBid || '').get();
+    if(notification.content)
+      notification.content.businessName = senderSnapshot.get('name');
+    await snapshot.ref.update({'content.businessName': senderSnapshot.get('name') || ''});
+
     // Each settings object belongs to one contact
-    notificationsSettings.forEach(async (settings, index) => {
+    contacts.forEach(async (contact, index) => {
 
       // Contact info for this settings object
-      const contact = contacts[index];
-      const code = '' + notification.code;
+      const settings = notificationsSettings[index];
+      const code = notification.code as number;
 
       // Send notification by email, if set to true for this code
       if (settings[code].email && contact.email) {
         const mailContent = {
           to: contact.email,
-          // TODO
+          template: {
+            name: 'note' + code + '_' + lang,
+            data: await translateNoteContent(notification, lang),
+          },
         };
-        await admin.firestore().collection('mails').add(mailContent);
+        await admin.firestore().collection('mails').doc(snapshot.id || '').set(mailContent);
       }
 
       // Send notification by SMS, if set to true for this code
