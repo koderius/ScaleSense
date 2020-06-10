@@ -245,7 +245,9 @@
         <ion-row>
           <ion-button shape="round" strong="true"
                       *ngIf="customerEditMode || supplierEditMode"
-                      (click)="businessService.side == 'c' ? sendOrder() : approveOrder()">
+                      (click)="businessService.side == 'c' ? sendOrder() : approveOrder()"
+                      [disabled]="!orderHasChanged() && !isFinalApprove"
+          >
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="(!isDraft && customerEditMode) || supplierEditMode">שמירת שינויים ו</ion-text>
             <ion-text *ngIf="customerEditMode">שליחת הזמנה לספק</ion-text>

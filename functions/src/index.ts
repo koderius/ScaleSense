@@ -11,7 +11,7 @@ import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
 import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
 import {ContactInfo, NotesSettings} from '../../src/app/models/Business';
-import {translateNoteContent} from './translate';
+import {smsText, translateNoteContent} from './translate';
 
 admin.initializeApp();
 
@@ -613,21 +613,43 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
       const settings = notificationsSettings[index];
       const code = notification.code as number;
 
+      // Get template name (according to code and language), and the template data from the notification
+      const template = {
+        name: 'note' + code + '_' + lang,
+        data: await translateNoteContent(notification, lang),
+      };
+
       // Send notification by email, if set to true for this code
       if (settings[code].email && contact.email) {
         const mailContent = {
           to: contact.email,
-          template: {
-            name: 'note' + code + '_' + lang,
-            data: await translateNoteContent(notification, lang),
-          },
+          template: template,
         };
-        await admin.firestore().collection('mails').doc(snapshot.id || '').set(mailContent);
+        admin.firestore().collection('mails').doc(snapshot.id || '').set(mailContent);
       }
 
       // Send notification by SMS, if set to true for this code
       if (settings[code].sms && contact.phone) {
-        // TODO
+
+        // Get notification text according to the template
+        const text = await smsText(template);
+
+        // Generate a valid phone number: Remove all non-numeric chars. If starts with 0, add Israeli prefix instead
+        let phoneNum = contact.phone.replace(/[^0-9]+/g, '');
+        if(phoneNum.startsWith('0'))
+          phoneNum = '+972' + phoneNum.slice(1);
+
+        // Send SMS using Twilio API. (NodeJS package was very slow, so I use a direct HTTP)
+        axios.default.post(
+          'https://api.twilio.com/2010-04-01/Accounts/AC5a375e5daab19cdb70d7c3483cdcfbe5/Messages.json',
+          encodeURI(`From=Scale Sense&To=${phoneNum}&Body=${text}`),
+          {auth:
+              {
+                username: 'AC5a375e5daab19cdb70d7c3483cdcfbe5',
+                password: '7567258db17b95ed71e1ad26649dde57'
+              }
+          });
+
       }
 
     });
