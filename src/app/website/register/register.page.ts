@@ -64,7 +64,7 @@ export class RegisterPage implements OnInit {
     }
 
     // Entering the page with reset password link
-    if(this.authService.mode == 'resetPassword') {
+    if(this.authService.mode == 'resetPasswordAndSignIn') {
       this.pageStatus = PageStatus.RESET_PASSWORD;
       return;
     }

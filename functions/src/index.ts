@@ -625,6 +625,7 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
           to: contact.email,
           template: template,
         };
+        // Send email using firebase trigger email extension
         admin.firestore().collection('mails').doc(snapshot.id || '').set(mailContent);
       }
 
@@ -636,7 +637,7 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
 
         // Generate a valid phone number: Remove all non-numeric chars. If starts with 0, add Israeli prefix instead
         let phoneNum = contact.phone.replace(/[^0-9]+/g, '');
-        if(phoneNum.startsWith('0'))
+        if (phoneNum.startsWith('0'))
           phoneNum = '+972' + phoneNum.slice(1);
 
         // Send SMS using Twilio API. (NodeJS package was very slow, so I use a direct HTTP)

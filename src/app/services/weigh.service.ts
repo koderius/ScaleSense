@@ -6,10 +6,11 @@ import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 import {UsersService} from './users.service';
 import {UserPermission} from '../models/UserDoc';
 import {ProductOrder} from '../models/ProductI';
+import {ComponentsModule} from '../components/components.module';
 
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: ComponentsModule,
 })
 export class WeighService {
 
