@@ -5,7 +5,6 @@ import {Order} from '../models/Order';
 import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {ProductsService} from '../services/products.service';
 import {AlertsService} from '../services/alerts.service';
-import {WeighService} from '../services/weigh.service';
 import {NavigationService} from '../services/navigation.service';
 import {Platform, PopoverController} from '@ionic/angular';
 import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
@@ -14,6 +13,7 @@ import {isNumber} from 'util';
 import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
 import {FullCustomerOrderProductDoc, ProductOrder} from '../models/ProductI';
+import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 
 @Component({
   selector: 'app-reception',
@@ -40,11 +40,11 @@ export class ReceptionPage implements OnInit, OnDestroy {
     private orderService: OrdersService,
     private productsService: ProductsService,
     private alerts: AlertsService,
-    private weighService: WeighService,
     private navService: NavigationService,
     private popoverCtrl: PopoverController,
     private platform: Platform,
     private userService: UsersService,
+    private weighProductOpener: WeighProductOpenerService,
   ) {}
 
   get pageTitle() {
@@ -152,7 +152,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
   /** Open weight modal */
   async weightIconClicked(product: ProductOrder) {
-    const res = await this.weighService.openProductsWeightModal(product);
+    const res = await this.weighProductOpener.openProductsWeightModal(product);
     if(res.role == 'ok')
       this.hasChanges = true;
   }

@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
 import {BusinessSide} from '../models/Business';
 import {NavigationService} from '../services/navigation.service';
-import {AuthSoftwareService} from '../services/auth-software.service';
 import {UsersService} from '../services/users.service';
-import {UserDoc, UserPermission, UserRole} from '../models/UserDoc';
-import {AlertController, ModalController} from '@ionic/angular';
+import {UserPermission, UserRole} from '../models/UserDoc';
+import {ModalController} from '@ionic/angular';
 import {NotificationsSettingsModalComponent} from './notifications-settings-modal/notifications-settings-modal.component';
+import {BusinessService} from '../services/business.service';
 
 @Component({
   selector: 'app-settings-menu',
@@ -21,12 +21,12 @@ export class SettingsPage implements OnInit {
   UserPermission = UserPermission;
 
   constructor(
-    private authService: AuthSoftwareService,
     public navService: NavigationService,
     public usersService: UsersService,
+    private businessService: BusinessService,
     private modalCtrl: ModalController,
   ) {
-    this.side = this.authService.currentUser.side;
+    this.side = this.businessService.side;
   }
 
   get amIAdmin() {

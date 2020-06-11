@@ -33,6 +33,7 @@ import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weig
 import {RoleNamePipe} from '../pipes/role-name.pipe';
 import {PermissionNamePipe} from '../pipes/permission-name.pipe';
 import {NotificationCodeNamePipe} from '../pipes/notification-code-name.pipe';
+import {WeighService} from '../services/weigh.service';
 
 @NgModule({
   imports: [
@@ -112,6 +113,8 @@ import {NotificationCodeNamePipe} from '../pipes/notification-code-name.pipe';
     AutocompleteFieldComponent,
   ],
   providers: [
+    // *Add WeighService here because it calls entry components in this module
+    WeighService,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy
     // { provide: MAT_DATE_LOCALE, useValue: 'iw' }   // Mat date format: dd.mm.yyyy
   ]

@@ -6,6 +6,7 @@ import {WeighService} from '../services/weigh.service';
 import {ReturnService} from '../services/return.service';
 import {AlertsService} from '../services/alerts.service';
 import {NavigationService} from '../services/navigation.service';
+import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 
 @Component({
   selector: 'app-return-good-modal',
@@ -26,6 +27,7 @@ export class ReturnGoodModalComponent implements OnInit {
     private alerts: AlertsService,
     private toastCtrl: ToastController,
     private navService: NavigationService,
+    private weighProductOpener: WeighProductOpenerService,
   ) { }
 
 
@@ -48,7 +50,7 @@ export class ReturnGoodModalComponent implements OnInit {
 
   async weigh() {
     // Get net weight
-    await this.weighService.openProductsWeightModal(this.returnDoc.product);
+    await this.weighProductOpener.openProductsWeightModal(this.returnDoc.product);
     // Pass the weight data from the final amount to the returned amount, and delete it
     this.returnDoc.product.amountReturned = this.returnDoc.product.finalWeight;
     delete this.returnDoc.product.finalWeight;

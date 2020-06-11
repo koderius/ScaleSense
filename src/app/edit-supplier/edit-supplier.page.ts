@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Route} from '@angular/router';
+import {ActivatedRoute} from '@angular/router';
 import {SupplierDoc} from '../models/Business';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
-import {AuthSoftwareService} from '../services/auth-software.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-edit-supplier',
@@ -21,7 +21,7 @@ export class EditSupplierPage implements OnInit {
   logoPreview: string;
   tempLogo: File;
 
-  emailRegex = AuthSoftwareService.EMAIL_REGEX;
+  emailRegex = AuthService.EMAIL_REGEX;
 
   myBusinessMode: boolean;
 

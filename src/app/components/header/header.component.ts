@@ -48,7 +48,7 @@ export class HeaderComponent implements OnInit {
   }
 
   backToMain() {
-    this.navService.goToMain();
+    this.navService.goToAppMain();
   }
 
   goToSettings() {

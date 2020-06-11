@@ -91,7 +91,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
   }
 
   goBack() {
-    this.navService.goToMain();
+    this.navService.goToAppMain();
   }
 
 

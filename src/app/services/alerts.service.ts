@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {AlertController, LoadingController} from '@ionic/angular';
+import {AlertController, LoadingController, ToastController} from '@ionic/angular';
 
 /**
  * This is a UI service for alerts, prompts and loaders
@@ -15,6 +15,7 @@ export class AlertsService {
   constructor(
     private loadCtrl: LoadingController,
     private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
   ) {
 
     window.alert = (msg)=>{this.defaultAlert(msg)};
@@ -111,6 +112,25 @@ export class AlertsService {
     alert.present();
     const res = await alert.onDidDismiss();
     return res.data.values[0];
+  }
+
+
+  async errorToast(header?: string, msg?: string, ltr?: boolean) {
+
+    // Dismiss previous, if there is
+    if(await this.toastCtrl.getTop())
+      this.toastCtrl.dismiss();
+
+    // Create toast message
+    const t = await this.toastCtrl.create({
+      header: header,
+      message: msg,
+      position: 'bottom',
+      color: 'danger',
+      duration: 5000,
+      cssClass: ltr ? 'ltr' : '',
+    });
+    t.present();
   }
 
 }

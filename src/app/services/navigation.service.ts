@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {NavController} from '@ionic/angular';
-import {AuthSoftwareService} from './auth-software.service';
+import {AuthService} from './auth.service';
 
 /**
  * Navigation utility. Contains commands to navigate to all app's routes
@@ -13,12 +13,26 @@ export class NavigationService {
 
   constructor(
     private navCtrl: NavController,
-    private authService: AuthSoftwareService,
+    private authService: AuthService,
   ) {}
 
 
-  goToMain() {
-    this.navCtrl.navigateRoot(this.authService.currentUser.side == 'c' ? 'customer' : 'supplier', {animationDirection: 'back'});
+  // Go to register website page
+  goToRegister() {
+    this.navCtrl.navigateRoot('register');
+  }
+
+  // Go to website homepage
+  goToWebHomepage() {
+    this.navCtrl.navigateRoot('');
+  }
+
+
+  goToAppMain() {
+    this.navCtrl.navigateRoot(
+      this.authService.currentUser.side == 'c' ? 'customer' : 'supplier',
+      {animationDirection: 'back'}
+      );
   }
 
   /** Go back to the last page in the app's stack. If nothing happened, go to main page */
@@ -26,13 +40,12 @@ export class NavigationService {
     const id = window.history.state.navigationId;
     await this.navCtrl.pop();
     if (window.history.state.navigationId == id)
-      this.goToMain();
+      this.goToAppMain();
   }
 
 
   goToDraftsList() {
-    if(this.authService.currentUser.side == 'c')
-      this.navCtrl.navigateForward('orders-list?mode=drafts');
+    this.navCtrl.navigateForward('orders-list?mode=drafts');
   }
 
   goToOrdersList(edit?: boolean) {
@@ -58,8 +71,7 @@ export class NavigationService {
   }
 
   goToDraft(orderId: string) {
-    if(this.authService.currentUser.side == 'c')
-      this.navCtrl.navigateForward('/order/' + orderId, {queryParams: {draft: true}});
+    this.navCtrl.navigateForward('/order/' + orderId, {queryParams: {draft: true}});
   }
 
   goToSettings() {

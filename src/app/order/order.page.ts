@@ -335,7 +335,7 @@ export class OrderPage implements OnInit {
 
 
   backToMain() {
-    this.navService.goToMain();
+    this.navService.goToAppMain();
   }
 
 

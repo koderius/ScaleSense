@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {AuthWebsiteService} from '../auth-website.service';
 import {NavController} from '@ionic/angular';
 import {UserDoc} from '../../models/UserDoc';
 import {MailService} from '../mail/mail.service';
 import {MailForm} from '../mail/MailForm';
-import * as libphonenumber from 'google-libphonenumber';
+import {AuthService, AuthStage} from '../../services/auth.service';
+import {BusinessService} from '../../services/business.service';
 
 enum PageStatus {
 
@@ -46,25 +46,26 @@ export class RegisterPage implements OnInit {
 
   userDoc: UserDoc = {} as UserDoc;
 
-  readonly EmailRegex = AuthWebsiteService.EMAIL_REGEX;
+  readonly EmailRegex = AuthService.EMAIL_REGEX;
 
   constructor(
-    private authService: AuthWebsiteService,
+    private authService: AuthService,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
     public mailService: MailService,
+    private businessService: BusinessService,
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
 
-    // Entering the page with 'forgotpassword' query
-    if(this.activatedRoute.snapshot.queryParams['forgotpassword']) {
+    // Entering the page in forgot password mode
+    if(this.authService.authStage == AuthStage.FORGOT_PASSWORD) {
       this.pageStatus = PageStatus.FORGOT_PASSWORD;
       return;
     }
 
     // Entering the page with reset password link
-    if(this.authService.mode == 'resetPasswordAndSignIn') {
+    if(this.authService.authStage == AuthStage.RESET_PASSWORD) {
       this.pageStatus = PageStatus.RESET_PASSWORD;
       return;
     }
@@ -72,14 +73,30 @@ export class RegisterPage implements OnInit {
     // Get the ID from the URL
     this.id = this.activatedRoute.snapshot.params['id'];
 
+    // For no ID, open contact form
     if(this.id === '0')
       this.pageStatus = PageStatus.CONTACT;
+
+    // For ID, check if the it's a new business and start registration process
     else {
-      // TODO: Check if the ID belong to a user that connected the company
-      if(true)
-        this.pageStatus = PageStatus.FIRST_STEP;
-      else
+
+      this.businessName = await this.businessService.getNewCustomer(this.id);
+      if(!this.businessName) {
         this.navCtrl.navigateRoot('site');
+        return;
+      }
+
+      // If or when the user is signed in, go to the second page
+      if(this.authService.currentUser)
+        this.pageStatus = PageStatus.SECOND_STEP;
+      else {
+        this.pageStatus = PageStatus.FIRST_STEP;
+        this.authService.onCurrentUser.subscribe(()=>{
+          if(this.authService.currentUser)
+            this.pageStatus = PageStatus.SECOND_STEP;
+        });
+      }
+
     }
 
   }
@@ -149,13 +166,13 @@ export class RegisterPage implements OnInit {
   }
 
   async sendResetPasswordEmail() {
-    await this.authService.sendResetPasswordEmail(this.email);
+    await this.authService.sendPasswordResetEmail(this.email);
     this.pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
   }
 
   async resetPasswordClicked() {
     if(this.password == this.passwordV)
-      await this.authService.resetPassword(this.password);
+      await this.authService.resetPasswordAndSignIn(this.password);
   }
 
 
@@ -185,7 +202,7 @@ export class RegisterPage implements OnInit {
 
 
     // Check password is valid
-    if(this.inputToShow('password') && (!this.password || !this.password.match(AuthWebsiteService.PASSWORD_REGEX))) {
+    if(this.inputToShow('password') && (!this.password || !this.password.match(AuthService.PASSWORD_REGEX))) {
       alert('הסיסמה חייבת להכיל לפחות 6 תוים');
       return false;
     }
@@ -201,7 +218,7 @@ export class RegisterPage implements OnInit {
       return false;
     }
 
-    // return true;
+    return true;
 
   }
 

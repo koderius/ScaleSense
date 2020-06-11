@@ -2,15 +2,12 @@ import {Injectable} from '@angular/core';
 import {ModalController} from '@ionic/angular';
 import {WeightCameraComponent} from '../weight-camera/weight-camera.component';
 import {CameraService} from './camera.service';
-import {WeightModalComponent} from '../weight-modal/weight-modal.component';
 import {UsersService} from './users.service';
 import {UserPermission} from '../models/UserDoc';
-import {ProductOrder} from '../models/ProductI';
-import {ComponentsModule} from '../components/components.module';
 
 
 @Injectable({
-  providedIn: ComponentsModule,
+  providedIn: 'root',
 })
 export class WeighService {
 
@@ -21,27 +18,6 @@ export class WeighService {
   ) {
 
   }
-
-
-  async openProductsWeightModal(product: ProductOrder) {
-
-    // Prevent unauthorized users from opening this modal
-    if(!this.userService.hasPermission(UserPermission.USE_SCALES))
-      return;
-
-    const m = await this.modalCtrl.create({
-      component: WeightModalComponent,
-      componentProps: {
-        product: product,
-      },
-      backdropDismiss: false,
-      cssClass: 'wide-modal',
-    });
-    m.present();
-    return await m.onDidDismiss();
-
-  }
-
 
   async openWeightModal(closeStreamWhenDone?: boolean) {
 

@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {BusinessService} from './business.service';
-import {AuthSoftwareService} from './auth-software.service';
 import {OrdersService} from './orders.service';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import * as firebase from 'firebase/app';
@@ -10,6 +9,7 @@ import {ProductsService} from './products.service';
 import {DefaultNotificationsCustomer, DefaultNotificationsSupplier} from '../../assets/defaults/notifications';
 import {LangService} from './lang.service';
 import {DicNotifications} from '../../assets/dictionaries/notificaions';
+import {AuthService} from './auth.service';
 
 
 @Injectable({
@@ -31,7 +31,7 @@ export class NotificationsService {
 
   constructor(
     private businessService: BusinessService,
-    private authService: AuthSoftwareService,
+    private authService: AuthService,
     private orderService: OrdersService,
     private productService: ProductsService,
     private statusText: OrderStatusTextPipe,

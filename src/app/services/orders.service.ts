@@ -7,7 +7,6 @@ import 'firebase/functions';
 import {SuppliersService} from './suppliers.service';
 import {Order} from '../models/Order';
 import {BusinessService} from './business.service';
-import {AuthSoftwareService} from './auth-software.service';
 import {CustomersService} from './customers.service';
 import CollectionReference = firebase.firestore.CollectionReference;
 import DocumentReference = firebase.firestore.DocumentReference;
@@ -15,7 +14,6 @@ import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
 import {Dictionary} from '../utilities/dictionary';
 import {ProductOrder} from '../models/ProductI';
-import {ProductsService} from './products.service';
 
 @Injectable({
   providedIn: 'root'
@@ -38,16 +36,15 @@ export class OrdersService {
   private _myOrders: OrderDoc[] = [];
 
   constructor(
-    private authService: AuthSoftwareService,
     private suppliersService: SuppliersService,
     private customersService: CustomersService,
     private businessService: BusinessService,
   ) {}
 
   get myOrders() : Query {
-    const bidProp = this.authService.currentUser.side + 'id';
-    const myBid = this.authService.currentUser.bid;
-    return this.ordersRef.where(bidProp,'==',myBid);
+    const bidPropName = this.businessService.side + 'id';
+    const myBid = this.businessService.myBid;
+    return this.ordersRef.where(bidPropName,'==',myBid);
   }
 
   get myDrafts() : CollectionReference {

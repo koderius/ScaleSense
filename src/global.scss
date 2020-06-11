@@ -37,6 +37,11 @@ body {
   font-family: 'Open Sans Hebrew', serif;
 }
 
+// when left to right needed
+.ltr {
+  direction: ltr;
+}
+
 // The app's background
 ion-content {--background: #ececec url('/assets/background.png') top/100% 100% no-repeat}
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {NavController} from '@ionic/angular';
+import {NavigationService} from '../../../services/navigation.service';
 
 @Component({
   selector: 'website-footer',
@@ -8,16 +8,16 @@ import {NavController} from '@ionic/angular';
 })
 export class FooterComponent implements OnInit {
 
-  constructor(private navCtrl: NavController) { }
+  constructor(private navService: NavigationService) { }
 
   ngOnInit() {}
 
   goHome() {
-    this.navCtrl.navigateRoot('');
+    this.navService.goToWebHomepage();
   }
 
   register() {
-    this.navCtrl.navigateRoot('/register');
+    this.navService.goToRegister();
   }
 
 }

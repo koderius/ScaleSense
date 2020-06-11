@@ -4,8 +4,6 @@ import * as firebase from 'firebase/app';
 import 'firebase/functions';
 import 'firebase/firestore';
 import {BusinessService} from './business.service';
-import {AuthSoftwareService} from './auth-software.service';
-import {Enum} from '../utilities/enum';
 import {
   DefaultManagerCustomer,
   DefaultManagerSupplier,
@@ -13,6 +11,7 @@ import {
   DefaultWorkerSupplier
 } from '../../assets/defaults/permissions';
 import WriteBatch = firebase.firestore.WriteBatch;
+import {AuthService} from './auth.service';
 
 /**
  * This service manages the users belong to the current account.
@@ -40,7 +39,7 @@ export class UsersService {
 
   constructor(
     private businessService: BusinessService,
-    private authService: AuthSoftwareService,
+    private authService: AuthService,
   ) {
 
     // Get full list of permissions, based on the defaults lists (get only the keys, values does not matter)
