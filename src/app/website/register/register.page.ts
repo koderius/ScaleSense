@@ -1,11 +1,18 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {NavController} from '@ionic/angular';
 import {UserDoc} from '../../models/UserDoc';
 import {MailService} from '../mail/mail.service';
 import {MailForm} from '../mail/MailForm';
 import {AuthService, AuthStage} from '../../services/auth.service';
 import {BusinessService} from '../../services/business.service';
+import {BusinessDoc} from '../../models/Business';
+import * as firebase from 'firebase/app';
+import 'firebase/functions';
+import {AlertsService} from '../../services/alerts.service';
+import {FilesService} from '../../services/files.service';
+import {NavigationService} from '../../services/navigation.service';
+import {take} from 'rxjs/operators';
+import {AlertController} from '@ionic/angular';
 
 enum PageStatus {
 
@@ -14,7 +21,7 @@ enum PageStatus {
 
   FIRST_STEP = 21,
   SECOND_STEP = 22,
-  THIRD_STEP = 23,
+  PAYMENTS = 23,
   REGISTRATION_DONE = 24,
 
   FORGOT_PASSWORD = 40,
@@ -36,7 +43,7 @@ export class RegisterPage implements OnInit {
   // Page ID
   id: string;
 
-  // Details for contact
+  // Details for contact / password recovery (contact mode)
   businessName: string;
   fullName: string;
   email: string;
@@ -44,28 +51,38 @@ export class RegisterPage implements OnInit {
   password: string;
   passwordV: string;
 
-  userDoc: UserDoc = {} as UserDoc;
+  // User details
+  userDoc: UserDoc = {};
+
+  // Business details
+  customerDoc: BusinessDoc = {contacts: [{},{}]};
 
   readonly EmailRegex = AuthService.EMAIL_REGEX;
+  readonly PasswordRegex = AuthService.PASSWORD_REGEX;
+
+  logoLoader: boolean;
 
   constructor(
+    private alerts: AlertsService,
+    private alertCtrl: AlertController,
     private authService: AuthService,
     private activatedRoute: ActivatedRoute,
-    private navCtrl: NavController,
+    private navService: NavigationService,
     public mailService: MailService,
     private businessService: BusinessService,
+    private filesService: FilesService,
   ) {}
 
   async ngOnInit() {
 
     // Entering the page in forgot password mode
-    if(this.authService.authStage == AuthStage.FORGOT_PASSWORD) {
+    if (this.authService.authStage == AuthStage.FORGOT_PASSWORD) {
       this.pageStatus = PageStatus.FORGOT_PASSWORD;
       return;
     }
 
     // Entering the page with reset password link
-    if(this.authService.authStage == AuthStage.RESET_PASSWORD) {
+    if (this.authService.authStage == AuthStage.RESET_PASSWORD) {
       this.pageStatus = PageStatus.RESET_PASSWORD;
       return;
     }
@@ -74,29 +91,24 @@ export class RegisterPage implements OnInit {
     this.id = this.activatedRoute.snapshot.params['id'];
 
     // For no ID, open contact form
-    if(this.id === '0')
+    if (this.id === '0')
       this.pageStatus = PageStatus.CONTACT;
 
-    // For ID, check if the it's a new business and start registration process
+    // If entered this page as a verified user of an exist business, go to payments
+    else if (this.id == 'payments') {
+      this.authService.onCurrentUser.pipe(take(1)).subscribe((user)=>{
+        if(user)
+          this.pageStatus = PageStatus.PAYMENTS;
+      });
+    }
+
     else {
-
-      this.businessName = await this.businessService.getNewCustomer(this.id);
-      if(!this.businessName) {
-        this.navCtrl.navigateRoot('site');
-        return;
-      }
-
-      // If or when the user is signed in, go to the second page
-      if(this.authService.currentUser)
-        this.pageStatus = PageStatus.SECOND_STEP;
-      else {
+      // If the business ID has only initial document, start registration process
+      this.customerDoc.name = await this.businessService.getNewCustomer(this.id);
+      if (this.customerDoc.name)
         this.pageStatus = PageStatus.FIRST_STEP;
-        this.authService.onCurrentUser.subscribe(()=>{
-          if(this.authService.currentUser)
-            this.pageStatus = PageStatus.SECOND_STEP;
-        });
-      }
-
+      else
+        this.navService.goToWebHomepage();
     }
 
   }
@@ -137,11 +149,12 @@ export class RegisterPage implements OnInit {
       case PageStatus.CONTACT: this.sendDetailsClick(); break;
       case PageStatus.FORGOT_PASSWORD: this.sendResetPasswordEmail(); break;
       case PageStatus.RESET_PASSWORD: this.resetPasswordClicked(); break;
-      case PageStatus.FIRST_STEP: case PageStatus.SECOND_STEP: this.nextStep(); break;
+      case PageStatus.FIRST_STEP: this.pageStatus = PageStatus.SECOND_STEP; break;
+      case PageStatus.SECOND_STEP: this.doneRegistrationClicked();
+
     }
 
   }
-
 
   sendDetailsClick() {
     const mailContact: MailForm = {
@@ -157,22 +170,48 @@ export class RegisterPage implements OnInit {
       alert('פנייה נכשלה');
   }
 
-  nextStep() {
-    this.pageStatus++;
+  async doneRegistrationClicked() {
+    const l = this.alerts.loaderStart('יצירת חשבון חדש...');
+    // Create user account with email and password
+    const newUserCred = await this.authService.createUser(this.userDoc.email, this.password);
+    if(!newUserCred) {
+      this.alerts.loaderStop(l);
+      return;
+    }
+    // Call cloud function to create the account's documents
+    const createAccount = firebase.functions().httpsCallable('createAccount');
+    try {
+      await createAccount({
+        adminUserDoc: {
+          ...this.userDoc,
+          uid: newUserCred.user.uid
+        },
+        businessDoc: {
+          ...this.customerDoc,
+          id: this.id,
+        }
+      });
+      // After succeed, send verification email
+      this.sendVerificationEmail();
+    }
+    catch (e) {
+      console.error(e);
+      // If there was some error while creating the account, delete this new "orphaned" user to prevent 'already-exist' error in the future
+      await this.authService.deleteMe();
+    }
+    this.alerts.loaderStop(l);
   }
 
-  doneClicked() {
-    this.pageStatus = PageStatus.REGISTRATION_DONE;
-  }
 
-  async sendResetPasswordEmail() {
-    await this.authService.sendPasswordResetEmail(this.email);
-    this.pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
-  }
-
-  async resetPasswordClicked() {
-    if(this.password == this.passwordV)
-      await this.authService.resetPasswordAndSignIn(this.password);
+  async uploadLogo(file: File) {
+    // Upload the file to the storage under the business ID name, and get it's URL
+    this.logoLoader = true;
+    const url = await this.filesService.uploadFile(file, this.id);
+    if(url)
+      this.customerDoc.logo = url;
+    else
+      alert('תקלה בהעלאת הקובץ');
+    this.logoLoader = false;
   }
 
 
@@ -185,32 +224,22 @@ export class RegisterPage implements OnInit {
         alert('יש להזין את כל שדות החובה');
         return false;
       }
-    }
-
-
-    // Check email is well formatted
-    if(this.inputToShow('email') && !this.email.match(this.EmailRegex)) {
-      alert('כתובת דוא"ל אינה תקינה');
-      return false;
-    }
-
-    // Check phone is well formatted
-    if(this.inputToShow('phone') && !+this.phone) {
-      alert('מספר טלפון אינו תקין');
-      return false;
-    }
-
-
-    // Check password is valid
-    if(this.inputToShow('password') && (!this.password || !this.password.match(AuthService.PASSWORD_REGEX))) {
-      alert('הסיסמה חייבת להכיל לפחות 6 תוים');
-      return false;
-    }
-
-    // Check both password fields are identical
-    if(this.inputToShow('passwordV') && this.password != this.passwordV) {
-      alert('הסיסמה ואימות הסיסמא אינם זהים');
-      return false;
+      if(inputs.item(i).validity.patternMismatch && inputs.item(i).type == 'email') {
+        alert('כתובת דוא"ל אינה תקינה');
+        return false;
+      }
+      if(inputs.item(i).validity.patternMismatch && inputs.item(i).name == 'companyId') {
+        alert('יש להזין מספר ח.פ תקין');
+        return false;
+      }
+      if (inputs.item(i).validity.patternMismatch && inputs.item(i).type == 'password') {
+        alert('הסיסמה חייבת להכיל לפחות 6 תוים מסוג מספרים ואותיות באנגלית');
+        return false;
+      }
+      if(this.password && this.password != this.passwordV) {
+        alert('הסיסמה ואימות הסיסמא אינם זהים');
+        return false;
+      }
     }
 
     if(this.pageStatus == PageStatus.CONTACT && !this.mailService.recaptcha) {
@@ -220,6 +249,31 @@ export class RegisterPage implements OnInit {
 
     return true;
 
+  }
+
+
+  async sendVerificationEmail() {
+    this.authService.sendEmailVerification();
+    const a = await this.alertCtrl.create({
+      subHeader: 'קישור לאימות האימייל נשלח לכתובת: ' + this.userDoc.email,
+      message: 'אם לא קיבלת מייל, בדוק את תיבת הספאם והאם הכתובת שהזנת תקינה.',
+      buttons: [{
+        text: 'לא קיבלתי, שלח שוב...',
+        handler: () => this.sendVerificationEmail(),
+      }],
+      backdropDismiss: false,
+    });
+    a.present();
+  }
+
+  async sendResetPasswordEmail() {
+    await this.authService.sendPasswordResetEmail(this.email);
+    this.pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
+  }
+
+  async resetPasswordClicked() {
+    if(this.password == this.passwordV)
+      await this.authService.resetPasswordAndSignIn(this.password);
   }
 
 }

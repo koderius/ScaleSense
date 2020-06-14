@@ -54,7 +54,7 @@
             <ion-col size="3" required>ח.פ</ion-col>
             <ion-col>
               <mat-form-field aria-label="Company ID">
-                <input matInput [(ngModel)]="supplier.companyId" type="tel" required name="companyId">
+                <input matInput [(ngModel)]="supplier.companyId" inputmode="number" pattern="[0-9]*" required name="companyId">
               </mat-form-field>
             </ion-col>
           </ion-row>

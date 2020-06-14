@@ -25,6 +25,7 @@ ion-content {
       text-align: center;
       margin: auto;
       user-select: none;
+      cursor: pointer;
     }
   }
 }
@@ -53,6 +54,12 @@ ion-input {
   --placeholder-color: #a9a9a9;
   --placeholder-opacity: 1;
   margin-bottom: 1em;
+}
+.helper-text {
+  font-size: smaller;
+  margin-top: 0.5em;
+  padding: 0 1em;
+  transform: translateY(-0.5em);
 }
 
 

@@ -127,7 +127,7 @@ export class AlertsService {
       message: msg,
       position: 'bottom',
       color: 'danger',
-      duration: 5000,
+      buttons: ['Dismiss'],
       cssClass: ltr ? 'ltr' : '',
     });
     t.present();

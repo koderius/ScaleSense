@@ -73,21 +73,14 @@ export type Permissions = {[permissionName: string]: boolean}
 /** User document - the user data which is stored in firestore. */
 export interface UserDoc extends Partial<UserInfo> {
 
-  /** Additional unique identity detail */
-  username: string;
-
-  /** Additional optional contact info */
-  email2?: string;
-  phoneNumber2?: string;
-
   /** User's business belonging (ID and side - customer or supplier) */
-  bid: string;
-  side: BusinessSide;
+  bid?: string;
+  side?: BusinessSide;
 
   /** The role of the user, and a list of his permissions */
-  role: UserRole;
-  permissions: Permissions;
+  role?: UserRole;
+  permissions?: Permissions;
 
-  lang: string;
+  lang?: string;
 
 }

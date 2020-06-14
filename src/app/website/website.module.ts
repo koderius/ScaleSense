@@ -10,6 +10,7 @@ import {WebsiteHeaderComponent} from './components/header/website-header.compone
 import {RegisterPage} from './register/register.page';
 import {MailService} from './mail/mail.service';
 import {RecaptchaModule} from 'ng-recaptcha';
+import {MatTooltipModule} from '@angular/material';
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import {RecaptchaModule} from 'ng-recaptcha';
       }
     ]),
     RecaptchaModule.forRoot(),
+    MatTooltipModule,
   ],
   declarations: [WebsitePage, RegisterPage, FooterComponent, WebsiteHeaderComponent],
   providers: [MailService],

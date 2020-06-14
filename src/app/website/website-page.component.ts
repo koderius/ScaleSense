@@ -26,15 +26,7 @@ export class WebsitePage {
     private authService: AuthService,
     private navService: NavigationService,
     public mailService: MailService,
-    private alertsService: AlertsService,
-  ) {
-
-    this.authService.onAuthError.subscribe((error)=>{
-      console.error(error);
-      this.alertsService.errorToast(error.code, error.message, true);
-    });
-
-  }
+  ) {}
 
   // Go to register page
   goToRegister() {

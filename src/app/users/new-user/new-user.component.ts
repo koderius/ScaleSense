@@ -15,7 +15,6 @@ export class NewUserComponent implements OnInit {
   // Form validators
   email = new FormControl('', [Validators.required, Validators.email]);
   fullName = new FormControl('', [Validators.required]);
-  userName = new FormControl('', [Validators.required, Validators.minLength(6)]);
   password = new FormControl('', [Validators.required, Validators.minLength(6)]);
   passwordV = new FormControl('', [Validators.required, this.checkPasswordV()]);
   role = new FormControl('', [Validators.required]);
@@ -41,7 +40,6 @@ export class NewUserComponent implements OnInit {
     if(this.editUser) {
       this.email.setValue(this.editUser.email);
       this.fullName.setValue(this.editUser.displayName);
-      this.userName.setValue(this.editUser.username);
       this.role.setValue(this.editUser.role);
     }
   }
@@ -80,7 +78,6 @@ export class NewUserComponent implements OnInit {
     const doc: Partial<UserDoc> = {
       displayName: this.fullName.value,
       email: this.email.value,
-      username: this.userName.value,
       role: this.role.value,
     };
 

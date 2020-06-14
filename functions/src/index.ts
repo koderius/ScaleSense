@@ -10,7 +10,7 @@ import {MailForm} from '../../src/app/website/mail/MailForm';
 import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
 import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
-import {BusinessDoc, ContactInfo, NotesSettings} from '../../src/app/models/Business';
+import {BusinessDoc, BusinessSide, ContactInfo, NotesSettings} from '../../src/app/models/Business';
 import {smsText, translateNoteContent} from './translate';
 
 admin.initializeApp();
@@ -77,7 +77,107 @@ export const offerSpecialPrice = functions.https.onCall((data: { product: Produc
 
 });
 
+
+/**
+ * This function sends email to the support, after verifying reCAPTCHA
+ * If the user asked to register, it handles the registration request
+ * */
+export const sendEmail = functions.https.onCall(async (data: { mailForm: MailForm, recaptcha: string }) => {
+
+  // Recaptcha secret server-side key
+  const secret = '6LeDYvUUAAAAALxLMZzV0IXYIjxSaVhUwAxOPQ8D';
+  // Token from the user
+  const token = data.recaptcha || '';
+  // URL for verifying recaptcha
+  const url = `https://recaptcha.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
+
+  // Send verification
+  const res = (await axios.default.post(url)).data;
+
+  // On recaptcha success, send the requested email to the support by adding a document to the mails collection
+  if (res.success) {
+
+    // Get app's metadata
+    const metadataSnapshot = await firestore.collection('metadata').doc('domain').get();
+
+    // If registration requested, crate initial customer document
+    if(data.mailForm.registrationReq) {
+      const newCustomerRef = firestore.collection('customers_new').doc();
+      newCustomerRef.set({
+        id: newCustomerRef.id,
+        name: data.mailForm.businessName,
+      });
+      // Create registration link from the new doc ID, and add it to the mail content
+      data.mailForm.content = 'בקשה לרישום.\nקישור לרישום עבור הלקוח: ' + metadataSnapshot.get('main') + 'register/' + newCustomerRef.id;
+    }
+
+    // Get the support email address from the app metadata
+    const supportEmail = metadataSnapshot.get('supportEmail');
+    // Use form email template and send
+    const mailContent = {
+      to: supportEmail,
+      template: {
+        name: 'web-contact',
+        data: {...data.mailForm},
+      },
+    };
+    await firestore.collection('mails').add(mailContent);
+
+  } else
+    throw new HttpsError('failed-precondition', 'Recaptcha failed');
+
+});
+
+
+/**
+ * This function creates a new customer document with a new user's document for his admin.
+ * The function should be called after the user account (auth module) has been created.
+ * The user document should contain the pre-created user's ID.
+ * The business document should contain the ID that has been generated in the initial registration (doc in 'customers_new' collection)
+ */
+export const createAccount = functions.https.onCall(async (data: {adminUserDoc: UserDoc, businessDoc: BusinessDoc}) => {
+
+  // Check both business data and user data received
+  if(data && data.businessDoc && data.adminUserDoc) {
+
+    // Check the user has been created
+    if(!admin.auth().getUser(data.adminUserDoc.uid || ''))
+      throw new HttpsError('not-found', 'The user has not been created yet');
+
+    const batch = firestore.batch();
+
+    // Delete the initial customer account (Batch will fail, if not exits)
+    batch.delete(firestore.collection('customers_new').doc(data.businessDoc.id || ''));
+
+    // Create the customer document according to the given details
+    batch.set(firestore.collection('customers').doc(data.businessDoc.id || ''), data.businessDoc);
+
+    // Create the admin user document, containing his business data
+    batch.set(firestore.collection('users').doc(data.adminUserDoc.uid || ''), {
+      ...data.adminUserDoc,
+      side: 'c',
+      bid: data.adminUserDoc.uid,
+      role: 3,
+      exist: true,
+    });
+
+    // Commit batch
+    try {
+      await batch.commit();
+    }
+    catch (e) {
+      throw new HttpsError('aborted', e);
+    }
+
+  }
+  else
+    throw new HttpsError('invalid-argument', 'Missing data');
+
+});
+
+
 /** *
+ * This function creates new non-admin user into an exist business or updates data for an exist user
  * Get user details as User Document + password and create/update the user in the firebase auth module + update the user document in firestore.
  * If the user document contains UID, it will update an existed user, else it will create a new user with auto generated UID.
  * The user document will be set with the business data (side + business ID) and the default permissions of his given role.
@@ -169,64 +269,6 @@ export const deleteUser = functions.https.onCall(async (data: string, context) =
 
 
 /**
- * This function sends email to the support, after verifying reCAPTCHA
- * If the user asked to register, it handles the registration request
- * */
-export const sendEmail = functions.https.onCall(async (data: { mailForm: MailForm, recaptcha: string }) => {
-
-  // Recaptcha secret server-side key
-  const secret = '6LeDYvUUAAAAALxLMZzV0IXYIjxSaVhUwAxOPQ8D';
-  // Token from the user
-  const token = data.recaptcha || '';
-  // URL for verifying recaptcha
-  const url = `https://recaptcha.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`;
-
-  // Send verification
-  const res = (await axios.default.post(url)).data;
-
-  // On recaptcha success, send the requested email to the support by adding a document to the mails collection
-  if (res.success) {
-
-    // Get app's metadata
-    const metadataSnapshot = await firestore.collection('metadata').doc('domain').get();
-
-    // If registration requested, crate initial customer document
-    if(data.mailForm.registrationReq) {
-      const newCustomerRef = firestore.collection('customers_new').doc();
-      newCustomerRef.set({
-        id: newCustomerRef.id,
-        name: data.mailForm.businessName,
-      });
-      // Create registration link from the new doc ID, and add it to the mail content
-      data.mailForm.content = 'בקשה לרישום.\nקישור לרישום עבור הלקוח: ' + metadataSnapshot.get('main') + 'register/' + newCustomerRef.id;
-    }
-
-    // Get the support email address from the app metadata
-    const supportEmail = metadataSnapshot.get('supportEmail');
-    // Use form email template and send
-    const mailContent = {
-      to: supportEmail,
-      template: {
-        name: 'web-contact',
-        data: {...data.mailForm},
-      },
-    };
-    await firestore.collection('mails').add(mailContent);
-
-  } else
-    throw new HttpsError('failed-precondition', 'Recaptcha failed');
-
-});
-
-
-export const createAccount = functions.https.onCall((data: {adminUserDoc: UserDoc, password: string, businessDoc: BusinessDoc}, context) => {
-
-
-
-});
-
-
-/**
  * This function is in charge of all the changes in the orders collection.
  * Writing into an order is possible only by the admin through a cloud function.
  * Step 1: Checking user permission - Check whether the user is part of either the customer or the supplier of the requested order, and whether he has the requested permission.
@@ -258,7 +300,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
         side: userDoc.side,
         time: admin.firestore.Timestamp.now().toMillis(),
         // Get the new status according to the current status and the requested status
-        status: getNewOrderStatus(userDoc.side, orderSnapshot.get('status') || 0, order.status),
+        status: getNewOrderStatus(userDoc.side as BusinessSide, orderSnapshot.get('status') || 0, order.status),
       };
 
       // Check whether the user's business ID is equal to the order CID or SID (if it's an existing order)
@@ -270,7 +312,7 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
       const requestedPermission = getRequestedPermission(changeReport.status || NaN);
 
       // Check whether the user is an admin or has that permission
-      if (requestedPermission && userDoc.role !== 3 && !userDoc.permissions[requestedPermission]) {
+      if (requestedPermission && userDoc.role !== 3 && (!userDoc.permissions || !userDoc.permissions[requestedPermission])) {
         throw new HttpsError('permission-denied', 'The user has no permission', 'The user has no permission to perform the requested operation');
       }
 

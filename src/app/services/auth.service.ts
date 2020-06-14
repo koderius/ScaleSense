@@ -7,6 +7,7 @@ import {UserDoc} from '../models/UserDoc';
 import {ActivatedRoute} from '@angular/router';
 import UserCredential = firebase.auth.UserCredential;
 import {Observable} from 'rxjs';
+import {AlertsService} from './alerts.service';
 
 export enum AuthStage {
 
@@ -79,12 +80,22 @@ export class AuthService {
   }
 
 
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private alertsService: AlertsService,
+  ) {
+
+    this.onAuthError.subscribe((error)=>{
+      console.error(error);
+      this.alertsService.errorToast(error.code, error.message, true);
+    });
 
     // On sign in/out
     this.auth.onAuthStateChanged((user: User)=>{
 
+      // Reset
       this.isAuthReady = false;
+      this._userDoc = null;
 
       // Get the user, or null when signed out or no one is signed in
       console.log('Current user:', user);
@@ -106,12 +117,6 @@ export class AuthService {
           (e: FirebaseError)=>{
           e.code = 'userDocSubscribe';
           this.onAuthError.emit(e);
-        });
-
-        // When the user document suddenly becomes not available (on sign out), go to the main page
-        this.onDocChange.subscribe(()=>{
-          if(!this.currentUser)
-            window.location.href = '';
         });
 
       }
@@ -186,12 +191,13 @@ export class AuthService {
   private async verifyEmail() {
     try {
       await this.auth.applyActionCode(this._oobCode);
-      await this._user.reload();
       this._stage = AuthStage.EMAIL_VERIFIED;
     }
     catch (e) {
       this.onAuthError.emit(e);
     }
+    // Clear the query parameters (from current URL and from history)
+    history.replaceState(null, null, window.location.pathname);
   }
 
 
@@ -226,6 +232,26 @@ export class AuthService {
     catch (e) {
       this.onAuthError.emit(e);
     }
+  }
+
+
+  // Create user with email & password (For admin registration only)
+  async createUser(email: string, password: string) : Promise<UserCredential> {
+    try {
+      // Make sure no user is signed in
+      if(this._user)
+        await this.signOut();
+      // Create the user
+      return await this.auth.createUserWithEmailAndPassword(email ,password);
+    }
+    catch (e) {
+      this.onAuthError.emit(e);
+    }
+  }
+
+  async deleteMe() {
+    if(this._user)
+      await this._user.delete();
   }
 
 }

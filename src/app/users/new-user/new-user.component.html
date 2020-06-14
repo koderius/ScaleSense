@@ -11,38 +11,11 @@
     </div>
 
     <div>
-      <ion-label>* סיסמה</ion-label>
-      <mat-form-field aria-label="password">
-        <input matInput [formControl]="password" name="password">
-        <mat-error *ngIf="password.hasError('minlength') && !password.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
-        <mat-error *ngIf="password.hasError('required')">שדה חובה</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div>
       <ion-label>* אימייל</ion-label>
       <mat-form-field aria-label="email">
         <input matInput [formControl]="email" name="email">
         <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">כתובת אימייל אינה חוקית</mat-error>
         <mat-error *ngIf="email.hasError('required')">שדה חובה</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div>
-      <ion-label>* שם משתמש</ion-label>
-      <mat-form-field aria-label="username">
-        <input matInput [formControl]="userName" name="username">
-        <mat-error *ngIf="userName.hasError('minlength') && !userName.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
-        <mat-error *ngIf="userName.hasError('required')">שדה חובה</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div>
-      <ion-label>* אימות סיסמה</ion-label>
-      <mat-form-field aria-label="passwordV">
-        <input matInput [formControl]="passwordV" name="password2">
-        <mat-error *ngIf="passwordV.hasError('notSimilar') && !passwordV.hasError('required')">אימות סיסמה לא זהה</mat-error>
-        <mat-error *ngIf="passwordV.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>
     </div>
 
@@ -53,6 +26,24 @@
           <mat-option *ngFor="let role of roles" [value]="role" [disabled]="role == UserRole.ADMIN">{{role | roleName}}</mat-option>
         </mat-select>
         <mat-error *ngIf="role.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* סיסמה</ion-label>
+      <mat-form-field aria-label="password">
+        <input matInput [formControl]="password" name="password">
+        <mat-error *ngIf="password.hasError('minlength') && !password.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
+        <mat-error *ngIf="password.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* אימות סיסמה</ion-label>
+      <mat-form-field aria-label="passwordV">
+        <input matInput [formControl]="passwordV" name="password2">
+        <mat-error *ngIf="passwordV.hasError('notSimilar') && !passwordV.hasError('required')">אימות סיסמה לא זהה</mat-error>
+        <mat-error *ngIf="passwordV.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>
     </div>
 

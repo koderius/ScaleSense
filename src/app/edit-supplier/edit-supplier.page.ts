@@ -102,11 +102,20 @@ export class EditSupplierPage implements OnInit {
     const inputs = document.querySelector('#forms').getElementsByTagName('input');
 
     // Check their validity
-    for (let i = 0; i < inputs.length; i++)
-      if(!inputs[i].validity.valid) {
+    for (let i = 0; i < inputs.length; i++) {
+      if(inputs[i].validity.valueMissing) {
         alert('יש למלא את כל השדות המסומנים ב-*');
         return false;
       }
+      if(inputs[i].validity.patternMismatch && inputs[i].type == 'email') {
+        alert('כתובת דוא"ל לא תקינה');
+        return false;
+      }
+      if(inputs[i].validity.patternMismatch && inputs[i].name == 'companyId') {
+        alert('יש להזין מספר ח.פ תקין');
+        return false;
+      }
+    }
 
     return true;
 

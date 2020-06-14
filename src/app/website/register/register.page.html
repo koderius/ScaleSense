@@ -5,14 +5,14 @@
   <h1 class="title">{{pageStatus == PageStatus.RESET_PASSWORD || pageStatus == PageStatus.FORGOT_PASSWORD ? 'שכחתי סיסמא' : 'הרשמה למערכת'}}</h1>
 
 
-  <div id="step" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus <= PageStatus.THIRD_STEP">
+  <div id="step" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus <= PageStatus.PAYMENTS">
     <ion-img [src]="'../../../assets/website/step' + (pageStatus - 20) + '.png'"></ion-img>
     <ion-row>
       <ion-col>
         <div class="ion-float-start">פרטי כניסה למערכת</div>
       </ion-col>
       <ion-col>
-        <div>פרטי יצירת קשר</div>
+        <div>פרטי עסק</div>
       </ion-col>
       <ion-col>
         <div class="ion-float-end">אמצעי תשלום</div>
@@ -28,85 +28,245 @@
 
       <h1 class="reset-password-msg" *ngIf="subheaderToShow()">{{subheaderToShow()}}</h1>
 
-      <ion-input placeholder="שם העסק" *ngIf="inputToShow('businessName')" [(ngModel)]="businessName" required></ion-input>
+      <ion-input placeholder="שם העסק"
+                 name="businessName"
+                 aria-label="Business Name"
+                 *ngIf="inputToShow('businessName')"
+                 [(ngModel)]="businessName"
+                 required
+      ></ion-input>
 
-      <ion-input placeholder="שם מלא" *ngIf="inputToShow('name')" [(ngModel)]="fullName" required></ion-input>
+      <ion-input placeholder="שם מלא"
+                 name="fullName"
+                 aria-label="Full Name"
+                 *ngIf="inputToShow('name')"
+                 [(ngModel)]="fullName"
+                 required
+      ></ion-input>
 
-      <ion-input placeholder="דוא&quot;ל" type="email" *ngIf="inputToShow('email')" [(ngModel)]="email" required [pattern]="EmailRegex"></ion-input>
+      <ion-input placeholder="דוא&quot;ל"
+                 type="email"
+                 name="email"
+                 aria-label="Email"
+                 *ngIf="inputToShow('email')"
+                 [(ngModel)]="email"
+                 required
+                 [pattern]="EmailRegex"
+      ></ion-input>
 
-      <ion-input placeholder="טלפון" type="tel" *ngIf="inputToShow('phone')" [(ngModel)]="phone" required></ion-input>
+      <ion-input placeholder="טלפון"
+                 name="phone"
+                 aria-label="Phone"
+                 type="tel"
+                 *ngIf="inputToShow('phone')"
+                 [(ngModel)]="phone"
+                 required
+      ></ion-input>
 
-      <ion-input placeholder="סיסמה חדשה" type="password" [(ngModel)]="password" *ngIf="inputToShow('password')" required></ion-input>
+      <ion-input placeholder="סיסמה חדשה"
+                 name="newPassword"
+                 aria-label="New Password"
+                 type="password"
+                 [(ngModel)]="password"
+                 *ngIf="inputToShow('password')"
+                 required
+      ></ion-input>
 
-      <ion-input placeholder="אימות סיסמה" type="password" [(ngModel)]="passwordV" *ngIf="inputToShow('passwordV')" required></ion-input>
+      <ion-input placeholder="אימות סיסמה"
+                 name="Password2"
+                 aria-label="Password Verification"
+                 type="password"
+                 [(ngModel)]="passwordV"
+                 *ngIf="inputToShow('passwordV')"
+                 required
+      ></ion-input>
 
     </div>
 
     <div *ngIf="pageStatus == PageStatus.FIRST_STEP">
 
-      <ion-input placeholder="* שם הלקוח"></ion-input>
+      <ion-input placeholder="* שם הלקוח"
+                 name="customerName"
+                 aria-label="Customer Name"
+                 [(ngModel)]="userDoc.displayName"
+                 required
+      ></ion-input>
 
-      <ion-input placeholder="* שם משתמש ראשי"></ion-input>
+      <ion-input placeholder="* כתובת דוא&quot;ל"
+                 type="email"
+                 name="email"
+                 aria-label="User Email"
+                 [(ngModel)]="userDoc.email"
+                 required
+                 [pattern]="EmailRegex"
+      ></ion-input>
+      <p class="helper-text">
+        <ion-text color="medium">כתובת הדוא&quot;ל האישית שלך, לצורך חיבור למערכת</ion-text>
+      </p>
 
-      <ion-input placeholder="* סיסמה" type="password"></ion-input>
+      <ion-input placeholder="* סיסמה"
+                 type="password"
+                 name="password"
+                 aria-label="Password"
+                 [(ngModel)]="password"
+                 required
+                 [pattern]="PasswordRegex"
+      ></ion-input>
 
-      <ion-input placeholder="* אישור סיסמה" type="password"></ion-input>
-
-      <input type="file" class="ion-hide" #inputFile>
-      <ion-input placeholder="* תמונת לוגו" id="logo-input" readonly></ion-input>
-      <ion-button shape="round" class="ion-float-end" (click)="inputFile.click()">העלאת קובץ</ion-button>
+      <ion-input placeholder="* אישור סיסמה"
+                 type="password"
+                 name="password2"
+                 aria-label="Password Verification"
+                 [(ngModel)]="passwordV"
+                 required
+                 [pattern]="PasswordRegex"
+      ></ion-input>
 
     </div>
 
+    <p class="helper-text" *ngIf="pageStatus == PageStatus.SECOND_STEP">
+      <ion-text color="medium">* פרטי העסק ניתנים לעריכה בהמשך</ion-text>
+    </p>
+
     <ion-row *ngIf="pageStatus == PageStatus.SECOND_STEP">
+
       <ion-col class="ion-padding-end">
 
+        <ion-input placeholder="* שם העסק"
+                   name="businessName"
+                   aria-label="Business Name"
+                   required
+                   [(ngModel)]="customerDoc.name"
+        ></ion-input>
+
         <div class="extended-input">
-          <ion-input placeholder="* כתובת דוא&quot;ל ראשית" type="email"></ion-input>
-          <ion-fab-button size="small" class="ion-float-end" *ngIf="userDoc.email2 === undefined" (click)="userDoc.email2 = ''">
+          <ion-input placeholder="* כתובת דוא&quot;ל ראשית"
+                     type="email"
+                     name="contact1email"
+                     aria-label="Primary contact email address"
+                     required
+                     [pattern]="EmailRegex"
+                     [(ngModel)]="customerDoc.contacts[0].email"
+          ></ion-input>
+          <ion-fab-button size="small" class="ion-float-end" *ngIf="customerDoc.contacts[1].email === undefined" (click)="customerDoc.contacts[1].email = ''">
             <ion-icon name="add"></ion-icon>
           </ion-fab-button>
         </div>
 
-        <div class="extended-input" *ngIf="userDoc.email2 !== undefined">
-          <ion-input placeholder="* כתובת דוא&quot;ל נוספת" type="email"></ion-input>
-          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="userDoc.email2 = undefined">
+        <div class="extended-input" *ngIf="customerDoc.contacts[1].email !== undefined">
+          <ion-input placeholder="כתובת דוא&quot;ל נוספת"
+                     type="email"
+                     name="contact2email"
+                     aria-label="Secondary contact email address"
+                     [pattern]="EmailRegex"
+                     [(ngModel)]="customerDoc.contacts[1].email"
+          ></ion-input>
+          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="customerDoc.contacts[1].email = undefined">
             <ion-icon name="close"></ion-icon>
           </ion-fab-button>
         </div>
 
         <div class="extended-input">
-          <ion-input placeholder="* נייד" type="tel"></ion-input>
-          <ion-fab-button size="small" class="ion-float-end" *ngIf="userDoc.phoneNumber2 === undefined" (click)="userDoc.phoneNumber2 = ''">
+          <ion-input placeholder="* נייד"
+                     type="tel"
+                     name="contact1phone"
+                     aria-label="Primary contact phone"
+                     required
+                     [(ngModel)]="customerDoc.contacts[0].phone"
+          ></ion-input>
+          <ion-fab-button size="small" class="ion-float-end" *ngIf="customerDoc.contacts[1].phone === undefined" (click)="customerDoc.contacts[1].phone = ''">
             <ion-icon name="add"></ion-icon>
           </ion-fab-button>
         </div>
 
-        <div class="extended-input" *ngIf="userDoc.phoneNumber2 !== undefined">
-          <ion-input placeholder="* נייד נוסף" type="tel"></ion-input>
-          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="userDoc.phoneNumber2 = undefined">
+        <div class="extended-input" *ngIf="customerDoc.contacts[1].phone !== undefined">
+          <ion-input placeholder="נייד נוסף"
+                     type="tel"
+                     name="contact2phone"
+                     aria-label="Secondary contact phone"
+                     [(ngModel)]="customerDoc.contacts[1].phone"
+          ></ion-input>
+          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="customerDoc.contacts[1].phone = undefined">
             <ion-icon name="close"></ion-icon>
           </ion-fab-button>
         </div>
 
-        <ion-input placeholder="* כתובת עסק"></ion-input>
-
-        <ion-input placeholder="טלפון עסק" type="tel"></ion-input>
+        <p class="helper-text">
+          <ion-text color="medium">פרטי אנשי קשר אליהם יישלחו התראות (יש להזין לפחות איש קשר אחד)</ion-text>
+        </p>
 
       </ion-col>
       <ion-col class="ion-padding-start">
 
-        <ion-input placeholder="פקס" type="tel"></ion-input>
+        <ion-input placeholder="* כתובת עסק"
+                   name="address"
+                   aria-label="Business address"
+                   [(ngModel)]="customerDoc.address"
+                   required
+        ></ion-input>
 
-        <ion-input placeholder="מספר עוסק" inputmode="number"></ion-input>
+        <ion-input placeholder="טלפון עסק"
+                   type="tel"
+                   name="businessPhone"
+                   aria-label="Business Phone"
+                   [(ngModel)]="customerDoc.businessPhone"
+        ></ion-input>
 
-        <ion-input placeholder="דוא&quot;ל הנהלת חשבונות" type="email"></ion-input>
+        <ion-input placeholder="פקס"
+                   type="tel"
+                   name="fax"
+                   aria-label="Fax"
+                   [(ngModel)]="customerDoc.fax"
+        ></ion-input>
+
+        <ion-input placeholder="* מספר עוסק"
+                   inputmode="number"
+                   name="companyId"
+                   aria-label="Company ID"
+                   [(ngModel)]="customerDoc.companyId"
+                   required
+                   pattern="[0-9]*"
+        ></ion-input>
+
+        <ion-input placeholder="דוא&quot;ל הנהלת חשבונות"
+                   type="email"
+                   name="accountancy Email"
+                   aria-label="Accountancy Email"
+                   [pattern]="EmailRegex"
+                   [(ngModel)]="customerDoc.accountancyEmail"
+        ></ion-input>
+
+        <input type="file"
+               accept="image/*"
+               class="ion-hide"
+               #inputFile
+               (change)="uploadLogo($event.target.files[0])"
+               required
+        >
+        <ion-input placeholder="* תמונת לוגו" id="logo-input" readonly></ion-input>
+        <ion-button shape="round" class="ion-float-end"
+                    (click)="inputFile.click()"
+                    [disabled]="logoLoader"
+                    *ngIf="!customerDoc.logo"
+        >העלאת קובץ</ion-button>
+
+        <ion-item *ngIf="logoLoader || customerDoc.logo" lines="none">
+          <ion-thumbnail slot="start" *ngIf="customerDoc.logo">
+            <img [src]="customerDoc.logo">
+          </ion-thumbnail>
+          <ion-spinner *ngIf="logoLoader" color="dark" slot="end"></ion-spinner>
+          <ion-button color="dark" shape="round" fill="clear" slot="end"
+                      (click)="customerDoc.logo = null"
+                      *ngIf="customerDoc.logo">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-item>
 
       </ion-col>
     </ion-row>
 
 
-    <div *ngIf="pageStatus == PageStatus.THIRD_STEP">
+    <div *ngIf="pageStatus == PageStatus.PAYMENTS">
 
       <ion-input type="tel" placeholder="* מספר כרטיס"></ion-input>
 
@@ -136,16 +296,15 @@
     </re-captcha>
 
     <ion-row class="send-btn">
+      <ion-button color="medium" shape="round" (click)="pageStatus = PageStatus.FIRST_STEP" *ngIf="pageStatus == PageStatus.SECOND_STEP">אחורה</ion-button>
       <ion-button color="secondary" shape="round" strong="true" (click)="buttonAction()" *ngIf="buttonText()">{{buttonText()}}</ion-button>
-      <ion-button shape="round" strong="true" *ngIf="pageStatus == PageStatus.THIRD_STEP" style="width: 75%" (click)="doneClicked()">סיום הרשמה וכניסה למערכת</ion-button>
+      <ion-button shape="round" strong="true" *ngIf="pageStatus == PageStatus.PAYMENTS" style="width: 75%" (click)="buttonAction()">סיום הרשמה וכניסה למערכת</ion-button>
     </ion-row>
-    <p id="required-comment" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus <= PageStatus.THIRD_STEP">יש למלא את כל השדות המסונים ב*</p>
+    <p id="required-comment" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus <= PageStatus.PAYMENTS">יש למלא את כל השדות המסונים ב*</p>
 
   </div>
 
-
-  <h1 class="scs-msg" *ngIf="pageStatus == PageStatus.CONTACT_DONE">הפרטים נשלחו בהצלחה</h1>
-
+  <h1 class="scs-msg" *ngIf="pageStatus == PageStatus.REGISTRATION_DONE">הפרטים נשלחו בהצלחה</h1>
 
   <div id="done" *ngIf="pageStatus == PageStatus.CONTACT_DONE">
     <ion-img src="../../../assets/website/contact_done.png"></ion-img>

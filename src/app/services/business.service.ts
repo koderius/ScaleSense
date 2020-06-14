@@ -50,7 +50,7 @@ export class BusinessService {
   }
 
   get businessDoc() : BusinessDoc {
-    return this._businessDoc;
+    return JSON.parse(JSON.stringify(this._businessDoc || {})) as BusinessDoc;
   }
 
   constructor(private authService: AuthService) {
