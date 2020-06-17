@@ -210,6 +210,28 @@ export const sendSupplierInvitation = functions.https.onCall(async (data: {suppl
 
 
 /** *
+ * When a supplier is being created, tell all customers that connected to this supplier to update his status to ACTIVE
+ */
+export const onSupplierCreated = functions.firestore.document('suppliers/{id}').onCreate(async (snapshot, context) => {
+
+  // Get the ID of the new supplier
+  const supplierId: string = snapshot.id;
+
+  await firestore.runTransaction(async transaction => {
+    // Get all the customers supplier docs for this supplier
+    const snapshot = await transaction.get(firestore.collectionGroup('my_suppliers').where('id', '==', supplierId));
+    // Update them with status ACTIVE (2)
+    snapshot.docs.forEach((doc)=>{
+      transaction.update(doc.ref, {status: 2});
+    });
+  });
+
+  return true;
+
+});
+
+
+/** *
  * This function creates new non-admin user into an exist business or updates data for an exist user
  * Get user details as User Document + password and create/update the user in the firebase auth module + update the user document in firestore.
  * If the user document contains UID, it will update an existed user, else it will create a new user with auto generated UID.

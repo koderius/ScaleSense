@@ -23,8 +23,6 @@ export class SuppliersService {
 
   /** The collection of all the suppliers */
   public readonly allSuppliersRef = firebase.firestore().collection('suppliers');
-  /** The collection of all the suppliers that was not created yet, but got an invitation */
-  public readonly newSuppliersRef = firebase.firestore().collection('suppliers_new');
 
   /** List of all the suppliers that belong to the current customer. Continually updated from the server */
   private _mySuppliers: SupplierDoc[] = [];
