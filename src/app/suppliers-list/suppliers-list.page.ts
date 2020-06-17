@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
-import {BusinessDoc, SupplierDoc} from '../models/Business';
+import {BusinessDoc, SupplierDoc, SupplierStatus} from '../models/Business';
 import {AlertsService} from '../services/alerts.service';
 import {XlsService} from '../services/xls.service';
 import {XlsParseService} from '../services/xls-parse.service';
@@ -12,6 +12,8 @@ import {XlsParseService} from '../services/xls-parse.service';
   styleUrls: ['./suppliers-list.page.scss'],
 })
 export class SuppliersListPage implements OnInit {
+
+  SupplierStatus = SupplierStatus;
 
   query: string = '';
 

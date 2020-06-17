@@ -34,6 +34,8 @@ import {RoleNamePipe} from '../pipes/role-name.pipe';
 import {PermissionNamePipe} from '../pipes/permission-name.pipe';
 import {NotificationCodeNamePipe} from '../pipes/notification-code-name.pipe';
 import {WeighService} from '../services/weigh.service';
+import {SupplierLinkComponent} from './supplier-link/supplier-link.component';
+import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
 
 @NgModule({
   imports: [
@@ -57,6 +59,7 @@ import {WeighService} from '../services/weigh.service';
     WeightCameraComponent,
     CustomerPricingModalComponent,
     ManualWeightPopoverComponent,
+    SupplierLinkComponent,
   ],
   declarations: [
     HeaderComponent,
@@ -69,6 +72,7 @@ import {WeighService} from '../services/weigh.service';
     RoleNamePipe,
     PermissionNamePipe,
     NotificationCodeNamePipe,
+    SupplierStatusPipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,
@@ -80,6 +84,7 @@ import {WeighService} from '../services/weigh.service';
     AutocompleteFieldComponent,
     CustomerPricingModalComponent,
     ManualWeightPopoverComponent,
+    SupplierLinkComponent,
   ],
   exports: [
     MatSelectModule,
@@ -102,6 +107,7 @@ import {WeighService} from '../services/weigh.service';
     RoleNamePipe,
     PermissionNamePipe,
     NotificationCodeNamePipe,
+    SupplierStatusPipe,
     SelectPopoverDirective,
     PaginationComponent,
     NotificationsTableComponent,
@@ -111,9 +117,10 @@ import {WeighService} from '../services/weigh.service';
     ReturnGoodModalComponent,
     ReturnStatusTextPipe,
     AutocompleteFieldComponent,
+    SupplierLinkComponent,
   ],
   providers: [
-    // *Add WeighService here because it calls entry components in this module
+    // *Add services that call the entry components of this module
     WeighService,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy
     // { provide: MAT_DATE_LOCALE, useValue: 'iw' }   // Mat date format: dd.mm.yyyy

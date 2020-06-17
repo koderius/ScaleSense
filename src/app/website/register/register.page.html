@@ -136,7 +136,7 @@
                    name="businessName"
                    aria-label="Business Name"
                    required
-                   [(ngModel)]="customerDoc.name"
+                   [(ngModel)]="businessDoc.name"
         ></ion-input>
 
         <div class="extended-input">
@@ -146,22 +146,22 @@
                      aria-label="Primary contact email address"
                      required
                      [pattern]="EmailRegex"
-                     [(ngModel)]="customerDoc.contacts[0].email"
+                     [(ngModel)]="businessDoc.contacts[0].email"
           ></ion-input>
-          <ion-fab-button size="small" class="ion-float-end" *ngIf="customerDoc.contacts[1].email === undefined" (click)="customerDoc.contacts[1].email = ''">
+          <ion-fab-button size="small" class="ion-float-end" *ngIf="businessDoc.contacts[1].email === undefined" (click)="businessDoc.contacts[1].email = ''">
             <ion-icon name="add"></ion-icon>
           </ion-fab-button>
         </div>
 
-        <div class="extended-input" *ngIf="customerDoc.contacts[1].email !== undefined">
+        <div class="extended-input" *ngIf="businessDoc.contacts[1].email !== undefined">
           <ion-input placeholder="כתובת דוא&quot;ל נוספת"
                      type="email"
                      name="contact2email"
                      aria-label="Secondary contact email address"
                      [pattern]="EmailRegex"
-                     [(ngModel)]="customerDoc.contacts[1].email"
+                     [(ngModel)]="businessDoc.contacts[1].email"
           ></ion-input>
-          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="customerDoc.contacts[1].email = undefined">
+          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="businessDoc.contacts[1].email = undefined">
             <ion-icon name="close"></ion-icon>
           </ion-fab-button>
         </div>
@@ -172,21 +172,21 @@
                      name="contact1phone"
                      aria-label="Primary contact phone"
                      required
-                     [(ngModel)]="customerDoc.contacts[0].phone"
+                     [(ngModel)]="businessDoc.contacts[0].phone"
           ></ion-input>
-          <ion-fab-button size="small" class="ion-float-end" *ngIf="customerDoc.contacts[1].phone === undefined" (click)="customerDoc.contacts[1].phone = ''">
+          <ion-fab-button size="small" class="ion-float-end" *ngIf="businessDoc.contacts[1].phone === undefined" (click)="businessDoc.contacts[1].phone = ''">
             <ion-icon name="add"></ion-icon>
           </ion-fab-button>
         </div>
 
-        <div class="extended-input" *ngIf="customerDoc.contacts[1].phone !== undefined">
+        <div class="extended-input" *ngIf="businessDoc.contacts[1].phone !== undefined">
           <ion-input placeholder="נייד נוסף"
                      type="tel"
                      name="contact2phone"
                      aria-label="Secondary contact phone"
-                     [(ngModel)]="customerDoc.contacts[1].phone"
+                     [(ngModel)]="businessDoc.contacts[1].phone"
           ></ion-input>
-          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="customerDoc.contacts[1].phone = undefined">
+          <ion-fab-button size="small" color="danger" class="ion-float-end" (click)="businessDoc.contacts[1].phone = undefined">
             <ion-icon name="close"></ion-icon>
           </ion-fab-button>
         </div>
@@ -201,7 +201,7 @@
         <ion-input placeholder="* כתובת עסק"
                    name="address"
                    aria-label="Business address"
-                   [(ngModel)]="customerDoc.address"
+                   [(ngModel)]="businessDoc.address"
                    required
         ></ion-input>
 
@@ -209,21 +209,21 @@
                    type="tel"
                    name="businessPhone"
                    aria-label="Business Phone"
-                   [(ngModel)]="customerDoc.businessPhone"
+                   [(ngModel)]="businessDoc.businessPhone"
         ></ion-input>
 
         <ion-input placeholder="פקס"
                    type="tel"
                    name="fax"
                    aria-label="Fax"
-                   [(ngModel)]="customerDoc.fax"
+                   [(ngModel)]="businessDoc.fax"
         ></ion-input>
 
         <ion-input placeholder="* מספר עוסק"
                    inputmode="number"
                    name="companyId"
                    aria-label="Company ID"
-                   [(ngModel)]="customerDoc.companyId"
+                   [(ngModel)]="businessDoc.companyId"
                    required
                    pattern="[0-9]*"
         ></ion-input>
@@ -233,7 +233,7 @@
                    name="accountancy Email"
                    aria-label="Accountancy Email"
                    [pattern]="EmailRegex"
-                   [(ngModel)]="customerDoc.accountancyEmail"
+                   [(ngModel)]="businessDoc.accountancyEmail"
         ></ion-input>
 
         <input type="file"
@@ -241,23 +241,22 @@
                class="ion-hide"
                #inputFile
                (change)="uploadLogo($event.target.files[0])"
-               required
         >
         <ion-input placeholder="* תמונת לוגו" id="logo-input" readonly></ion-input>
         <ion-button shape="round" class="ion-float-end"
                     (click)="inputFile.click()"
                     [disabled]="logoLoader"
-                    *ngIf="!customerDoc.logo"
+                    *ngIf="!businessDoc.logo"
         >העלאת קובץ</ion-button>
 
-        <ion-item *ngIf="logoLoader || customerDoc.logo" lines="none">
-          <ion-thumbnail slot="start" *ngIf="customerDoc.logo">
-            <img [src]="customerDoc.logo">
+        <ion-item *ngIf="logoLoader || businessDoc.logo" lines="none">
+          <ion-thumbnail slot="start" *ngIf="businessDoc.logo">
+            <img [src]="businessDoc.logo">
           </ion-thumbnail>
           <ion-spinner *ngIf="logoLoader" color="dark" slot="end"></ion-spinner>
           <ion-button color="dark" shape="round" fill="clear" slot="end"
-                      (click)="customerDoc.logo = null"
-                      *ngIf="customerDoc.logo">
+                      (click)="businessDoc.logo = null"
+                      *ngIf="businessDoc.logo">
             <ion-icon slot="icon-only" name="close"></ion-icon>
           </ion-button>
         </ion-item>
@@ -305,6 +304,7 @@
   </div>
 
   <h1 class="scs-msg" *ngIf="pageStatus == PageStatus.REGISTRATION_DONE">הפרטים נשלחו בהצלחה</h1>
+  <h1 class="scs-msg" *ngIf="pageStatus == PageStatus.RESET_PASSWORD_EMAIL_SENT">קישור לאיפוס סיסמא נשלח למייל: {{email}}</h1>
 
   <div id="done" *ngIf="pageStatus == PageStatus.CONTACT_DONE">
     <ion-img src="../../../assets/website/contact_done.png"></ion-img>

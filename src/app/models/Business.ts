@@ -33,10 +33,15 @@ export interface BusinessDoc {
   /** The language of the business */
   lang?: string;
 
+  /** An Error for supplier that no user connected to his account (has not accepted invitation yet) */
+  notExist?: boolean;
+
 }
 
 /** Contains also the private data that each customer has for his supplier */
 export interface SupplierDoc extends BusinessDoc {
+
+  status?: SupplierStatus;
 
   /** Supplier's serial number */
   nid?: number;
@@ -56,4 +61,11 @@ export type NotesSettings = {[noteType: number]: {
     email: boolean,
     sms: boolean,
   }
+}
+
+export enum SupplierStatus {
+  NOT_EXIST = 0,
+  INVITATION_WILL_BE_SENT = 0.5,
+  INVITATION_SENT = 1,
+  ACTIVE = 2,
 }

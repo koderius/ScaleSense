@@ -1,12 +1,14 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {SupplierDoc} from '../models/Business';
+import {SupplierDoc, SupplierStatus} from '../models/Business';
 import {SuppliersService} from '../services/suppliers.service';
 import {AlertsService} from '../services/alerts.service';
 import {FilesService} from '../services/files.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {AuthService} from '../services/auth.service';
+import {ModalController} from '@ionic/angular';
+import {SupplierLinkComponent} from '../components/supplier-link/supplier-link.component';
 
 @Component({
   selector: 'app-edit-supplier',
@@ -14,6 +16,9 @@ import {AuthService} from '../services/auth.service';
   styleUrls: ['./edit-supplier.page.scss'],
 })
 export class EditSupplierPage implements OnInit {
+
+  SupplierStatus = SupplierStatus;
+  invitationTo: string;
 
   supplier: SupplierDoc;
   originalSupplier: string;
@@ -31,6 +36,7 @@ export class EditSupplierPage implements OnInit {
     private alerts: AlertsService,
     private navService: NavigationService,
     private businessService: BusinessService,
+    private modalCtrl: ModalController,
   ) {}
 
   async ngOnInit() {
@@ -72,6 +78,23 @@ export class EditSupplierPage implements OnInit {
         return 'עריכת פרטי עסק';
       else
         return this.supplier.id ? 'עריכת ספק' : 'הקמת ספק חדש';
+    }
+  }
+
+  get statusColor() {
+    switch (this.supplier.status) {
+      case SupplierStatus.NOT_EXIST: default: return 'danger';
+      case SupplierStatus.INVITATION_SENT: case SupplierStatus.INVITATION_WILL_BE_SENT: return 'warning';
+      case SupplierStatus.ACTIVE: return 'success';
+    }
+  }
+
+  get statusDesc() {
+    switch (this.supplier.status) {
+      case SupplierStatus.NOT_EXIST: default: return 'פרטי הספק שמורים\\ישמרו ברשימה שלך, אך לא מחוברים למשתמש פעיל בצד השני. יש להתחבר לספק קיים או לשלוח הזמנה לספק.';
+      case SupplierStatus.INVITATION_WILL_BE_SENT: return `הזמנה לפתיחת חשבון ספק תישלח לכתובת: ${this.invitationTo} לאחת שמירת הפרטים`;
+      case SupplierStatus.INVITATION_SENT: return 'נשלחה הזמנה ליצירת חשבון ספק. יש להמתין ליצירת החשבון על מנת שיהפוך לספק פעיל';
+      case SupplierStatus.ACTIVE: return 'ספק פעיל. ניתן לבצע הזמנות ופעולות אחרות';
     }
   }
 
@@ -127,23 +150,60 @@ export class EditSupplierPage implements OnInit {
     if(!this.checkFields())
       return;
 
+    // Open the modal for link the supplier, if not linked
+    if(!this.supplier.status && !await this.findSupplier())
+      return;
+
     // Save my business data
     if(this.myBusinessMode) {
       const l = this.alerts.loaderStart('שומר פרטי עסק...');
-      this.businessService.businessDocRef.update(this.supplier);
+      try {
+        this.businessService.businessDocRef.update(this.supplier);
+        alert('פרטי עסק נשמרו בהצלחה');
+      }
+      catch (e) {
+        console.error(e);
+      }
       this.alerts.loaderStop(l);
-      alert('פרטי עסק נשמרו בהצלחה');
     }
 
     // Save the supplier
     else {
+
       const l = this.alerts.loaderStart('שומר פרטי ספק...');
-      await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo);
-      this.alerts.loaderStop(l);
-      alert('פרטי ספק נשמרו בהצלחה');
+      if(await this.suppliersService.saveSupplierDoc(this.supplier, this.tempLogo)) {
+        alert('פרטי ספק נשמרו בהצלחה');
+      }
       this.navService.goToSuppliersList();
+      this.alerts.loaderStop(l);
+
+      // Send invitation
+      if(this.supplier.status == SupplierStatus.INVITATION_WILL_BE_SENT)
+        this.suppliersService.sendSupplierInvitation(this.supplier, this.invitationTo);
+
     }
 
+  }
+
+
+  async findSupplier() : Promise<boolean> {
+    const m = await this.modalCtrl.create({
+      component: SupplierLinkComponent,
+      componentProps: {supplierDoc: this.supplier},
+      backdropDismiss: false,
+      showBackdrop: true,
+    });
+    await m.present();
+    const res = await m.onDidDismiss();
+    if(res && res.role == 'linked') {
+      this.supplier.status = SupplierStatus.ACTIVE;
+      return true;
+    }
+    if(res && res.role == 'invitation') {
+      this.invitationTo = res.data;
+      this.supplier.status = SupplierStatus.INVITATION_WILL_BE_SENT;
+      return true;
+    }
   }
 
 }

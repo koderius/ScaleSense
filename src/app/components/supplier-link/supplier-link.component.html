@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>קישור ספק</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <p>
+    <ion-text color="medium">על מנת לעבוד מול הספק, יש לבחור את הספק המתאים מתוך רשימת הספקים הקיימים שנמצאו, או לשלוח הזמנה לאחד מאנשי הקשר לצורך ליצירת חשבון ספק חדש במערכת</ion-text>
+  </p>
+
+  <ion-list>
+
+    <ion-item-divider *ngIf="invitationAllow.length">שליחת הזמנה לספק</ion-item-divider>
+
+    <ion-item *ngFor="let allow of invitationAllow; let idx = index" (click)="linkSupplier(null, supplierDoc.contacts[idx].email)" [disabled]="!allow" button>
+      <ion-icon slot="start"
+                [color]="allow ? 'primary' : 'danger'"
+                [name]="allow ? 'add' : 'remove-circle'"
+      ></ion-icon>
+      <ion-label *ngIf="allow">
+        <h2>שליחת הזמנה לספק חדש</h2>
+        <h6>הזמנה ליצירת חשבון ספק תשלח ל-{{supplierDoc?.contacts[idx].email}}</h6>
+      </ion-label>
+      <ion-label *ngIf="!allow">
+        <h2>שליחת הזמנה חסומה</h2>
+        <h6>כתובת המייל: {{supplierDoc.contacts[idx].email}} כבר מקושרת לחשבון לקוח.</h6>
+      </ion-label>
+      <ion-icon slot="end" name="mail" *ngIf="allow"></ion-icon>
+    </ion-item>
+
+    <ion-item-divider>ספקים קיימים</ion-item-divider>
+    <p *ngIf="!matchList.length" class="ion-margin">לא נמצאו במערכת ספקים בעלי ח.פ זהה</p>
+
+    <ion-item *ngFor="let supplier of matchList" (click)="linkSupplier(supplier)" button>
+      <ion-thumbnail slot="start">
+        <img [src]="supplier.logo">
+      </ion-thumbnail>
+      <ion-label>
+        <h1>{{supplier.name}}</h1>
+        <h6 *ngIf="supplier.companyId != supplierDoc.companyId">
+          <ion-text color="warning">* שים לב, מספר ח.פ אינו תואם: {{supplier.companyId}}</ion-text>
+        </h6>
+        <h6 *ngFor="let contact of supplier.contacts">
+          <ion-icon name="person" color="medium"></ion-icon>
+          <b>{{contact.name}}</b>
+          <ion-text>: {{contact.phone}}, {{contact.email}}</ion-text>
+        </h6>
+        <p *ngIf="supplier.address">
+          <ion-icon name="business" color="medium"></ion-icon>
+          <ion-text>{{supplier.address}}</ion-text>
+        </p>
+        <p *ngIf="supplier.businessPhone">
+          <ion-icon name="call" color="medium"></ion-icon>
+          <ion-text>{{supplier.businessPhone}}</ion-text>
+        </p>
+      </ion-label>
+      <ion-icon slot="end" name="link"></ion-icon>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>
+
+<ion-footer>
+  <ion-button shape="round" color="secondary" (click)="cancel()">
+    <ion-text>ביטול</ion-text>
+  </ion-button>
+</ion-footer>

@@ -39,6 +39,7 @@ export class NewUserComponent implements OnInit {
   ngOnInit() {
     if(this.editUser) {
       this.email.setValue(this.editUser.email);
+      this.email.disable();
       this.fullName.setValue(this.editUser.displayName);
       this.role.setValue(this.editUser.role);
     }

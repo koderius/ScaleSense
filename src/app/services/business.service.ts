@@ -18,6 +18,7 @@ export class BusinessService {
   readonly customersCollection = firebase.firestore().collection('customers');
   readonly suppliersCollection = firebase.firestore().collection('suppliers');
   readonly newCustomersCollection = firebase.firestore().collection('customers_new');
+  readonly newSuppliersCollection = firebase.firestore().collection('suppliers_new');
 
   private businessSubscription;
 
@@ -82,10 +83,14 @@ export class BusinessService {
   }
 
   // Get new customer's name according to it's ID
-  async getNewCustomer(bid: string) : Promise<string> {
-    const snap = await this.newCustomersCollection.doc(bid).get();
-    if(snap.exists)
-      return snap.get('name');
+  async getNewBusiness(bid: string, side: BusinessSide) : Promise<BusinessDoc> {
+    const snap = await (side == 'c' ? this.newCustomersCollection : this.newSuppliersCollection).doc(bid).get();
+    const doc = snap.data() as BusinessDoc;
+    if(!doc.contacts)
+      doc.contacts = [{},{}];
+    if(!doc.contacts[1])
+      doc.contacts[1] = {};
+    return doc;
   }
 
 }

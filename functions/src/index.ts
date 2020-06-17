@@ -80,7 +80,7 @@ export const offerSpecialPrice = functions.https.onCall((data: { product: Produc
 
 /**
  * This function sends email to the support, after verifying reCAPTCHA
- * If the user asked to register, it handles the registration request
+ * If the user asked to register, it handles the registration request by creating new temporal customer document and generation of registration URL
  * */
 export const sendEmail = functions.https.onCall(async (data: { mailForm: MailForm, recaptcha: string }) => {
 
@@ -108,11 +108,12 @@ export const sendEmail = functions.https.onCall(async (data: { mailForm: MailFor
         name: data.mailForm.businessName,
       });
       // Create registration link from the new doc ID, and add it to the mail content
-      data.mailForm.content = 'בקשה לרישום.\nקישור לרישום עבור הלקוח: ' + metadataSnapshot.get('main') + 'register/' + newCustomerRef.id;
+      data.mailForm.content = 'בקשה לרישום.\nקישור לרישום עבור הלקוח: ' +
+        metadataSnapshot.get('main') + 'register/' + newCustomerRef.id + '?side=c';
     }
 
     // Get the support email address from the app metadata
-    const supportEmail = metadataSnapshot.get('supportEmail');
+    const supportEmail = metadataSnapshot.get('supportEmail') as string[];
     // Use form email template and send
     const mailContent = {
       to: supportEmail,
@@ -130,15 +131,15 @@ export const sendEmail = functions.https.onCall(async (data: { mailForm: MailFor
 
 
 /**
- * This function creates a new customer document with a new user's document for his admin.
+ * This function creates a new business document with a new user's document for his admin.
  * The function should be called after the user account (auth module) has been created.
  * The user document should contain the pre-created user's ID.
- * The business document should contain the ID that has been generated in the initial registration (doc in 'customers_new' collection)
+ * The business document should contain the ID that has been generated in the initial registration (doc in 'customers_new' / 'suppliers_new' collection)
  */
-export const createAccount = functions.https.onCall(async (data: {adminUserDoc: UserDoc, businessDoc: BusinessDoc}) => {
+export const createAccount = functions.https.onCall(async (data: {adminUserDoc: UserDoc, businessDoc: BusinessDoc, side: BusinessSide}) => {
 
   // Check both business data and user data received
-  if(data && data.businessDoc && data.adminUserDoc) {
+  if(data && data.businessDoc && data.adminUserDoc && data.side) {
 
     // Check the user has been created
     if(!admin.auth().getUser(data.adminUserDoc.uid || ''))
@@ -146,17 +147,19 @@ export const createAccount = functions.https.onCall(async (data: {adminUserDoc: 
 
     const batch = firestore.batch();
 
-    // Delete the initial customer account (Batch will fail, if not exits)
-    batch.delete(firestore.collection('customers_new').doc(data.businessDoc.id || ''));
+    const colName = data.side == 'c' ? 'customers' : 'suppliers';
 
-    // Create the customer document according to the given details
-    batch.set(firestore.collection('customers').doc(data.businessDoc.id || ''), data.businessDoc);
+    // Delete the initial account (Batch will fail, if not exits)
+    batch.delete(firestore.collection(colName + '_new').doc(data.businessDoc.id || ''));
+
+    // Create the business document according to the given details
+    batch.set(firestore.collection(colName).doc(data.businessDoc.id || ''), data.businessDoc);
 
     // Create the admin user document, containing his business data
     batch.set(firestore.collection('users').doc(data.adminUserDoc.uid || ''), {
       ...data.adminUserDoc,
-      side: 'c',
-      bid: data.adminUserDoc.uid,
+      side: data.side,
+      bid: data.businessDoc.id,
       role: 3,
       exist: true,
     });
@@ -168,6 +171,36 @@ export const createAccount = functions.https.onCall(async (data: {adminUserDoc: 
     catch (e) {
       throw new HttpsError('aborted', e);
     }
+
+  }
+  else
+    throw new HttpsError('invalid-argument', 'Missing data');
+
+});
+
+
+export const sendSupplierInvitation = functions.https.onCall(async (data: {supplierDoc: BusinessDoc, email: string}, context) => {
+
+  if (data && data.supplierDoc && data.email) {
+
+    // Create new supplier document
+    await firestore.collection('suppliers_new').doc(data.supplierDoc.id || '').set(data.supplierDoc);
+
+    // Get app's metadata
+    const metadataSnapshot = await firestore.collection('metadata').doc('domain').get();
+
+    // Create registration link from the new doc ID
+    const link = metadataSnapshot.get('main') + 'register/' + data.supplierDoc.id + '?side=s';
+
+    // Use form email template and send
+    const mailContent = {
+      to: data.email,
+      template: {
+        name: 'supplierInvite',
+        data: {link: link},
+      },
+    };
+    await firestore.collection('mails').add(mailContent);
 
   }
   else
@@ -211,6 +244,8 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
       if (!userDoc.uid) {
         userRec = await admin.auth().createUser(userAuthDetails);
       } else {
+        // Can't edit email
+        delete userAuthDetails.email;
         userRec = await admin.auth().updateUser(userDoc.uid, userAuthDetails);
       }
 
@@ -498,6 +533,43 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
     });
 
   });
+
+  // Things to do every day at UTC midnight (~00:00 - 00:05)
+  const d = new Date(now);
+  if(d.getUTCHours() === 0 && d.getUTCMinutes() < 6) {
+
+    // Delete all (successful) mails documents
+    const mails = await firestore.collection('mails').where('state', '==', 'SUCCESS').get();
+    mails.forEach((doc)=>{
+      doc.ref.delete();
+    });
+
+    // Things to do every month 1st (at UTC midnight)
+    if(d.getUTCDate() === 1) {
+
+      // Things do to every year (January 1st at UTC midnight)
+      if(d.getUTCMonth() === 0) {
+
+        // Delete all the orders & returns documents of X years ago (X is according to metadata)
+        firestore.runTransaction(async (transaction)=>{
+          const yearsToKeep = (await transaction.get(firestore.collection('metadata').doc('data'))).get('keepDataYears') as number;
+          if(yearsToKeep > 0) {
+            const ordersSnapshot = await transaction.get(firestore.collection('orders').where('created', '<', new Date(d.getUTCFullYear() - yearsToKeep, 0)));
+            ordersSnapshot.docs.forEach((doc)=>{
+              doc.ref.delete();
+            });
+            const returnsSnapshot = await transaction.get(firestore.collection('returns').where('time', '<', new Date(d.getUTCFullYear() - yearsToKeep, 0)));
+            returnsSnapshot.docs.forEach((doc)=>{
+              doc.ref.delete();
+            });
+          }
+        });
+
+      }
+
+    }
+
+  }
 
 });
 

@@ -3,19 +3,19 @@
   <div id="grid">
 
     <div>
-      <ion-label>* שם מלא</ion-label>
-      <mat-form-field aria-label="fullName">
-        <input matInput [formControl]="fullName" name="name">
-        <mat-error *ngIf="fullName.hasError('required')">שדה חובה</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div>
       <ion-label>* אימייל</ion-label>
       <mat-form-field aria-label="email">
         <input matInput [formControl]="email" name="email">
         <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">כתובת אימייל אינה חוקית</mat-error>
         <mat-error *ngIf="email.hasError('required')">שדה חובה</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <ion-label>* שם מלא</ion-label>
+      <mat-form-field aria-label="fullName">
+        <input matInput [formControl]="fullName" name="name">
+        <mat-error *ngIf="fullName.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>
     </div>
 

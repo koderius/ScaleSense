@@ -15,6 +15,7 @@ import {NotificationsService} from '../services/notifications.service';
 import {ProductCustomerDoc, ProductOrder} from '../models/ProductI';
 import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
+import {SupplierStatus} from '../models/Business';
 
 @Component({
   selector: 'app-order',
@@ -257,8 +258,12 @@ export class OrderPage implements OnInit {
 
 
   selectOrderSupplier(sid: string) {
-    this.order.sid = sid;
-    this.page = 2;
+    if(this.getSupplierData(sid).status == SupplierStatus.ACTIVE) {
+      this.order.sid = sid;
+      this.page = 2;
+    }
+    else
+      alert('ספק אינו פעיל')
   }
 
 

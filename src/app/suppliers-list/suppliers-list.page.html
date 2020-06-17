@@ -48,6 +48,10 @@
                       *ngIf="!hasAllRequired(supplier)"
                       matTooltip="חסרים פרטי ספק"
             ></ion-icon>
+            <ion-icon name="alert-circle" color="danger"
+                      *ngIf="!supplier.status || supplier.status < SupplierStatus.ACTIVE"
+                      matTooltip="ספק אינו פעיל"
+            ></ion-icon>
           </ion-col>
           <ion-col>
             <ion-img [src]="supplier.logo" class="ion-margin-end"></ion-img>

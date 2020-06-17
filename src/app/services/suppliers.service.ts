@@ -1,14 +1,15 @@
-import { Injectable } from '@angular/core';
-import {SupplierDoc} from '../models/Business';
+import {Injectable} from '@angular/core';
+import {SupplierDoc, SupplierStatus} from '../models/Business';
 import {ProductCustomerDoc} from '../models/ProductI';
 import {BusinessService} from './business.service';
-import CollectionReference = firebase.firestore.CollectionReference;
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
-import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+import 'firebase/functions';
 import {FilesService} from './files.service';
 import {ProductsService} from './products.service';
 import {Dictionary} from '../utilities/dictionary';
+import CollectionReference = firebase.firestore.CollectionReference;
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 
 @Injectable({
   providedIn: 'root'
@@ -20,9 +21,13 @@ import {Dictionary} from '../utilities/dictionary';
  * */
 export class SuppliersService {
 
+  /** The collection of all the suppliers */
+  public readonly allSuppliersRef = firebase.firestore().collection('suppliers');
+  /** The collection of all the suppliers that was not created yet, but got an invitation */
+  public readonly newSuppliersRef = firebase.firestore().collection('suppliers_new');
+
   /** List of all the suppliers that belong to the current customer. Continually updated from the server */
   private _mySuppliers: SupplierDoc[] = [];
-
 
   constructor(
     private businessService: BusinessService,
@@ -140,41 +145,31 @@ export class SuppliersService {
        if(supplier)
          supplierDoc.id = supplier.id;
     }
-
-    // Check whether it's a new supplier by having server ID
-    const isNew = !supplierDoc.id;
+    // Or find available serial number (NID)
+    else {
+      let serial = 1;
+      while (this.mySuppliers.some((s)=>s.nid == serial))
+        serial++;
+      supplierDoc.nid = serial;
+    }
 
     // Set modification time
     supplierDoc.modified = Date.now();
 
-    // For new suppliers
-    if(isNew) {
-
-      // Set new ID and creation time
+    // For set creation time & new ID if needed
+    if(!supplierDoc.id)
       supplierDoc.id = this.mySuppliersRef.doc().id;
+    if(!supplierDoc.created)
       supplierDoc.created = supplierDoc.modified;
-
-      // Find available serial number (NID), if not defined
-      if(!supplierDoc.nid) {
-        let serial = 1;
-        while (this.mySuppliers.some((s)=>s.nid == serial))
-          serial++;
-        supplierDoc.nid = serial;
-      }
-
-    }
 
     // Upload or delete logo image
     try {
-
       // If there is no logo, delete the file (if exists)
       if(!supplierDoc.logo)
         this.filesService.deleteFile(supplierDoc.id);
-
       // Upload the temp file (if there is) and get its URL
       if(logoFile)
         supplierDoc.logo = await this.filesService.uploadFile(logoFile, supplierDoc.id);
-
     }
     catch (e) {
       console.error(e);
@@ -183,11 +178,49 @@ export class SuppliersService {
     // Save the supplier
     try {
       await this.mySuppliersRef.doc(supplierDoc.id).set(supplierDoc, {merge: true});
+      return true;
     }
     catch (e) {
       console.error(e);
     }
 
+  }
+
+
+  async sendSupplierInvitation(supplier: SupplierDoc, email: string) {
+    if(supplier.status != SupplierStatus.INVITATION_WILL_BE_SENT)
+      return;
+    try {
+      const sendSupplierInvitation = firebase.functions().httpsCallable('sendSupplierInvitation');
+      await sendSupplierInvitation({supplierDoc: supplier, email: email});
+      await this.mySuppliersRef.doc(supplier.id).update({status: SupplierStatus.INVITATION_SENT});
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
+
+  /** Get suppliers by common company ID */
+  async searchSuppliersByCompanyId(supplier: SupplierDoc) : Promise<SupplierDoc[]> {
+    const res = await this.allSuppliersRef.where('companyId', '==', supplier.companyId).get();
+    return res.docs.map((d)=>d.data() as SupplierDoc);
+  }
+
+
+  /** Change supplier's ID, when linked to supplier from the main suppliers list */
+  async changeMySupplierId(supplier: SupplierDoc, newId: string) {
+    try {
+      await firebase.firestore().runTransaction(async transaction => {
+        const currentData = await transaction.get(this.mySuppliersRef.doc(supplier.id));
+        transaction.set(this.mySuppliersRef.doc(newId), {...currentData, id: newId});
+        transaction.delete(this.mySuppliersRef.doc(supplier.id));
+      });
+      supplier.id = newId;
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
 

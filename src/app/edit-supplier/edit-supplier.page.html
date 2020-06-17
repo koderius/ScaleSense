@@ -86,6 +86,22 @@
             </ion-col>
           </ion-row>
 
+          <ion-row class="input-div" *ngIf="!myBusinessMode">
+            <ion-col size="3">סטטוס</ion-col>
+            <ion-col>
+              <ion-item lines="none">
+                <ion-label [color]="statusColor" [matTooltip]="statusDesc">{{supplier.status | supplierStatus}}</ion-label>
+                <ion-button slot="end" fill="clear" color="dark"
+                            *ngIf="supplier.status != SupplierStatus.ACTIVE"
+                            [disabled]="!supplier.companyId || !supplier.contacts[0].email"
+                            (click)="findSupplier()">
+                  <ion-icon slot="start" name="search"></ion-icon>
+                  <ion-text>מציאת ספק</ion-text>
+                </ion-button>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+
         </div>
       </div>
 

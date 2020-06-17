@@ -5,7 +5,7 @@ import {MailService} from '../mail/mail.service';
 import {MailForm} from '../mail/MailForm';
 import {AuthService, AuthStage} from '../../services/auth.service';
 import {BusinessService} from '../../services/business.service';
-import {BusinessDoc} from '../../models/Business';
+import {BusinessDoc, BusinessSide} from '../../models/Business';
 import * as firebase from 'firebase/app';
 import 'firebase/functions';
 import {AlertsService} from '../../services/alerts.service';
@@ -42,6 +42,7 @@ export class RegisterPage implements OnInit {
 
   // Page ID
   id: string;
+  side: BusinessSide;
 
   // Details for contact / password recovery (contact mode)
   businessName: string;
@@ -55,7 +56,7 @@ export class RegisterPage implements OnInit {
   userDoc: UserDoc = {};
 
   // Business details
-  customerDoc: BusinessDoc = {contacts: [{},{}]};
+  businessDoc: BusinessDoc = {contacts: [{},{}]};
 
   readonly EmailRegex = AuthService.EMAIL_REGEX;
   readonly PasswordRegex = AuthService.PASSWORD_REGEX;
@@ -91,21 +92,19 @@ export class RegisterPage implements OnInit {
     this.id = this.activatedRoute.snapshot.params['id'];
 
     // For no ID, open contact form
-    if (this.id === '0')
+    if (this.id === '0') {
       this.pageStatus = PageStatus.CONTACT;
-
-    // If entered this page as a verified user of an exist business, go to payments
-    else if (this.id == 'payments') {
+      // If there is a logged-in user, go to his payments page
       this.authService.onCurrentUser.pipe(take(1)).subscribe((user)=>{
         if(user)
           this.pageStatus = PageStatus.PAYMENTS;
       });
     }
-
     else {
       // If the business ID has only initial document, start registration process
-      this.customerDoc.name = await this.businessService.getNewCustomer(this.id);
-      if (this.customerDoc.name)
+      this.side = this.activatedRoute.snapshot.queryParams['side'];
+      this.businessDoc = await this.businessService.getNewBusiness(this.id, this.side);
+      if (this.businessDoc)
         this.pageStatus = PageStatus.FIRST_STEP;
       else
         this.navService.goToWebHomepage();
@@ -134,7 +133,7 @@ export class RegisterPage implements OnInit {
 
   buttonText() {
     switch (this.pageStatus) {
-      case PageStatus.CONTACT: case PageStatus.FORGOT_PASSWORD: case PageStatus.RESET_PASSWORD_EMAIL_SENT: return 'שליחה';
+      case PageStatus.CONTACT: case PageStatus.FORGOT_PASSWORD: return 'שליחה';
       case PageStatus.FIRST_STEP: case PageStatus.SECOND_STEP: return 'המשך';
       case PageStatus.RESET_PASSWORD: return 'איפוס';
     }
@@ -150,8 +149,8 @@ export class RegisterPage implements OnInit {
       case PageStatus.FORGOT_PASSWORD: this.sendResetPasswordEmail(); break;
       case PageStatus.RESET_PASSWORD: this.resetPasswordClicked(); break;
       case PageStatus.FIRST_STEP: this.pageStatus = PageStatus.SECOND_STEP; break;
-      case PageStatus.SECOND_STEP: this.doneRegistrationClicked();
-
+      case PageStatus.SECOND_STEP: this.doneRegistrationClicked(); break;
+      case PageStatus.PAYMENTS: this.navService.goToAppMain(); break; //TODO: Payments
     }
 
   }
@@ -187,9 +186,10 @@ export class RegisterPage implements OnInit {
           uid: newUserCred.user.uid
         },
         businessDoc: {
-          ...this.customerDoc,
+          ...this.businessDoc,
           id: this.id,
-        }
+        },
+        side: this.side,
       });
       // After succeed, send verification email
       this.sendVerificationEmail();
@@ -208,7 +208,7 @@ export class RegisterPage implements OnInit {
     this.logoLoader = true;
     const url = await this.filesService.uploadFile(file, this.id);
     if(url)
-      this.customerDoc.logo = url;
+      this.businessDoc.logo = url;
     else
       alert('תקלה בהעלאת הקובץ');
     this.logoLoader = false;
@@ -238,6 +238,10 @@ export class RegisterPage implements OnInit {
       }
       if(this.password && this.password != this.passwordV) {
         alert('הסיסמה ואימות הסיסמא אינם זהים');
+        return false;
+      }
+      if(inputs.item(i).type == 'file' && !this.businessDoc.logo) {
+        alert('יש להעלות תמונת לוגו');
         return false;
       }
     }
@@ -272,8 +276,13 @@ export class RegisterPage implements OnInit {
   }
 
   async resetPasswordClicked() {
-    if(this.password == this.passwordV)
+    if(this.password == this.passwordV) {
       await this.authService.resetPasswordAndSignIn(this.password);
+      alert('סיסמא שונתה בהצלחה');
+      this.navService.goToWebHomepage();
+    }
+    else
+      alert('סיסמא ואימות סיסמא לא תואמים');
   }
 
 }

@@ -140,13 +140,20 @@ export class AuthService {
   }
 
 
-  // Get some user's document
-  async getUserDoc(uid: string) : Promise<UserDoc | null> {
-    if (this.currentUser && this.currentUser.uid == uid)
+  // Get some user's document by UID or by email
+  async getUserDoc(uidOrMail: string) : Promise<UserDoc | null> {
+    if (this.currentUser && this.currentUser.uid == uidOrMail || this.currentUser.email == uidOrMail)
       return this.currentUser;
     else {
       try {
-        return (await this.usersCollection.doc(uid).get()).data() as UserDoc;
+        // Search by email (only one result possible)
+        if(uidOrMail.includes('@')) {
+          const doc = (await this.usersCollection.where('email', '==', uidOrMail).limit(1).get()).docs[0];
+          return doc ? doc.data() : null;
+        }
+        // Search by UID
+        else
+          return (await this.usersCollection.doc(uidOrMail).get()).data() as UserDoc;
       }
       catch (e) {
         this.onAuthError.emit(e);

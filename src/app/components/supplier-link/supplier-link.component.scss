@@ -1,0 +1,14 @@
+ion-content {
+  --background: white;
+}
+
+ion-thumbnail {
+  border: solid black 1px;
+}
+
+p > ion-icon,
+h6 > ion-icon
+{
+  vertical-align: middle;
+  padding: 0 3px;
+}

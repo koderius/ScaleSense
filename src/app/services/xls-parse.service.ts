@@ -5,7 +5,6 @@ import {Objects} from '../utilities/objects';
 import {ProductsService} from './products.service';
 import {BusinessService} from './business.service';
 import {ProductCustomerDoc, ProductType} from '../models/ProductI';
-import {CategoriesService} from './categories.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +15,6 @@ export class XlsParseService {
     private supplierService: SuppliersService,
     private productService: ProductsService,
     private businessService: BusinessService,
-    private categoriesService: CategoriesService,
   ) { }
 
   async setSuppliers(table: string[][]) : Promise<number> {
