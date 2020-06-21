@@ -56,7 +56,7 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
 
 
   get isMobile() {
-    return this.cameraService.isMobile;
+    return this.cameraService.isCordova;
   }
 
 
@@ -104,6 +104,8 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if(this.isMobile)
       this.cameraService.hideCameraPreview();
+    if(this.toast)
+      this.toast.dismiss();
   }
 
 }

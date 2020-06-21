@@ -11,50 +11,55 @@ const routes: Routes = [
   },
 
   {
-    path: 'customer',
+    path: 'app',
+    redirectTo: '',
+  },
+
+  {
+    path: 'app/customer',
     loadChildren: () => import('./customer/customer.module').then( m => m.CustomerPageModule),
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
 
   {
-    path: 'supplier',
+    path: 'app/supplier',
     loadChildren: () => import('./supplier/supplier.module').then( m => m.SupplierPageModule),
     canActivateChild: [AppEnterGuard],
     data: {side: 's'}
   },
 
   {
-    path: 'order',
+    path: 'app/order',
     loadChildren: () => import('./order/order.module').then(m => m.OrderPageModule),
     canActivateChild: [AppEnterGuard],
   },
 
   {
-    path: 'orders-list',
+    path: 'app/orders-list',
     loadChildren: () => import('./orders-list/orders-list.module').then( m => m.OrdersListPageModule),
     canActivateChild: [AppEnterGuard],
   },
 
   {
-    path: 'settings',
+    path: 'app/settings',
     loadChildren: () => import('./settings/settings.module').then(m => m.SettingsPageModule),
     canActivateChild: [AppEnterGuard],
   },
   {
-    path: 'reception',
+    path: 'app/reception',
     loadChildren: () => import('./reception/reception.module').then( m => m.ReceptionPageModule),
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
   {
-    path: 'returns-drafts',
+    path: 'app/returns-drafts',
     loadChildren: () => import('./returns-drafts/returns-drafts.module').then( m => m.ReturnsDraftsPageModule),
     canActivateChild: [AppEnterGuard],
     data: {side: 'c'}
   },
   {
-    path: 'returns',
+    path: 'app/returns',
     loadChildren: () => import('./returns/returns.module').then( m => m.ReturnsPageModule),
     canActivateChild: [AppEnterGuard],
     data: {side: 's'}

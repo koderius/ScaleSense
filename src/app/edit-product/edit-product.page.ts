@@ -101,7 +101,7 @@ export class EditProductPage implements OnInit {
   }
 
   async getPicture() {
-    if(this.cameraService.isMobile) {
+    if(this.cameraService.isCordova) {
       this.logoPreview = await this.cameraService.takePhoto();
       this.tempLogo = FilesService.CreateFile(this.logoPreview, this.product.name + '.jpg');
     }

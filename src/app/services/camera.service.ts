@@ -17,12 +17,7 @@ export class CameraService {
 
   private isCameraPreviewOn: boolean;
 
-  isMobile: boolean;
-
-  videoSize = {
-    width: 0,
-    height: 0,
-  };
+  isCordova: boolean;
 
   get isCameraOn() {
     return this.isCameraPreviewOn || this.stream;
@@ -39,7 +34,7 @@ export class CameraService {
       this.cameraCheck();
 
     // Get platform
-    this.isMobile = this.platform.is('cordova');
+    this.isCordova = this.platform.is('cordova');
 
   }
 
@@ -48,7 +43,7 @@ export class CameraService {
 
   /** Open the PC camera and get its stream object (Video only, no audio) */
   async openVideoStream() {
-    if(!this.isMobile && !this.stream) {
+    if(!this.isCordova && !this.stream) {
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: {
           // Open video in rear camera ("environment") if possible (on mobile)
@@ -62,7 +57,7 @@ export class CameraService {
 
   /** Close the PC camera stream */
   closeVideoStream() {
-    if(!this.isMobile && this.stream) {
+    if(!this.isCordova && this.stream) {
       const tracks = this.stream.getTracks();
       if(tracks && tracks.length)
         tracks.forEach((t)=>{
@@ -91,7 +86,7 @@ export class CameraService {
 
   /** Open full screen moblie camera in the back of the app */
   async openFullScreenCamera() {
-    if(this.isMobile && !this.isCameraPreviewOn) {
+    if(this.isCordova && !this.isCameraPreviewOn) {
       await this.cameraPreview.startCamera({
         camera: 'rear',
         toBack: true,
@@ -108,7 +103,7 @@ export class CameraService {
 
   /** Close the mobile camera */
   async closeFullScreenCamera() {
-    if(this.isMobile && this.isCameraPreviewOn) {
+    if(this.isCordova && this.isCameraPreviewOn) {
       await this.cameraPreview.stopCamera();
       this.isCameraPreviewOn = false;
     }
@@ -117,7 +112,7 @@ export class CameraService {
 
   /** Show mobile camera preview by hiding all the app's elements, showing only a button */
   async showCameraPreview() {
-    if(this.isMobile && this.isCameraPreviewOn) {
+    if(this.isCordova && this.isCameraPreviewOn) {
       return new Promise(async (resolve) => {
         await this.cameraPreview.show();
         document.documentElement.classList.add('hide-background');
@@ -128,7 +123,7 @@ export class CameraService {
 
   /** Hide mobile camera preview, and show back the app */
   async hideCameraPreview() {
-    if(this.isMobile && this.isCameraPreviewOn) {
+    if(this.isCordova && this.isCameraPreviewOn) {
       await this.cameraPreview.hide();
       document.documentElement.classList.remove('hide-background');
     }
@@ -136,7 +131,7 @@ export class CameraService {
 
   /** Take a snapshot from the mobile camera */
   async getCameraSnapshot() {
-    if(this.isMobile && this.isCameraPreviewOn) {
+    if(this.isCordova && this.isCameraPreviewOn) {
       const base64 = await this.cameraPreview.takeSnapshot({
         width: this.platform.width(),
         height: this.platform.height(),
@@ -170,7 +165,7 @@ export class CameraService {
 
   async cameraCheck() {
 
-    if(this.isMobile) {
+    if(this.isCordova) {
       await this.openFullScreenCamera();
       await this.closeFullScreenCamera();
     }

@@ -26,7 +26,7 @@ export class WeighService {
       return;
 
     // Start camera according to platform
-    if(this.cameraService.isMobile)
+    if(this.cameraService.isCordova)
       await this.cameraService.openFullScreenCamera();
     else
       this.cameraService.openVideoStream();
@@ -53,7 +53,7 @@ export class WeighService {
 
   // Stop video
   async stopCamera() {
-    this.cameraService.isMobile ? this.cameraService.closeFullScreenCamera() : this.cameraService.closeVideoStream();
+    this.cameraService.isCordova ? this.cameraService.closeFullScreenCamera() : this.cameraService.closeVideoStream();
   }
 
 }
