@@ -3,7 +3,8 @@ import {ActivatedRouteSnapshot, CanActivateChild, RouterStateSnapshot} from '@an
 import {BusinessSide} from './models/Business';
 import {UserRole} from './models/UserDoc';
 import {AuthService} from './services/auth.service';
-import {take} from 'rxjs/operators';
+import {AlertsService} from './services/alerts.service';
+import {NavigationService} from './services/navigation.service';
 
 /** Guards for entering the customer and the supplier app */
 
@@ -12,6 +13,8 @@ import {take} from 'rxjs/operators';
 })
 export class AppEnterGuard implements CanActivateChild {
 
+  userSubscription;
+
   // The side that this page belong to, if not specified, opened for both
   side: BusinessSide;
   // The permissions that are required to enter this page
@@ -19,7 +22,12 @@ export class AppEnterGuard implements CanActivateChild {
   // Whether only the admin can enter the page
   adminOnly: boolean;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private alertsService: AlertsService,
+    private navService: NavigationService,
+  ) {}
+
 
   async canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 
@@ -30,12 +38,17 @@ export class AppEnterGuard implements CanActivateChild {
       this.adminOnly = route.data['adminOnly'];
     }
 
-    // Get the user data, or wait auth is ready, and check user. (Stop subscription after one time)
+    // Get the user data, or wait auth is ready
     return await new Promise<boolean>(resolve => {
-      this.authService.onCurrentUser.pipe(
-        take(1)
-      ).subscribe(()=>{
-        resolve(this.checkUser());
+      this.userSubscription = this.authService.onCurrentUser.subscribe((user)=>{
+        // Check the user's requirements
+        if(user) {
+          resolve(this.checkUser() || this.throwBack());
+          this.userSubscription.unsubscribe();
+        }
+        // Ask user to sign in
+        else
+          this.popSignIn();
       });
     });
 
@@ -46,10 +59,6 @@ export class AppEnterGuard implements CanActivateChild {
   checkUser() {
 
     const user = this.authService.currentUser;
-
-    // Check user is signed in
-    if(!user)
-      return false;
 
     // Check user's side - if needed
     if(this.side && user.side != this.side)
@@ -69,9 +78,28 @@ export class AppEnterGuard implements CanActivateChild {
   }
 
 
-  hasPermission(p: string) {
+  // Whether the user has some requested permission
+  hasPermission(p: string) : boolean {
     const userDoc = this.authService.currentUser;
     return userDoc.role == UserRole.ADMIN || (userDoc.permissions && userDoc.permissions[p]);
+  }
+
+
+  // Ask user to sign in. If fails, retry
+  async popSignIn() {
+    const data = await this.alertsService.inputAuth();
+    const l = this.alertsService.loaderStart('מתחבר...');
+    if(!await this.authService.signIn(data.email, data.password))
+      this.popSignIn();
+    this.alertsService.loaderStop(l);
+  }
+
+
+  // Throw user back the website
+  throwBack() : false {
+    alert('אין הרשאה לכניסה לעמוד');
+    this.navService.goToWebHomepage();
+    return false;
   }
 
 }

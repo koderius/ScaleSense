@@ -41,18 +41,20 @@ export class EditSupplierPage implements OnInit {
 
   async ngOnInit() {
 
-    // Create new supplier document or get existed one, according to the ID in the URL
+    // Create new supplier document
     const id = this.activatedRoute.snapshot.params['id'];
     if(id == 'new')
       this.supplier = {};
-    else
-      this.supplier = await this.suppliersService.loadSupplier(id);
 
-    // For editing current business
-    if(id == 'edit' && window.location.pathname.endsWith('/my-business/edit')) {
-      this.supplier = this.businessService.businessDoc;
+    // Or, edit my business document (for both suppliers and customers)
+    else if(id == 'edit' && window.location.pathname.endsWith('/my-business/edit')) {
+      this.supplier = await this.businessService.getBusinessDoc(this.businessService.side, this.businessService.myBid);
       this.myBusinessMode = true;
     }
+
+    // Or edit some existing supplier
+    else
+      this.supplier = await this.suppliersService.loadSupplier(id);
 
     // Go back if no supplier
     if(!this.supplier) {
@@ -150,8 +152,8 @@ export class EditSupplierPage implements OnInit {
     if(!this.checkFields())
       return;
 
-    // Open the modal for link the supplier, if not linked
-    if(!this.supplier.status && !await this.findSupplier())
+    // Open the modal to link the supplier (which is not myself), if not linked
+    if(this.supplier.id != this.businessService.myBid && !this.supplier.status && !await this.findSupplier())
       return;
 
     // Save my business data

@@ -161,6 +161,7 @@ export const createAccount = functions.https.onCall(async (data: {adminUserDoc: 
       side: data.side,
       bid: data.businessDoc.id,
       role: 3,
+      lang: 'iw',
       exist: true,
     });
 
@@ -732,52 +733,52 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
       notification.content.businessName = senderSnapshot.get('name') || '';
     await snapshot.ref.update({'content.businessName': senderSnapshot.get('name') || ''});
 
-    // Each settings object belongs to one contact
-    contacts.forEach(async (contact, index) => {
 
-      // Contact info for this settings object
-      const settings = notificationsSettings[index];
-      const code = notification.code as number;
+    // Get email/SMS template name (according to code and language), and the template data from the notification
+    const code = notification.code as number;
+    const template = {
+      name: 'note' + code + '_' + lang,
+      data: await translateNoteContent(notification, lang),
+    };
 
-      // Get template name (according to code and language), and the template data from the notification
-      const template = {
-        name: 'note' + code + '_' + lang,
-        data: await translateNoteContent(notification, lang),
-      };
+    // List of emails: contacts that their settings are configured to receive emails from this notification code
+    const emailList = contacts
+    .filter((contact, index)=>notificationsSettings[index][code].email)
+    .map((contact)=>contact.email || '');
 
-      // Send notification by email, if set to true for this code
-      if (settings[code].email && contact.email) {
-        const mailContent = {
-          to: contact.email,
-          template: template,
-        };
-        // Send email using firebase trigger email extension
-        firestore.collection('mails').doc(snapshot.id || '').set(mailContent);
-      }
+    // Send email using firebase trigger email extension
+    if(emailList && emailList.length)
+      firestore.collection('mails').doc(snapshot.id || '').set({
+        to: emailList,
+        template: template,
+      });
 
-      // Send notification by SMS, if set to true for this code
-      if (settings[code].sms && contact.phone) {
+    // List of phones: contacts that their settings are configured to receive SMS from this notification code
+    const phoneList = contacts
+    .filter((contact, index)=>notificationsSettings[index][code].sms)
+    .map((contact)=>contact.phone || '');
 
-        // Get notification text according to the template
-        const text = await smsText(template);
+    // Send SMS for each phone number
+    phoneList.forEach(async (phone) => {
 
-        // Generate a valid phone number: Remove all non-numeric chars. If starts with 0, add Israeli prefix instead
-        let phoneNum = contact.phone.replace(/[^0-9]+/g, '');
-        if (phoneNum.startsWith('0'))
-          phoneNum = '+972' + phoneNum.slice(1);
+      // Get notification text according to the template
+      const text = await smsText(template);
 
-        // Send SMS using Twilio API. (NodeJS package was very slow, so I use a direct HTTP)
-        axios.default.post(
-          'https://api.twilio.com/2010-04-01/Accounts/AC5a375e5daab19cdb70d7c3483cdcfbe5/Messages.json',
-          encodeURI(`From=Scale Sense&To=${phoneNum}&Body=${text}`),
-          {auth:
-              {
-                username: 'AC5a375e5daab19cdb70d7c3483cdcfbe5',
-                password: '7567258db17b95ed71e1ad26649dde57'
-              }
-          });
+      // Generate a valid phone number: Remove all non-numeric chars. If starts with 0, add Israeli prefix instead
+      let phoneNum = phone.replace(/[^0-9]+/g, '');
+      if (phoneNum.startsWith('0'))
+        phoneNum = '+972' + phoneNum.slice(1);
 
-      }
+      // Send SMS using Twilio API. (NodeJS package was very slow, so I use a direct HTTP call)
+      axios.default.post(
+        'https://api.twilio.com/2010-04-01/Accounts/AC5a375e5daab19cdb70d7c3483cdcfbe5/Messages.json',
+        encodeURI(`From=Scale Sense&To=${phoneNum}&Body=${text}`),
+        {auth:
+            {
+              username: 'AC5a375e5daab19cdb70d7c3483cdcfbe5',
+              password: '1c9aa4caf9be796d373df229a33d1a83'
+            }
+        });
 
     });
 
