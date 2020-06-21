@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content scrollY="false">
 
   <ion-text id="waiting" *ngIf="!stream">ממתין למצלמה...</ion-text>
 
@@ -24,21 +24,37 @@
 
   <img [src]="snapshot" *ngIf="snapshot" class="view">
 
-  <h1 id="weight-text" *ngIf="stream">{{weight? (weight | unitAmount : 0) : 'ממתין לשקילה'}}</h1>
+<!--  <div id="floating">-->
 
-  <ion-row>
+<!--    <h1 id="weight-text" *ngIf="stream">-->
+<!--      <ion-text>{{weight? (weight | unitAmount : 0) : 'ממתין לשקילה'}}</ion-text>-->
+<!--    </h1>-->
 
-    <ion-button *ngIf="!snapshot" shape="round" color="secondary" (click)="takeSnapshot()" size="large" strong="true" [disabled]="!stream">
-      <ion-icon slot="start" src="../../assets/svg/icon_weight_white.svg"></ion-icon>
-      <ion-text>שקילה</ion-text>
-    </ion-button>
+<!--    <ion-row>-->
 
-    <ion-button *ngIf="snapshot" shape="round" color="secondary" (click)="accept()" size="large" strong="true">
-      <ion-icon slot="start" name="checkmark"></ion-icon>
-      <ion-text>אישור</ion-text>
-    </ion-button>
+<!--      <ion-button *ngIf="!snapshot" shape="round" color="secondary" (click)="takeSnapshot()" size="large" strong="true" [disabled]="!stream">-->
+<!--        <ion-icon slot="start" src="../../assets/svg/icon_weight_white.svg"></ion-icon>-->
+<!--        <ion-text>שקילה</ion-text>-->
+<!--      </ion-button>-->
 
-  </ion-row>
+<!--      <ion-button *ngIf="snapshot" shape="round" color="secondary" (click)="accept()" size="large" strong="true">-->
+<!--        <ion-icon slot="start" name="checkmark"></ion-icon>-->
+<!--        <ion-text>אישור</ion-text>-->
+<!--      </ion-button>-->
+
+<!--    </ion-row>-->
+
+<!--  </div>-->
+
+  <ion-fab vertical="bottom" horizontal="center">
+    <ion-fab-button color="secondary" (click)="takeSnapshot()" *ngIf="!snapshot">
+      <ion-icon name="speedometer"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button color="secondary" (click)="accept()" *ngIf="snapshot">
+      <ion-icon name="checkmark"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 
 </ion-content>
 

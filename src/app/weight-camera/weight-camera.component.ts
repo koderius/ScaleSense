@@ -1,8 +1,10 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ModalController} from '@ionic/angular';
+import {ModalController, ToastController} from '@ionic/angular';
 import {CameraService} from '../services/camera.service';
 import {BusinessService} from '../services/business.service';
-import {MetadataService} from '../services/metadata.service';
+import {WebsocketService} from '../services/websocket.service';
+import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
+import {ProductType} from '../models/ProductI';
 
 @Component({
   selector: 'app-weight-camera',
@@ -17,39 +19,23 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   /** Weight snapshot */
   weight: number;
 
+  toast;
+
   /** Stream from the service. on PC, it's the video element's stream. On mobile it's a useless object. Indicating the camera is on */
   get stream() {
     return this.cameraService.stream;
   }
 
   constructor(
-    private cameraService: CameraService,
+    public cameraService: CameraService,
     private modalCtrl: ModalController,
     private businessService: BusinessService,
-  ) {
+    private websocketService: WebsocketService,
+    private toastCtrl: ToastController,
+    private unitAmountPipe: UnitAmountPipe,
+  ) {}
 
-    // TODO: Delete this
-    const scaleSocket = new WebSocket("ws://136.243.189.206:8080?id=12345");
-    scaleSocket.onopen = function (evt) {
-      console.log("Scale: Connection open ...");
-    };
-    scaleSocket.onmessage = function (evt) {
-      console.log("Received Message From Client: " + evt.data);
-      if (evt.data === 'scale') {
-        this.send('12345:40.41:' + Date.now());
-      }
-    };
-    scaleSocket.onclose = function (evt) {
-      alert("Scale: Connection closed.");
-    };
-
-  }
-
-  ngOnInit() {
-
-    // Set the size of the picture
-    document.body.style.setProperty('--video-width', (this.cameraService.videoSize.width) + 'px');
-    document.body.style.setProperty('--video-height', (this.cameraService.videoSize.height) + 'px');
+  async ngOnInit() {
 
     // Show camera preview for mobile
     if(this.isMobile)
@@ -57,6 +43,14 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
         await this.takeSnapshot();
         this.cameraService.hideCameraPreview();
       });
+
+    // Show instruction toast
+    this.toast = await this.toastCtrl.create({
+      message: 'כוון את המצלמה אל המוצר שמונח על המשקל ולחץ על הכפתור בתחתית המסך לשקילה',
+      position: 'middle',
+      duration: 5000,
+    });
+    this.toast.present();
 
   }
 
@@ -80,53 +74,25 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     }
 
     // Snapshot from the scales
-    this.weight = await this.getWeightSnapshot();
+    this.weight = await this.websocketService.getWeightSnapshot('mock' || this.businessService.businessDoc.scalesId); // TODO
 
-  }
-
-  async getWeightSnapshot() : Promise<number> {
-
-    // Get IP + port and scale ID
-    const scalesId = this.businessService.businessDoc.scalesId;
-    const ipPort = MetadataService.SCALE_IP;
-
-    return new Promise((resolve, reject) => {
-
-      if(!scalesId || !ipPort) {
-        reject('No scale data');
-        return;
-      }
-
-      const clientSocket = new WebSocket(`ws://${ipPort}?scale=${scalesId}`);
-
-      clientSocket.onopen = function (evt) {
-        console.log("Client: Connection open");
-        this.send('scale:'+scalesId);
-      };
-
-      clientSocket.onmessage = function (evt) {
-        console.log(evt.data);
-        const dataStr = (evt.data as string).split(':');
-        const data = {
-          id: dataStr[0],
-          weight: +dataStr[1],
-          time: +dataStr[2],
-        };
-        if(data.id == scalesId)
-          resolve(data.weight);
-        if(Date.now() - data.time > 1000)
-          throw new Error('Scale timeout');
-      };
-
-      clientSocket.onclose = function (evt) {
-        console.log("Client:Connection closed.");
-      };
+    // Dismiss current toast
+    if(this.toast)
+      this.toast.dismiss();
+    // Show weight toast
+    this.toast = await this.toastCtrl.create({
+      header: this.unitAmountPipe.transform(this.weight, ProductType.BY_WEIGHT),
+      position: 'middle',
+      cssClass: 'weight-toast'
     });
+    this.toast.present();
 
   }
 
   /** Return the weight snapshot */
   accept() {
+    if(this.toast)
+      this.toast.dismiss();
     this.modalCtrl.dismiss({snapshot: this.snapshot, weight: this.weight}, 'ok');
   }
 

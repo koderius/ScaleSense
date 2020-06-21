@@ -12,6 +12,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {CameraPreview} from '@ionic-native/camera-preview/ngx';
 import {Camera} from '@ionic-native/camera/ngx';
 import {OrderStatusTextPipe} from './pipes/order-status-text.pipe';
+import {UnitAmountPipe} from './pipes/unit-amount.pipe';
 
 
 @NgModule({
@@ -23,6 +24,7 @@ import {OrderStatusTextPipe} from './pipes/order-status-text.pipe';
     CameraPreview,
     Camera,
     OrderStatusTextPipe,
+    UnitAmountPipe,
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
   ],
   bootstrap: [AppComponent]

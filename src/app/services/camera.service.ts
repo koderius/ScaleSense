@@ -41,18 +41,21 @@ export class CameraService {
     // Get platform
     this.isMobile = this.platform.is('cordova');
 
-    // Set the size of the image in (4:3), when the max width is 600px minus 16px frame width
-    this.videoSize.width = (this.platform.width() > 600 ? 600 : this.platform.width()) - 32;
-    this.videoSize.height = this.videoSize.width * 0.75;
-
   }
+
 
   /** For PC camera **/
 
   /** Open the PC camera and get its stream object (Video only, no audio) */
   async openVideoStream() {
     if(!this.isMobile && !this.stream) {
-      this.stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          // Open video in rear camera ("environment") if possible (on mobile)
+          facingMode: 'environment',
+        },
+        audio: false
+      });
       this.hasCamera = this.stream && !!this.stream.getVideoTracks().length;
     }
   }
