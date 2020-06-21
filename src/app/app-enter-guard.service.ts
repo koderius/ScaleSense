@@ -6,7 +6,9 @@ import {AuthService} from './services/auth.service';
 import {AlertsService} from './services/alerts.service';
 import {NavigationService} from './services/navigation.service';
 
-/** Guards for entering the customer and the supplier app */
+/**
+ * This guard prevents users entering pages, if they don't have the requested requirements
+ * */
 
 @Injectable({
   providedIn: 'root'

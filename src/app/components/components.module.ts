@@ -36,6 +36,7 @@ import {NotificationCodeNamePipe} from '../pipes/notification-code-name.pipe';
 import {WeighService} from '../services/weigh.service';
 import {SupplierLinkComponent} from './supplier-link/supplier-link.component';
 import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
+import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 
 @NgModule({
   imports: [
@@ -122,6 +123,7 @@ import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
   providers: [
     // *Add services that call the entry components of this module
     WeighService,
+    WeighProductOpenerService,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' }   // Mat date format: dd/mm/yyyy
     // { provide: MAT_DATE_LOCALE, useValue: 'iw' }   // Mat date format: dd.mm.yyyy
   ]
