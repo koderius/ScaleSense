@@ -14,3 +14,11 @@
   display: flex;
   justify-content: center;
 }
+
+ion-list {
+  margin: 1em;
+  background-color: transparent;
+  ion-item {
+    border-radius: 1em;
+  }
+}

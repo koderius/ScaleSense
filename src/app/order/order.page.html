@@ -243,16 +243,27 @@
           <ion-button shape="round" color="dark" *ngIf="!isDraft && (customerEditMode || supplierEditMode)" (click)="cancelOrder()">ביטול הזמנה</ion-button>
         </ion-row>
         <ion-row>
+
           <ion-button shape="round" strong="true"
-                      *ngIf="customerEditMode || supplierEditMode"
-                      (click)="businessService.side == 'c' ? sendOrder() : approveOrder()"
-                      [disabled]="!orderHasChanged() && !isFinalApprove"
+                      *ngIf="supplierEditMode"
+                      (click)="approveOrder()"
+                      [disabled]="!orderHasChanged() && !isFinalApprove && order.status >= OrderStatus.APPROVED"
           >
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
-            <ion-text *ngIf="(!isDraft && customerEditMode) || supplierEditMode">שמירת שינויים ו</ion-text>
-            <ion-text *ngIf="customerEditMode">שליחת הזמנה לספק</ion-text>
+            <ion-text *ngIf="orderHasChanged()">שמירת שינויים ו</ion-text>
             <ion-text *ngIf="supplierEditMode">{{isFinalApprove ? 'אישור סופי' : 'אישור ראשוני'}}</ion-text>
           </ion-button>
+
+          <ion-button shape="round" strong="true"
+                      *ngIf="customerEditMode"
+                      (click)="sendOrder()"
+                      [disabled]="!orderHasChanged()"
+          >
+            <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
+            <ion-text *ngIf="!isDraft">שמירת שינויים ו</ion-text>
+            <ion-text>שליחת הזמנה לספק</ion-text>
+          </ion-button>
+
           <ion-button shape="round" *ngIf="!customerEditMode && !supplierEditMode" (click)="backToMain()">חזרה למסך הראשי</ion-button>
         </ion-row>
       </div>

@@ -1,0 +1,33 @@
+<ion-menu side="end"
+          menuId="menu"
+          contentId="menuContent"
+          swipeGesture="false"
+          (ionWillOpen)="onOpen()"
+          #menu
+>
+
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>תפריט ראשי</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content id="menuContent">
+    <ion-list>
+
+      <ion-item>
+        <ion-thumbnail slot="start">
+          <img [src]="businessService.businessDoc.logo">
+        </ion-thumbnail>
+        <ion-title>{{businessService.businessDoc.name}}</ion-title>
+      </ion-item>
+
+      <ion-item *ngFor="let btn of buttons" (click)="btn.click(); menu.close()" button>
+        <ion-icon slot="start" [src]="getIconSrc(btn)"></ion-icon>
+        <ion-label>{{btn.innerText}}</ion-label>
+      </ion-item>
+
+    </ion-list>
+  </ion-content>
+
+</ion-menu>

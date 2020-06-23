@@ -22,7 +22,8 @@ export class NotificationsTableComponent implements OnInit {
     private navService: NavigationService,
     private alerts: AlertsService,
     private userService: UsersService,
-  ) { }
+  ) {}
+
 
   ngOnInit() {
     this.businessColumnTitle = 'שם ה' + (this.businessService.side == 'c' ? 'ספק' : 'לקוח');

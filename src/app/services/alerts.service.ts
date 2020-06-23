@@ -117,30 +117,7 @@ export class AlertsService {
 
 
   async inputAuth() {
-    const alert = await this.alertCtrl.create({
-      header: 'התחברות ל-Scale-Sense',
-      inputs: [
-        {
-          placeholder: 'כתובת דוא"ל',
-        },
-        {
-          placeholder: 'סיסמא',
-          type: 'password',
-        }
-      ],
-      buttons: [
-        {
-          text: 'התחברות',
-        },
-      ],
-      backdropDismiss: false,
-    });
-    alert.present();
-    const res = await alert.onDidDismiss();
-    return {
-      email: res.data.values[0],
-      password: res.data.values[1]
-    };
+
   }
 
 

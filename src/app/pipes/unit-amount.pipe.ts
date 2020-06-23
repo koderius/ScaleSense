@@ -1,25 +1,22 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import {ProductType} from '../models/ProductI';
 import {formatNumber} from '@angular/common';
+import {DicUnits} from '../../assets/dictionaries/units';
+import {LangService} from '../services/lang.service';
 
 @Pipe({
   name: 'unitAmount'
 })
 export class UnitAmountPipe implements PipeTransform {
 
-  transform(amount: number, unit?: ProductType): string {
+  constructor(private langService: LangService) {}
+
+  transform(amount: number, unit: ProductType = 0): string {
 
     // Is plural - 1 or null (no amount) will be displayed as single
-    const p = (amount != 1 && amount !== null);
+    const plural = (amount != 1 && amount !== null);
 
-    // Set the name of the unit
-    let unitName;
-    switch (unit) {
-      case ProductType.BY_WEIGHT: default: unitName = 'ק"ג'; break;
-      case ProductType.BOX: unitName = p ? 'ארגזים' : 'ארגז'; break;
-      case ProductType.BLOCK: unitName = p ? 'בלוקים' : 'בלוק'; break;
-      case ProductType.UNIT: unitName = p ? 'יחידות' : 'יחידה'; break;
-    }
+    const unitName = DicUnits[this.langService.lang]['u' + unit + (plural ? 'p' : '')];
 
     // Amount format - up to 3 digits after decimal point
     let numberStr = formatNumber(amount, 'en-US', '1.0-3');

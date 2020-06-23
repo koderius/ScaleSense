@@ -6,7 +6,7 @@ import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc} from '../models/Business';
 import {BusinessService} from '../services/business.service';
 import {XlsService} from '../services/xls.service';
-import {ModalController} from '@ionic/angular';
+import {ActionSheetController, ModalController} from '@ionic/angular';
 import {CustomerPricingModalComponent} from '../customer-pricing-modal/customer-pricing-modal.component';
 import {AlertsService} from '../services/alerts.service';
 import {CustomersService} from '../services/customers.service';
@@ -52,6 +52,7 @@ export class ProductsListPage {
     private modalCtrl: ModalController,
     private alerts: AlertsService,
     private usersService: UsersService,
+    private actionSheetCtrl: ActionSheetController,
   ) { }
 
 
@@ -171,5 +172,34 @@ export class ProductsListPage {
       return true;
   }
 
+
+  async openPopoverMenu(product: ProductPublicDoc) {
+
+    const buttons =  [
+      {
+        text: 'עריכת מוצר',
+        icon: 'create',
+        handler: ()=>this.navService.goToEditProduct(product.id),
+      },
+      {
+        text: 'מחיקת מוצר',
+        icon: 'trash',
+        role: 'destructive',
+        handler: ()=>this.deleteProduct(product),
+      }
+    ];
+
+    if(this.businessService.side == 's' && this.canOfferPrice)
+      buttons.push({
+        text: 'תמחור לקוחות',
+        icon: 'cash-outline',
+        handler: ()=>this.customerPricing(product),
+      });
+
+    const a = await this.actionSheetCtrl.create({
+      buttons: buttons,
+    });
+    a.present();
+  }
 
 }

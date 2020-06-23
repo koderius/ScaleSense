@@ -15,11 +15,12 @@ import {OrderStatusTextPipe} from './pipes/order-status-text.pipe';
 import {UnitAmountPipe} from './pipes/unit-amount.pipe';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import {ComponentsModule} from './components/components.module';
 
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BrowserAnimationsModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BrowserAnimationsModule, ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}), ComponentsModule],
   providers: [
     StatusBar,
     SplashScreen,

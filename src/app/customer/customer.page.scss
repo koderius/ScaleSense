@@ -17,7 +17,7 @@
   width: 100%;
 }
 .action-div:last-child {
-  width: 130%;
+  width: 120%;
   padding-left: 0;
 }
 
@@ -43,6 +43,19 @@
 }
 .circle-btn.dark {
   background-image: radial-gradient(var(--ion-color-dark-tint), var(--ion-color-dark-shade));
+}
+
+// Mobile view
+@media (max-width: 576px) {
+  #buttons-container {
+    width: 100%;
+    padding: 1em;
+  }
+  .action-div {
+    width: 100% !important;
+    padding: 0;
+    align-items: flex-end;
+  }
 }
 
 #system-and-weight {

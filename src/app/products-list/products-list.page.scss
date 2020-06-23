@@ -1,12 +1,14 @@
 #upper-section {
   background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  //display: flex;
+  //align-items: center;
+  //justify-content: space-between;
   padding: 3em 3em 1em 2em;
   margin: 1em 0 1px;
+  display: block;
   ion-searchbar {
     width: 40% !important;
+    min-width: 300px;
   }
   ion-button {
     margin: 0.5em;
@@ -16,4 +18,14 @@
 #table-section {
   background-color: white;
   padding: 1em 2em;
+}
+@media (max-width: 400px) {
+  #table-section {
+    padding: 0.5em;
+  }
+}
+
+#more-btn {
+  --padding-end: 0;
+  --padding-start: 0;
 }

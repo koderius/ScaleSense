@@ -12,13 +12,22 @@
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
 
-      <div>
+      <div class="ion-hide-md-down">
         <ion-button shape="round" color="secondary" strong="true" (click)="navService.goToEditProduct('new')">
           <ion-icon slot="start" name="add"></ion-icon>
           <ion-text>הוספת מוצר</ion-text>
         </ion-button>
         <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
         <input class="ion-hide" type="file" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event); excel.value = null">
+      </div>
+
+      <div class="ion-hide-md-up">
+        <ion-button shape="round" fill="outline" color="secondary" (click)="navService.goToEditProduct('new')">
+          <ion-icon slot="icon-only" name="add"></ion-icon>
+        </ion-button>
+        <ion-button fill="outline" shape="round" color="success" (click)="excel.click()">
+          <ion-icon slot="icon-only" src="../../assets/svg/excel.svg"></ion-icon>
+        </ion-button>
       </div>
 
     </div>
@@ -56,18 +65,19 @@
         </div>
 
         <ion-row *ngIf="results.length">
-          <ion-col size="0.5"></ion-col>
-          <ion-col size="0.5"></ion-col>
+          <ion-col size="1" sizeMd="0.5"></ion-col>
+          <ion-col size="1" sizeMd="0.5" [class]="!showAllProducts ? 'ion-hide-lg-down' : ''"></ion-col>
           <ion-col size="1.5"></ion-col>
-          <ion-col size="3">שם המוצר</ion-col>
-          <ion-col>מק"ט</ion-col>
+          <ion-col sizeMd="3">שם המוצר</ion-col>
+          <ion-col class="ion-hide-md-down">מק"ט</ion-col>
           <ion-col>מחיר</ion-col>
-          <ion-col></ion-col>
-          <ion-col></ion-col>
+          <ion-col class="ion-hide-lg-down"></ion-col>
+          <ion-col class="ion-hide-lg-down"></ion-col>
+          <ion-col class="ion-hide-lg-up" size="1"></ion-col>
         </ion-row>
 
-        <ion-row *ngFor="let product of results">
-          <ion-col size="0.5">
+        <ion-row *ngFor="let product of results; let idx = index">
+          <ion-col size="1" sizeMd="0.5">
             <ion-icon name="warning" color="warning"
                       *ngIf="!showAllProducts && !hasAllRequired(product)"
                       matTooltip="חסרים פרטי מוצר"
@@ -77,7 +87,7 @@
                       matTooltip="מחיר מחוץ לטווח"
             ></ion-icon>
           </ion-col>
-          <ion-col size="0.5">
+          <ion-col size="1" sizeMd="0.5" [class]="!showAllProducts ? 'ion-hide-lg-down' : ''">
             <ion-checkbox *ngIf="showAllProducts" [checked]="customerHasProduct(product)" (ionChange)="onCheckProduct(product, $event)"></ion-checkbox>
             <ion-button class="small-circle-btn" color="secondary" fill="clear" (click)="deleteProduct(product)" *ngIf="!showAllProducts">
               <ion-icon name="close" slot="icon-only"></ion-icon>
@@ -88,18 +98,23 @@
               <img [src]="product.image">
             </ion-thumbnail>
           </ion-col>
-          <ion-col size="3"><b><ion-text color="primary">{{product.name}}</ion-text></b></ion-col>
-          <ion-col>{{product.catalogNumS}}</ion-col>
+          <ion-col sizeMd="3"><b><ion-text color="primary">{{product.name}}</ion-text></b></ion-col>
+          <ion-col class="ion-hide-md-down">{{product.catalogNumS}}</ion-col>
           <ion-col>{{product.price | price}} / {{null | unitAmount : product.type}}</ion-col>
-          <ion-col>
+          <ion-col class="ion-hide-lg-down">
             <ion-button fill="outline" color="dark" shape="round" *ngIf="!showAllProducts" (click)="navService.goToEditProduct(product.id)">עריכת מוצר</ion-button>
           </ion-col>
-          <ion-col>
+          <ion-col class="ion-hide-lg-down">
             <ion-button fill="outline" color="dark" shape="round"
                         *ngIf="businessService.side == 's'"
                         (click)="customerPricing(product)"
                         [disabled]="!canOfferPrice"
             >תמחור לקוחות</ion-button>
+          </ion-col>
+          <ion-col class="ion-hide-lg-up" size="1" *ngIf="!showAllProducts">
+            <ion-button fill="clear" (click)="openPopoverMenu(product)" id="more-btn">
+              <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+            </ion-button>
           </ion-col>
         </ion-row>
 

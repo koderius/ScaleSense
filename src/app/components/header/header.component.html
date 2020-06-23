@@ -1,6 +1,6 @@
-<ion-row id="container">
+<ion-row id="container" class="ion-hide-lg-down">
 
-  <ion-col size="6" sizeLg="3">
+  <ion-col size="3">
     <ion-img src="../../assets/logo_small.png" style="height: 3em; cursor: pointer" (click)="backToMain()"></ion-img>
     <div id="business-logo">
       <div>
@@ -9,7 +9,7 @@
     </div>
   </ion-col>
 
-  <ion-col id="main" class="ion-hide-lg-down">
+  <ion-col id="main-menu">
     <ion-button fill="clear" [disabled]="!usersService.hasPermission(UserPermissions.REPORTS)">
       <ion-icon slot="start" src="../../assets/svg/icon_reports.svg"></ion-icon>
       <ion-text>דוחות</ion-text>
@@ -44,6 +44,19 @@
   <ion-button id="back-btn" color="secondary" fill="clear" strong="true" (click)="back()" *ngIf="pageTitle">חזרה אחורה</ion-button>
 
 </ion-row>
+
+
+<ion-toolbar class="ion-hide-lg-up">
+
+  <ion-buttons slot="start">
+    <ion-img src="../../assets/logo_small.png" style="height: 3em; cursor: pointer" (click)="backToMain()"></ion-img>
+  </ion-buttons>
+
+  <ion-buttons slot="end" class="ion-hide-lg-up">
+    <ion-menu-button menu="menu"></ion-menu-button>
+  </ion-buttons>
+
+</ion-toolbar>
 
 <div id="sub-header" *ngIf="pageTitle">
   <h1>{{pageTitle}}<i id="comment" *ngIf="comment"> - <ion-text color="danger">{{comment}}</ion-text></i></h1>

@@ -1,0 +1,8 @@
+ion-content {
+  --background: white;
+}
+
+// Solves some strange problem of unclickable items
+ion-item {
+  pointer-events: auto !important;
+}

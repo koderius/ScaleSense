@@ -2,7 +2,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {OrderStatus} from '../../models/OrderI';
 import {NavigationService} from '../../services/navigation.service';
 import {BusinessService} from '../../services/business.service';
-import {ScreenMode} from '../../app.component';
 import {UsersService} from '../../services/users.service';
 import {UserPermission} from '../../models/UserDoc';
 
@@ -12,8 +11,6 @@ import {UserPermission} from '../../models/UserDoc';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-
-  ScreenMode = ScreenMode;
 
   UserPermissions = UserPermission;
 

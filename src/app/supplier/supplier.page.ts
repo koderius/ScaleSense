@@ -12,12 +12,20 @@ export class SupplierPage implements OnInit {
 
   UserPermissions = UserPermission;
 
+  buttons: HTMLElement[] = [];
+
   constructor(
     public navService: NavigationService,
     public userService: UsersService,
   ) { }
 
   ngOnInit() {
+
+    // Get the list of the buttons
+    const buttons = document.getElementsByClassName('page-container').item(0).getElementsByTagName('ion-button');
+    for (let i = 0; i < buttons.length; i++)
+      this.buttons.push(buttons.item(i));
+
   }
 
 }

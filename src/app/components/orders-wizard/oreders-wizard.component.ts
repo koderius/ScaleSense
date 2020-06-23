@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {NavController} from '@ionic/angular';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-reservation-wizard',
@@ -13,7 +13,7 @@ export class OredersWizardComponent implements OnInit {
 
   maxStep: 1 | 2 | 3 = 1;
 
-  constructor(private navCtrl: NavController) { }
+  constructor(private navService: NavigationService) { }
 
   get step() {
     return this._step;
@@ -33,7 +33,7 @@ export class OredersWizardComponent implements OnInit {
   }
 
   backToMain() {
-    this.navCtrl.navigateRoot('customer');
+    this.navService.goBack();
   }
 
 }

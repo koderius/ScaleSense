@@ -3,8 +3,8 @@ import {ActivatedRouteSnapshot, CanActivateChild, RouterStateSnapshot} from '@an
 import {BusinessSide} from './models/Business';
 import {UserRole} from './models/UserDoc';
 import {AuthService} from './services/auth.service';
-import {AlertsService} from './services/alerts.service';
 import {NavigationService} from './services/navigation.service';
+import {AlertController} from '@ionic/angular';
 
 /**
  * This guard prevents users entering pages, if they don't have the requested requirements
@@ -15,7 +15,11 @@ import {NavigationService} from './services/navigation.service';
 })
 export class AppEnterGuard implements CanActivateChild {
 
+  // User subscriber
   userSubscription;
+
+  // Sign in alert
+  alert;
 
   // The side that this page belong to, if not specified, opened for both
   side: BusinessSide;
@@ -26,7 +30,7 @@ export class AppEnterGuard implements CanActivateChild {
 
   constructor(
     private authService: AuthService,
-    private alertsService: AlertsService,
+    private alertCtrl: AlertController,
     private navService: NavigationService,
   ) {}
 
@@ -46,6 +50,8 @@ export class AppEnterGuard implements CanActivateChild {
         // Check the user's requirements
         if(user) {
           resolve(this.checkUser() || this.throwBack());
+          if(this.alert)
+            this.alert.dismiss();
           this.userSubscription.unsubscribe();
         }
         // Ask user to sign in
@@ -89,11 +95,34 @@ export class AppEnterGuard implements CanActivateChild {
 
   // Ask user to sign in. If fails, retry
   async popSignIn() {
-    const data = await this.alertsService.inputAuth();
-    const l = this.alertsService.loaderStart('מתחבר...');
-    if(!await this.authService.signIn(data.email, data.password))
+
+    // Pop sign in alert
+    this.alert = await this.alertCtrl.create({
+      header: 'התחברות ל-Scale-Sense',
+      inputs: [
+        {
+          placeholder: 'כתובת דוא"ל',
+          type: 'email',
+          name: 'email'
+        },
+        {
+          placeholder: 'סיסמא',
+          type: 'password',
+        }
+      ],
+      buttons: [{
+        text: 'התחברות',
+        role: 'sign-in'
+      }],
+      backdropDismiss: false,
+    });
+    this.alert.present();
+
+    // Try to sign in with the inputs data, pop the alert again if failed
+    const res = await this.alert.onDidDismiss();
+    if(res.data.role == 'sign-in' && !await this.authService.signIn(res.data.values[0], res.data.values[1]))
       this.popSignIn();
-    this.alertsService.loaderStop(l);
+
   }
 
 

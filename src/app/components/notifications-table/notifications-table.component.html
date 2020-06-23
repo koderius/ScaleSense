@@ -1,36 +1,72 @@
 <ion-grid id="notifications-table">
 
   <ion-row>
-    <ion-col size="1" class="center">סטטוס</ion-col>
-    <ion-col size="2" class="center">התקבלה</ion-col>
-    <ion-col class="center">{{businessColumnTitle}}</ion-col>
+    <ion-col size="1" class="center ion-hide-sm-down">סטטוס</ion-col>
+    <ion-col size="2" class="center ion-hide-md-down">התקבלה</ion-col>
+    <ion-col sizeMd="1.5" size="2.5" class="center">{{businessColumnTitle}}</ion-col>
     <ion-col size="2" class="center">מספר הזמנה</ion-col>
-    <ion-col size="5.5">נושא</ion-col>
+    <ion-col sizeMd="5.5" size="6.5">נושא</ion-col>
   </ion-row>
 
   <div *ngIf="!notificationsService.myNotifications.length" id="no-notes">אין הודעות</div>
 
-  <ion-row *ngFor="let note of notificationsService.myNotifications; let odd = odd" [ngClass]="odd ? '' : 'odd'">
-    <ion-col size="1">
+  <ion-row *ngFor="let note of notificationsService.myNotifications; let odd = odd"
+           [ngClass]="odd ? '' : 'odd'">
+    <ion-col size="1" class="ion-hide-sm-down">
       <ion-img [src]="'../../assets/images/' + (isNotificationRead(note) ? 'read' : 'unread') + '.png'"
                (click)="notificationsService.markAsRead(note, true)"
                style="cursor: pointer; margin: auto"
                [title]="isNotificationRead(note) ? 'סמן כלא נקרא' : ''"
       ></ion-img>
     </ion-col>
-    <ion-col size="2" dir="ltr">{{note.time | date : 'dd/MM/yyyy&emsp;HH:mm'}}</ion-col>
-    <ion-col class="center">{{note.content?.businessName}}</ion-col>
+    <ion-col size="2" dir="ltr" class="ion-hide-md-down">{{note.time | date : 'dd/MM/yyyy&emsp;HH:mm'}}</ion-col>
+    <ion-col class="center" sizeMd="1.5" size="2.5">{{note.content?.businessName}}</ion-col>
     <ion-col size="2" class="center">{{note.content?.orderSerial}}</ion-col>
-    <ion-col size="3.5" [ngStyle]="{fontWeight: isNotificationRead(note) ? 'normal' : 'bold'}">{{note.text}}</ion-col>
-    <ion-col size="2">
-      <ion-button color="secondary" shape="round" (click)="openNotification(note)">פתיחה</ion-button>
-      <ion-button class="small-circle-btn" fill="clear" (click)="onDeleteClicked(note.id)">
+    <ion-col size="5.5" sizeMd="4.5" sizeLg="3.5" [ngStyle]="{fontWeight: isNotificationRead(note) ? 'normal' : 'bold'}">{{note.text}}</ion-col>
+    <ion-col size="1" sizeLg="2">
+      <ion-button color="secondary" shape="round" (click)="openNotification(note)" class="ion-hide-lg-down">פתיחה</ion-button>
+      <ion-button color="secondary" fill="clear" (click)="openNotification(note)" class="ion-hide-lg-up">
+        <ion-icon slot="icon-only" name="folder-open"></ion-icon>
+      </ion-button>
+      <ion-button class="small-circle-btn ion-hide-md-down" fill="clear" (click)="onDeleteClicked(note.id)">
         <ion-icon slot="icon-only" name="close"></ion-icon>
       </ion-button>
     </ion-col>
   </ion-row>
 
 </ion-grid>
+
+
+<!--<ion-list class="ion-margin-vertical ion-no-padding" *ngIf="noTable()">-->
+
+<!--  <ion-item-divider color="primary"></ion-item-divider>-->
+
+<!--  <ion-item *ngFor="let note of notificationsService.myNotifications; let odd = odd" [ngClass]="odd ? '' : 'odd'"-->
+<!--            [color]="odd ? 'tertiary' : ''">-->
+
+<!--    <ion-img [src]="'../../assets/images/' + (isNotificationRead(note) ? 'read' : 'unread') + '.png'"-->
+<!--             (click)="notificationsService.markAsRead(note, true)"-->
+<!--             style="cursor: pointer; margin: auto"-->
+<!--             [title]="isNotificationRead(note) ? 'סמן כלא נקרא' : ''"-->
+<!--             slot="start"-->
+<!--             class="ion-padding-end"-->
+<!--    ></ion-img>-->
+
+<!--    <ion-label>-->
+<!--      <h6 *ngIf="note.content?.businessName">ספק: {{note.content.businessName}}</h6>-->
+<!--      <h6 *ngIf="note.content?.orderSerial">הזמנה {{note.content.orderSerial}}</h6>-->
+<!--      <h2 [ngStyle]="{fontWeight: isNotificationRead(note) ? 'normal' : 'bold'}">{{note.text}}</h2>-->
+<!--      <p dir="ltr" class="ion-text-end" style="display: flex">{{note.time | date : 'dd/MM/yyyy&emsp;HH:mm'}}</p>-->
+<!--    </ion-label>-->
+
+<!--    <ion-button fill="clear" slot="end" color="secondary" (click)="openNotification(note)">-->
+<!--      <ion-icon slot="icon-only" name="folder-open"></ion-icon>-->
+<!--    </ion-button>-->
+
+<!--  </ion-item>-->
+
+<!--</ion-list>-->
+
 
 <ion-row>
   <ion-button fill="outline" color="dark" shape="round" size="small"

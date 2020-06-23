@@ -1,4 +1,4 @@
-import {AfterViewChecked, Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -23,7 +23,16 @@ export class AppComponent {
     private statusBar: StatusBar,
     private metadataService: MetadataService,
   ) {
+
     this.initializeApp();
+
+    // Remove splash screen after 5 seconds
+    setTimeout(()=>{
+      const splash = document.getElementById('splash');
+      if(splash)
+        splash.remove();
+    }, 5000);
+
   }
 
   initializeApp() {

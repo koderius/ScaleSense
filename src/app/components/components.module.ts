@@ -37,6 +37,7 @@ import {WeighService} from '../services/weigh.service';
 import {SupplierLinkComponent} from './supplier-link/supplier-link.component';
 import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
 import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
+import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
 
 @NgModule({
   imports: [
@@ -86,6 +87,7 @@ import {WeighProductOpenerService} from '../services/weigh-product-opener.servic
     CustomerPricingModalComponent,
     ManualWeightPopoverComponent,
     SupplierLinkComponent,
+    MobileMenuComponent,
   ],
   exports: [
     MatSelectModule,
@@ -119,6 +121,7 @@ import {WeighProductOpenerService} from '../services/weigh-product-opener.servic
     ReturnStatusTextPipe,
     AutocompleteFieldComponent,
     SupplierLinkComponent,
+    MobileMenuComponent,
   ],
   providers: [
     // *Add services that call the entry components of this module
