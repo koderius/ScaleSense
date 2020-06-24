@@ -38,6 +38,8 @@ import {SupplierLinkComponent} from './supplier-link/supplier-link.component';
 import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
 import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
+import {ReportGeneratorModalComponent} from '../report-generator-modal/report-generator-modal.component';
+import {PropertyNamePipe} from '../pipes/property-name.pipe';
 
 @NgModule({
   imports: [
@@ -62,6 +64,7 @@ import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
     CustomerPricingModalComponent,
     ManualWeightPopoverComponent,
     SupplierLinkComponent,
+    ReportGeneratorModalComponent,
   ],
   declarations: [
     HeaderComponent,
@@ -88,6 +91,8 @@ import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
     ManualWeightPopoverComponent,
     SupplierLinkComponent,
     MobileMenuComponent,
+    ReportGeneratorModalComponent,
+    PropertyNamePipe,
   ],
   exports: [
     MatSelectModule,
@@ -122,6 +127,8 @@ import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
     AutocompleteFieldComponent,
     SupplierLinkComponent,
     MobileMenuComponent,
+    ReportGeneratorModalComponent,
+    PropertyNamePipe,
   ],
   providers: [
     // *Add services that call the entry components of this module

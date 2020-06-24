@@ -1,6 +1,7 @@
 <mat-form-field>
   <mat-label>{{label}}</mat-label>
-  <input [placeholder]="placeholder || ''"
+  <input #inputEl
+         [placeholder]="placeholder || ''"
          matInput
          [(ngModel)]="query"
          (keyup)="onQueryChange.emit(query)"

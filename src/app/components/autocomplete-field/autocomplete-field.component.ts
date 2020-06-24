@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 
 @Component({
   selector: 'app-autocomplete-field',
@@ -6,6 +6,8 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
   styleUrls: ['./autocomplete-field.component.scss'],
 })
 export class AutocompleteFieldComponent implements OnInit {
+
+  @ViewChild('inputEl', {static: true}) private inputEl;
 
   // The full list of objects
   @Input() list: any[] = [];
@@ -29,7 +31,7 @@ export class AutocompleteFieldComponent implements OnInit {
   @Output() onQueryChange = new EventEmitter();
 
   // Text query in the input field
-  query: string = '';
+  @Input() query: string = '';
 
 
   // The filtered list to be shown
@@ -58,8 +60,10 @@ export class AutocompleteFieldComponent implements OnInit {
         this.query = '';
         this.onSelect.emit(null);
       }
+  }
 
-
+  getInputElement() {
+    return this.inputEl.nativeElement;
   }
 
 }

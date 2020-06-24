@@ -1,0 +1,283 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>הפקת דו"ח</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content color="light">
+
+  <div *ngIf="step == 1">
+
+    <ion-card>
+
+      <ion-card-header>
+        <ion-card-subtitle>סטטוס הזמנות</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-radio-group [(ngModel)]="orderStatus">
+        <ion-item>
+          <ion-radio slot="start" value="all"></ion-radio>
+          <ion-label>כל ההזמנות</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-radio slot="start" value="opened"></ion-radio>
+          <ion-label>הזמנות פתוחות</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-radio slot="start" value="closed"></ion-radio>
+          <ion-label>הזמנות סגורות</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-radio slot="start" value="canceled"></ion-radio>
+          <ion-label>הזמנות מבוטלות</ion-label>
+        </ion-item>
+      </ion-radio-group>
+
+    </ion-card>
+
+    <ion-card>
+
+      <ion-card-header>
+        <ion-card-subtitle>תאריך יצירה</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <mat-form-field>
+          <mat-label>מתאריך</mat-label>
+          <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" readonly [max]="today" (dateChange)="fromDate > toDate ? toDate = fromDate : ''">
+          <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker [touchUi]="narrowScreen" #fromPicker></mat-datepicker>
+        </mat-form-field>
+
+        <br>
+
+        <mat-form-field>
+          <mat-label>עד תאריך</mat-label>
+          <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" readonly [min]="fromDate" [max]="today">
+          <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker [touchUi]="narrowScreen" #toPicker></mat-datepicker>
+        </mat-form-field>
+
+      </ion-card-content>
+
+    </ion-card>
+
+    <div class="okBtn">
+      <ion-button shape="round" (click)="step = 2">
+        <ion-text>הבא</ion-text>
+        <ion-icon slot="end" name="chevron-forward"></ion-icon>
+      </ion-button>
+    </div>
+
+  </div>
+
+
+  <div *ngIf="step == 2">
+
+    <ion-card>
+
+      <ion-card-header>
+        <ion-card-subtitle>סינון (אופציונאלי)</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+
+        <ion-item>
+          <mat-form-field class="fullMatInput">
+            <mat-label>{{businessTitle}}</mat-label>
+            <mat-select [(ngModel)]="bids" multiple>
+              <mat-option *ngFor="let business of businessesList" [value]="business.id">{{business.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ion-button slot="end" fill="clear" color="dark" (click)="bids = []" *ngIf="bids?.length">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <ion-item>
+          <mat-form-field class="fullMatInput">
+            <mat-label>מוצרים</mat-label>
+            <mat-select [(ngModel)]="productsIds" multiple>
+              <mat-option *ngFor="let product of productsList" [value]="product.id">{{product.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ion-button slot="end" fill="clear" color="dark" (click)="productsIds = []" *ngIf="productsIds?.length">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <ion-item>
+          <mat-form-field class="fullMatInput" *ngIf="categoriesList">
+            <mat-label>קטגוריות</mat-label>
+            <mat-select [(ngModel)]="categories" multiple>
+              <mat-option *ngFor="let category of categoriesList" [value]="category.title">{{category.title}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ion-button slot="end" fill="clear" color="dark" (click)="categories = []" *ngIf="categories?.length">
+            <ion-icon slot="icon-only" name="close"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <ion-item-divider>תאריך אספקה</ion-item-divider>
+        <ion-item lines="none">
+          <mat-form-field>
+            <mat-label>מתאריך</mat-label>
+            <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromSupplyDate" readonly [max]="today" (dateChange)="fromSupplyDate > toSupplyDate ? toSupplyDate = fromSupplyDate : ''">
+            <mat-datepicker-toggle matSuffix [for]="fromPicker"></mat-datepicker-toggle>
+            <mat-datepicker [touchUi]="narrowScreen" #fromPicker></mat-datepicker>
+          </mat-form-field>
+        </ion-item>
+        <ion-item>
+          <mat-form-field>
+            <mat-label>עד תאריך</mat-label>
+            <input matInput [matDatepicker]="toPicker" [(ngModel)]="toSupplyDate" readonly [min]="fromSupplyDate" [max]="today">
+            <mat-datepicker-toggle matSuffix [for]="toPicker"></mat-datepicker-toggle>
+            <mat-datepicker [touchUi]="narrowScreen" #toPicker></mat-datepicker>
+          </mat-form-field>
+        </ion-item>
+
+        <ion-item-divider>מספר הזמנה</ion-item-divider>
+        <ion-item lines="none">
+          <mat-form-field>
+            <mat-label>ממספר</mat-label>
+            <input matInput inputmode="numeric" maxlength="7" name="serialNum1" #serial1 (change)="onSerialChange(serial1)" [(ngModel)]="fromSerial">
+          </mat-form-field>
+        </ion-item>
+        <ion-item>
+          <mat-form-field>
+            <mat-label>עד מספר</mat-label>
+            <input matInput inputmode="numeric" maxlength="7" name="serialNum2" #serial2 (change)="onSerialChange(serial2)" [(ngModel)]="toSerial">
+          </mat-form-field>
+        </ion-item>
+
+        <ion-item>
+          <ion-checkbox slot="start" [(ngModel)]="isManualWeight"></ion-checkbox>
+          <ion-text>מוצרים שהתקבלו ללא שקילה</ion-text>
+        </ion-item>
+
+      </ion-card-content>
+
+    </ion-card>
+
+    <div class="okBtn">
+      <ion-button shape="round" color="tertiary" (click)="step = 1">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        <ion-text>הקודם</ion-text>
+      </ion-button>
+      <ion-button shape="round" (click)="getResults()">
+        <ion-text>הבא</ion-text>
+        <ion-icon slot="end" name="chevron-forward"></ion-icon>
+      </ion-button>
+    </div>
+
+  </div>
+
+
+  <div *ngIf="step == 3">
+
+    <ion-item>
+      <ion-label>{{numOfRecords()}} רשומות נמצאו.</ion-label>
+    </ion-item>
+
+    <ion-card>
+
+      <ion-card-header>
+        <ion-card-subtitle>שדות להצגה</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content id="fields-lists">
+
+        <ion-list>
+
+          <ion-item-divider *ngIf="unselectedOrderProps.length || narrowScreen">
+            <ion-text>מאפייני הזמנה</ion-text>
+            <ion-button slot="end" fill="clear" *ngIf="!narrowScreen" (click)="reportsGeneratorService.selectAllOrderProps()">בחר הכל</ion-button>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let prop of (narrowScreen ? reportsGeneratorService.orderProperties : unselectedOrderProps)" button
+                    [color]="reportsGeneratorService.selectedOrderProperties.has(prop) ? 'tertiary' : ''"
+                    (click)="reportsGeneratorService.selectedOrderProperties.has(prop) ? reportsGeneratorService.selectedOrderProperties.delete(prop) : reportsGeneratorService.selectedOrderProperties.add(prop)">
+            <ion-icon *ngIf="!narrowScreen" slot="start" name="add-circle" color="success"></ion-icon>
+            <ion-label>{{prop | propertyName : 'order'}}</ion-label>
+          </ion-item>
+
+          <ion-item-divider *ngIf="unselectedBusinessProps.length || narrowScreen">
+            <ion-text>מאפייני עסק</ion-text>
+            <ion-button slot="end" fill="clear" *ngIf="!narrowScreen" (click)="reportsGeneratorService.selectAllBusinessProps()">בחר הכל</ion-button>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let prop of (narrowScreen ? reportsGeneratorService.businessProperties : unselectedBusinessProps)" button
+                    [color]="reportsGeneratorService.selectedBusinessProperties.has(prop) ? 'tertiary' : ''"
+                    (click)="reportsGeneratorService.selectedBusinessProperties.has(prop) ? reportsGeneratorService.selectedBusinessProperties.delete(prop) : reportsGeneratorService.selectedBusinessProperties.add(prop)">
+            <ion-icon *ngIf="!narrowScreen" slot="start" name="add-circle" color="success"></ion-icon>
+            <ion-label>{{prop | propertyName : 'business'}}</ion-label>
+          </ion-item>
+
+          <ion-item-divider *ngIf="unselectedProductsProps.length || narrowScreen">
+            <ion-text>מאפייני מוצר</ion-text>
+            <ion-button slot="end" fill="clear" *ngIf="!narrowScreen" (click)="reportsGeneratorService.selectAllProductsProps()">בחר הכל</ion-button>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let prop of (narrowScreen ? reportsGeneratorService.selectedProductProperties : unselectedProductsProps)" button
+                    [color]="reportsGeneratorService.selectedProductProperties.has(prop) ? 'tertiary' : ''"
+                    (click)="reportsGeneratorService.selectedProductProperties.has(prop) ? reportsGeneratorService.selectedProductProperties.delete(prop) : reportsGeneratorService.selectedProductProperties.add(prop)">
+            <ion-icon *ngIf="!narrowScreen" slot="start" name="add-circle" color="success"></ion-icon>
+            <ion-label>{{prop | propertyName : 'product'}}</ion-label>
+          </ion-item>
+
+        </ion-list>
+
+        <ion-list *ngIf="!narrowScreen">
+
+          <ion-item-divider *ngIf="reportsGeneratorService.selectedOrderProperties.size">
+            <ion-text>מאפייני הזמנה</ion-text>
+            <ion-button slot="end" fill="clear" (click)="reportsGeneratorService.selectedOrderProperties.clear()">הסר הכל</ion-button>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let prop of reportsGeneratorService.selectedOrderProperties" button (click)="reportsGeneratorService.selectedOrderProperties.delete(prop)">
+            <ion-icon slot="start" name="remove-circle" color="danger"></ion-icon>
+            <ion-label>{{prop | propertyName : 'order'}}</ion-label>
+          </ion-item>
+
+          <ion-item-divider *ngIf="reportsGeneratorService.selectedBusinessProperties.size">
+            <ion-text>מאפייני עסק</ion-text>
+            <ion-button slot="end" fill="clear" (click)="reportsGeneratorService.selectedBusinessProperties.clear()">הסר הכל</ion-button>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let prop of reportsGeneratorService.selectedBusinessProperties" button (click)="reportsGeneratorService.selectedBusinessProperties.delete(prop)">
+            <ion-icon slot="start" name="remove-circle" color="danger"></ion-icon>
+            <ion-label>{{prop | propertyName : 'business'}}</ion-label>
+          </ion-item>
+
+          <ion-item-divider *ngIf="reportsGeneratorService.selectedProductProperties.size">
+            <ion-text>מאפייני מוצר</ion-text>
+            <ion-button slot="end" fill="clear" (click)="reportsGeneratorService.selectedProductProperties.clear()">הסר הכל</ion-button>
+          </ion-item-divider>
+
+          <ion-item *ngFor="let prop of reportsGeneratorService.selectedProductProperties" button (click)="reportsGeneratorService.selectedProductProperties.delete(prop)">
+            <ion-icon slot="start" name="remove-circle" color="danger"></ion-icon>
+            <ion-label>{{prop | propertyName : 'product'}}</ion-label>
+          </ion-item>
+
+        </ion-list>
+
+      </ion-card-content>
+
+    </ion-card>
+
+  </div>
+
+
+</ion-content>
+
+
+<ion-footer *ngIf="step == 3">
+  <ion-button class="ion-margin" shape="round" color="secondary" (click)="createReport()">הפקת דו"ח</ion-button>
+</ion-footer>

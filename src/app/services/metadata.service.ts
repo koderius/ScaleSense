@@ -23,7 +23,7 @@ export class MetadataService {
   constructor() {
 
     // As default, take the metadata from the local storage
-    const localData = localStorage.getItem(this.METADATA_MARKET_LOCAL);
+    const localData = JSON.parse(localStorage.getItem(this.METADATA_MARKET_LOCAL) || null);
     if(localData) {
       MetadataService.COIN_SIGN = localData['coin_sign'];
       MetadataService.VAT = localData['vat'];
@@ -40,7 +40,7 @@ export class MetadataService {
       MetadataService.VAT = snapshot.get('vat');
       MetadataService.COIN_SIGN = snapshot.get('coin_sign');
       // Save in local storage
-      localStorage.setItem(this.METADATA_MARKET_LOCAL, snapshot.data());
+      localStorage.setItem(this.METADATA_MARKET_LOCAL, JSON.stringify(snapshot.data()));
     });
 
     // Load scale server data

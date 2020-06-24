@@ -1,0 +1,25 @@
+.okBtn {
+  padding: 1em;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fullMatInput {
+  width: 100%;
+}
+
+#fields-lists {
+  display: flex;
+  justify-content: space-between;
+  ion-list {
+    width: 100%;
+    &:first-child{
+      border-inline-end: solid var(--ion-color-primary-tint) 1px;
+    }
+  }
+}
+
+ion-footer {
+  display: flex;
+  justify-content: flex-end;
+}

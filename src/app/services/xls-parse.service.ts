@@ -108,7 +108,7 @@ export class XlsParseService {
         product.unitWeight = +row[6] || undefined;
 
       product.tara = +row[7] || 0;
-      product.barcode = +row[8] || undefined;
+      product.barcode = row[8] || undefined;
 
       product.isVeg = row[9].toUpperCase() == 'Y';
       if(product.isVeg)

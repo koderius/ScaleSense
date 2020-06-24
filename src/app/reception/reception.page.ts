@@ -204,26 +204,29 @@ export class ReceptionPage implements OnInit, OnDestroy {
   /** Send order with CLOSED status */
   async finish() {
     const l = this.alerts.loaderStart('מסכם הזמנה...');
-    await this.orderService.updateOrder(this.order, OrderStatus.CLOSED);
+    if(await this.orderService.updateOrder(this.order, OrderStatus.CLOSED)) {
+      this.orderService.deleteSplitOrder(this.order);
+      alert('הזמנה נסגרה בהצלחה');
+      this.hasChanges = false;
+      this.navService.goBack();
+    }
     this.alerts.loaderStop(l);
-    alert('הזמנה נסגרה בהצלחה');
-    this.hasChanges = false;
-    this.navService.goBack();
   }
 
 
   /** Save the order with some products that have been weighed */
   async splitOrder() {
-    if(!this.order.products.some((p)=>!!p.finalWeight)) {
+    if(!this.order.products.some((p)=>isNumber(p.finalWeight))) {
       alert('על מנת לפצל הזמנה יש לקבל לפחות מוצר אחד');
       return;
     }
     const l = this.alerts.loaderStart('מפצל הזמנה...');
-    await this.orderService.setSplitOrder(this.order);
+    if(await this.orderService.setSplitOrder(this.order)) {
+      alert('פרטי קבלת הזמנה נשמרו');
+      this.hasChanges = false;
+      this.navService.goBack();
+    }
     this.alerts.loaderStop(l);
-    alert('פרטי קבלת הזמנה נשמרו');
-    this.hasChanges = false;
-    this.navService.goBack();
   }
 
 }

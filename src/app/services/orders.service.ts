@@ -14,6 +14,8 @@ import QuerySnapshot = firebase.firestore.QuerySnapshot;
 import Query = firebase.firestore.Query;
 import {Dictionary} from '../utilities/dictionary';
 import {ProductOrder} from '../models/ProductI';
+import {Objects} from '../utilities/objects';
+import {isNumber} from 'util';
 
 @Injectable({
   providedIn: 'root'
@@ -225,7 +227,7 @@ export class OrdersService {
     catch (e) {
       if(!isRetry) {
         console.log('Retry...');
-        this.updateOrder(order, newStatus, true);
+        return await this.updateOrder(order, newStatus, true);
       }
       console.error(e);
     }
@@ -322,11 +324,24 @@ export class OrdersService {
     }
   }
 
-  async setSplitOrder(order: Order) {
+  async setSplitOrder(order: Order) : Promise<boolean> {
     try {
       // Save only the products that has been changed/weighed during the reception
-      const productsToSave = order.products.filter((p)=>p.finalWeight || p.priceChangedInReception || p.amountChangedInReception);
+      const productsToSave = order.products.filter((p)=>isNumber(p.finalWeight) || p.priceChangedInReception || p.amountChangedInReception);
+      productsToSave.forEach((p)=>Objects.ClearUndefined(p));
       await this.splitOrdersRef.doc(order.id).set({products: productsToSave}, {merge: true});
+      return true;
+    }
+    catch (e) {
+      console.error(e);
+    }
+  }
+
+  async deleteSplitOrder(order: Order) {
+    const ref = this.splitOrdersRef.doc(order.id);
+    try {
+      if((await ref.get()).exists)
+        await ref.delete();
     }
     catch (e) {
       console.error(e);

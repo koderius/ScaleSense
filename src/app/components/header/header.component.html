@@ -10,7 +10,7 @@
   </ion-col>
 
   <ion-col id="main-menu">
-    <ion-button fill="clear" [disabled]="!usersService.hasPermission(UserPermissions.REPORTS)">
+    <ion-button fill="clear" [disabled]="!usersService.hasPermission(UserPermissions.REPORTS)" (click)="openReports()">
       <ion-icon slot="start" src="../../assets/svg/icon_reports.svg"></ion-icon>
       <ion-text>דוחות</ion-text>
     </ion-button>

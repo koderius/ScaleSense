@@ -19,7 +19,7 @@ export interface ProductPublicDoc {
   name?: string;
 
   /** Barcode */
-  barcode?: number;
+  barcode?: string;
 
   /** Image URL */
   image?: string;
@@ -74,7 +74,7 @@ export interface ProductCustomerDoc extends ProductPublicDoc{
   maxPrice?: number;
 
   /** Max weight differences between original order to order approve (in %) */
-  orderWeightTolerance?: number;
+  orderWeightTolerance?: number; // TODO?
 
   /** Max weight differences between final order to reception (in %) */
   receiveWeightTolerance?: number;

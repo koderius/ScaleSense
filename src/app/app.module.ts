@@ -16,6 +16,7 @@ import {UnitAmountPipe} from './pipes/unit-amount.pipe';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import {ComponentsModule} from './components/components.module';
+import {PropertyNamePipe} from './pipes/property-name.pipe';
 
 
 @NgModule({
@@ -28,6 +29,7 @@ import {ComponentsModule} from './components/components.module';
     Camera,
     OrderStatusTextPipe,
     UnitAmountPipe,
+    PropertyNamePipe,
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
   ],
   bootstrap: [AppComponent]

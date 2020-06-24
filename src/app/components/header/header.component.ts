@@ -4,6 +4,7 @@ import {NavigationService} from '../../services/navigation.service';
 import {BusinessService} from '../../services/business.service';
 import {UsersService} from '../../services/users.service';
 import {UserPermission} from '../../models/UserDoc';
+import {ReportsGeneratorService} from '../../services/reports-generator.service';
 
 @Component({
   selector: 'app-header',
@@ -23,6 +24,7 @@ export class HeaderComponent implements OnInit {
     private navService: NavigationService,
     private businessService: BusinessService,
     public usersService: UsersService,
+    private reportsGeneratorService: ReportsGeneratorService,
   ) { }
 
   ngOnInit() {}
@@ -50,6 +52,10 @@ export class HeaderComponent implements OnInit {
 
   goToSettings() {
     this.navService.goToSettings();
+  }
+
+  openReports() {
+    this.reportsGeneratorService.openGeneratorModal();
   }
 
 }

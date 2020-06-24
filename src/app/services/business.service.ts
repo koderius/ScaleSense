@@ -82,7 +82,7 @@ export class BusinessService {
     return (await ref.doc(bid).get()).data();
   }
 
-  // Get new customer's name according to it's ID
+  // Get new business's name according to it's ID
   async getNewBusiness(bid: string, side: BusinessSide) : Promise<BusinessDoc> {
     const snap = await (side == 'c' ? this.newCustomersCollection : this.newSuppliersCollection).doc(bid).get();
     const doc = snap.data() as BusinessDoc;
