@@ -23,10 +23,15 @@ export class MetadataService {
   constructor() {
 
     // As default, take the metadata from the local storage
-    const localData = JSON.parse(localStorage.getItem(this.METADATA_MARKET_LOCAL) || null);
-    if(localData) {
-      MetadataService.COIN_SIGN = localData['coin_sign'];
-      MetadataService.VAT = localData['vat'];
+    try {
+      const localData = JSON.parse(localStorage.getItem(this.METADATA_MARKET_LOCAL) || null);
+      if(localData) {
+        MetadataService.COIN_SIGN = localData['coin_sign'];
+        MetadataService.VAT = localData['vat'];
+      }
+    }
+    catch (e) {
+      localStorage.removeItem(this.METADATA_MARKET_LOCAL);
     }
 
   }

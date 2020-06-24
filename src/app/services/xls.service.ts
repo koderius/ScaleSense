@@ -77,7 +77,7 @@ export class XlsService {
   }
 
 
-  createExcel(data: any[][], headers: string[], fileName: string, title?: string, subject?: string,) {
+  createExcel(data: any[][], headers: string[], fileName: string, title?: string, subject?: string) {
 
     // Create new book
     const workBook = XLSX.utils.book_new();
@@ -95,7 +95,7 @@ export class XlsService {
     fileName = fileName + '.' + bookType;
 
     // Download file
-    const file = XLSX.writeFile(workBook, fileName,{
+    const blob: Blob = XLSX.writeFile(workBook, fileName,{
       type: 'file',
       bookType: bookType,
       Props: {
@@ -107,7 +107,7 @@ export class XlsService {
       }
     });
 
-    console.log(file);
+    return new File([blob], fileName)
 
   }
 

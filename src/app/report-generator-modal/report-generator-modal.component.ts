@@ -163,6 +163,12 @@ export class ReportGeneratorModalComponent implements OnInit {
 
 
   createReport() {
+
+    if(!this.reportsGeneratorService.selectedProductProperties.size && !this.reportsGeneratorService.selectedBusinessProperties.size && !this.reportsGeneratorService.selectedOrderProperties.size) {
+      alert('יש לבחור שדות להצגה');
+      return;
+    }
+
     // Save the selected fields for further use
     this.reportsGeneratorService.saveSelectedFields();
     // Create the report
