@@ -8,7 +8,7 @@ import {HighlightifyPipe} from '../pipes/highlightify.pipe';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {
-  MAT_DATE_LOCALE, MatAutocompleteModule, MatButtonModule,
+  MAT_DATE_LOCALE, MatAutocompleteModule, MatButtonModule, MatChipsModule,
   MatDatepickerModule,
   MatFormFieldModule,
   MatIconModule,
@@ -56,6 +56,7 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     MatSelectModule,
     MatAutocompleteModule,
     MatButtonModule,
+    MatChipsModule,
   ],
   entryComponents: [
     ReturnGoodModalComponent,

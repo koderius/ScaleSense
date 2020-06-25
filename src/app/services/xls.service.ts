@@ -107,6 +107,7 @@ export class XlsService {
       }
     });
 
+    // Return the file
     return new File([blob], fileName)
 
   }

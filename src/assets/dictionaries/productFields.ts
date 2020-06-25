@@ -23,7 +23,7 @@ export const DicProductFields : DictionaryType = {
     comment: 'הערת לקוח',
     boxes: 'מס. ארגזים',
     finalWeight: 'משקל בקבלה',
-    isManualWeight: 'ללא שקילה',
+    isManualWeight: 'התקבל ללא שקילה',
     isWeightMatch: 'משקל תואם',
     amountReturned: 'כמות שהוחזרה',
   },
@@ -49,7 +49,7 @@ export const DicProductFields : DictionaryType = {
     comment: 'Customer comment',
     boxes: 'No. of boxes',
     finalWeight: 'Reception weight',
-    isManualWeight: 'Not weighed',
+    isManualWeight: 'Not weighed in reception',
     isWeightMatch: 'Weight match',
     amountReturned: 'Amount returned',
   }

@@ -91,38 +91,68 @@
 
         <ion-item>
           <mat-form-field class="fullMatInput">
-            <mat-label>{{businessTitle}}</mat-label>
-            <mat-select [(ngModel)]="bids" multiple>
-              <mat-option *ngFor="let business of businessesList" [value]="business.id">{{business.name}}</mat-option>
-            </mat-select>
+            <mat-chip-list #chipListBusiness>
+              <mat-chip
+                      *ngFor="let business of bids; let i = index"
+                      [selectable]="true"
+                      [removable]="true"
+                      (removed)="bids.splice(i,1)">
+                {{getBusinessById(business)?.name}}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <input  #inputBusiness
+                      [placeholder]="businessTitle"
+                      [matAutocomplete]="autoBusiness"
+                      [matChipInputFor]="chipListBusiness">
+            </mat-chip-list>
+            <mat-autocomplete #autoBusiness="matAutocomplete" autoActiveFirstOption (optionSelected)="bids.push($event.option.value); inputBusiness.value = ''">
+              <mat-option *ngFor="let business of filteredAutoComplete(businessesList, 'name', inputBusiness.value)" [value]="business.id">{{business.name}}</mat-option>
+            </mat-autocomplete>
           </mat-form-field>
-          <ion-button slot="end" fill="clear" color="dark" (click)="bids = []" *ngIf="bids?.length">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
         </ion-item>
 
         <ion-item>
           <mat-form-field class="fullMatInput">
-            <mat-label>מוצרים</mat-label>
-            <mat-select [(ngModel)]="productsIds" multiple>
-              <mat-option *ngFor="let product of productsList" [value]="product.id">{{product.name}}</mat-option>
-            </mat-select>
+            <mat-chip-list #chipListProducts>
+              <mat-chip
+                      *ngFor="let product of productsIds; let i = index"
+                      [selectable]="true"
+                      [removable]="true"
+                      (removed)="productsIds.splice(i,1)">
+                {{getProductById(product)?.name}}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <input  #inputProducts
+                      placeholder="מוצרים"
+                      [matAutocomplete]="autoProducts"
+                      [matChipInputFor]="chipListProducts">
+            </mat-chip-list>
+            <mat-autocomplete #autoProducts="matAutocomplete" autoActiveFirstOption (optionSelected)="productsIds.push($event.option.value); inputProducts.value = ''">
+              <mat-option *ngFor="let product of filteredAutoComplete(productsList, 'name', inputProducts.value)" [value]="product.id">{{product.name}}</mat-option>
+            </mat-autocomplete>
           </mat-form-field>
-          <ion-button slot="end" fill="clear" color="dark" (click)="productsIds = []" *ngIf="productsIds?.length">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
         </ion-item>
 
         <ion-item>
-          <mat-form-field class="fullMatInput" *ngIf="categoriesList">
-            <mat-label>קטגוריות</mat-label>
-            <mat-select [(ngModel)]="categories" multiple>
-              <mat-option *ngFor="let category of categoriesList" [value]="category.title">{{category.title}}</mat-option>
-            </mat-select>
+          <mat-form-field class="fullMatInput">
+            <mat-chip-list #chipListCategories>
+              <mat-chip
+                      *ngFor="let category of categories; let i = index"
+                      [selectable]="true"
+                      [removable]="true"
+                      (removed)="categories.splice(i,1)">
+                {{category}}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip>
+              <input  #inputCategories
+                      placeholder="קטגוריות"
+                      [matAutocomplete]="autoCategories"
+                      [matChipInputFor]="chipListCategories">
+            </mat-chip-list>
+            <mat-autocomplete #autoCategories="matAutocomplete" autoActiveFirstOption (optionSelected)="categories.push($event.option.value); inputCategories.value = ''">
+              <mat-option *ngFor="let category of filteredAutoComplete(categoriesList, 'title', inputCategories.value)" [value]="category.title">{{category.title}}</mat-option>
+            </mat-autocomplete>
           </mat-form-field>
-          <ion-button slot="end" fill="clear" color="dark" (click)="categories = []" *ngIf="categories?.length">
-            <ion-icon slot="icon-only" name="close"></ion-icon>
-          </ion-button>
         </ion-item>
 
         <ion-item-divider>תאריך אספקה</ion-item-divider>
@@ -155,11 +185,6 @@
             <mat-label>עד מספר</mat-label>
             <input matInput inputmode="numeric" maxlength="7" name="serialNum2" #serial2 (change)="onSerialChange(serial2)" [(ngModel)]="toSerial">
           </mat-form-field>
-        </ion-item>
-
-        <ion-item>
-          <ion-checkbox slot="start" [(ngModel)]="isManualWeight"></ion-checkbox>
-          <ion-text>מוצרים שהתקבלו ללא שקילה</ion-text>
         </ion-item>
 
       </ion-card-content>

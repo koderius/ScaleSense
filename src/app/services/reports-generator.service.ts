@@ -23,7 +23,6 @@ export class ReportsGeneratorService {
   readonly LOCAL_STORAGE_BUSINESS_PROPERTIES = 'scale-sense_reportsBusinessProps';
 
   readonly orderProperties: string[] = [
-    'id',
     'serial',
     'status',
     'supplyTime',
@@ -31,7 +30,6 @@ export class ReportsGeneratorService {
     'invoice',
     'driverName',
     'created',
-    'modified',
   ];
 
   readonly businessProperties: string[] = [
@@ -40,25 +38,15 @@ export class ReportsGeneratorService {
   ];
 
   readonly productProperties: string[] = [
-    'id',
     'name',
     'catalogNumS',
     'catalogNumC',
     'category',
-    'barcode',
-    'description',
-    'isVeg',
-    'minPrice',
-    'maxPrice',
-    'orderWeightTolerance',
-    'receiveWeightTolerance',
     'amount',
     'type',
     'unitWeight',
-    'orderMin',
-    'tara',
+    'price',
     'priceInOrder',
-    'comment',
     'boxes',
     'finalWeight',
     'isManualWeight',
@@ -155,7 +143,7 @@ export class ReportsGeneratorService {
   }
 
 
-  getProducts(queries: {productIds?: string[], categories?: string[], isManualWeight?: boolean}, orders: OrderDoc[] = this.results) {
+  getProducts(queries: {productIds?: string[], categories?: string[]}, orders: OrderDoc[] = this.results) {
 
     orders.forEach((order)=>{
 
@@ -169,10 +157,6 @@ export class ReportsGeneratorService {
           const product: ProductCustomerDoc = this.productsService.myProducts.find((prod)=>prod.id == p.id);
           queries.categories.includes(product.category);
         });
-
-      // Filter products that not been weighed
-      if(queries.isManualWeight)
-        order.products = order.products.filter((p)=>p.isManualWeight);
 
     });
 

@@ -35,7 +35,6 @@ export class ReportGeneratorModalComponent implements OnInit {
   toSupplyDate: Date;
   fromSerial: string;
   toSerial: string;
-  isManualWeight: boolean;
 
 
   constructor(
@@ -57,22 +56,37 @@ export class ReportGeneratorModalComponent implements OnInit {
     return new Date();
   }
 
-  get businessesList() {
-    return (this.businessService.side == 'c' ? this.suppliersService.mySuppliers : this.customersService.myCustomers);
-
+  filteredAutoComplete(fullList: any[], prop: string, query: string) {
+    return fullList.filter((el)=>(el[prop] as string).startsWith(query));
   }
+
+  get businessesList() {
+    return (this.businessService.side == 'c' ? this.suppliersService.mySuppliers : this.customersService.myCustomers)
+      .filter((b)=>!this.bids.includes(b.id));
+  }
+
+  getBusinessById(id: string) {
+    return (this.businessService.side == 'c' ? this.suppliersService.mySuppliers : this.customersService.myCustomers).find((b)=>b.id == id);
+  }
+
+  getProductById(id: string) {
+    return this.productService.myProducts.find((p)=>p.id == id)
+  }
+
 
   get businessTitle() {
     return (this.businessService.side == 'c' ? 'ספקים' : 'לקוחות');
   }
 
   get productsList() {
-    return this.productService.myProducts;
+    return this.productService.myProducts
+      .filter((p)=>!this.productsIds.includes(p.id));
   }
 
   get categoriesList() {
     if(this.businessService.side == 'c')
-      return this.categoryService.allCategories;
+      return this.categoryService.allCategories
+        .filter((c)=>!this.categories.includes(c.title));
   }
 
   // The relevant statuses for each selected option
@@ -139,7 +153,6 @@ export class ReportGeneratorModalComponent implements OnInit {
     this.reportsGeneratorService.getProducts({
       productIds: this.productsIds,
       categories: this.categories,
-      isManualWeight: this.isManualWeight
     });
     if(!this.reportsGeneratorService.results.every((o)=>o.products.length > 0)) {
       alert('לא נמצאו מוצרים');
