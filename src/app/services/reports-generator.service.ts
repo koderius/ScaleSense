@@ -1,7 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {OrdersService} from './orders.service';
 import {ModalController} from '@ionic/angular';
-import {ReportGeneratorModalComponent} from '../report-generator-modal/report-generator-modal.component';
 import {BusinessService} from './business.service';
 import {OrderDoc, OrderStatus} from '../models/OrderI';
 import {ProductCustomerDoc} from '../models/ProductI';
@@ -12,6 +11,9 @@ import {XlsService} from './xls.service';
 import {PropertyNamePipe} from '../pipes/property-name.pipe';
 import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
+import {Calculator} from '../utilities/Calculator';
+import {LangService} from './lang.service';
+import {PrintHTML} from '../utilities/PrintHTML';
 
 @Injectable({
   providedIn: 'root'
@@ -34,23 +36,16 @@ export class ReportsGeneratorService {
 
   readonly businessProperties: string[] = [
     'name',
-    'nid',
   ];
 
   readonly productProperties: string[] = [
     'name',
     'catalogNumS',
-    'catalogNumC',
-    'category',
     'amount',
-    'type',
     'unitWeight',
     'price',
     'priceInOrder',
     'boxes',
-    'finalWeight',
-    'isManualWeight',
-    'isWeightMatch',
     'amountReturned',
   ];
 
@@ -72,7 +67,23 @@ export class ReportsGeneratorService {
     private propertyNamePipe: PropertyNamePipe,
     private orderStatusPipe: OrderStatusTextPipe,
     private unitAmountPipe: UnitAmountPipe,
-  ) { }
+    private langService: LangService,
+  ) {
+
+    // Add some properties that are relevant only for the customer
+    if(this.businessService.side == 'c') {
+      this.productProperties.push(
+        'catalogNumC',
+        'category',
+        'finalWeight',
+        'isManualWeight',
+        'isWeightMatch',
+        'weightGap',
+      );
+      this.businessProperties.push('nid');
+    }
+
+  }
 
 
   selectAllOrderProps() {
@@ -85,18 +96,6 @@ export class ReportsGeneratorService {
 
   selectAllProductsProps() {
     this.selectedProductProperties = new Set<string>(this.productProperties);
-  }
-
-
-  async openGeneratorModal() {
-    const m = await this.modalCtrl.create({
-      component: ReportGeneratorModalComponent,
-      componentProps: {
-        reportsGeneratorService: this,
-      },
-      backdropDismiss: false,
-    });
-    m.present();
   }
 
 
@@ -170,7 +169,7 @@ export class ReportsGeneratorService {
   }
 
 
-  createReport() {
+  createReportData() : string[][] {
 
     const rows: any[][] = [];
     const headers = [];
@@ -188,9 +187,11 @@ export class ReportsGeneratorService {
         const row: any[] = [...this.selectedOrderProperties.values()].map((p)=>{
           if(i1 === 0 && i2 === 0)
             headers.push(this.propertyNamePipe.transform(p, 'order'));
-          if(p == 'status')
-            return this.orderStatusPipe.transform(order.status);
-          return order[p];
+          switch (p) {
+            case 'status': return this.orderStatusPipe.transform(order.status);
+            case 'supplyTime': case 'realSupplyTime': case 'created': return order[p] ? new Date(order[p]) : '';
+            default: return order[p];
+          }
         });
 
         // Add the business's selected properties
@@ -204,9 +205,11 @@ export class ReportsGeneratorService {
         row.push(...[...this.selectedProductProperties.values()].map((p)=>{
           if(i1 === 0 && i2 === 0)
             headers.push(this.propertyNamePipe.transform(p, 'product'));
-          if(p == 'type')
-            return this.unitAmountPipe.transform(null, product.type);
-          return product[p];
+          switch (p) {
+            case 'amount': case 'amountReturned': return product[p] ? this.unitAmountPipe.transform(product[p], product.type) : '';
+            case 'weightGap': return product.finalWeight ? product.finalWeight - Calculator.ProductExpectedNetWeight(product) : '';
+            default: return product[p];
+          }
         }));
 
         // Add the row to the table
@@ -215,8 +218,40 @@ export class ReportsGeneratorService {
       });
     });
 
-    this.xlsx.createExcel(rows, headers,'report');
+    rows.unshift(headers);
 
+    return rows;
+
+  }
+
+
+  createReportTables() : HTMLTableElement {
+
+    // Create workbook
+    this.xlsx.createWorkBook();
+
+    // Create report data and save it as a sheet in the workbook
+    const data = this.createReportData();
+    this.xlsx.addSheetToWorkbook(data, this.langService.langProps.title, this.langService.langProps.dir == 'rtl');
+
+    // If the system language is not english, add another sheet in english
+    if(this.langService.lang != 'en') {
+      const orgLang = this.langService.lang;
+      this.langService.lang = 'en';
+      const data2 = this.createReportData();
+      this.xlsx.addSheetToWorkbook(data2, this.langService.langProps.title);
+      this.langService.lang = orgLang;
+    }
+
+    // Return the table
+    return this.xlsx.createHTMLFromSheet();
+
+  }
+
+
+  downloadFile() {
+    // Download workbook
+    this.xlsx.downLoadWorkbook('scale-sense report');
   }
 
 }

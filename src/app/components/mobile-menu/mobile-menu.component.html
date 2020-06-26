@@ -16,7 +16,7 @@
     <ion-list>
 
       <ion-item>
-        <ion-thumbnail slot="start">
+        <ion-thumbnail slot="start"  *ngIf="businessService.businessDoc.logo">
           <img [src]="businessService.businessDoc.logo">
         </ion-thumbnail>
         <ion-title>{{businessService.businessDoc.name}}</ion-title>

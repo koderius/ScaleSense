@@ -32,5 +32,37 @@ export const DicOrderStatus : DictionaryType = {
     s401: 'בוטלה ע"י הספק',
     s402: 'בוטלה ע"י הלקוח',
     s100: 'סגורה',
+  },
+  en: {
+    // Groups
+    g0: 'Opened',
+    g1: 'Final approved',
+    g2: 'Closed',
+    g3: 'Cancelled',
+    // Customer view
+    c0: 'Draft',
+    c10: 'Sent to supplier',
+    c11: 'Sent to supplier (edited)',
+    c20: 'Opened by supplier, not approved',
+    c30: 'Initial approve',
+    c31: 'Initial approve with changes',
+    c21: 'Edited by the customer after initial approve',
+    c80: 'Final approved',
+    c81: 'Final approved with changes',
+    c401: 'Cancelled by supplier',
+    c402: 'Cancelled by customer',
+    c100: 'Closed',
+    // Supplier view
+    s10: 'New order',
+    s11: 'New order',
+    s20: 'New order',
+    s21: 'Edited by customer',
+    s30: 'Initial approve',
+    s31: 'Initial approve with changes',
+    s80: 'Final approved',
+    s81: 'Final approved with changes',
+    s401: 'Cancelled by supplier',
+    s402: 'Cancelled by customer',
+    s100: 'Closed',
   }
 };

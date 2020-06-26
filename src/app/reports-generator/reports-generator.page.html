@@ -1,18 +1,16 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>הפקת דו"ח</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()">
-        <ion-icon slot="icon-only" name="close"></ion-icon>
-      </ion-button>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
     </ion-buttons>
+    <ion-title>הפקת דו"ח</ion-title>
   </ion-toolbar>
 </ion-header>
 
 
 <ion-content color="light">
 
-  <div *ngIf="step == 1">
+  <div *ngIf="step == 1" class="page-container">
 
     <ion-card>
 
@@ -79,7 +77,7 @@
   </div>
 
 
-  <div *ngIf="step == 2">
+  <div *ngIf="step == 2" class="page-container">
 
     <ion-card>
 
@@ -205,10 +203,10 @@
   </div>
 
 
-  <div *ngIf="step == 3">
+  <div *ngIf="step == 3" class="page-container">
 
     <ion-item>
-      <ion-label>{{numOfRecords()}} רשומות נמצאו.</ion-label>
+      <ion-label color="success">{{numOfRecords()}} רשומות נמצאו.</ion-label>
     </ion-item>
 
     <ion-card>
@@ -297,12 +295,43 @@
 
     </ion-card>
 
+    <div class="okBtn">
+      <ion-button shape="round" color="tertiary" (click)="step = 2">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        <ion-text>הקודם</ion-text>
+      </ion-button>
+    </div>
+
   </div>
 
+  <div *ngIf="step == 4" style="height: 95%">
+
+    <ion-card id="table-wrapper"></ion-card>
+
+    <div class="okBtn">
+      <ion-button shape="round" color="tertiary" (click)="step = 3">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        <ion-text>הקודם</ion-text>
+      </ion-button>
+      <ion-button shape="round" color="secondary" title="הורד קובץ xlsx" (click)="reportsGeneratorService.downloadFile()">
+        <ion-icon slot="icon-only" name="download-outline"></ion-icon>
+      </ion-button>
+      <ion-button shape="round" color="secondary" title="שלח להדפסה" (click)="printTable()">
+        <ion-icon slot="icon-only" name="print-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+  </div>
 
 </ion-content>
 
 
+
 <ion-footer *ngIf="step == 3">
-  <ion-button class="ion-margin" shape="round" color="secondary" (click)="createReport()">הפקת דו"ח</ion-button>
+  <div class="okBtn">
+    <ion-button shape="round" color="secondary" (click)="createReport()">
+      <ion-text>הפקת דו"ח</ion-text>
+      <ion-icon slot="end" name="document-text-outline"></ion-icon>
+    </ion-button>
+  </div>
 </ion-footer>

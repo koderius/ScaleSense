@@ -127,4 +127,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('app/returns');
   }
 
+  goToReports() {
+    this.navCtrl.navigateForward('app/reports-generator');
+  }
+
 }

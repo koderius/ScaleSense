@@ -38,7 +38,6 @@ import {SupplierLinkComponent} from './supplier-link/supplier-link.component';
 import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
 import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
-import {ReportGeneratorModalComponent} from '../report-generator-modal/report-generator-modal.component';
 import {PropertyNamePipe} from '../pipes/property-name.pipe';
 
 @NgModule({
@@ -65,7 +64,6 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     CustomerPricingModalComponent,
     ManualWeightPopoverComponent,
     SupplierLinkComponent,
-    ReportGeneratorModalComponent,
   ],
   declarations: [
     HeaderComponent,
@@ -92,7 +90,6 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     ManualWeightPopoverComponent,
     SupplierLinkComponent,
     MobileMenuComponent,
-    ReportGeneratorModalComponent,
     PropertyNamePipe,
   ],
   exports: [
@@ -105,6 +102,7 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    MatChipsModule,
     HeaderComponent,
     OredersWizardComponent,
     NgSelectComponent,
@@ -128,7 +126,6 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     AutocompleteFieldComponent,
     SupplierLinkComponent,
     MobileMenuComponent,
-    ReportGeneratorModalComponent,
     PropertyNamePipe,
   ],
   providers: [

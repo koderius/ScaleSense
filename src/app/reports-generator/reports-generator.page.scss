@@ -1,3 +1,7 @@
+.page-container {
+  padding: 1em;
+}
+
 .okBtn {
   padding: 1em;
   display: flex;
@@ -14,6 +18,7 @@
   ion-list {
     width: 100%;
     &:first-child{
+      padding-inline-end: 1em;
       border-inline-end: solid var(--ion-color-primary-tint) 1px;
     }
   }
@@ -22,4 +27,12 @@
 ion-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+// Make table wide and scrollable
+#table-wrapper {
+  margin-bottom: 1em;
+  white-space: nowrap;
+  overflow: auto;
+  height: 80%;
 }

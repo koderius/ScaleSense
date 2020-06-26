@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ReportsGeneratorService} from '../services/reports-generator.service';
-import {ModalController, Platform} from '@ionic/angular';
+import {Platform} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {CustomersService} from '../services/customers.service';
 import {BusinessService} from '../services/business.service';
@@ -9,16 +9,14 @@ import {CategoriesService} from '../services/categories.service';
 import {formatNumber} from '@angular/common';
 import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {AlertsService} from '../services/alerts.service';
+import {PrintHTML} from '../utilities/PrintHTML';
 
 @Component({
-  selector: 'app-report-generator-modal',
-  templateUrl: './report-generator-modal.component.html',
-  styleUrls: ['./report-generator-modal.component.scss'],
+  selector: 'app-reports-generator',
+  templateUrl: './reports-generator.page.html',
+  styleUrls: ['./reports-generator.page.scss'],
 })
-export class ReportGeneratorModalComponent implements OnInit {
-
-  // Get as parameter from the service itself
-  reportsGeneratorService: ReportsGeneratorService;
+export class ReportsGeneratorPage implements OnInit {
 
   step: number = 1;
 
@@ -36,9 +34,8 @@ export class ReportGeneratorModalComponent implements OnInit {
   fromSerial: string;
   toSerial: string;
 
-
   constructor(
-    private modalCtrl: ModalController,
+    public reportsGeneratorService: ReportsGeneratorService,
     private platform: Platform,
     private businessService: BusinessService,
     private suppliersService: SuppliersService,
@@ -62,7 +59,7 @@ export class ReportGeneratorModalComponent implements OnInit {
 
   get businessesList() {
     return (this.businessService.side == 'c' ? this.suppliersService.mySuppliers : this.customersService.myCustomers)
-      .filter((b)=>!this.bids.includes(b.id));
+    .filter((b)=>!this.bids.includes(b.id));
   }
 
   getBusinessById(id: string) {
@@ -80,13 +77,13 @@ export class ReportGeneratorModalComponent implements OnInit {
 
   get productsList() {
     return this.productService.myProducts
-      .filter((p)=>!this.productsIds.includes(p.id));
+    .filter((p)=>!this.productsIds.includes(p.id));
   }
 
   get categoriesList() {
     if(this.businessService.side == 'c')
       return this.categoryService.allCategories
-        .filter((c)=>!this.categories.includes(c.title));
+      .filter((c)=>!this.categories.includes(c.title));
   }
 
   // The relevant statuses for each selected option
@@ -182,15 +179,25 @@ export class ReportGeneratorModalComponent implements OnInit {
       return;
     }
 
-    // Save the selected fields for further use
+    this.step = 4;
+
+    // Save the selected fields for further use in local storage
     this.reportsGeneratorService.saveSelectedFields();
+
     // Create the report
-    this.reportsGeneratorService.createReport();
+    const table = this.reportsGeneratorService.createReportTables();
+
+    // Show the table in the page
+    setTimeout(()=>{
+      document.getElementById('table-wrapper').appendChild(table);
+    }, 500);
+
   }
 
 
-  close() {
-    this.modalCtrl.dismiss();
+  printTable() {
+    PrintHTML.PrintHTML(document.getElementById('table-wrapper').innerHTML);
   }
+
 
 }

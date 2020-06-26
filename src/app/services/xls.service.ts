@@ -10,8 +10,8 @@ import { Injectable } from '@angular/core';
 import * as XLSX from 'xlsx';
 import {AuthService} from './auth.service';
 import {BusinessService} from './business.service';
-import {of} from 'rxjs';
 import {formatDate, formatNumber} from '@angular/common';
+import {PrintHTML} from '../utilities/PrintHTML';
 
 @Injectable({
   providedIn: 'root'
@@ -77,25 +77,47 @@ export class XlsService {
   }
 
 
-  createExcel(data: any[][], headers: string[], fileName: string, title?: string, subject?: string) {
+  createWorkBook() {
+    this.workbook = XLSX.utils.book_new();
+    this.workbook.Workbook = {
+      Views: [],
+    };
+  }
 
-    // Create new book
-    const workBook = XLSX.utils.book_new();
 
-    // Add headers
-    data.unshift(headers);
+  addSheetToWorkbook(data: any[][], sheetName?: string, rtl: boolean = false) {
+
+    if(!this.workbook)
+      throw Error('Should create workbook first!');
 
     // Translate data and create new sheet
     XlsService.TranslateData(data);
     const sheet = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(workBook, sheet);
+
+    const headers = data[0];
+
+    // Set each column width as the width of header text length or the data text length (the widest)
+    sheet['!cols'] = data[1].map((col, index)=>{return {
+      wch: Math.max((''+col).length, headers[index].length, 10),
+    }});
+
+    // Set RTL
+    this.workbook.Workbook.Views.push({RTL: rtl});
+
+    // Append the sheet to the created workbook
+    XLSX.utils.book_append_sheet(this.workbook, sheet, sheetName);
+
+  }
+
+
+  downLoadWorkbook(fileName: string, title?: string, subject?: string) {
 
     // File format
     const bookType = 'xlsx';
     fileName = fileName + '.' + bookType;
 
     // Download file
-    const blob: Blob = XLSX.writeFile(workBook, fileName,{
+    const blob: Blob = XLSX.writeFile(this.workbook, fileName,{
       type: 'file',
       bookType: bookType,
       Props: {
@@ -104,13 +126,41 @@ export class XlsService {
         Company: this.businessService.businessDoc.name,
         Title: title,
         Subject: subject,
-      }
+      },
     });
 
     // Return the file
     return new File([blob], fileName)
 
   }
+
+
+  createHTMLFromSheet(sheet : number | string = 0) : HTMLTableElement {
+
+    // Get sheet name by its index
+    if(typeof sheet == 'number')
+      sheet = this.workbook.SheetNames[sheet];
+
+    // Get sheet by its name
+    const selectedSheet = this.workbook.Sheets[sheet];
+
+    // Create HTML from the sheet
+    const html = XLSX.utils.sheet_to_html(selectedSheet);
+
+    // Configure table HTML for printing
+    const el = document.createElement('div');
+    el.innerHTML = html;
+    const table = el.querySelector('table');
+    table.dir = document.dir;
+    el.querySelectorAll('td').forEach((td)=>{
+      td.style.padding = '0 0.5em';
+    });
+
+    // Return the table element
+    return table
+
+  }
+
 
   static TranslateData(data: any[][]) {
 
@@ -122,7 +172,7 @@ export class XlsService {
           data[i][j] = formatNumber(cell, 'en-US', '1.0-3').replace(/,/g, '');
 
         // To date format that excel can read
-        if(cell instanceof Date || (typeof cell == 'number' && (''+cell).length === 13 && (''+cell).startsWith('1')))
+        if(cell instanceof Date)
           data[i][j] = formatDate(cell, 'dd/MM/yyyy HH:mm:ss', 'en-US');
 
         // No data
