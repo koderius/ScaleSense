@@ -84,7 +84,6 @@ export interface OrderDoc {
 
   /** Time of supply */
   supplyTime?: number;
-  realSupplyTime?: number; // TODO
 
   /** Order status */
   status?: OrderStatus;

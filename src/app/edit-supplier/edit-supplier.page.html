@@ -86,6 +86,16 @@
             </ion-col>
           </ion-row>
 
+          <ion-row class="input-div" *ngIf="myBusinessMode">
+            <ion-col size="3">דוא"ל הנהלת חשבונות</ion-col>
+            <ion-col>
+              <mat-form-field aria-label="Accountancy email">
+                <input matInput [(ngModel)]="supplier.accountancyEmail" type="email" name="accountancy email" [pattern]="emailRegex">
+                <mat-error>כתובת אימייל לא תקינה</mat-error>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+
           <ion-row class="input-div" *ngIf="!myBusinessMode">
             <ion-col size="3">סטטוס</ion-col>
             <ion-col>

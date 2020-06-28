@@ -107,6 +107,7 @@ export class WeightModalComponent implements OnInit, OnDestroy {
     this.product.finalWeight = this.totalNetto;
     this.product.isManualWeight = false;
     this.product.isWeightMatch = this.orderMatch;
+    this.product.timeOfWeight = Date.now();
     this.modalCtrl.dismiss({data: this.product.finalWeight, role: 'ok'});
   }
 

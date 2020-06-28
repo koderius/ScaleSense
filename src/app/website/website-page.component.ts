@@ -39,15 +39,31 @@ export class WebsitePage {
     this.authService.forgotPassword();
   }
 
+  goToApp() {
+    this.navService.goToAppMain();
+  }
+
+
+  get currentUser() {
+    return this.authService.currentUser;
+  }
+
+
+  async signout() {
+    this.authService.signOut();
+  }
+
 
   // Sign in and go to app main page (after document has loaded)
   async login() {
-    await this.authService.signIn(this.email, this.password);
-    this.authService.onCurrentUser.pipe(
-      take(1)
-    ).subscribe(()=>{
-      this.navService.goToAppMain();
-    });
+    if(this.email && this.password) {
+      await this.authService.signIn(this.email, this.password);
+      this.authService.onCurrentUser.pipe(
+        take(1)
+      ).subscribe(()=>{
+        this.navService.goToAppMain();
+      });
+    }
   }
 
 

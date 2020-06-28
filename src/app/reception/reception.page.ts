@@ -14,6 +14,8 @@ import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
 import {FullCustomerOrderProductDoc, ProductOrder} from '../models/ProductI';
 import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
+import {ReportsGeneratorService} from '../services/reports-generator.service';
+import {BusinessService} from '../services/business.service';
 
 @Component({
   selector: 'app-reception',
@@ -45,6 +47,8 @@ export class ReceptionPage implements OnInit, OnDestroy {
     private platform: Platform,
     private userService: UsersService,
     private weighProductOpener: WeighProductOpenerService,
+    private reportsService: ReportsGeneratorService,
+    private businessService: BusinessService,
   ) {}
 
   get pageTitle() {
@@ -189,6 +193,8 @@ export class ReceptionPage implements OnInit, OnDestroy {
       const expected = Calculator.ProductExpectedNetWeight(product);
       product.isWeightMatch = Calculator.IsTolerant(expected, product.finalWeight, this.products.find((p)=>p.id == product.id).receiveWeightTolerance);
 
+      product.timeOfWeight = Date.now();
+
       this.hasChanges = true;
 
     }
@@ -206,8 +212,9 @@ export class ReceptionPage implements OnInit, OnDestroy {
     const l = this.alerts.loaderStart('מסכם הזמנה...');
     if(await this.orderService.updateOrder(this.order, OrderStatus.CLOSED)) {
       this.orderService.deleteSplitOrder(this.order);
-      alert('הזמנה נסגרה בהצלחה');
+      this.alerts.defaultAlert('הזמנה נסגרה בהצלחה', 'דו"ח קבלה יישלח להנהלת חשבונות');
       this.hasChanges = false;
+      this.sendReceptionReport();
       this.navService.goBack();
     }
     this.alerts.loaderStop(l);
@@ -222,11 +229,30 @@ export class ReceptionPage implements OnInit, OnDestroy {
     }
     const l = this.alerts.loaderStart('מפצל הזמנה...');
     if(await this.orderService.setSplitOrder(this.order)) {
-      alert('פרטי קבלת הזמנה נשמרו');
+      this.alerts.defaultAlert('פרטי קבלת הזמנה נשמרו', 'דו"ח קבלה מפוצלת יישלח להנהלת חשבונות');
       this.hasChanges = false;
+      this.sendReceptionReport(true);
       this.navService.goBack();
     }
     this.alerts.loaderStop(l);
   }
+
+
+  sendReceptionReport(partial?: boolean) {
+
+    // Filter by this order
+    this.reportsService.results = [this.order];
+    // Create data (with all properties) and write it on a xlsx workbook
+    this.reportsService.createReportData(true);
+    this.reportsService.createReportTables();
+    // Send the file to the accountancy (or to the main email if no accountancy)
+    this.reportsService.sendReportEmail(
+      this.businessService.businessDoc.accountancyEmail || this.businessService.businessDoc.contacts[0].email,
+      'order_received' + (partial ? '_partial' : '') + this.order.serial,
+      'דו"ח קבלת סחורה ' + (partial ? '(חלקי)' : '(מלא)'),
+      `מצ"ב דו"ח קבלת סחורה להזמנה: ${this.order.serial}. ${partial ? 'קבלת הסחורה פוצלה. דו"ח מלא יישלח כאשר ההזמנה תסגר סופית.' : ''}`,
+    );
+  }
+
 
 }

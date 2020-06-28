@@ -12,6 +12,7 @@ import {AuthService} from './auth.service';
 import {BusinessService} from './business.service';
 import {formatDate, formatNumber} from '@angular/common';
 import {PrintHTML} from '../utilities/PrintHTML';
+import {WritingOptions} from 'xlsx';
 
 @Injectable({
   providedIn: 'root'
@@ -110,15 +111,15 @@ export class XlsService {
   }
 
 
-  downLoadWorkbook(fileName: string, title?: string, subject?: string) {
+  createFileFromWorkbook(downloadFile?: boolean, fileName?: string, title?: string, subject?: string) {
 
     // File format
     const bookType = 'xlsx';
     fileName = fileName + '.' + bookType;
 
-    // Download file
-    const blob: Blob = XLSX.writeFile(this.workbook, fileName,{
-      type: 'file',
+    // File properties
+    const options: WritingOptions = {
+      type: downloadFile ? 'file' : 'base64',
       bookType: bookType,
       Props: {
         Author: this.authService.currentUser.displayName,
@@ -127,10 +128,16 @@ export class XlsService {
         Title: title,
         Subject: subject,
       },
-    });
+    };
 
-    // Return the file
-    return new File([blob], fileName)
+    // Download as a file (using filename parameter) or create and return base64 format
+    let base64;
+    if(downloadFile)
+      XLSX.writeFile(this.workbook, fileName, options);
+    else
+      base64 = XLSX.write(this.workbook, options);
+
+    return base64;
 
   }
 

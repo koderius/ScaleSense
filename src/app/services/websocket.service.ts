@@ -46,7 +46,7 @@ export class WebsocketService {
 
       // Send scale ID to the server
       clientSocket.onopen = function (evt) {
-        console.log("Client: Connection open");
+        console.log("Client: Connection open", evt);
         this.send('scale:'+scalesId);
       };
 
@@ -70,7 +70,7 @@ export class WebsocketService {
 
       // Close socket
       clientSocket.onclose = function (evt) {
-        console.log("Client:Connection closed.");
+        console.log("Client:Connection closed.", evt);
       };
 
     });

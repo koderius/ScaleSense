@@ -52,9 +52,10 @@ export class AppEnterGuard implements CanActivateChild {
           resolve(this.checkUser() || this.throwBack());
           if(this.alert)
             this.alert.dismiss();
-          this.userSubscription.unsubscribe();
+          if(this.userSubscription)
+            this.userSubscription.unsubscribe();
         }
-        // Ask user to sign in
+        // Ask user to sign in (and keep subscribing)
         else
           this.popSignIn();
       });

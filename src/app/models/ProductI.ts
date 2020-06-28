@@ -99,6 +99,9 @@ export interface ProductOrder extends ProductPublicDoc {
   /** Number of boxes for that product (edited by supplier in final approval) */
   boxes?: number;
 
+  /** Time of reception of the product (time of weight setting) */
+  timeOfWeight?: number;
+
   /** Weight after received and weighed by the customer (in Kg) */
   finalWeight?: number;
 

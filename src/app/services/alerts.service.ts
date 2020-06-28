@@ -63,10 +63,11 @@ export class AlertsService {
   }
 
 
-  async defaultAlert(msg: string) {
+  async defaultAlert(msg: string, details: string = '') {
     const alert = await this.alertCtrl.create({
       header: 'הודעת מערכת',
       subHeader: msg,
+      message: details,
       buttons: ['הבנתי'],
     });
     alert.present();

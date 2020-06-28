@@ -13,7 +13,9 @@ import {OrderStatusTextPipe} from '../pipes/order-status-text.pipe';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {Calculator} from '../utilities/Calculator';
 import {LangService} from './lang.service';
-import {PrintHTML} from '../utilities/PrintHTML';
+import * as firebase from 'firebase/app';
+import 'firebase/firestore';
+import {AuthService} from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +30,6 @@ export class ReportsGeneratorService {
     'serial',
     'status',
     'supplyTime',
-    'realSupplyTime',
     'invoice',
     'driverName',
     'created',
@@ -68,6 +69,7 @@ export class ReportsGeneratorService {
     private orderStatusPipe: OrderStatusTextPipe,
     private unitAmountPipe: UnitAmountPipe,
     private langService: LangService,
+    private authService: AuthService,
   ) {
 
     // Add some properties that are relevant only for the customer
@@ -79,6 +81,7 @@ export class ReportsGeneratorService {
         'isManualWeight',
         'isWeightMatch',
         'weightGap',
+        'timeOfWeight',
       );
       this.businessProperties.push('nid');
     }
@@ -99,6 +102,7 @@ export class ReportsGeneratorService {
   }
 
 
+  // Filter orders
   async getOrders(queries: {status?: OrderStatus[], bids?: string[], fromSupplyTime?: Date, toSupplyTime?: Date, fromCreateTime?: Date, toCreateTime?: Date, fromSerial?: string, toSerial?: string}) {
 
     const oneDay = 24*3600*1000;
@@ -142,6 +146,7 @@ export class ReportsGeneratorService {
   }
 
 
+  // Filter products out of the given orders
   getProducts(queries: {productIds?: string[], categories?: string[]}, orders: OrderDoc[] = this.results) {
 
     orders.forEach((order)=>{
@@ -169,7 +174,7 @@ export class ReportsGeneratorService {
   }
 
 
-  createReportData() : string[][] {
+  createReportData(allProps?: boolean) : string[][] {
 
     const rows: any[][] = [];
     const headers = [];
@@ -184,30 +189,34 @@ export class ReportsGeneratorService {
       order.products.forEach((product, i2)=>{
 
         // Get the order's selected properties
-        const row: any[] = [...this.selectedOrderProperties.values()].map((p)=>{
+        const orderProps = allProps ? this.orderProperties : [...this.selectedOrderProperties.values()];
+        const row: any[] = orderProps.map((p)=>{
           if(i1 === 0 && i2 === 0)
             headers.push(this.propertyNamePipe.transform(p, 'order'));
           switch (p) {
             case 'status': return this.orderStatusPipe.transform(order.status);
-            case 'supplyTime': case 'realSupplyTime': case 'created': return order[p] ? new Date(order[p]) : '';
+            case 'supplyTime': case 'created': return order[p] ? new Date(order[p]) : '';
             default: return order[p];
           }
         });
 
         // Add the business's selected properties
-        row.push(...[...this.selectedBusinessProperties.values()].map((p)=>{
+        const businessProps = allProps ? this.businessProperties : [...this.selectedBusinessProperties.values()];
+        row.push(...businessProps.map((p)=>{
           if(i1 === 0 && i2 === 0)
             headers.push(this.propertyNamePipe.transform(p, 'business'));
           return business ? business[p] : '';
         }));
 
         // Add the product's selected properties
-        row.push(...[...this.selectedProductProperties.values()].map((p)=>{
+        const productProps = allProps ? this.productProperties : [...this.selectedProductProperties.values()];
+        row.push(...productProps.map((p)=>{
           if(i1 === 0 && i2 === 0)
             headers.push(this.propertyNamePipe.transform(p, 'product'));
           switch (p) {
             case 'amount': case 'amountReturned': return product[p] ? this.unitAmountPipe.transform(product[p], product.type) : '';
             case 'weightGap': return product.finalWeight ? product.finalWeight - Calculator.ProductExpectedNetWeight(product) : '';
+            case 'timeOfWeight': return product.timeOfWeight ? new Date(product.timeOfWeight) : '';
             default: return product[p];
           }
         }));
@@ -251,7 +260,31 @@ export class ReportsGeneratorService {
 
   downloadFile() {
     // Download workbook
-    this.xlsx.downLoadWorkbook('scale-sense report');
+    return this.xlsx.createFileFromWorkbook(true, 'scale-sense_report');
+  }
+
+
+  async sendReportEmail(sendTo: string | string[], filename: string, subject: string, text: string = '') : Promise<boolean> {
+    try {
+      await firebase.firestore().collection('mails').add({
+        to: sendTo,
+        message: {
+          subject: subject,
+          html: `<p>${text}</p><b>ע"י ${this.authService.currentUser.displayName} (${this.authService.currentUser.email})</b>`,
+          attachments: [
+            {
+              filename: filename + '.xlsx',
+              content: this.xlsx.createFileFromWorkbook(),
+              encoding: 'base64'
+            }
+          ],
+        }
+      });
+      return true;
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
 }

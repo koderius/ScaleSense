@@ -495,13 +495,17 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 
   // Get all orders that were sent to the supplier but has not been opened after 24 hours
   const unOpenedOrders = await firestore.collection('orders')
-  .where('status', 'in', [10, 11])                       // Have not been opened yet
-  .where('adminAlerts.nAfter24', '<', now - h24)     // Alert has been sent more than 24 hours ago (or has'nt been sent yet)
+  .where('status', 'in', [10, 11])                      // Have not been opened yet
+  .where('adminAlerts.nAfter24', '<', now - h24)        // Alert has been sent more than 24 hours ago (or has'nt been sent yet)
   .get();
 
   unOpenedOrders.docs.forEach((doc) => {
 
     const data = doc.data() as OrderDoc;
+
+    // If supply time has already passed, dont send the alert
+    if(data.supplyTime && data.supplyTime < now)
+      return;
 
     // Notification content
     const notification: BaseNotificationDoc = {
@@ -525,7 +529,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
   });
 
 
-  // Get all orders that were not finally approved 24 before supply time
+  // Get all orders that were not finally approved 24 hours before supply time
   const supplyTimeOrders = await firestore.collection('orders')
   .where('status', 'in', [10, 11, 20, 21, 30, 31])
   .where('supplyTime', '<', now + h24)
@@ -562,7 +566,7 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
   if(d.getUTCHours() === 0 && d.getUTCMinutes() < 6) {
 
     // Delete all (successful) mails documents
-    const mails = await firestore.collection('mails').where('state', '==', 'SUCCESS').get();
+    const mails = await firestore.collection('mails').where('delivery.state', '==', 'SUCCESS').get();
     mails.forEach((doc)=>{
       doc.ref.delete();
     });

@@ -12,16 +12,22 @@
         <p>לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית נולום ארווס סאפיאן - פוסיליס קוויס, אקווזמן סחטיר בלובק. תצטנפל בלינדו למרקל אס לכימפו, דול, צוט ומעיוט - לפתיעם ברשג - ולתיעם גדדיש. קוויז דומור ליאמום בלינך רוגצה. לפמעט מוסן מנת. לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. סת אלמנקום ניסי נון ניבאה. דס</p>
         <p>לפמעט מוסן מנת. לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. סת אלמנקום ניסי נון ניבאה. דס</p>
         <div id="login-buttons">
-          <div class="enter-btn" (click)="enterAs = 'c'" [ngClass]="enterAs == 'c' ? 'selected' : ''">
+<!--          <div class="enter-btn" (click)="enterAs = 'c'" [ngClass]="enterAs == 'c' ? 'selected' : ''">-->
+<!--            <span>-->
+<!--              <ion-text>כניסת</ion-text>-->
+<!--              <ion-text>משתמש</ion-text>-->
+<!--            </span>-->
+<!--          </div>-->
+<!--          <div class="enter-btn" (click)="enterAs = 's'" [ngClass]="enterAs == 's' ? 'selected' : ''">-->
+<!--            <span>-->
+<!--              <ion-text>כניסת</ion-text>-->
+<!--              <ion-text>ספק</ion-text>-->
+<!--            </span>-->
+<!--          </div>-->
+          <div class="enter-btn" (click)="enterAs = 'g'" [ngClass]="enterAs == 'g' ? 'selected' : ''">
             <span>
               <ion-text>כניסת</ion-text>
-              <ion-text>משתמש</ion-text>
-            </span>
-          </div>
-          <div class="enter-btn" (click)="enterAs = 's'" [ngClass]="enterAs == 's' ? 'selected' : ''">
-            <span>
-              <ion-text>כניסת</ion-text>
-              <ion-text>ספק</ion-text>
+              <ion-text>ספקים ולקוחות</ion-text>
             </span>
           </div>
         </div>
@@ -30,27 +36,38 @@
 
 
     <div id="login-container" *ngIf="enterAs">
-      <ion-row>
-        <ion-col size="4">
-          <ion-label color="dark" class="ion-float-end">שם משתמש</ion-label>
-        </ion-col>
-        <ion-col>
-          <ion-input [(ngModel)]="email"></ion-input>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size="4">
-          <ion-label color="dark" class="ion-float-end">סיסמה</ion-label>
-        </ion-col>
-        <ion-col>
-          <ion-input type="password" [(ngModel)]="password"></ion-input>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-button shape="round" (click)="login()" [disabled]="!password || !email">כניסה למערכת</ion-button>
-      </ion-row>
-      <a (click)="goToRegister()">הרשמה</a>
-      <a (click)="goToResetPassword()">שכחתי סיסמה</a>
+      <div *ngIf="!currentUser">
+        <ion-row>
+          <ion-col size="4">
+            <ion-label color="dark" class="ion-float-end">שם משתמש</ion-label>
+          </ion-col>
+          <ion-col>
+            <ion-input [(ngModel)]="email" (keyup.enter)="inputPass.setFocus()"></ion-input>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="4">
+            <ion-label color="dark" class="ion-float-end">סיסמה</ion-label>
+          </ion-col>
+          <ion-col>
+            <ion-input type="password" [(ngModel)]="password" #inputPass (keyup.enter)="login()"></ion-input>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-button shape="round" (click)="login()" [disabled]="!password || !email">כניסה למערכת</ion-button>
+        </ion-row>
+        <a (click)="goToRegister()">הרשמה</a>
+        <a (click)="goToResetPassword()">שכחתי סיסמה</a>
+      </div>
+      <div *ngIf="currentUser">
+        <ion-row>
+          <ion-label color="dark" style="margin: auto">שלום {{currentUser.displayName}}</ion-label>
+        </ion-row>
+        <ion-row>
+          <ion-button shape="round" (click)="goToApp()">כניסה למערכת</ion-button>
+        </ion-row>
+        <a (click)="signout()">התנתקות</a>
+      </div>
     </div>
 
     <div class="bg-image" style="top: -2em; pointer-events: none">

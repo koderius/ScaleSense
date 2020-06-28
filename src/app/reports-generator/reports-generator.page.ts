@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ReportsGeneratorService} from '../services/reports-generator.service';
-import {Platform} from '@ionic/angular';
+import {AlertController, Platform} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {CustomersService} from '../services/customers.service';
 import {BusinessService} from '../services/business.service';
@@ -10,6 +10,7 @@ import {formatNumber} from '@angular/common';
 import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {AlertsService} from '../services/alerts.service';
 import {PrintHTML} from '../utilities/PrintHTML';
+import {AlertInput} from '@ionic/core';
 
 @Component({
   selector: 'app-reports-generator',
@@ -43,6 +44,7 @@ export class ReportsGeneratorPage implements OnInit {
     private productService: ProductsService,
     private categoryService: CategoriesService,
     private alerts: AlertsService,
+    private alertCtrl: AlertController,
   ) { }
 
   get narrowScreen() {
@@ -172,6 +174,7 @@ export class ReportsGeneratorPage implements OnInit {
   }
 
 
+  // Create report from according to the filters and show the table in the page
   createReport() {
 
     if(!this.reportsGeneratorService.selectedProductProperties.size && !this.reportsGeneratorService.selectedBusinessProperties.size && !this.reportsGeneratorService.selectedOrderProperties.size) {
@@ -195,8 +198,49 @@ export class ReportsGeneratorPage implements OnInit {
   }
 
 
+  // Print the displayed table
   printTable() {
     PrintHTML.PrintHTML(document.getElementById('table-wrapper').innerHTML);
+  }
+
+
+  // Choose emails and send them the workbook file
+  async sendEmail() {
+
+    // Contact(s) email(s)
+    const inputs: AlertInput[] = this.businessService.businessDoc.contacts.map((c)=>{return {
+      type: 'checkbox',
+      label: `${c.name} (${c.email})`,
+      value: c.email,
+    }});
+
+    // Accountancy email
+    const accountancyEmail = this.businessService.businessDoc.accountancyEmail;
+    if(accountancyEmail)
+      inputs.push({
+        type: 'checkbox',
+        label: `הנהלת חשבונות (${accountancyEmail})`,
+        value: accountancyEmail,
+      });
+
+    // Show alert
+    const a = await this.alertCtrl.create({
+      header: 'שליחת דו"ח',
+      subHeader: 'שלח אל (דוא"ל)',
+      inputs: inputs,
+      buttons: [
+        {
+          text: 'שליחה',
+          handler: async (emails)=>{
+            const filename = 'custom_report_' + new Date().toLocaleDateString().replace(/./g, '-');
+            if (await this.reportsGeneratorService.sendReportEmail(emails, filename, 'דו"ח Scale-sense', 'דו"ח שנוצר בהתאמה אישית'))
+              alert('דוא"ל נשלח');
+          },
+        }
+      ]
+    });
+    a.present();
+
   }
 
 
