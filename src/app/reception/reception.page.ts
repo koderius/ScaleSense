@@ -9,13 +9,13 @@ import {NavigationService} from '../services/navigation.service';
 import {Platform, PopoverController} from '@ionic/angular';
 import {ManualWeightPopoverComponent} from '../manual-weight-popover/manual-weight-popover.component';
 import {Calculator} from '../utilities/Calculator';
-import {isNumber} from 'util';
 import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
 import {FullCustomerOrderProductDoc, ProductOrder} from '../models/ProductI';
 import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 import {ReportsGeneratorService} from '../services/reports-generator.service';
 import {BusinessService} from '../services/business.service';
+import {isNumber} from 'util';
 
 @Component({
   selector: 'app-reception',
