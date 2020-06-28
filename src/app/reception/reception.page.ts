@@ -248,7 +248,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
     // Send the file to the accountancy (or to the main email if no accountancy)
     this.reportsService.sendReportEmail(
       this.businessService.businessDoc.accountancyEmail || this.businessService.businessDoc.contacts[0].email,
-      'order_received' + (partial ? '_partial' : '') + this.order.serial,
+      'order_reception' + (partial ? '_partial_' : '_') + this.order.serial,
       'דו"ח קבלת סחורה ' + (partial ? '(חלקי)' : '(מלא)'),
       `מצ"ב דו"ח קבלת סחורה להזמנה: ${this.order.serial}. ${partial ? 'קבלת הסחורה פוצלה. דו"ח מלא יישלח כאשר ההזמנה תסגר סופית.' : ''}`,
     );

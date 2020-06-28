@@ -6,6 +6,7 @@ import {BusinessService} from './business.service';
 import {OrdersService} from './orders.service';
 import {Dictionary} from '../utilities/dictionary';
 import {Objects} from '../utilities/objects';
+import {ReportsGeneratorService} from './reports-generator.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class ReturnService {
   constructor(
     private businessService: BusinessService,
     private orderService: OrdersService,
+    private reportsService: ReportsGeneratorService,
   ) { }
 
 
@@ -197,13 +199,36 @@ export class ReturnService {
       await batch.commit();
       // When done, clear the list
       this.clearList();
-      // TODO: Print report...
+      this.sendReturnReport();
     }
     catch (e) {
       console.error(e);
     }
 
   }
+
+
+  async sendReturnReport() {
+
+    // For each product document, get its order and set the product in it
+    const promises = this.returnsDocsList.map(async (doc)=>{
+      const order = await this.orderService.getOrderById(doc.orderId, false);
+      const orderDoc = order.getDocument();
+      orderDoc.products = [doc.product];
+      this.reportsService.results.push(orderDoc);
+    });
+    await Promise.all(promises);
+    this.reportsService.createReportData(true);
+    this.reportsService.createReportTables();
+    this.reportsService.sendReportEmail(
+      this.businessService.businessDoc.accountancyEmail || this.businessService.businessDoc.contacts[0].email,
+      'return_report',
+      'דו"ח החזרת סחורה',
+      'מצ"ב דו"ח החזרת סחורה'
+    )
+
+  }
+
 
   removeFromList(id: string) {
     const idx = this.returnsDocsList.findIndex((d)=>d.id == id);
