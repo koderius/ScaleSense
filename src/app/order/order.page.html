@@ -175,14 +175,20 @@
         <div id="dates" *ngIf="customerEditMode || supplierEditDate">
           <p>בחירת תאריך אספקה:</p>
           <div class="date-picker">
-            <ion-icon name="close" (click)="supplyDateInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
+            <ion-icon name="close" (click)="supplyDateInput = supplyHourInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
             <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()" readonly (click)="picker.open()">
             <ion-icon name="caret-down" (click)="picker.open()"></ion-icon>
-            <mat-datepicker #picker></mat-datepicker>
+            <mat-datepicker [touchUi]="narrowScreen" #picker></mat-datepicker>
           </div>
-          <ion-input placeholder="שעה" [(ngModel)]="supplyHourInput" (ionChange)="mergeDateAndTime()" (ionFocus)="timeFocus = true" (ionBlur)="timeFocus = false" [type]="timeFocus || supplyHourInput ? 'time' : 'text'">
-            <ion-icon name="caret-down"></ion-icon>
-          </ion-input>
+<!--          <ion-input (click)="openTimePopover($event)" placeholder="שעה" [value]="supplyHourInput ? supplyHourInput.toLocaleTimeString().slice(0,-3) : null" readonly>-->
+<!--            <ion-icon name="caret-down"></ion-icon>-->
+<!--          </ion-input>-->
+          <app-time-picker
+                  [(date)]="supplyHourInput"
+                  defaultTime="12:00"
+                  placeholder="שעה"
+                  icon="caret-down"
+          ></app-time-picker>
         </div>
 
         <ion-item lines="none" *ngIf="supplierEditMode">

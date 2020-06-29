@@ -6,7 +6,6 @@ import {OrdersService} from '../services/orders.service';
 import {ProductsService} from '../services/products.service';
 import {AlertsService} from '../services/alerts.service';
 import {Order} from '../models/Order';
-import {formatDate} from '@angular/common';
 import {Objects} from '../utilities/objects';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
@@ -16,6 +15,8 @@ import {ProductCustomerDoc, ProductOrder} from '../models/ProductI';
 import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
 import {SupplierStatus} from '../models/Business';
+import {Platform, PopoverController} from '@ionic/angular';
+import {TimePickerPopover} from '../app-time-picker/time-picker-popover/time-picker-popover.component';
 
 @Component({
   selector: 'app-order',
@@ -66,7 +67,7 @@ export class OrderPage implements OnInit {
   dateFocus: boolean;
   timeFocus: boolean;
   supplyDateInput: Date;
-  supplyHourInput: string;
+  supplyHourInput: Date;
   now = new Date().toISOString().slice(0,10); // Today's date as yyyy-mm-dd
   supplierEditDate: boolean;
 
@@ -88,7 +89,14 @@ export class OrderPage implements OnInit {
     private unitPipe: UnitAmountPipe,
     private notificationService: NotificationsService,
     private usersService: UsersService,
+    private platform: Platform,
+    private popoverCtrl: PopoverController,
   ) {}
+
+
+  get narrowScreen() : boolean {
+    return this.platform.width() < 600;
+  }
 
   /** Whether in mode of draft (with wizard) */
   get isDraft() : boolean {
@@ -231,11 +239,28 @@ export class OrderPage implements OnInit {
     // Split order's supply time into 2 inputs (date & time)
     if(this.order.supplyTime) {
       this.supplyDateInput = new Date(this.order.supplyTime);
-      this.supplyHourInput = formatDate(new Date(this.order.supplyTime),'HH:mm','en-US');
+      this.supplyHourInput = new Date(this.order.supplyTime);
     }
 
     this.supplierSeenOrder();
 
+  }
+
+
+  async openTimePopover(evt) {
+    if(!this.supplyHourInput) {
+      this.supplyHourInput = new Date();
+      this.supplyHourInput.setHours(8,0);
+    }
+    const p = await this.popoverCtrl.create({
+      component: TimePickerPopover,
+      componentProps: {date: this.supplyHourInput},
+      event: this.narrowScreen ? null : evt,
+      showBackdrop: this.narrowScreen,
+    });
+    p.present();
+    await p.onDidDismiss();
+    this.mergeDateAndTime();
   }
 
 
@@ -271,8 +296,7 @@ export class OrderPage implements OnInit {
   mergeDateAndTime() {
     if(this.supplyDateInput && this.supplyHourInput) {
       const time = new Date(this.supplyDateInput);
-      time.setHours(+this.supplyHourInput.slice(0,2));
-      time.setMinutes(+this.supplyHourInput.slice(3,5));
+      time.setHours(this.supplyHourInput.getHours(), this.supplyHourInput.getMinutes());
       this.order.supplyTime = time.getTime();
     }
     else

@@ -1,0 +1,87 @@
+<div id="time-picker-wrapper">
+
+  <ion-grid dir="ltr">
+
+    <ion-row>
+
+      <ion-col>
+        <ion-button color="dark" fill="clear" (click)="btnClicked(hourInput, 1)">
+          <ion-icon slot="icon-only" name="chevron-up"></ion-icon>
+        </ion-button>
+      </ion-col>
+
+      <ion-col [size]="separatorColSize"></ion-col>
+
+      <ion-col>
+        <ion-button color="dark" fill="clear" (click)="btnClicked(minInput, 1)">
+          <ion-icon slot="icon-only" name="chevron-up"></ion-icon>
+        </ion-button>
+      </ion-col>
+
+    </ion-row>
+
+    <ion-row>
+
+      <ion-col>
+        <div class="input-wrapper">
+          <ion-input inputmode="numeric"
+                     name="hours"
+                     #hourInput
+                     autofocus
+                     min="0"
+                     max="23"
+                     maxlength="2"
+                     [value]="date ? get2Digits(date.getHours()) : '--'"
+                     (ionFocus)="autoSelect(hourInput)"
+                     (ionBlur)="onBlur(hourInput)"
+                     (input)="onInput($event, hourInput, minInput)"
+          ></ion-input>
+        </div>
+      </ion-col>
+
+      <ion-col [size]="separatorColSize">
+        <ion-input
+                [value]="separator"
+                readonly
+        ></ion-input>
+      </ion-col>
+
+      <ion-col>
+        <div class="input-wrapper">
+          <ion-input inputmode="numeric"
+                     name="minutes"
+                     #minInput
+                     min="0"
+                     max="59"
+                     maxlength="2"
+                     [value]="date ? get2Digits(date.getMinutes()) : '--'"
+                     (ionFocus)="autoSelect(minInput)"
+                     (ionBlur)="onBlur(minInput)"
+                     (input)="onInput($event, minInput)"
+          ></ion-input>
+        </div>
+      </ion-col>
+
+    </ion-row>
+
+    <ion-row>
+
+      <ion-col>
+        <ion-button color="dark" fill="clear" (click)="btnClicked(hourInput, -1)">
+          <ion-icon slot="icon-only" name="chevron-down"></ion-icon>
+        </ion-button>
+      </ion-col>
+
+      <ion-col [size]="separatorColSize"></ion-col>
+
+      <ion-col>
+        <ion-button color="dark" fill="clear" (click)="btnClicked(minInput, -1)">
+          <ion-icon slot="icon-only" name="chevron-down"></ion-icon>
+        </ion-button>
+      </ion-col>
+
+    </ion-row>
+
+  </ion-grid>
+
+</div>

@@ -13,6 +13,7 @@ import {ProductSummeryComponent} from '../components/product-summery/product-sum
 import {ProductsTotalPriceComponent} from '../components/products-total-price/products-total-price.component';
 import {OrderChangeReportComponent} from '../components/order-change-report/order-change-report.component';
 import {MatTooltipModule} from '@angular/material';
+import {AppTimePickerModule} from '../app-time-picker/app-time-picker.module';
 
 @NgModule({
   imports: [
@@ -22,6 +23,7 @@ import {MatTooltipModule} from '@angular/material';
     orderPageRoutingModule,
     ComponentsModule,
     MatTooltipModule,
+    AppTimePickerModule,
   ],
   exports: [
     ProductSummeryComponent,

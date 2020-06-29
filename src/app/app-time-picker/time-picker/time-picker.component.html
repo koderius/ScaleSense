@@ -1,0 +1,11 @@
+<ion-input type="text"
+           readonly
+           [placeholder]="placeholder"
+           [name]="name"
+           [required]="required"
+           [disabled]="disabled"
+           [value]="date ? date.toLocaleTimeString().slice(0,-3) : null"
+           (click)="openPopover($event)"
+>
+  <ion-icon *ngIf="icon" [name]="icon"></ion-icon>
+</ion-input>
