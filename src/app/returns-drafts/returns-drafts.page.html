@@ -64,7 +64,7 @@
             <ion-text>{{getSupplierById(draft.sid)?.name}}</ion-text>
           </ion-col>
           <ion-col>{{draft.orderSerial}}</ion-col>
-          <ion-col>{{draft.productName}}</ion-col>
+          <ion-col>{{draft.product?.name}}</ion-col>
           <ion-col>
             <ion-button color="dark" shape="round" fill="outline" (click)="openDraft(draft)">כניסה לטיוטה</ion-button>
           </ion-col>
@@ -74,8 +74,8 @@
         </ion-row>
 
         <ion-row style="display: flex; justify-content: flex-end">
-          <mat-form-field *ngIf="returnsService.returnsDocsList.length">
-            <input matInput placeholder="שם הנהג המקבל" [(ngModel)]="driverName">
+          <mat-form-field *ngIf="returnsService.returnsDocsList.length" aria-label="Driver name">
+            <input matInput placeholder="שם הנהג המקבל" name="driver name" [(ngModel)]="driverName">
           </mat-form-field>
         </ion-row>
 

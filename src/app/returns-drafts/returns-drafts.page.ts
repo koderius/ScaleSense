@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {SuppliersService} from '../services/suppliers.service';
-import {ReturnDoc} from '../models/Return';
 import {ReturnService} from '../services/return.service';
 import {ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
@@ -9,6 +8,7 @@ import {ActivatedRoute} from '@angular/router';
 import {UsersService} from '../services/users.service';
 import {NavigationService} from '../services/navigation.service';
 import {UserPermission} from '../models/UserDoc';
+import {ReturnObj} from '../models/ReturnObj';
 
 @Component({
   selector: 'app-returns-drafts',
@@ -20,7 +20,7 @@ export class ReturnsDraftsPage implements OnInit {
   supplierQuery: string = '';
   query: string;
 
-  drafts: ReturnDoc[] = [];
+  drafts: ReturnObj[] = [];
 
   driverName: string;
 
@@ -71,24 +71,24 @@ export class ReturnsDraftsPage implements OnInit {
     return this.suppliersService.getSupplierById(id);
   }
 
-  async openDraft(returnDoc: ReturnDoc) {
+  async openDraft(returnObj: ReturnObj) {
     const m = await this.modalService.create({
       component: ReturnGoodModalComponent,
-      componentProps: {returnDoc: returnDoc},
+      componentProps: {returnObj: returnObj},
       backdropDismiss: false,
       cssClass: 'wide-modal',
     });
     m.present();
   }
 
-  async deleteDraft(returnDoc: ReturnDoc) {
+  async deleteDraft(returnDoc: ReturnObj) {
     if(await this.alerts.areYouSure('האם למחוק טיוטת החזרה?')) {
       await this.returnsService.deleteDraft(returnDoc.id);
       this.search();
     }
   }
 
-  onChecked(returnDoc: ReturnDoc ,ev) {
+  onChecked(returnDoc: ReturnObj ,ev) {
 
     if(ev.detail.checked)
       this.returnsService.addDoc(returnDoc, true);
@@ -115,13 +115,15 @@ export class ReturnsDraftsPage implements OnInit {
     if(await this.alerts.areYouSure('האם לשלוח ' + this.returnsService.returnsDocsList.length + ' מוצרים להחזרה?')) {
 
       // Stamp driver name on each product to send
-      this.returnsService.returnsDocsList.forEach((doc)=>{
-        doc.driverName = this.driverName;
-      });
+      if(this.driverName)
+        this.returnsService.returnsDocsList.forEach((draft)=>{
+          draft.product.returnDriverName = this.driverName;
+        });
 
       // Send
       const l = this.alerts.loaderStart('שולח...');
-      await this.returnsService.sendListToSupplier();
+      if(await this.returnsService.sendListToSupplier())
+        this.alerts.defaultAlert('דיווחי החזרות נשלחו לספק', 'דו"ח נשלח בדוא"ל להנהלת חשבונות');
       this.alerts.loaderStop(l);
 
       // Refresh the list

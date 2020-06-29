@@ -243,8 +243,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
     // Filter by this order
     this.reportsService.results = [this.order];
     // Create data (with all properties) and write it on a xlsx workbook
-    this.reportsService.createReportData(true);
-    this.reportsService.createReportTables();
+    this.reportsService.createReportTables(true);
     // Send the file to the accountancy (or to the main email if no accountancy)
     this.reportsService.sendReportEmail(
       this.businessService.businessDoc.accountancyEmail || this.businessService.businessDoc.contacts[0].email,

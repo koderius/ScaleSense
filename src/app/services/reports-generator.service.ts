@@ -3,7 +3,7 @@ import {OrdersService} from './orders.service';
 import {ModalController} from '@ionic/angular';
 import {BusinessService} from './business.service';
 import {OrderDoc, OrderStatus} from '../models/OrderI';
-import {ProductCustomerDoc} from '../models/ProductI';
+import {ProductCustomerDoc, ProductType} from '../models/ProductI';
 import {ProductsService} from './products.service';
 import {SuppliersService} from './suppliers.service';
 import {CustomersService} from './customers.service';
@@ -47,7 +47,8 @@ export class ReportsGeneratorService {
     'price',
     'priceInOrder',
     'boxes',
-    'amountReturned',
+    'returnedWeight',
+    'returnStatus',
   ];
 
   selectedOrderProperties = new Set<string>(JSON.parse(localStorage.getItem(this.LOCAL_STORAGE_ORDER_PROPERTIES) || '[]'));
@@ -214,7 +215,8 @@ export class ReportsGeneratorService {
           if(i1 === 0 && i2 === 0)
             headers.push(this.propertyNamePipe.transform(p, 'product'));
           switch (p) {
-            case 'amount': case 'amountReturned': return product[p] ? this.unitAmountPipe.transform(product[p], product.type) : '';
+            case 'amount': return product[p] ? this.unitAmountPipe.transform(product[p], product.type) : '';
+            case 'returnedWeight': return product[p] ? this.unitAmountPipe.transform(product[p], ProductType.BY_WEIGHT) : '';
             case 'weightGap': return product.finalWeight ? product.finalWeight - Calculator.ProductExpectedNetWeight(product) : '';
             case 'timeOfWeight': return product.timeOfWeight ? new Date(product.timeOfWeight) : '';
             default: return product[p];
@@ -234,20 +236,20 @@ export class ReportsGeneratorService {
   }
 
 
-  createReportTables() : HTMLTableElement {
+  createReportTables(allProps?: boolean) : HTMLTableElement {
 
     // Create workbook
     this.xlsx.createWorkBook();
 
     // Create report data and save it as a sheet in the workbook
-    const data = this.createReportData();
+    const data = this.createReportData(allProps);
     this.xlsx.addSheetToWorkbook(data, this.langService.langProps.title, this.langService.langProps.dir == 'rtl');
 
     // If the system language is not english, add another sheet in english
     if(this.langService.lang != 'en') {
       const orgLang = this.langService.lang;
       this.langService.lang = 'en';
-      const data2 = this.createReportData();
+      const data2 = this.createReportData(allProps);
       this.xlsx.addSheetToWorkbook(data2, this.langService.langProps.title);
       this.langService.lang = orgLang;
     }

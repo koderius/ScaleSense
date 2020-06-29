@@ -142,12 +142,12 @@ export class OrdersListPage implements OnInit, OnDestroy {
     const m = await this.modalCtrl.create({
       component: ReturnGoodModalComponent,
       componentProps: {
-        returnDoc: {
+        returnObj: {
           orderId: this.orderReturn.id,
           orderSerial: this.orderReturn.serial,
           sid: this.orderReturn.sid,
+          cid: this.businessService.myBid,
           product: {...product},
-          productName: product.name,
         },
       },
       backdropDismiss: false,

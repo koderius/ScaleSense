@@ -19,16 +19,16 @@
       <ion-col>
         <ion-item id="product-item" lines="none">
           <ion-thumbnail slot="start">
-            <img [src]="returnDoc.product?.image">
+            <img [src]="returnObj.product?.image">
           </ion-thumbnail>
           <ion-label>
             <h1>
-              <ion-text color="primary" style="font-weight: bold">{{returnDoc.product?.name}}</ion-text>
+              <ion-text color="primary" style="font-weight: bold">{{returnObj.product?.name}}</ion-text>
             </h1>
             <h2 style="display: flex; justify-content: space-between">
-              <p><b>מחיר לק"ג: </b><ion-text>{{returnDoc.product.priceInOrder | price}}</ion-text></p>
-              <p><b>כמות שהוזמנה: </b><ion-text>{{returnDoc.product.amount | unitAmount : returnDoc.product?.type}}</ion-text></p>
-              <p><b>סה"כ מחיר: </b><ion-text>{{(returnDoc.product.amount * returnDoc.product.priceInOrder) | price}}</ion-text></p>
+              <p><b>מחיר לק"ג: </b><ion-text>{{returnObj.product.priceInOrder | price}}</ion-text></p>
+              <p><b>כמות שהוזמנה: </b><ion-text>{{returnObj.product.amount | unitAmount : returnObj.product?.type}}</ion-text></p>
+              <p><b>סה"כ מחיר: </b><ion-text>{{(returnObj.product.amount * returnObj.product.priceInOrder) | price}}</ion-text></p>
             </h2>
           </ion-label>
         </ion-item>
@@ -43,23 +43,16 @@
         </ion-text>
       </ion-col>
       <ion-col>
-        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.REFUND" [ngClass]="returnDoc.status == ReturnStatus.REFUND ? 'selected' : ''">{{ReturnStatus.REFUND | returnStatusText}}</ion-button>
-        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.CHANGE" [ngClass]="returnDoc.status == ReturnStatus.CHANGE ? 'selected' : ''">{{ReturnStatus.CHANGE | returnStatusText}}</ion-button>
-        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnDoc.status = ReturnStatus.TRASH" [ngClass]="returnDoc.status === ReturnStatus.TRASH ? 'selected' : ''">{{ReturnStatus.TRASH | returnStatusText}}</ion-button>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnObj.product.returnStatus = ReturnStatus.REFUND" [ngClass]="returnObj.product.returnStatus == ReturnStatus.REFUND ? 'selected' : ''">{{ReturnStatus.REFUND | returnStatusText}}</ion-button>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnObj.product.returnStatus = ReturnStatus.CHANGE" [ngClass]="returnObj.product.returnStatus == ReturnStatus.CHANGE ? 'selected' : ''">{{ReturnStatus.CHANGE | returnStatusText}}</ion-button>
+        <ion-button fill="outline" size="large" class="ion-margin-end" (click)="returnObj.product.returnStatus = ReturnStatus.TRASH" [ngClass]="returnObj.product.returnStatus === ReturnStatus.TRASH ? 'selected' : ''">{{ReturnStatus.TRASH | returnStatusText}}</ion-button>
       </ion-col>
     </ion-row>
-
-<!--    <ion-row>-->
-<!--      <ion-col size="4">שם נהג מקבל</ion-col>-->
-<!--      <ion-col>-->
-<!--        <ion-input [(date)]="returnDoc.driverName"></ion-input>-->
-<!--      </ion-col>-->
-<!--    </ion-row>-->
 
     <ion-row>
       <ion-col size="4">סיבת החזרה</ion-col>
       <ion-col>
-        <ion-input [(ngModel)]="returnDoc.reason"></ion-input>
+        <ion-input [(ngModel)]="returnObj.product.returnReason"></ion-input>
       </ion-col>
     </ion-row>
 
@@ -69,7 +62,7 @@
         <ion-button fill="outline" size="large" style="max-width: 8em" (click)="weigh()">שקילת מוצר</ion-button>
         <p style="margin: 0.5em">
           <b>כמות להחזרה: </b>
-          <ion-text>{{returnDoc.product.amountReturned ? (returnDoc.product.amountReturned | unitAmount : returnDoc.product?.type) : 'טרם נשקל'}}</ion-text>
+          <ion-text>{{returnObj.product.returnedWeight ? (returnObj.product.returnedWeight | unitAmount : 0) : 'טרם נשקל'}}</ion-text>
         </p>
       </ion-col>
     </ion-row>

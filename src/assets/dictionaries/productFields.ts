@@ -23,10 +23,12 @@ export const DicProductFields : DictionaryType = {
     priceInOrder: 'מחיר סופי',
     comment: 'הערת לקוח',
     boxes: 'מס. ארגזים',
+    timeOfWeight: 'זמן אספקה בפועל',
     finalWeight: 'משקל בקבלה (ק"ג)',
     isManualWeight: 'התקבל ללא שקילה',
     isWeightMatch: 'משקל תואם',
-    amountReturned: 'כמות שהוחזרה',
+    returnedWeight: 'משקל החזרה (ק"ג)',
+    returnStatus: 'סטטוס החזרה',
     weightGap: 'פער במשקל (ק"ג)',
   },
   en: {
@@ -51,10 +53,12 @@ export const DicProductFields : DictionaryType = {
     priceInOrder: 'Final price',
     comment: 'Customer comment',
     boxes: 'No. of boxes',
+    timeOfWeight: 'Arrival time',
     finalWeight: 'Reception weight (kg)',
     isManualWeight: 'Not weighed in reception',
     isWeightMatch: 'Weight match',
-    amountReturned: 'Amount returned',
+    returnedWeight: 'Returned weight (Kg)',
+    returnStatus: 'Return status',
     weightGap: 'Weight gap (kg)'
   }
 };

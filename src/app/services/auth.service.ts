@@ -178,7 +178,12 @@ export class AuthService {
 
   // Sign out (will set the user doc to null, and then navigate to the main page)
   async signOut() : Promise<void> {
-    await this.auth.signOut();
+    try {
+      await this.auth.signOut();
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
 

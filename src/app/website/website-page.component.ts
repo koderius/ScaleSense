@@ -4,7 +4,6 @@ import {MailService} from './mail/mail.service';
 import {MailForm} from './mail/MailForm';
 import {AuthService} from '../services/auth.service';
 import {NavigationService} from '../services/navigation.service';
-import {AlertsService} from '../services/alerts.service';
 import {take} from 'rxjs/operators';
 
 @Component({
@@ -21,6 +20,8 @@ export class WebsitePage {
 
   contact: MailForm = {};
   isSending: boolean;
+
+  isLogin: boolean;
 
   constructor(
     private authService: AuthService,
@@ -57,12 +58,15 @@ export class WebsitePage {
   // Sign in and go to app main page (after document has loaded)
   async login() {
     if(this.email && this.password) {
-      await this.authService.signIn(this.email, this.password);
-      this.authService.onCurrentUser.pipe(
-        take(1)
-      ).subscribe(()=>{
-        this.navService.goToAppMain();
-      });
+      this.isLogin = true;
+      if(await this.authService.signIn(this.email, this.password))
+        this.authService.onCurrentUser.pipe(
+          take(1)
+        ).subscribe(()=>{
+          this.navService.goToAppMain();
+        });
+      else
+        this.isLogin = false;
     }
   }
 

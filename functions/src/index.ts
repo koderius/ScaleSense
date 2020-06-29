@@ -677,7 +677,15 @@ export const onReturnCreated = functions.firestore.document('returns/{returnId}'
     const orderRef = firestore.collection('orders').doc(idParts[0]);
     const products = (await transaction.get(orderRef)).get('products') as ProductOrder[];
     const idx = products.findIndex((p) => p.id == idParts[1]);
-    products[idx].amountReturned = (data.product || {}).amountReturned;
+
+    if(products[idx] && data.product) {
+      products[idx].returnedWeight = data.product.returnedWeight;
+      products[idx].returnStatus = data.product.returnStatus;
+      products[idx].returnReason = data.product.returnReason;
+      products[idx].returnTime = data.product.returnTime;
+      products[idx].returnDriverName = data.product.returnDriverName;
+    }
+
     transaction.update(orderRef, {products: products});
 
   });

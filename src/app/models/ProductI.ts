@@ -1,4 +1,5 @@
 import {BusinessSide} from './Business';
+import {ReturnStatus} from './Return';
 
 /** These are the product's public core properties */
 export interface ProductPublicDoc {
@@ -120,8 +121,12 @@ export interface ProductOrder extends ProductPublicDoc {
    * When the other side approves the changes the property is being deleted */
   priceChangedInOrder?: BusinessSide;
 
-  /** The amount that has been returned to the supplier */
-  amountReturned?: number;
+  /** Product's return data */
+  returnedWeight?: number;
+  returnStatus?: ReturnStatus;
+  returnReason?: string;
+  returnTime?: number;
+  returnDriverName?: string;
 
 }
 

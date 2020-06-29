@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {ReturnService} from '../services/return.service';
-import {ReturnDoc} from '../models/Return';
 import {AlertsService} from '../services/alerts.service';
 import {CustomersService} from '../services/customers.service';
 import {NavigationService} from '../services/navigation.service';
+import {ReturnObj} from '../models/ReturnObj';
 
 @Component({
   selector: 'app-returns',
@@ -12,7 +12,7 @@ import {NavigationService} from '../services/navigation.service';
 })
 export class ReturnsPage implements OnInit {
 
-  myReturns: ReturnDoc[] = [];
+  myReturns: ReturnObj[] = [];
 
   constructor(
     private returnService: ReturnService,
@@ -31,7 +31,7 @@ export class ReturnsPage implements OnInit {
 
 
 
-  async deleteReturn(returnDoc: ReturnDoc) {
+  async deleteReturn(returnDoc: ReturnObj) {
     if(await this.alerts.areYouSure('האם למחוק מסמך החזרה?')) {
       await this.returnService.deleteReturn(returnDoc.id);
       // Refresh current page
