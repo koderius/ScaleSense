@@ -220,6 +220,7 @@ export class ReportsGeneratorService {
             case 'returnedWeight': return product[p] ? this.unitAmountPipe.transform(product[p], ProductType.BY_WEIGHT) : '';
             case 'weightGap': return product.finalWeight ? product.finalWeight - Calculator.ProductExpectedNetWeight(product) : '';
             case 'timeOfWeight': return product.timeOfWeight ? new Date(product.timeOfWeight) : '';
+            // case 'returnStatus': return
             default: return product[p];
           }
         }));

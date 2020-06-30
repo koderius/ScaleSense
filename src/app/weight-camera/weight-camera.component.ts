@@ -74,7 +74,7 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     }
 
     // Snapshot from the scales
-    this.weight = await this.websocketService.getWeightSnapshot('mock' || this.businessService.businessDoc.scalesId); // TODO
+    this.weight = await this.websocketService.getWeightSnapshot(this.businessService.businessDoc.scalesId);
 
     // Dismiss current toast
     if(this.toast)

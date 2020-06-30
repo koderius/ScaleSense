@@ -59,18 +59,13 @@ export class AuthService {
 
   // Get the current user (if ready), and then subscribe every document change or auth change
   public onCurrentUser = new Observable<UserDoc | null>(subscriber => {
-
     if(this.isAuthReady)
       subscriber.next(this.currentUser);
-
-    const childSub = this.onDocChange.subscribe(()=>{
-      subscriber.next(this.currentUser);
-    });
-
+    const childSub = this.onDocChange.subscribe(()=>subscriber.next(this.currentUser));
     // Add the inner subscription to the unsubscribe chain (so it will unsubscribe to when unsubscribe the main)
     subscriber.add(childSub);
-
   });
+
 
   // Get current user's document. Only if user's document has loaded, and the user's email is verified
   get currentUser(): UserDoc | null {

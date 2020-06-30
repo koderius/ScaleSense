@@ -5,6 +5,7 @@ import {UserRole} from './models/UserDoc';
 import {AuthService} from './services/auth.service';
 import {NavigationService} from './services/navigation.service';
 import {AlertController} from '@ionic/angular';
+import {takeWhile} from 'rxjs/operators';
 
 /**
  * This guard prevents users entering pages, if they don't have the requested requirements
@@ -14,9 +15,6 @@ import {AlertController} from '@ionic/angular';
   providedIn: 'root'
 })
 export class AppEnterGuard implements CanActivateChild {
-
-  // User subscriber
-  userSubscription;
 
   // Sign in alert
   alert;
@@ -46,19 +44,19 @@ export class AppEnterGuard implements CanActivateChild {
 
     // Get the user data, or wait auth is ready
     return await new Promise<boolean>(resolve => {
-      this.userSubscription = this.authService.onCurrentUser.subscribe((user)=>{
-        // Check the user's requirements
-        if(user) {
-          resolve(this.checkUser() || this.throwBack());
-          if(this.alert)
-            this.alert.dismiss();
-          if(this.userSubscription)
-            this.userSubscription.unsubscribe();
-        }
-        // Ask user to sign in (and keep subscribing)
-        else
-          this.popSignIn();
-      });
+      this.authService.onCurrentUser
+        .pipe(takeWhile(user=>!user, true))         // Subscribe as long as there is no user, and the first time there is a user (inclusive)
+        .subscribe((user)=>{
+          // Check the user's requirements
+          if(user) {
+            resolve(this.checkUser() || this.throwBack());
+            if(this.alert)
+              this.alert.dismiss();
+          }
+          // Ask user to sign in (and keep subscribing)
+          else
+            this.popSignIn();
+        });
     });
 
   }
@@ -104,11 +102,12 @@ export class AppEnterGuard implements CanActivateChild {
         {
           placeholder: 'כתובת דוא"ל',
           type: 'email',
-          name: 'email'
+          name: 'userEmail'
         },
         {
           placeholder: 'סיסמא',
           type: 'password',
+          name: 'password'
         }
       ],
       buttons: [{
@@ -121,7 +120,7 @@ export class AppEnterGuard implements CanActivateChild {
 
     // Try to sign in with the inputs data, pop the alert again if failed
     const res = await this.alert.onDidDismiss();
-    if(res.data.role == 'sign-in' && !await this.authService.signIn(res.data.values[0], res.data.values[1]))
+    if(res.role == 'sign-in' && !await this.authService.signIn(res.data.values['userEmail'], res.data.values['password']))
       this.popSignIn();
 
   }
