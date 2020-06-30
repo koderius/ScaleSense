@@ -57,6 +57,7 @@ export class ReportsGeneratorService {
 
 
   results: OrderDoc[] = [];
+  table: HTMLTableElement;
 
   constructor(
     private modalCtrl: ModalController,
@@ -255,7 +256,8 @@ export class ReportsGeneratorService {
     }
 
     // Return the table
-    return this.xlsx.createHTMLFromSheet();
+    this.table = this.xlsx.createHTMLFromSheet();
+    return this.table;
 
   }
 
@@ -267,6 +269,16 @@ export class ReportsGeneratorService {
 
 
   async sendReportEmail(sendTo: string | string[], filename: string, subject: string, text: string = '') : Promise<boolean> {
+
+    // Make sure there are mails
+    if(!sendTo)
+      return;
+    if(typeof sendTo != 'string') {
+      sendTo = sendTo.filter((mail)=>mail);
+      if(!sendTo.length)
+        return;
+    }
+
     try {
       await firebase.firestore().collection('mails').add({
         to: sendTo,

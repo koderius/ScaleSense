@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {NavController} from '@ionic/angular';
 import {AuthService} from './auth.service';
+import {Router} from '@angular/router';
 
 /**
  * Navigation utility. Contains commands to navigate to all app's routes
@@ -14,6 +15,7 @@ export class NavigationService {
   constructor(
     private navCtrl: NavController,
     private authService: AuthService,
+    private router: Router,
   ) {
 
     // If user is suddenly sign-out, (not while in registration page) throw him to the website homepage
@@ -127,8 +129,8 @@ export class NavigationService {
     this.navCtrl.navigateForward('app/returns');
   }
 
-  goToReports() {
-    this.navCtrl.navigateForward('app/reports-generator');
+  goToReports(hasTable?: boolean) {
+    this.router.navigate(['/app/reports-generator'], {queryParams: hasTable ? {table: hasTable} : {}});
   }
 
 }

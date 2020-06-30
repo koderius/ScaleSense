@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ReportsGeneratorService} from '../services/reports-generator.service';
 import {AlertController, Platform} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
@@ -11,6 +11,10 @@ import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {AlertsService} from '../services/alerts.service';
 import {PrintHTML} from '../utilities/PrintHTML';
 import {AlertInput} from '@ionic/core';
+import {UsersService} from '../services/users.service';
+import {UserPermission} from '../models/UserDoc';
+import {NavigationService} from '../services/navigation.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-reports-generator',
@@ -19,6 +23,7 @@ import {AlertInput} from '@ionic/core';
 })
 export class ReportsGeneratorPage implements OnInit {
 
+  generateMode: boolean;
   step: number = 1;
 
   // Step 1 filters
@@ -45,7 +50,11 @@ export class ReportsGeneratorPage implements OnInit {
     private categoryService: CategoriesService,
     private alerts: AlertsService,
     private alertCtrl: AlertController,
+    private activatedRoute: ActivatedRoute,
+    private users: UsersService,
+    private navService: NavigationService,
   ) { }
+
 
   get narrowScreen() {
     return this.platform.width() < 600;
@@ -116,7 +125,19 @@ export class ReportsGeneratorPage implements OnInit {
   }
 
 
-  ngOnInit() {}
+  ngOnInit() {
+
+    // go to display table (step 4) with a table that has already been created
+    if(this.activatedRoute.snapshot.queryParams['table'] && this.reportsGeneratorService.table)
+      this.goToTableDisplay();
+    // Or generate table from step 1 (only if has permission)
+    else {
+      this.generateMode = true;
+      if(!this.users.hasPermission(UserPermission.REPORTS))
+        this.navService.goBack();
+    }
+
+  }
 
 
   onSerialChange(element: HTMLInputElement) {
@@ -182,17 +203,24 @@ export class ReportsGeneratorPage implements OnInit {
       return;
     }
 
-    this.step = 4;
-
     // Save the selected fields for further use in local storage
     this.reportsGeneratorService.saveSelectedFields();
 
     // Create the report
-    const table = this.reportsGeneratorService.createReportTables();
+    this.reportsGeneratorService.createReportTables();
 
-    // Show the table in the page
+    this.goToTableDisplay();
+
+  }
+
+
+  // Go to display view and set the table
+  goToTableDisplay() {
+
+    this.step = 4;
+
     setTimeout(()=>{
-      document.getElementById('table-wrapper').appendChild(table);
+      document.getElementById('table-wrapper').appendChild(this.reportsGeneratorService.table);
     }, 500);
 
   }

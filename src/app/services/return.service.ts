@@ -8,6 +8,7 @@ import {Dictionary} from '../utilities/dictionary';
 import {Objects} from '../utilities/objects';
 import {ReportsGeneratorService} from './reports-generator.service';
 import {ReturnObj} from '../models/ReturnObj';
+import {NavigationService} from './navigation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,7 @@ export class ReturnService {
     private businessService: BusinessService,
     private orderService: OrdersService,
     private reportsService: ReportsGeneratorService,
+    private navService: NavigationService,
   ) { }
 
 
@@ -214,8 +216,9 @@ export class ReturnService {
     });
     await Promise.all(promises);
     this.reportsService.createReportTables(true);
+    this.navService.goToReports(true);
     this.reportsService.sendReportEmail(
-      this.businessService.businessDoc.accountancyEmail || this.businessService.businessDoc.contacts[0].email,
+      [this.businessService.businessDoc.accountancyEmail, this.businessService.businessDoc.contacts[0].email],
       'return_report',
       'דו"ח החזרת סחורה',
       'מצ"ב דו"ח החזרת סחורה'

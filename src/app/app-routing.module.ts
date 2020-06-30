@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import {AppEnterGuard} from './app-enter-guard.service';
-import {UserPermission} from './models/UserDoc';
 
 const routes: Routes = [
 
@@ -69,7 +68,6 @@ const routes: Routes = [
     path: 'app/reports-generator',
     loadChildren: () => import('./reports-generator/reports-generator.module').then( m => m.ReportsGeneratorPageModule),
     canActivateChild: [AppEnterGuard],
-    data: {permissions: [UserPermission.REPORTS]}
   },
 
 

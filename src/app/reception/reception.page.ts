@@ -244,9 +244,10 @@ export class ReceptionPage implements OnInit, OnDestroy {
     this.reportsService.results = [this.order];
     // Create data (with all properties) and write it on a xlsx workbook
     this.reportsService.createReportTables(true);
+    this.navService.goToReports(true);
     // Send the file to the accountancy (or to the main email if no accountancy)
     this.reportsService.sendReportEmail(
-      this.businessService.businessDoc.accountancyEmail || this.businessService.businessDoc.contacts[0].email,
+      [this.businessService.businessDoc.accountancyEmail, this.businessService.businessDoc.contacts[0].email],
       'order_reception' + (partial ? '_partial_' : '_') + this.order.serial,
       'דו"ח קבלת סחורה ' + (partial ? '(חלקי)' : '(מלא)'),
       `מצ"ב דו"ח קבלת סחורה להזמנה: ${this.order.serial}. ${partial ? 'קבלת הסחורה פוצלה. דו"ח מלא יישלח כאשר ההזמנה תסגר סופית.' : ''}`,

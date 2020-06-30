@@ -10,7 +10,7 @@
 
 <ion-content color="light">
 
-  <div *ngIf="step == 1" class="page-container">
+  <div *ngIf="step == 1 && generateMode" class="page-container">
 
     <ion-card>
 
@@ -77,7 +77,7 @@
   </div>
 
 
-  <div *ngIf="step == 2" class="page-container">
+  <div *ngIf="step == 2 && generateMode" class="page-container">
 
     <ion-card>
 
@@ -203,7 +203,7 @@
   </div>
 
 
-  <div *ngIf="step == 3" class="page-container">
+  <div *ngIf="step == 3 && generateMode" class="page-container">
 
     <ion-item>
       <ion-label color="success">{{numOfRecords()}} רשומות נמצאו.</ion-label>
@@ -309,7 +309,7 @@
     <ion-card id="table-wrapper"></ion-card>
 
     <div class="okBtn">
-      <ion-button shape="round" color="tertiary" (click)="step = 3">
+      <ion-button shape="round" color="tertiary" (click)="step = 3" *ngIf="generateMode">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         <ion-text>הקודם</ion-text>
       </ion-button>
