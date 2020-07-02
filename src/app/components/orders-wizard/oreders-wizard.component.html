@@ -12,7 +12,10 @@
 
     <div class="circle" [ngClass]="_step == 3 ? 'current' : 'before'" [ngStyle]="{cursor: maxStep >= _step ? 'pointer' : ''}" (click)="stepClicked(3)">סיכום הזמנה</div>
 
-    <ion-button id="back-btn" color="secondary" fill="clear" strong="true" (click)="backToMain()">חזרה למסך הראשי</ion-button>
+    <ion-button id="back-btn" color="secondary" fill="clear" strong="true"
+                class="ion-hide-lg-down"
+                (click)="backToMain()"
+    >חזרה למסך הראשי</ion-button>
 
   </div>
 

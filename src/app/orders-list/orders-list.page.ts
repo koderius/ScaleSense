@@ -7,7 +7,7 @@ import {OrderStatus, OrderStatusGroup} from '../models/OrderI';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessService} from '../services/business.service';
 import {ProductsService} from '../services/products.service';
-import {IonSearchbar, ModalController} from '@ionic/angular';
+import {IonContent, IonSearchbar, ModalController} from '@ionic/angular';
 import {ReturnGoodModalComponent} from '../return-good-modal/return-good-modal.component';
 import {ScreenMode} from '../app.component';
 import {OrderActionMode} from '../components/order-item/order-item.component';
@@ -21,6 +21,7 @@ import {ProductOrder} from '../models/ProductI';
 export class OrdersListPage implements OnInit, OnDestroy {
 
   @ViewChild('ionSearchbar', {static: true}) ionSearchbar: IonSearchbar;
+  @ViewChild('content', {static: true}) content: IonContent;
 
   ScreenMode = ScreenMode;
 
@@ -134,6 +135,9 @@ export class OrdersListPage implements OnInit, OnDestroy {
   async openOrderProducts(order: Order) {
     if(this.pageMode == 'goods_return') {
       this.orderReturn = order;
+      setTimeout(()=>{
+        this.content.scrollToBottom();
+      },200);
     }
   }
 

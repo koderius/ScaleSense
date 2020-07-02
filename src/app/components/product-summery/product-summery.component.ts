@@ -6,6 +6,8 @@ import {AlertsService} from '../../services/alerts.service';
 import {ProductsService} from '../../services/products.service';
 import {UsersService} from '../../services/users.service';
 import {UserPermission} from '../../models/UserDoc';
+import {AlertController} from '@ionic/angular';
+import {BusinessService} from '../../services/business.service';
 
 @Component({
   selector: 'app-product-summery',
@@ -40,6 +42,8 @@ export class ProductSummeryComponent implements OnInit {
     private alertsService: AlertsService,
     private productService: ProductsService,
     private usersService: UsersService,
+    private alertCtrl: AlertController,
+    public businessService: BusinessService,
   ) { }
 
   get hasPermissionToChangePrice() {
@@ -80,5 +84,82 @@ export class ProductSummeryComponent implements OnInit {
     this.edit = false;
     this.doneEdit.emit();
   }
+
+
+  // Show product's comment alert (in mobile mode). Can be edited only by the customer (on edit mode)
+  async popComment() {
+    const a = await this.alertCtrl.create({
+      subHeader: 'הערה למוצר ' + this.productOrder.name,
+      inputs: [{
+        name: 'comment',
+        placeholder: 'הערה לספק',
+        value: this.productOrder.comment,
+        disabled: this.businessService.side == 's' || !this.editProduct,
+      }],
+      buttons: [{
+        text: 'אישור',
+        handler: (data)=>this.productOrder.comment = data['comment'],
+      }],
+    });
+    a.present();
+  }
+
+
+  async popEditProduct() {
+    this.editClicked.emit();
+    const a = await this.alertCtrl.create({
+      subHeader: 'עריכת המוצר ' + this.productOrder.name,
+      inputs: [
+        {
+          disabled: true,
+          value: `כמות (${this.unitAmountPipe.transform(null, this.productOrder.type)}):`,
+        },
+        {
+          name: 'amount',
+          type: 'number',
+          value: this.productOrder.amount,
+        },
+        {
+          disabled: true,
+          value: `מחיר ל${this.unitAmountPipe.transform(null, this.productOrder.type)}:`,
+        },
+        {
+          name: 'price',
+          type: 'number',
+          value: this.productOrder.priceInOrder,
+        }
+      ],
+      buttons: [{
+        text: 'אישור',
+        handler: (data)=>{
+          this.tempAmount = +data['amount'];
+          this.tempPrice = +data['price'];
+          this.onAcceptChange();
+        },
+      }],
+    });
+    a.present();
+  }
+
+
+  async popBoxes() {
+    if(this.editBoxes) {
+      const a = await this.alertCtrl.create({
+        subHeader: 'כמות ארגזים במשלוח המוצר ' + this.productOrder.name,
+        inputs: [{
+          name: 'num_of_boxes',
+          type: 'number',
+          placeholder: 'הזן מספר ארגזים',
+          value: this.productOrder.boxes,
+        }],
+        buttons: [{
+          text: 'אישור',
+          handler: (data)=>{this.productOrder.boxes = +data['num_of_boxes']},
+        }],
+      });
+      a.present();
+    }
+  }
+
 
 }

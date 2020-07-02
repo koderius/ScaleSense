@@ -2,8 +2,9 @@
   padding-top: 3em;
 }
 
-.select-container {
+.select-box {
   width: 40%;
+  min-width: 200px;
 }
 
 .suppliers-header {
@@ -14,14 +15,21 @@
 }
 
 .suppliers-boxes {
-  width: 60em;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
   margin: auto;
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(auto-fill, minmax(10em, 1fr));
+  }
 }
 
 .supplier-box {
-  display: inline-block;
   height: 10em;
   width: 10em;
+  @media (max-width: 400px) {
+    height: 8em;
+    width: 8em;
+  }
   margin: 1em;
   cursor: pointer;
   ion-img {
@@ -121,6 +129,7 @@
     app-time-picker {
       height: 2em;
       width: 20%;
+      min-width: 100px;
       border: solid var(--ion-color-medium) 1px;
       border-radius: 1em;
       --padding-start: 1em;
@@ -133,6 +142,7 @@
     }
     .date-picker {
       width: 33%;
+      min-width: 100px;
       height: 2em;
       border: solid var(--ion-color-medium) 1px;
       border-radius: 1em;
@@ -214,14 +224,10 @@
 }
 
 h1#title-with-logo {
-  position: relative;
   margin: 1em 0;
   ion-img {
-    position: absolute;
-    left: 0;
     height: 3em;
     width: 3em;
-    bottom: 0;
-    transform: translateY(25%);
+    transform: translateY(-30%);
   }
 }

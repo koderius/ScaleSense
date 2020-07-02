@@ -12,13 +12,22 @@
         <ion-icon src="../../assets/svg/search.svg"></ion-icon>
       </ion-searchbar>
 
-      <div>
+      <div class="ion-hide-md-down">
         <ion-button shape="round" color="secondary" strong="true" (click)="navService.goToEditSupplier()">
           <ion-icon slot="start" name="add"></ion-icon>
           <ion-text>הקמת ספק חדש</ion-text>
         </ion-button>
         <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
         <input type="file" class="ion-hide" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event); excel.value = null">
+      </div>
+
+      <div class="ion-hide-md-up">
+        <ion-button shape="round" fill="outline" color="secondary" (click)="navService.goToEditSupplier()">
+          <ion-icon slot="icon-only" name="add"></ion-icon>
+        </ion-button>
+        <ion-button fill="outline" shape="round" color="success" (click)="excel.click()">
+          <ion-icon slot="icon-only" src="../../assets/svg/excel.svg"></ion-icon>
+        </ion-button>
       </div>
 
     </div>
@@ -36,10 +45,10 @@
         <ion-row *ngIf="suppliersService.mySuppliers.length">
           <ion-col size="1"></ion-col>
           <ion-col>שם הספק</ion-col>
-          <ion-col>מס. ספק</ion-col>
+          <ion-col size="1" class="ion-hide-md-down">מס. ספק</ion-col>
           <ion-col>איש קשר</ion-col>
-          <ion-col>טלפון</ion-col>
-          <ion-col size="3"></ion-col>
+          <ion-col sizeMd="2" class="ion-hide-sm-down">טלפון</ion-col>
+          <ion-col sizeLg="1" sizeSm="2"></ion-col>
         </ion-row>
 
         <ion-row *ngFor="let supplier of results">
@@ -57,20 +66,17 @@
             <ion-img [src]="supplier.logo" class="ion-margin-end"></ion-img>
             <ion-text>{{supplier.name}}</ion-text>
           </ion-col>
-          <ion-col>{{supplier.nid | number : '3.0-0'}}</ion-col>
+          <ion-col size="1" class="ion-hide-md-down">{{supplier.nid | number : '3.0-0'}}</ion-col>
           <ion-col>{{(supplier.contacts && supplier.contacts[0]) ? supplier.contacts[0].name : ''}}</ion-col>
-          <ion-col>{{(supplier.contacts && supplier.contacts[0]) ? supplier.contacts[0].phone : ''}}</ion-col>
-          <ion-col size="1">
+          <ion-col sizeMd="2" class="ion-hide-sm-down">{{(supplier.contacts && supplier.contacts[0]) ? supplier.contacts[0].phone : ''}}</ion-col>
+          <ion-col sizeLg="1" sizeSm="2">
             <ion-button fill="clear" color="dark" (click)="navService.goToEditSupplier(supplier.id)">
               <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
             </ion-button>
-          </ion-col>
-          <ion-col size="1">
             <ion-button class="small-circle-btn" fill="clear" color="secondary" (click)="deleteSupplier(supplier)">
               <ion-icon slot="icon-only" name="close"></ion-icon>
             </ion-button>
           </ion-col>
-          <ion-col size="1"></ion-col>
         </ion-row>
 
       </ion-grid>

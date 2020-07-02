@@ -1,11 +1,10 @@
 #upper-section {
   background-color: white;
-  //display: flex;
-  //align-items: center;
-  //justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 3em 3em 1em 2em;
   margin: 1em 0 1px;
-  display: block;
   ion-searchbar {
     width: 40% !important;
     min-width: 300px;
@@ -17,15 +16,32 @@
 
 #table-section {
   background-color: white;
-  padding: 1em 2em;
+  padding: 5em 1em 1em;
 }
 @media (max-width: 400px) {
   #table-section {
     padding: 0.5em;
+  }
+  #upper-section {
+    padding: 3em 0 1em;
+    display: block;
+  }
+}
+@media (max-width: 600px) {
+  #upper-section {
+    display: block;
   }
 }
 
 #more-btn {
   --padding-end: 0;
   --padding-start: 0;
+}
+
+#product-filtering {
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: 500px) {
+    display: block;
+  }
 }

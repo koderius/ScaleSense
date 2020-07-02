@@ -1,6 +1,8 @@
 <ion-item lines="none">
+
   <ion-thumbnail slot="start"></ion-thumbnail>
-  <ion-row>
+
+  <ion-row class="ion-hide-lg-down">
     <ion-col [size]="colSize" [push]="colPush">
       <ion-label>
         <h6>סה"כ הזמנה</h6>
@@ -14,4 +16,19 @@
       </ion-label>
     </ion-col>
   </ion-row>
+
+
+<!--  MOBILE-->
+  <ion-label class="ion-hide-lg-up" style="max-width: 12em">
+    <h6>
+      <ion-text>סה"כ הזמנה</ion-text>
+      <ion-text class="ion-float-end">{{price | price}}</ion-text>
+    </h6>
+    <p>
+      <ion-text>המחיר כולל מע"מ</ion-text>
+      <ion-text color="dark"><b class="ion-float-end">{{price | price : 'vat'}}</b></ion-text>
+    </p>
+  </ion-label>
+
+
 </ion-item>

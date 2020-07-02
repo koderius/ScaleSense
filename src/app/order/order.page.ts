@@ -47,6 +47,8 @@ export class OrderPage implements OnInit {
    * */
   private _page: number;
 
+  mobileToCartView: 'order' | 'products' = 'products';
+
   /** Whether in edit mode (editing existing order or creating/editing a draft). Fields are open to be written */
   customerEditMode: boolean;
 
@@ -64,8 +66,6 @@ export class OrderPage implements OnInit {
   filteredSupplierProducts: ProductCustomerDoc[] = null;
 
   /** Date and time inputs */
-  dateFocus: boolean;
-  timeFocus: boolean;
   supplyDateInput: Date;
   supplyHourInput: Date;
   now = new Date().toISOString().slice(0,10); // Today's date as yyyy-mm-dd
@@ -93,6 +93,9 @@ export class OrderPage implements OnInit {
     private popoverCtrl: PopoverController,
   ) {}
 
+  get isLargeScreen() {
+    return this.platform.width() > 992;
+  }
 
   get narrowScreen() : boolean {
     return this.platform.width() < 600;
@@ -422,7 +425,7 @@ export class OrderPage implements OnInit {
       this.alerts.loaderStop(l);
       if(res) {
         this.order = res;
-        this.updateChanges();
+        // this.updateChanges();
       }
       return !!res;
     }

@@ -42,6 +42,9 @@
 .table-section {
   background-color: white;
   padding: 2em;
+  @media (max-width: 768px) {
+    padding: 2em 0;
+  }
 }
 
 

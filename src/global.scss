@@ -96,6 +96,7 @@ input[type="time"]::-ms-clear {
 // Search bar styling + search icon (need to add inside)
 ion-searchbar {
   width: 60% !important;
+  min-width: 320px !important;
   --box-shadow: none !important;
   --icon-color: transparent !important;
   .searchbar-input {

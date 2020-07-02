@@ -7,13 +7,15 @@
   </h6>
 </ion-item>
 
-<ion-item lines="none" *ngIf="productOrder">
+<ion-item lines="none" *ngIf="productOrder" class="ion-hide-lg-down">
+
   <ion-thumbnail slot="start">
     <img [src]="productOrder.image || '../../assets/defaults/default_logo.png'">
   </ion-thumbnail>
+
   <ion-row class="inner-item">
 
-    <ion-col size="3">
+    <ion-col sizeLg="3">
       <h6>{{productOrder.name}}</h6>
     </ion-col>
 
@@ -70,4 +72,76 @@
     </ion-col>
 
   </ion-row>
+
+</ion-item>
+
+<ion-item class="ion-hide-lg-up">
+
+  <ion-thumbnail slot="start">
+    <img [src]="productOrder.image || '../../assets/defaults/default_logo.png'">
+  </ion-thumbnail>
+
+  <ion-label class="ion-hide-sm-down">
+    <h2><b><ion-text color="primary">{{productOrder.name}}</ion-text></b></h2>
+  </ion-label>
+
+  <ion-label class="ion-hide-sm-down">
+    <h6><b>{{productOrder.amount * (productOrder.priceInOrder || productOrder.price) | price}}</b></h6>
+  </ion-label>
+
+  <ion-label>
+    <h2 class="ion-hide-sm-up"><b><ion-text color="primary">{{productOrder.name}}</ion-text></b></h2>
+    <h6 class="ion-hide-sm-up"><b>{{productOrder.amount * (productOrder.priceInOrder || productOrder.price) | price}}</b></h6>
+    <p>
+      <ion-text>{{productOrder.priceInOrder || productOrder.price | price}}</ion-text>
+      <ion-icon name="close" style="vertical-align: middle"></ion-icon>
+      <ion-text>{{productOrder.amount | unitAmount : productOrder.type}}</ion-text>
+    </p>
+  </ion-label>
+
+  <ion-note slot="end" class="ion-float-end"
+            *ngIf="productOrder.boxes || editBoxes"
+            matTooltip="מספר ארגזים"
+            matTooltipPosition="before"
+            style="font-size: 1em"
+            (click)="popBoxes()"
+  >
+    <ion-icon name="cube-outline" style="vertical-align: middle" color="primary"></ion-icon>
+    <ion-text>{{productOrder.boxes || ''}}</ion-text>
+    <ion-text class="ion-hide-xs-down"> ארגזים</ion-text>
+  </ion-note>
+
+  <ion-button fill="clear" slot="end" *ngIf="showComment"
+              [color]="productOrder.comment ? 'primary' : 'dark'"
+              [disabled]="!productOrder.comment && (businessService.side == 's' || !editProduct)"
+              (click)="popComment()"
+  >
+    <ion-icon slot="icon-only" [name]="productOrder.comment ? 'chatbox-ellipses' : 'chatbox-ellipses-outline'"></ion-icon>
+  </ion-button>
+
+  <ion-button fill="clear"
+              (click)="popEditProduct()"
+              *ngIf="editProduct"
+              slot="end">
+    <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+  </ion-button>
+
+  <ion-button class="small-circle-btn" fill="clear"
+              (click)="clearClicked.emit()"
+              *ngIf="editProduct"
+              slot="end">
+    <ion-icon slot="icon-only" name="close"></ion-icon>
+  </ion-button>
+
+  <ion-button *ngIf="returnBtn && !productOrder.returnedWeight"
+              fill="clear" slot="end" shape="round"
+              (click)="returnBtnClicked.emit(productOrder)"
+              style="width: 10em"
+  >החזרה</ion-button>
+
+  <ion-button disabled fill="clear" slot="end" color="danger"
+              *ngIf="returnBtn && productOrder.returnedWeight"
+              style="width: 10em"
+  >הוחזרו {{productOrder.returnedWeight | unitAmount : 0}}</ion-button>
+
 </ion-item>

@@ -1,9 +1,9 @@
 <ion-item lines="none">
-  <ion-thumbnail slot="start">
+  <ion-thumbnail slot="start" class="ion-hide-xs-down">
     <img [src]="product.image || '../../assets/defaults/default_logo.png'">
   </ion-thumbnail>
   <div class="inner-wrapper">
-    <ion-label>
+    <ion-label class="ion-padding-end">
       <h2>
         <ion-icon name="information-circle" color="dark"
                   [matTooltip]="product.description || 'לא קיים תיאור'"

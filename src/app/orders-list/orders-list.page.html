@@ -2,7 +2,7 @@
   <app-header [pageTitle]="pageTitle"></app-header>
 </ion-header>
 
-<ion-content>
+<ion-content #content>
 
   <div class="page-container">
 
@@ -106,6 +106,7 @@
       <ion-list id="return-list">
         <app-product-summery *ngFor="let product of orderReturn.products"
                              [productOrder]="product"
+                             [showComment]="false"
                              [returnBtn]="true"
                              (returnBtnClicked)="onProductReturn($event)"
         ></app-product-summery>

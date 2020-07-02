@@ -11,7 +11,7 @@
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
     </ion-searchbar>
 
-    <div style="width: 40%" class="select-box">
+    <div class="select-box">
       <ion-select (ionChange)="selectOrderSupplier($event.detail.value)" interface="popover" placeholder="רשימת ספקים" mode="md" [interfaceOptions]="{cssClass: 'select-popover', animated: false, showBackdrop: false}" appSelectPopover>
         <ion-select-option *ngFor="let supplier of suppliersService.mySuppliers" [value]="supplier.id">{{supplier.name}}</ion-select-option>
       </ion-select>
@@ -53,13 +53,18 @@
 
   <div class="page-container" *ngIf="page == 2">
 
+    <ion-segment [(ngModel)]="mobileToCartView" class="ion-hide-lg-up">
+      <ion-segment-button value="products">רשימת מוצרים</ion-segment-button>
+      <ion-segment-button value="order">פרטי הזמנה</ion-segment-button>
+    </ion-segment>
+
     <ion-searchbar placeholder="הקלד שם פריט | קטגוריה" (ionChange)="searchProduct($event.detail.value)">
       <ion-icon src="../../assets/svg/search.svg"></ion-icon>
     </ion-searchbar>
 
     <ion-row style="margin-top: 2em">
 
-      <ion-col>
+      <ion-col *ngIf="isLargeScreen || mobileToCartView == 'products'" class="ion-padding-start">
         <ion-list id="products-list">
 
           <ion-list-header>
@@ -75,7 +80,7 @@
         </ion-list>
       </ion-col>
 
-      <ion-col>
+      <ion-col *ngIf="isLargeScreen || mobileToCartView == 'order'" class="ion-padding-end">
         <div id="summery">
 
           <ion-list id="summery-list">
@@ -104,15 +109,15 @@
           <br><br>
           <p id="price-comment" *ngIf="order.products.length">המחיר אינו סופי ועלול להשתנות בהתאם להסכם עם הספק</p>
 
-          <ion-row class="ion-padding ion-justify-content-between">
-            <ion-button shape="round" [color]="order.products.length ? 'primary' : 'dark'" style="margin: auto"
+          <div class="ion-padding">
+            <ion-button shape="round" [color]="order.products.length ? 'primary' : 'dark'" class="ion-margin-end"
                         (click)="page = 3"
                         [disabled]="!order.products.length">
               <ion-icon slot="start" src="../../assets/svg/icon_thumb.svg"></ion-icon>
               <ion-text>אישור הזמנה והמשך בתהליך</ion-text>
             </ion-button>
             <ion-button *ngIf="order.products.length && isDraft" shape="round" (click)="saveDraft()">שמירת טיוטה</ion-button>
-          </ion-row>
+          </div>
 
         </div>
       </ion-col>
@@ -124,10 +129,12 @@
 
   <div class="page-container" *ngIf="page == 3">
 
+    <img [src]="getSelectedSupplier()?.logo" class="ion-hide-md-up" style="width: 100%; height: 3em; object-fit: contain">
+
     <h1 class="ion-text-center" id="title-with-logo">
       <ion-text>פרטי הזמנה</ion-text>
       <ion-text *ngIf="page == 3" [title]="newSerialMsg"> מס. {{order.serial}}</ion-text>
-      <ion-img [src]="getSelectedSupplier()?.logo" style="position: absolute"></ion-img>
+      <ion-img [src]="getSelectedSupplier()?.logo" class="ion-float-end ion-hide-md-down"></ion-img>
     </h1>
     <h4 *ngIf="notification" class="ion-text-center" style="margin: 1em">{{notification}}</h4>
 
@@ -163,28 +170,28 @@
         </div>
 
         <p class="ion-text-center" *ngIf="!customerEditMode && !supplierEditDate">
-          <ion-text>ההזמנה תסופק בתאריך: </ion-text>
+          <ion-text class="ion-hide-sm-down">ההזמנה תסופק בתאריך: </ion-text>
+          <ion-text class="ion-hide-sm-up">זמן אספקה: </ion-text>
           <ion-text color="primary">{{order.supplyTime | date : 'dd/MM/yyyy'}}</ion-text>
-          <ion-text> בשעה: </ion-text>
+          <ion-text class="ion-hide-sm-down"> בשעה: </ion-text>
           <ion-text color="primary">{{order.supplyTime | date : 'HH:mm'}}</ion-text>
           <ion-button *ngIf="supplierEditMode" color="dark" fill="clear" size="small" (click)="supplierEditDate = true" title="שנה תאריך">
             <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
           </ion-button>
         </p>
 
+        <p  *ngIf="customerEditMode || supplierEditDate" class="ion-hide-sm-up">בחירת תאריך אספקה:</p>
         <div id="dates" *ngIf="customerEditMode || supplierEditDate">
-          <p>בחירת תאריך אספקה:</p>
+          <p class="ion-hide-sm-down">בחירת תאריך אספקה:</p>
           <div class="date-picker">
             <ion-icon name="close" (click)="supplyDateInput = supplyHourInput = null; mergeDateAndTime()" [ngClass]="supplyDateInput ? '' : 'ion-hide'"></ion-icon>
             <input placeholder="תאריך" [min]="now" matInput [matDatepicker]="picker" [(ngModel)]="supplyDateInput" (dateChange)="mergeDateAndTime()" readonly (click)="picker.open()">
             <ion-icon name="caret-down" (click)="picker.open()"></ion-icon>
             <mat-datepicker [touchUi]="narrowScreen" #picker></mat-datepicker>
           </div>
-<!--          <ion-input (click)="openTimePopover($event)" placeholder="שעה" [value]="supplyHourInput ? supplyHourInput.toLocaleTimeString().slice(0,-3) : null" readonly>-->
-<!--            <ion-icon name="caret-down"></ion-icon>-->
-<!--          </ion-input>-->
           <app-time-picker
                   [(date)]="supplyHourInput"
+                  (dateChange)="mergeDateAndTime()"
                   defaultTime="12:00"
                   placeholder="שעה"
                   icon="caret-down"
@@ -199,20 +206,35 @@
           ></ion-checkbox>
           <ion-label>
             <h2>אישור סופי</h2>
-            <h6>לקראת יציאה למשלוח. יש למלא כמות ארגזים לכל מוצר ומספר ת. משלוח</h6>
+            <h6 style="white-space: normal">לקראת יציאה למשלוח. יש למלא כמות ארגזים לכל מוצר ומספר ת. משלוח</h6>
           </ion-label>
         </ion-item>
 
-        <p *ngIf="(supplierEditMode && isFinalApprove) || order.status >= OrderStatus.FINAL_APPROVE">
-          <ion-text>מספר תעודת משלוח: </ion-text>
-          <mat-form-field>
-            <input matInput type="number" [(ngModel)]="order.invoice" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="invoice">
-          </mat-form-field>
-          <ion-text>שם נהג: </ion-text>
-          <mat-form-field>
-            <input matInput [(ngModel)]="order.driverName" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="driverName">
-          </mat-form-field>
-        </p>
+        <div *ngIf="(supplierEditMode && isFinalApprove) || order.status >= OrderStatus.FINAL_APPROVE">
+
+          <p class="ion-hide-md-down">
+            <ion-text>מספר תעודת משלוח: </ion-text>
+            <mat-form-field>
+              <input matInput type="number" [(ngModel)]="order.invoice" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="invoice">
+            </mat-form-field>
+            <ion-text>שם נהג: </ion-text>
+            <mat-form-field>
+              <input matInput [(ngModel)]="order.driverName" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="driverName">
+            </mat-form-field>
+          </p>
+
+          <div class="ion-hide-md-up">
+            <ion-item>
+              <ion-label position="stacked">מספר תעודת משלוח</ion-label>
+              <ion-input type="number" [(ngModel)]="order.invoice" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="invoice"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">שם נהג</ion-label>
+              <ion-input [(ngModel)]="order.driverName" [readonly]="order.status >= OrderStatus.FINAL_APPROVE" name="driverName"></ion-input>
+            </ion-item>
+          </div>
+
+        </div>
 
         <div *ngIf="supplierEditMode || order.supplierComment" style="margin-top: 1em">
           <p style="font-weight: normal; margin: 0 0.5em">הערות {{businessService.side == 'c' ? 'מהספק' : 'ללקוח'}}</p>
