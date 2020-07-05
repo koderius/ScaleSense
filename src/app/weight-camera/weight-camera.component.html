@@ -25,13 +25,22 @@
   <img [src]="snapshot" *ngIf="snapshot" class="view">
 
   <ion-fab vertical="bottom" horizontal="center">
-    <ion-fab-button color="secondary" (click)="takeSnapshot()" *ngIf="!snapshot">
+    <ion-fab-button color="secondary" (click)="takeSnapshot()" [disabled]="!websocketService.hasConnection || !stream" *ngIf="!snapshot">
       <ion-icon name="speedometer"></ion-icon>
     </ion-fab-button>
     <ion-fab-button color="secondary" (click)="accept()" *ngIf="snapshot">
       <ion-icon name="checkmark"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+  <div *ngIf="!websocketService.hasConnection" class="ion-padding">
+    <p><ion-text color="danger">בעיה בחיבור</ion-text></p>
+    <ul>
+      <li *ngIf="!websocketService.scalesId">לא קיים משקל משוייך</li>
+      <li *ngIf="!websocketService.appConnected && websocketService.scalesId">בעיה בחיבור לשרת</li>
+      <li *ngIf="!websocketService.scaleConnected && websocketService.appConnected && websocketService.scalesId">לא מקבל אות מהמשקל</li>
+    </ul>
+  </div>
 
 
 </ion-content>

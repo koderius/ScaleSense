@@ -48,7 +48,6 @@ export class AppEnterGuard implements CanActivateChild {
         .pipe(takeWhile(user=>!user, true))         // Subscribe as long as there is no user, and the first time there is a user (inclusive)
         .subscribe((user)=>{
           // Check the user's requirements
-          console.log('Guard:',user);
           if(user) {
             resolve(this.checkUser() || this.throwBack());
             if(this.alert)

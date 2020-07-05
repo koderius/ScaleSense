@@ -3,9 +3,11 @@ import {BusinessSide} from '../models/Business';
 import {NavigationService} from '../services/navigation.service';
 import {UsersService} from '../services/users.service';
 import {UserPermission, UserRole} from '../models/UserDoc';
-import {ModalController} from '@ionic/angular';
+import {AlertController, ModalController} from '@ionic/angular';
 import {NotificationsSettingsModalComponent} from './notifications-settings-modal/notifications-settings-modal.component';
 import {BusinessService} from '../services/business.service';
+import {CameraService} from '../services/camera.service';
+import {WebsocketService} from '../services/websocket.service';
 
 @Component({
   selector: 'app-settings-menu',
@@ -25,6 +27,9 @@ export class SettingsPage implements OnInit {
     public usersService: UsersService,
     private businessService: BusinessService,
     private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
+    private cameraService: CameraService,
+    private websocketService: WebsocketService,
   ) {
     this.side = this.businessService.side;
   }
@@ -45,4 +50,40 @@ export class SettingsPage implements OnInit {
     m.present();
   }
 
+
+  async openEquipmentSettings() {
+    const a = await this.alertCtrl.create({
+      subHeader: 'Equipment settings',
+      inputs: [
+        {
+          value: 'Camera:',
+          disabled: true,
+        },
+        {
+          value: this.cameraService.cameraLabel,
+          disabled: true,
+        },
+        {
+          value: 'Scales ID:',
+          disabled: true,
+        },
+        {
+          name: 'scalesId',
+          value: this.businessService.businessDoc.scalesId,
+          disabled: !this.usersService.hasPermission(UserPermission.SETTINGS_EQUIPMENT),
+          type: 'tel',
+        }
+      ],
+      buttons: [{
+        text: 'OK',
+        handler: (data)=>{
+          this.businessService.businessDocRef.update({scalesId: data['scalesId']});
+        }
+      }],
+      cssClass: 'ltr',
+    });
+    a.present();
+  }
 }
+
+

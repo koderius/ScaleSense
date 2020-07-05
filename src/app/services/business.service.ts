@@ -76,8 +76,8 @@ export class BusinessService {
 
   }
 
-  // Load some business data
-  async getBusinessDoc(side: BusinessSide, bid: string) : Promise<BusinessDoc> {
+  // Load some business data (default - current user's business data, asynchronously)
+  async getBusinessDoc(side: BusinessSide = this.side, bid: string = this.myBid) : Promise<BusinessDoc> {
     let ref = side == 'c' ? this.customersCollection : this.suppliersCollection;
     return (await ref.doc(bid).get()).data();
   }

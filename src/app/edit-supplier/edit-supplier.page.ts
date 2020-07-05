@@ -48,7 +48,7 @@ export class EditSupplierPage implements OnInit {
 
     // Or, edit my business document (for both suppliers and customers)
     else if(id == 'edit' && window.location.pathname.endsWith('/my-business/edit')) {
-      this.supplier = await this.businessService.getBusinessDoc(this.businessService.side, this.businessService.myBid);
+      this.supplier = await this.businessService.getBusinessDoc();
       this.myBusinessMode = true;
     }
 

@@ -5,6 +5,7 @@ import {BusinessService} from '../services/business.service';
 import {WebsocketService} from '../services/websocket.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {ProductType} from '../models/ProductI';
+import {AlertsService} from '../services/alerts.service';
 
 @Component({
   selector: 'app-weight-camera',
@@ -29,10 +30,10 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   constructor(
     public cameraService: CameraService,
     private modalCtrl: ModalController,
-    private businessService: BusinessService,
-    private websocketService: WebsocketService,
+    public websocketService: WebsocketService,
     private toastCtrl: ToastController,
     private unitAmountPipe: UnitAmountPipe,
+    private alertService: AlertsService,
   ) {}
 
   async ngOnInit() {
@@ -43,6 +44,10 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
         await this.takeSnapshot();
         this.cameraService.hideCameraPreview();
       });
+
+    // Open connection if not opened yet
+    if(!this.websocketService.scalesId)
+      this.websocketService.openConnection();
 
     // Show instruction toast
     this.toast = await this.toastCtrl.create({
@@ -74,18 +79,25 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     }
 
     // Snapshot from the scales
-    this.weight = await this.websocketService.getWeightSnapshot(this.businessService.businessDoc.scalesId);
+    try {
 
-    // Dismiss current toast
-    if(this.toast)
-      this.toast.dismiss();
-    // Show weight toast
-    this.toast = await this.toastCtrl.create({
-      header: this.unitAmountPipe.transform(this.weight, ProductType.BY_WEIGHT),
-      position: 'middle',
-      cssClass: 'weight-toast'
-    });
-    this.toast.present();
+      this.weight = await this.websocketService.getScaleSnapshot();
+
+      // Dismiss current toast
+      if(this.toast)
+        this.toast.dismiss();
+
+      // Show weight toast
+      this.toast = await this.toastCtrl.create({
+        header: this.unitAmountPipe.transform(this.weight, ProductType.BY_WEIGHT),
+        position: 'middle',
+        cssClass: 'weight-toast'
+      });
+      this.toast.present();
+    }
+    catch (e) {
+      this.alertService.errorToast('קבלת משקל נכשלה...', e);
+    }
 
   }
 

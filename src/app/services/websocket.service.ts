@@ -1,16 +1,17 @@
-import { Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {MetadataService} from './metadata.service';
-import {Observable} from 'rxjs';
 import {take, timeout} from 'rxjs/operators';
+import {BusinessService} from './business.service';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
 
-  scalesId: string;
+  private clientSocket: WebSocket;
 
-  clientSocket: WebSocket;
+  scalesId: string;
 
   // Whether app client is connected
   appConnected: boolean;
@@ -18,161 +19,122 @@ export class WebsocketService {
   // Whether scales client is connected
   scaleConnected: boolean;
 
-  onScale: Observable<number>;
-
-  constructor() {
-
-    // // TODO: Delete this - scale side
-    // const scaleSocket = new WebSocket("ws://136.243.189.206:8080?id=12345");
-    // scaleSocket.onopen = function (evt) {
-    //   console.log("Scale: Connection open ...");
-    // };
-    // scaleSocket.onmessage = function (evt) {
-    //   console.log("Received Message From Client: " + evt.data);
-    //   if (evt.data === 'scale') {
-    //     this.send('12345:40.41:' + Date.now());
-    //   }
-    // };
-    // scaleSocket.onclose = function (evt) {
-    //   alert("Scale: Connection closed.");
-    // };
-
+  get hasConnection() {
+    return this.appConnected && this.scaleConnected;
   }
 
-  async getWeightSnapshot(scalesId: string) : Promise<number> {
-
-    // Get scales server IP + Port from the metadata
-    const ipPort = MetadataService.SCALE_IP;
-
-    if(!scalesId || !ipPort) {
-      console.error('No scale data');
-      return;
-    }
-
-    // Mock weight
-    if (scalesId === 'mock')
-      return Math.random() * 20;
-
-    return new Promise((resolve, reject) => {
-
-      // Open socket
-      const clientSocket = new WebSocket(`ws://${ipPort}?scale=${scalesId}`);
-
-      // Send scale ID to the server
-      clientSocket.onopen = function (evt) {
-        console.log("Client: Connection open", evt);
-        this.send('scale:'+scalesId);
-      };
-
-      // Get response as {scale ID}:{weight (Kg)}:{time}
-      clientSocket.onmessage = function (evt) {
-        console.log(evt.data);
-        const dataStr = (evt.data as string).split(':');
-        const data = {
-          id: dataStr[0],
-          weight: +dataStr[1],
-          time: +dataStr[2],
-        };
-
-        // Make sure response has same ID and resolve the weight
-        if(data.id == scalesId)
-          resolve(data.weight);
-        // Throw error for timeout TODO?
-        if(Date.now() - data.time > 1000)
-          throw new Error('Scale timeout');
-      };
-
-      // Close socket
-      clientSocket.onclose = function (evt) {
-        console.log("Client:Connection closed.", evt);
-      };
-
-    });
-
-  }
+  // Emits every time websocket gets scale message
+  public onScale = new EventEmitter<number>();
 
 
-  openConnection(scalesId: string) {
+  constructor(private businessService: BusinessService) {}
+
+
+  async openConnection() {
 
     // Set scales ID for further requests
-    if(!scalesId)
-      throw Error('No scale ID');
-    this.scalesId = scalesId;
-
-    // Get scales server IP + Port from the metadata
-    const ipPort = MetadataService.SCALE_IP;
-    if(!ipPort)
-      throw Error('No IP data');
-
-    // Open connection only if not opened yet
-    if(this.appConnected) {
-      console.log('Already connected');
+    this.scalesId = this.businessService.businessDoc.scalesId || (await this.businessService.getBusinessDoc()).scalesId;
+    if(!this.scalesId) {
+      console.error('WS error: No scale ID');
       return;
     }
 
-    // Create observable for the websocket
-    this.onScale = new Observable((subscriber)=>{
+    // Get scales server IP + Port from the metadata
+    const ipPort = MetadataService.SCALE_IP;
+    if(!ipPort) {
+      console.error('WS error: No IP data');
+      return;
+    }
 
-      // Open socket
-      this.clientSocket = new WebSocket(`ws://${ipPort}?scale=${scalesId}`);
+    // Open connection only if not requested yet
+    if(this.clientSocket) {
+      console.log('WS: Already in process...');
+      return;
+    }
+    
+    // Open socket
+    this.clientSocket = new WebSocket(`ws://${ipPort}?scale=${this.scalesId}`);
 
-      // Open connection
-      this.clientSocket.onopen = (evt) => {
-        console.log("Client: Connection open", evt);
-        this.appConnected = true;
-        // Send test scale request
-        this.sendScaleRequest();
-      };
+    // Open connection
+    this.clientSocket.onopen = (evt) => {
+      console.log("WS client: Connection open", evt);
+      this.appConnected = true;
+      // Send scale request
+      this.sendScaleRequest();
+    };
 
-      // Get response as {scale ID}:{weight (Kg)}(:{time})
-      this.clientSocket.onmessage = (evt) => {
+    // Get response as {scale ID}:{msg: "connected" / "disconnected" / weight (Kg)}
+    this.clientSocket.onmessage = (evt) => {
 
-        console.log(evt.data);
+      console.log(evt.data);
 
-        const dataStr = (evt.data as string).split(':');
-        const data = {
-          id: dataStr[0],
-          weight: +dataStr[1],
-          time: +dataStr[2],
-        };
+      const dataStr = (evt.data as string).split(':');
+      const id = dataStr[0];
+      const msg = dataStr[1];
 
-        // Check response and send the weight value to subscribers
-        if(data.id == scalesId && !isNaN(data.weight))
-          subscriber.next(data.weight);
-        else
-          subscriber.error({name: 'Response format error', data: evt.data});
+      if(id == this.scalesId) {
+        switch (msg) {
+          case 'connected': this.scaleConnected = true; break;
+          case 'disconnected': this.scaleConnected = false; break;
+          default:
+            if(!isNaN(+msg))
+              this.onScale.emit(+msg);
+            else
+              console.error('WS error: Invalid response message', evt.data);
+        }
+      }
+      else
+        console.error('WS error: Invalid response ID', evt.data);
 
-      };
+    };
 
-      // On connection close throw error and finish subscription
-      this.clientSocket.onclose = (evt) => {
-        this.appConnected = false;
-        subscriber.error({name: 'App connection closed', data: evt});
-        subscriber.complete();
-      };
+    // On connection close
+    this.clientSocket.onclose = (evt) => {
 
-      // On some error
-      this.clientSocket.onerror = (err) => subscriber.error(err);
+      this.appConnected = this.scaleConnected = false;
+      console.error('WS error: App connection closed', evt);
 
-    });
+      // retry to connect every 5 seconds (only in production mode)
+      if(environment.production) {
+        console.log('WS: Retry connection in 5 seconds...');
+        setTimeout(()=>{
+          this.clientSocket = null;
+          this.openConnection();
+        }, 5000);
+      }
 
+    };
+
+    // On some error
+    this.clientSocket.onerror = (err) => console.error(err);
+      
   }
 
 
   // Send scale request
   sendScaleRequest() {
-    if(this.appConnected)
+
+    // Open connection if not opened yet (it will than send request)
+    if(!this.clientSocket)
+      this.openConnection();
+
+    // If has connection in both sides, send scale request
+    else if(this.hasConnection)
       this.clientSocket.send('scale:' + this.scalesId);
+
     else
-      console.log('Not connected');
+      console.log('WS: No connection');
   }
 
 
   // Send request and wait for the first response (once) within timeout
   getScaleSnapshot() : Promise<number> {
 
+    // Send scale request
+    this.sendScaleRequest();
+
+    // Return the first response within 2 seconds
     return new Promise<number>((resolve, reject) => {
-      this.sendScaleRequest();
       this.onScale
         .pipe(take(1))
         .pipe(timeout(2000))

@@ -5,6 +5,8 @@ import {CameraService} from '../services/camera.service';
 import {UsersService} from '../services/users.service';
 import {UserPermission} from '../models/UserDoc';
 import {Platform} from '@ionic/angular';
+import {WebsocketService} from '../services/websocket.service';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-customer',
@@ -20,6 +22,7 @@ export class CustomerPage implements OnInit {
   constructor(
     private navService: NavigationService,
     private weighService: WeighService,
+    public webSocketService: WebsocketService,
     public cameraService: CameraService,
     public userService: UsersService,
     private platform: Platform,
@@ -28,6 +31,9 @@ export class CustomerPage implements OnInit {
   ngOnInit() {
     // Show camera status only on desktop (mobile has built-in camera)
     this.showCameraStatus = this.platform.is('desktop');
+    // Open websocket for scales
+    if(environment.production)
+      this.webSocketService.openConnection();
   }
 
   get btnSize() {

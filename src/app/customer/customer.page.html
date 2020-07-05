@@ -43,7 +43,7 @@
           <div id="system-status" class="ion-hide-sm-down">
             <p class="ion-hide-md-down">מצב<br>מערכת</p>
             <ion-img *ngIf="showCameraStatus" [src]="cameraService.hasCamera ? '../../assets/images/camera_on.png' : '../../assets/images/camera_off.png'" [ngClass]="cameraService.hasCamera ? 'on' : 'off'"></ion-img>
-            <ion-img src="../../assets/images/scales_on.png" class="on"></ion-img>
+            <ion-img [src]="webSocketService.hasConnection ? '../../assets/images/scales_on.png' : '../../assets/images/scales_off.png'" [ngClass]="webSocketService.hasConnection ? 'on' : 'off'"></ion-img>
             <!--            <ion-img src="../../assets/images/printer_on.png" class="on"></ion-img>-->
           </div>
           <div id="weight">

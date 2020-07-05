@@ -11,6 +11,7 @@ import {environment} from '../../environments/environment';
 export class CameraService {
 
   hasCamera: boolean;
+  cameraLabel: string;
 
   /** Stream of the PC's camera */
   stream: MediaStream;
@@ -44,14 +45,24 @@ export class CameraService {
   /** Open the PC camera and get its stream object (Video only, no audio) */
   async openVideoStream() {
     if(!this.isCordova && !this.stream) {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          // Open video in rear camera ("environment") if possible (on mobile)
-          facingMode: 'environment',
-        },
-        audio: false
-      });
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            // Open video in rear camera ("environment") if possible (on mobile)
+            facingMode: 'environment',
+          },
+          audio: false
+        });
+      }
+      catch (e) {}
       this.hasCamera = this.stream && !!this.stream.getVideoTracks().length;
+      this.cameraLabel = this.stream.getVideoTracks()[0].label;
+      this.stream.oninactive = ()=>{
+        this.hasCamera = false;
+      };
+      this.stream.onactive = ()=>{
+        this.cameraCheck();
+      }
     }
   }
 

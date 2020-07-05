@@ -10,6 +10,7 @@ import { Injectable } from '@angular/core';
 export class MetadataService {
 
   private readonly METADATA_MARKET_LOCAL = 'scale-sense_app_metadata_market';
+  private readonly METADATA_IP_LOCAL = 'scale-sense_app_metadata_ip';
 
   // Market data
   static VAT;
@@ -29,6 +30,7 @@ export class MetadataService {
         MetadataService.COIN_SIGN = localData['coin_sign'];
         MetadataService.VAT = localData['vat'];
       }
+      MetadataService.SCALE_IP = localStorage.getItem(this.METADATA_IP_LOCAL);
     }
     catch (e) {
       localStorage.removeItem(this.METADATA_MARKET_LOCAL);
@@ -48,9 +50,10 @@ export class MetadataService {
       localStorage.setItem(this.METADATA_MARKET_LOCAL, JSON.stringify(snapshot.data()));
     });
 
-    // Load scale server data
+    // Load scale server data and set it on the local service
     this.metadataRef.doc('scaleServer').get().then((snapshot)=>{
       MetadataService.SCALE_IP = snapshot.get('ip');
+      localStorage.setItem(this.METADATA_IP_LOCAL, MetadataService.SCALE_IP);
     });
 
   }
