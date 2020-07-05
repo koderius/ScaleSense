@@ -8,6 +8,7 @@ import {NotificationsSettingsModalComponent} from './notifications-settings-moda
 import {BusinessService} from '../services/business.service';
 import {CameraService} from '../services/camera.service';
 import {WebsocketService} from '../services/websocket.service';
+import {__await} from 'tslib';
 
 @Component({
   selector: 'app-settings-menu',
@@ -71,13 +72,17 @@ export class SettingsPage implements OnInit {
           name: 'scalesId',
           value: this.businessService.businessDoc.scalesId,
           disabled: !this.usersService.hasPermission(UserPermission.SETTINGS_EQUIPMENT),
-          type: 'tel',
+          type: 'number',
         }
       ],
       buttons: [{
         text: 'OK',
         handler: (data)=>{
-          this.businessService.businessDocRef.update({scalesId: data['scalesId']});
+          if(data['scalesId'] != this.businessService.businessDoc.scalesId) {
+            this.businessService.businessDocRef.update({scalesId: ''+data['scalesId']});
+            this.websocketService.refreshConnection();
+            alert('שיוך משקל חדש בוצע. מתחבר תוך מספר שניות...');
+          }
         }
       }],
       cssClass: 'ltr',

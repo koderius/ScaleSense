@@ -111,6 +111,12 @@ export class WebsocketService {
   }
 
 
+  // Close connection. will retry in 5 seconds (on production mode)
+  refreshConnection() {
+    this.clientSocket.close();
+  }
+
+
   // Send scale request
   sendScaleRequest() {
 
