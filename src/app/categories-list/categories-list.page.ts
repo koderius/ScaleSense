@@ -37,12 +37,14 @@ export class CategoriesListPage implements OnInit {
 
   async addCategory() {
     const title = await this.alerts.inputAlert('יצירת קטגוריה חדשה', 'הזן שם קטגוריה');
-    const newCategory = {
-      id: null,
-      title: title,
-      checked: true,
-    };
-    this.categories.push(newCategory);
+    if(title) {
+      const newCategory = {
+        id: null,
+        title: title,
+        checked: true,
+      };
+      this.categories.push(newCategory);
+    }
   }
 
 

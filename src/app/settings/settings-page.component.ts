@@ -8,7 +8,6 @@ import {NotificationsSettingsModalComponent} from './notifications-settings-moda
 import {BusinessService} from '../services/business.service';
 import {CameraService} from '../services/camera.service';
 import {WebsocketService} from '../services/websocket.service';
-import {__await} from 'tslib';
 
 @Component({
   selector: 'app-settings-menu',

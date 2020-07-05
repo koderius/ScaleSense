@@ -107,38 +107,10 @@ export class ProductSummeryComponent implements OnInit {
 
   async popEditProduct() {
     this.editClicked.emit();
-    const a = await this.alertCtrl.create({
-      subHeader: 'עריכת המוצר ' + this.productOrder.name,
-      inputs: [
-        {
-          disabled: true,
-          value: `כמות (${this.unitAmountPipe.transform(null, this.productOrder.type)}):`,
-        },
-        {
-          name: 'amount',
-          type: 'number',
-          value: this.productOrder.amount,
-        },
-        {
-          disabled: true,
-          value: `מחיר ל${this.unitAmountPipe.transform(null, this.productOrder.type)}:`,
-        },
-        {
-          name: 'price',
-          type: 'number',
-          value: this.productOrder.priceInOrder,
-        }
-      ],
-      buttons: [{
-        text: 'אישור',
-        handler: (data)=>{
-          this.tempAmount = +data['amount'];
-          this.tempPrice = +data['price'];
-          this.onAcceptChange();
-        },
-      }],
-    });
-    a.present();
+    const data = await this.alertsService.editProduct(this.productOrder);
+    this.tempAmount = +data['amount'];
+    this.tempPrice = +data['price'];
+    this.onAcceptChange();
   }
 
 

@@ -51,16 +51,17 @@ export class WebsocketService {
       console.log('WS: Already in process...');
       return;
     }
+
+    // ws: / wss: protocol
+    const wsProtocol = window.location.protocol == 'https:' ? 'wss:' : 'ws:';
     
     // Open socket
-    this.clientSocket = new WebSocket(`ws://${ipPort}?scale=${this.scalesId}`);
+    this.clientSocket = new WebSocket(`${wsProtocol}//${ipPort}?scale=${this.scalesId}`);
 
     // Open connection
     this.clientSocket.onopen = (evt) => {
       console.log("WS client: Connection open", evt);
       this.appConnected = true;
-      // Send scale request
-      this.sendScaleRequest();
     };
 
     // Get response as {scale ID}:{msg: "connected" / "disconnected" / weight (Kg)}

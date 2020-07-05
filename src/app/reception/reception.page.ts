@@ -125,6 +125,15 @@ export class ReceptionPage implements OnInit, OnDestroy {
     this.tempPrice = product.priceInOrder;
   }
 
+
+  /** Edit product - for mobile */
+  async popEdit(product: ProductOrder) {
+    const data = await this.alerts.editProduct(product);
+    this.tempAmount = +data['amount'];
+    this.tempPrice = +data['price'];
+    this.onEditDone(product);
+  }
+
   /** Edit product done */
   onEditDone(product: ProductOrder) {
     // Mark changes in price and/or amount

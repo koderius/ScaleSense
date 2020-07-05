@@ -6,6 +6,14 @@
 }
 
 #upper-part {
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: 576px) {
+    display: block;
+  }
+}
+
+#inputs {
   width: 30%;
   min-width: 250px;
   margin-bottom: 1em;

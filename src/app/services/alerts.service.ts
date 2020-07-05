@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {AlertController, LoadingController, ToastController} from '@ionic/angular';
 import {AuthService} from './auth.service';
+import {ProductOrder} from '../models/ProductI';
+import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 
 /**
  * This is a UI service for alerts, prompts and loaders
@@ -17,6 +19,7 @@ export class AlertsService {
     private loadCtrl: LoadingController,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
+    private unitAmountPipe: UnitAmountPipe,
   ) {
 
     window.alert = (msg)=>{this.defaultAlert(msg)};
@@ -104,6 +107,7 @@ export class AlertsService {
       buttons: [
         {
           text: 'אישור',
+          role: 'ok',
         },
         {
           text: 'ביטול',
@@ -113,12 +117,7 @@ export class AlertsService {
     });
     alert.present();
     const res = await alert.onDidDismiss();
-    return res.data.values[0];
-  }
-
-
-  async inputAuth() {
-
+    return res.role == 'ok' ? res.data.values[0] : null;
   }
 
 
@@ -139,6 +138,41 @@ export class AlertsService {
       cssClass: ltr ? 'ltr' : '',
     });
     t.present();
+  }
+
+
+  async editProduct(productOrder: ProductOrder) {
+    const a = await this.alertCtrl.create({
+      subHeader: 'עריכת המוצר ' + productOrder.name,
+      inputs: [
+        {
+          disabled: true,
+          value: `כמות (${this.unitAmountPipe.transform(null, productOrder.type)}):`,
+        },
+        {
+          name: 'amount',
+          type: 'number',
+          value: productOrder.amount,
+        },
+        {
+          disabled: true,
+          value: `מחיר ל${this.unitAmountPipe.transform(null, productOrder.type)}:`,
+        },
+        {
+          name: 'price',
+          type: 'number',
+          value: productOrder.priceInOrder,
+        }
+      ],
+      buttons: [{
+        text: 'אישור',
+        role: 'ok'
+      }],
+    });
+    await a.present();
+    const res = await a.onDidDismiss();
+    if(res.role == 'ok')
+      return res.data.values;
   }
 
 }
