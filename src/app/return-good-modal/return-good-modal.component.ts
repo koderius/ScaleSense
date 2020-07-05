@@ -47,15 +47,9 @@ export class ReturnGoodModalComponent implements OnInit {
   }
 
 
+  // Open product weight modal (in return mode)
   async weigh() {
-    const tempFinalWeight = this.returnObj.product.finalWeight;
-    // Get net weight
-    const res = await this.weighProductOpener.openProductsWeightModal(this.returnObj.product);
-    if(res.role == 'ok') {
-      // Pass the weight data from the final amount to the returned amount, and delete it
-      this.returnObj.product.returnedWeight = this.returnObj.product.finalWeight;
-      this.returnObj.product.finalWeight = tempFinalWeight;
-    }
+    await this.weighProductOpener.openProductsWeightModal(this.returnObj.product, true);
   }
 
   checkFields() {

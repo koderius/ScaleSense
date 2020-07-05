@@ -1,0 +1,115 @@
+ion-toolbar {
+  --background: #f0f0f0;
+  color: var(--ion-color-primary);
+}
+
+ion-content {
+  --background: white;
+}
+
+ion-footer:before {
+  content: none;
+}
+
+ion-radio-group {
+  p {
+    white-space: normal;
+  }
+}
+
+ion-row {
+  margin: 1em 0;
+}
+
+ion-col:first-child > div {
+  font-size: 1.8em;
+  font-weight: bold;
+  height: 1.5em;
+  width: 1.5em;
+  margin: auto;
+  border-radius: 50%;
+  border: solid black 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+ion-col:nth-child(2) {
+  font-weight: bold;
+  display: flex;
+  align-items: flex-start;
+  font-size: 1.5em;
+  user-select: none;
+}
+
+ion-col {
+  ion-button {
+    width: 8em;
+  }
+}
+
+#step1 {
+  display: flex;
+  div {
+    padding: 0 1em;
+  }
+  p {
+    margin: 0;
+  }
+  ion-input {
+    --padding-start: 0;
+    border: solid black 1px;
+    border-radius: 3px;
+    width: 4em;
+    text-align: center;
+  }
+}
+
+#step2 {
+  display: flex;
+  align-items: center;
+  p {
+    margin: 0;
+  }
+}
+
+#step3 {
+  display: flex;
+  align-items: center;
+  h2 {
+    margin: 0;
+    font-weight: bold;
+  }
+}
+
+h2 > ion-icon {
+  vertical-align: text-bottom;
+  margin: 0 0.5em;
+}
+
+#product-item {
+  max-width: 550px;
+  h1 {
+    font-size: 1.5em;
+  }
+}
+
+#product-item-details {
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: 576px) {
+    display: block;
+  }
+}
+
+#checkbox-item {
+  --highlight-height: 0;
+  ion-input {
+    max-width: 6em;
+    border-bottom: solid black 1px;
+    --padding-bottom: 0;
+    --padding-top: 0;
+    --padding-start: 0;
+  }
+}

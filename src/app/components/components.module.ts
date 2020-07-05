@@ -39,6 +39,7 @@ import {SupplierStatusPipe} from '../pipes/supplier-status.pipe';
 import {WeighProductOpenerService} from '../services/weigh-product-opener.service';
 import {MobileMenuComponent} from './mobile-menu/mobile-menu.component';
 import {PropertyNamePipe} from '../pipes/property-name.pipe';
+import {WeightModalComponent2} from '../weight-modal2/weight-modal.component2';
 
 @NgModule({
   imports: [
@@ -64,6 +65,7 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     CustomerPricingModalComponent,
     ManualWeightPopoverComponent,
     SupplierLinkComponent,
+    WeightModalComponent2,
   ],
   declarations: [
     HeaderComponent,
@@ -91,6 +93,7 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     SupplierLinkComponent,
     MobileMenuComponent,
     PropertyNamePipe,
+    WeightModalComponent2,
   ],
   exports: [
     MatSelectModule,
@@ -127,6 +130,7 @@ import {PropertyNamePipe} from '../pipes/property-name.pipe';
     SupplierLinkComponent,
     MobileMenuComponent,
     PropertyNamePipe,
+    WeightModalComponent2,
   ],
   providers: [
     // *Add services that call the entry components of this module

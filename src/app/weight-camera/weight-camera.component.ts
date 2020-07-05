@@ -14,6 +14,8 @@ import {AlertsService} from '../services/alerts.service';
 })
 export class WeightCameraComponent implements OnInit, OnDestroy {
 
+  mock: boolean = true; // todo
+
   /** Base64 string of the camera snapshot */
   snapshot: string;
 
@@ -81,7 +83,10 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     // Snapshot from the scales
     try {
 
-      this.weight = await this.websocketService.getScaleSnapshot();
+      if(this.mock)
+        this.weight = Math.random() * 20;
+      else
+        this.weight = await this.websocketService.getScaleSnapshot();
 
       // Dismiss current toast
       if(this.toast)
