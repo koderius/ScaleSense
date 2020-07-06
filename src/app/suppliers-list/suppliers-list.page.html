@@ -18,7 +18,7 @@
           <ion-text>הקמת ספק חדש</ion-text>
         </ion-button>
         <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
-        <input type="file" class="ion-hide" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event); excel.value = null">
+        <input type="file" class="ion-hide" accept=".xlsx, .xls, .csv" capture="filesystem" #excel (change)="importFromExcel($event); excel.value = null">
       </div>
 
       <div class="ion-hide-md-up">

@@ -4,16 +4,21 @@
   "description": "אפליקציית סקייל סנס",
   "dir": "rtl",
   "lang": "iw",
+  "start_url": "/",
   "theme_color": "#00979c",
   "background_color": "#e9e9e9",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/app/",
-  "start_url": "/app/",
   "icons": [
     {
-      "src": "assets/icons/icon-72x72.png",
+      "src": "assets/icons/icon-64x64.png",
       "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/icon-144x144.png",
+      "sizes": "144x144",
       "type": "image/png",
       "purpose": "maskable any"
     }

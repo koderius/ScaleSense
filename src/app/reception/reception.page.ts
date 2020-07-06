@@ -218,6 +218,7 @@ export class ReceptionPage implements OnInit, OnDestroy {
 
   /** Send order with CLOSED status */
   async finish() {
+    this.order.supplyTime = Date.now();
     const l = this.alerts.loaderStart('מסכם הזמנה...');
     if(await this.orderService.updateOrder(this.order, OrderStatus.CLOSED)) {
       this.orderService.deleteSplitOrder(this.order);

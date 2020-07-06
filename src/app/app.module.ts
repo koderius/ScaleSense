@@ -21,7 +21,14 @@ import {PropertyNamePipe} from './pipes/property-name.pipe';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BrowserAnimationsModule, ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}), ComponentsModule],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
+    ComponentsModule
+  ],
   providers: [
     StatusBar,
     SplashScreen,

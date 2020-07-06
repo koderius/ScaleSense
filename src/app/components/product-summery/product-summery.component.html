@@ -59,14 +59,14 @@
       <p *ngIf="!editComment && productOrder.comment" style="overflow: auto"><ion-text style="text-decoration: underline">הערת לקוח</ion-text>: {{productOrder.comment}}</p>
     </ion-col>
 
-    <ion-col size="1" *ngIf="(editBoxes || productOrder.boxes) && !returnBtn" title="מספר ארגזים">
+    <ion-col size="1" *ngIf="(editBoxes || productOrder.boxes) && !returnBtn && !productOrder.returnedWeight" title="מספר ארגזים">
       <mat-form-field style="width: 100% !important; text-align: center">
         <input matInput [(ngModel)]="productOrder.boxes" [readonly]="!editBoxes">
         <mat-hint>מס. ארגזים</mat-hint>
       </mat-form-field>
     </ion-col>
 
-    <ion-col *ngIf="returnBtn">
+    <ion-col *ngIf="returnBtn || productOrder.returnedWeight">
       <ion-button id="extra-btn" color="dark" fill="outline" shape="round" (click)="returnBtnClicked.emit(productOrder)" *ngIf="!productOrder.returnedWeight">החזרת מוצר</ion-button>
       <ion-label color="danger" *ngIf="productOrder.returnedWeight">הוחזרו {{productOrder.returnedWeight | unitAmount : 0}}</ion-label>
     </ion-col>
@@ -139,9 +139,10 @@
               style="width: 10em"
   >החזרה</ion-button>
 
-  <ion-button disabled fill="clear" slot="end" color="danger"
-              *ngIf="returnBtn && productOrder.returnedWeight"
-              style="width: 10em"
-  >הוחזרו {{productOrder.returnedWeight | unitAmount : 0}}</ion-button>
+  <ion-note slot="end" color="danger"
+            *ngIf="productOrder.returnedWeight"
+            class="ion-no-margin"
+            style="font-size: 0.8em; width: 7em"
+  >הוחזרו<br>{{productOrder.returnedWeight | unitAmount : 0}}</ion-note>
 
 </ion-item>

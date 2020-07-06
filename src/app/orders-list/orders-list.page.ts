@@ -183,6 +183,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
       this.query,
       statuses && statuses.length ? statuses : null,
       byDate ? [this.fromDate, this.toDate] : (this.showPast ? null : [new Date()]),
+      this.pageMode == 'goods_return',
       movePage == 1 ? this.orders.slice(-1)[0] : null,
       movePage == -1 ? this.orders[0] : null,
     );

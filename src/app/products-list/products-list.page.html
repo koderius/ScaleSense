@@ -18,7 +18,7 @@
           <ion-text>הוספת מוצר</ion-text>
         </ion-button>
         <ion-button shape="round" color="dark" strong="true" class="ion-text-capitalize" (click)="excel.click()">טעינת קובץ Excel</ion-button>
-        <input class="ion-hide" type="file" accept=".xlsx, .xls, .csv" #excel (change)="importFromExcel($event); excel.value = null">
+        <input class="ion-hide" type="file" accept=".xlsx, .xls, .csv" capture="filesystem" #excel (change)="importFromExcel($event); excel.value = null">
       </div>
 
       <div class="ion-hide-md-up">

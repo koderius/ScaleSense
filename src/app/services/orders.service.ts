@@ -67,7 +67,7 @@ export class OrdersService {
    * - date range - inclusive,
    * - statuses - can filter by up to 10 different statuses - more than 10 will get all
    * for more than 10 results use pagination */
-  async queryOrders(isDraft: boolean, query: string = '', statusGroup?: OrderStatus[], dates?: Date[], lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
+  async queryOrders(isDraft: boolean, query: string = '', statusGroup?: OrderStatus[], dates?: Date[], reverse?: boolean, lastDoc?: OrderDoc, firstDoc?: OrderDoc) : Promise<Order[]> {
 
     // Get the drafts collection or the orders collection
     const baseRef: CollectionReference | Query = isDraft ? this.myDrafts : this.myOrders;
@@ -89,11 +89,11 @@ export class OrdersService {
 
       // For drafts, sort by modification time
       if(isDraft)
-        ref = baseRef.orderBy('modified');
+        ref = baseRef.orderBy('modified', 'desc');
 
       // For orders, sort by supply time and then by serial number. other possible queries are SID, CID and status
       else
-        ref = baseRef.orderBy('supplyTime').orderBy('serial');
+        ref = baseRef.orderBy('supplyTime', reverse ? 'desc' : 'asc').orderBy('serial', reverse ? 'desc' : 'asc');
 
       // For querying by dates (not for drafts), add date filter
       if(dates && !isDraft) {

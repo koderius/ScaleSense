@@ -147,7 +147,6 @@ export class EditProductPage implements OnInit {
     for (let i = 0; i < inputs.length; i++)
       if(!inputs.item(i).validity.valid) {
         alert('יש למלא את כל השדות המסומנים בכוכבית');
-        console.log(inputs.item(i));
         return false;
       }
 

@@ -101,7 +101,7 @@
 
     <ion-spinner *ngIf="orderReturn && !orderReturn.products.length" color="primary" style="margin: auto"></ion-spinner>
 
-    <div class="table-section" *ngIf="pageMode == 'goods_return' && orderReturn && orderReturn.products.length">
+    <div class="table-section" *ngIf="pageMode == 'goods_return' && orderReturn && orderReturn.products.length" id="return-table">
       <h2 style="font-weight: bold">הזמנה מס. {{orderReturn.serial}}</h2>
       <ion-list id="return-list">
         <app-product-summery *ngFor="let product of orderReturn.products"

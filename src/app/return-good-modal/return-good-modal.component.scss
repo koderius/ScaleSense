@@ -8,9 +8,6 @@ ion-footer {
     content: none;
   }
   div {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
     ion-button:last-child {
       height: 3em;
     }
@@ -23,6 +20,14 @@ ion-content {
 
 #container {
   padding: 2em;
+}
+
+#product-label {
+  display: flex;
+  justify-content: space-between;
+  @media (max-width: 576px) {
+    display: block;
+  }
 }
 
 ion-row {
@@ -55,6 +60,8 @@ ion-col {
   }
   ion-input {
     border-bottom: solid black 1px;
+    --padding-bottom: 0;
+    margin-inline-start: 1em;
     max-width: 15em;
   }
 }

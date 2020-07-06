@@ -70,7 +70,11 @@ export class ProductSummeryComponent implements OnInit {
 
     // Alert for changing price
     if(this.tempPrice != this.productOrder.priceInOrder && await this.alertsService.areYouSure('בוצע שינוי במחיר המוצר', 'האם לשנות את מחיר המוצר באופן קבוע או רק להזמנה זו?', 'באופן קבוע', 'להזמנה זו בלבד')) {
-      this.productService.saveProduct({price: this.tempPrice}).then(()=>alert('מחיר מוצר התעדכן'));
+      this.productOrder.price = this.tempPrice;
+      this.productService.saveProduct(this.productOrder).then((r)=>{
+        if(r)
+          alert('מחיר מוצר עודכן');
+      });
     }
 
     this.productOrder.priceInOrder = this.tempPrice;

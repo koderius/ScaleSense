@@ -238,7 +238,7 @@ export class ReportsGeneratorPage implements OnInit {
     // Contact(s) email(s)
     const inputs: AlertInput[] = this.businessService.businessDoc.contacts.map((c)=>{return {
       type: 'checkbox',
-      label: `${c.name} (${c.email})`,
+      label: c.name,
       value: c.email,
     }});
 
@@ -247,7 +247,7 @@ export class ReportsGeneratorPage implements OnInit {
     if(accountancyEmail)
       inputs.push({
         type: 'checkbox',
-        label: `הנהלת חשבונות (${accountancyEmail})`,
+        label: 'הנהלת חשבונות',
         value: accountancyEmail,
       });
 

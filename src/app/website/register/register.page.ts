@@ -94,10 +94,10 @@ export class RegisterPage implements OnInit {
     // For no ID, open contact form
     if (this.id === '0') {
       this.pageStatus = PageStatus.CONTACT;
-      // If there is a logged-in user, go to his payments page
+      // If there is a logged-in user, ask to sign out
       this.authService.onCurrentUser.pipe(take(1)).subscribe((user)=>{
         if(user)
-          this.pageStatus = PageStatus.PAYMENTS;
+          this.askToSignout();
       });
     }
     else {
@@ -283,6 +283,25 @@ export class RegisterPage implements OnInit {
     }
     else
       alert('סיסמא ואימות סיסמא לא תואמים');
+  }
+
+
+  async askToSignout() {
+    const a = await this.alertCtrl.create({
+      subHeader: 'משתמש מחובר',
+      message: 'את\\ה מחובר\\ת בתור ' + this.authService.currentUser.displayName,
+      buttons: [
+        {
+          text: 'התנתקות',
+          handler: ()=>this.authService.signOut(),
+        },
+        {
+          text: 'חזרה',
+          handler: ()=>this.navService.goToWebHomepage(),
+        }
+      ]
+    });
+    a.present();
   }
 
 }
