@@ -49,9 +49,6 @@
             <ion-col style="padding: 0" *ngIf="!logoPreview">
               <ion-button shape="round" color="secondary" (click)="fileInput.click()">העלאת תמונה</ion-button>
               <input class="ion-hide" type="file" accept="image/*" #fileInput (change)="chooseLogo($event.target.files[0])" name="Image" required>
-              <ion-button fill="clear" color="dark" class="ion-float-end" (click)="getPicture()">
-                <ion-icon name="camera" slot="icon-only"></ion-icon>
-              </ion-button>
               <ion-button fill="clear" color="dark" class="ion-float-end" (click)="enterLink()">
                 <ion-icon name="link" slot="icon-only"></ion-icon>
               </ion-button>

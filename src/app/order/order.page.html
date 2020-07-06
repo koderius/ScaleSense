@@ -78,6 +78,11 @@
           ></app-product-to-cart>
 
         </ion-list>
+        <ion-button shape="round" color="secondary"
+                    *ngIf="!isLargeScreen"
+                    class="ion-float-end ion-margin"
+                    (click)="mobileToCartView = 'order'"
+        >המשך</ion-button>
       </ion-col>
 
       <ion-col *ngIf="isLargeScreen || mobileToCartView == 'order'" class="ion-padding-end">
