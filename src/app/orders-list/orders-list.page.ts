@@ -136,7 +136,7 @@ export class OrdersListPage implements OnInit, OnDestroy {
     if(this.pageMode == 'goods_return') {
       this.orderReturn = order;
       setTimeout(()=>{
-        this.content.scrollToBottom();
+        this.content.scrollToBottom(500);
       },200);
     }
   }

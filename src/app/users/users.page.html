@@ -2,7 +2,7 @@
   <app-header pageTitle="הרשאות גישה"></app-header>
 </ion-header>
 
-<ion-content>
+<ion-content #content>
 
   <div class="page-container">
 
@@ -56,23 +56,33 @@
 
   </div>
 
-  <div class="page-container section" style="margin-bottom: 1em" *ngIf="selectedPermission">
+  <div class="page-container section" style="margin-bottom: 1em" *ngIf="selectedPermission" id="scrollHere">
 
-    <div style="display: flex; justify-content: space-between; align-items: center">
+    <ion-item>
 
-      <h3>
-        <ion-text>{{selectedUser.uid ? 'הרשאות למשתמש: ' : 'הרשאות כלליות לדרג: '}}</ion-text>
-        <ion-text>{{selectedUser.uid ? selectedUser.displayName : (selectedRole | roleName)}}</ion-text>
-      </h3>
+      <ion-label style="white-space: normal">
+        <h1>
+          <ion-text>{{selectedUser.uid ? 'הרשאות למשתמש: ' : 'הרשאות כלליות לדרג: '}}</ion-text>
+          <ion-text>{{selectedUser.uid ? selectedUser.displayName : (selectedRole | roleName)}}</ion-text>
+        </h1>
+      </ion-label>
 
-      <ion-button shape="round" color="dark" fill="outline" size="small"
+      <ion-button shape="round" color="dark" fill="outline" size="small" slot="end"
+                  class="ion-hide-sm-down"
                   *ngIf="selectedPermission && !selectedUser.uid"
                   (click)="restore()">
         <ion-icon slot="start" name="alert-circle-outline" color="danger"></ion-icon>
         <ion-text>שחזור הגדרות מערכת</ion-text>
       </ion-button>
 
-    </div>
+      <ion-button shape="round" fill="clear" slot="end"
+                  class="ion-hide-sm-up"
+                  *ngIf="selectedPermission && !selectedUser.uid"
+                  (click)="restore()">
+        <ion-icon slot="icon-only" name="alert-circle-outline" color="danger"></ion-icon>
+      </ion-button>
+
+    </ion-item>
 
     <app-permissions-list (onChange)="hasChanges = $event"
                           (onCancel)="selectedPermission = null"

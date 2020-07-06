@@ -51,8 +51,8 @@ export class MetadataService {
     });
 
     // Load scale server data and set it on the local service
-    this.metadataRef.doc('scaleServer').get().then((snapshot)=>{
-      MetadataService.SCALE_IP = snapshot.get('ip');
+    this.metadataRef.doc('domain').get().then((snapshot)=>{
+      MetadataService.SCALE_IP = snapshot.get('scaleServer');
       localStorage.setItem(this.METADATA_IP_LOCAL, MetadataService.SCALE_IP);
     });
 

@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {UserDoc, UserRole} from '../models/UserDoc';
 import {Enum} from '../utilities/enum';
 import {AlertsService} from '../services/alerts.service';
 import {UsersService} from '../services/users.service';
 import {NavigationService} from '../services/navigation.service';
+import {IonContent} from '@ionic/angular';
 
 @Component({
   selector: 'app-users',
@@ -11,6 +12,8 @@ import {NavigationService} from '../services/navigation.service';
   styleUrls: ['./users.page.scss'],
 })
 export class UsersPage implements OnInit {
+
+  @ViewChild('content', {static: true}) content: IonContent;
 
   // New user section opened ('newUser'),
   // user permissions section opened ('permissions'),
@@ -53,14 +56,20 @@ export class UsersPage implements OnInit {
 
 
   editPermissions(to: UserDoc | UserRole | null) {
-    // Open the permissions section
+
+    // Open the permissions section (and scroll down there)
     if(to) {
       this.extOpen = 'permissions';
       this.selectedPermission = to;
+      setTimeout(()=>{
+        this.content.scrollToPoint(undefined, document.getElementById('scrollHere').getBoundingClientRect().top - 150, 500);
+      },200);
     }
+
     // Close the permissions section
     else
       this.selectedPermission = this.extOpen = null;
+
   }
 
 

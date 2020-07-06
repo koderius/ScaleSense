@@ -21,11 +21,11 @@
       ></ion-icon>
       <ion-label *ngIf="allow">
         <h2>שליחת הזמנה לספק חדש</h2>
-        <h6>הזמנה ליצירת חשבון ספק תשלח ל-{{supplierDoc?.contacts[idx].email}}</h6>
+        <h6>הזמנה ליצירת חשבון ספק תשלח ל-<br>{{supplierDoc?.contacts[idx].email}}</h6>
       </ion-label>
       <ion-label *ngIf="!allow">
         <h2>שליחת הזמנה חסומה</h2>
-        <h6>כתובת המייל: {{supplierDoc.contacts[idx].email}} כבר מקושרת לחשבון לקוח.</h6>
+        <h6>כתובת המייל: <br>{{supplierDoc.contacts[idx].email}}<br> כבר מקושרת לחשבון לקוח.</h6>
       </ion-label>
       <ion-icon slot="end" name="mail" *ngIf="allow"></ion-icon>
     </ion-item>

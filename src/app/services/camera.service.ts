@@ -57,12 +57,6 @@ export class CameraService {
       catch (e) {}
       this.hasCamera = this.stream && !!this.stream.getVideoTracks().length;
       this.cameraLabel = this.stream.getVideoTracks()[0].label;
-      this.stream.oninactive = ()=>{
-        this.hasCamera = false;
-      };
-      this.stream.onactive = ()=>{
-        this.cameraCheck();
-      }
     }
   }
 

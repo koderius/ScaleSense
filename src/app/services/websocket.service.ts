@@ -52,11 +52,8 @@ export class WebsocketService {
       return;
     }
 
-    // ws: / wss: protocol
-    const wsProtocol = window.location.protocol == 'https:' ? 'wss:' : 'ws:';
-    
     // Open socket
-    this.clientSocket = new WebSocket(`${wsProtocol}//${ipPort}?scale=${this.scalesId}`);
+    this.clientSocket = new WebSocket(`wss://${ipPort}?scale=${this.scalesId}`);
 
     // Open connection
     this.clientSocket.onopen = (evt) => {

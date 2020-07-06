@@ -28,6 +28,9 @@ export class SupplierLinkComponent implements OnInit {
 
   async ngOnInit() {
 
+    // Use only contacts that has email
+    this.supplierDoc.contacts = this.supplierDoc.contacts.filter((c)=>c.email);
+
     this.supplierDoc.contacts.forEach(async (contact)=>{
       // Find contact
       const user = await this.authService.getUserDoc(contact.email);
@@ -52,19 +55,24 @@ export class SupplierLinkComponent implements OnInit {
 
     // Link to the selected supplier
     if(selectedSupplier) {
+
       // If the current supplier has some missing properties, get them from the selected supplier (including ID!)
       for(let p in selectedSupplier)
         if(!this.supplierDoc[p])
           this.supplierDoc[p] = selectedSupplier[p];
+
       // If the current supplier has extra contact available, get one of the selected supplier's contact (that is not in common)
       if(!this.supplierDoc.contacts[1] || !this.supplierDoc.contacts[1].name)
         this.supplierDoc.contacts[1] = selectedSupplier.contacts.find((c)=>c.email != this.supplierDoc.contacts[0].email && c.phone != this.supplierDoc.contacts[0])
+
       // If the supplier has already ID which is not the linked supplier ID, change it
       if(selectedSupplier.id != this.supplierDoc.id)
         await this.supplierService.changeMySupplierId(this.supplierDoc, selectedSupplier.id);
+
       // Dismiss as linked
       if(selectedSupplier.id == this.supplierDoc.id)
         this.modalCtrl.dismiss(null, 'linked');
+
     }
 
     // Dismiss with email address for invitation

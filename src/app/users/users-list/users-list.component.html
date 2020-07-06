@@ -1,4 +1,4 @@
-<ion-grid class="app-table">
+<ion-grid class="app-table ion-hide-lg-down">
 
   <ion-row>
 
@@ -20,7 +20,7 @@
     </ion-col>
 
     <ion-col>{{user.displayName}}</ion-col>
-    <ion-col size="2.5">{{user.email}}</ion-col>
+    <ion-col size="2.5"><a [href]="'mailto:'+user.email">{{user.email}}</a></ion-col>
     <ion-col size="1.5">{{user.role | roleName}}</ion-col>
 
     <ion-col>
@@ -52,3 +52,35 @@
   </ion-row>
 
 </ion-grid>
+
+<ion-list class="ion-hide-lg-up">
+  <div *ngFor="let user of users">
+    <ion-item>
+      <ion-button
+              shape="round" slot="start"
+              [fill]="userToEdit?.uid == user.uid ? 'solid' : 'clear'"
+              [color]="userToEdit?.uid == user.uid ? 'secondary' : 'dark'"
+              (click)="onEditUserClicked(user)"
+              [disabled]="!canEditDetails(user) || disabled"
+      >
+        <ion-icon slot="icon-only" src="../../assets/svg/icon_pen.svg"></ion-icon>
+      </ion-button>
+      <ion-label>
+        <h2>{{user.displayName}}</h2>
+        <h6>{{user.role | roleName}}</h6>
+        <a [href]="'mailto:'+user.email">{{user.email}}</a>
+      </ion-label>
+      <ion-button shape="round" slot="end"
+                  [fill]="selectedUser == user.uid ? 'solid' : 'clear'"
+                  [color]="selectedUser == user.uid ? 'secondary' : 'dark'"
+                  (click)="onPermissionClicked(user)"
+                  [disabled]="!canEditPermissions(user) || disabled">
+        <ion-icon slot="icon-only" name="key"></ion-icon>
+      </ion-button>
+    </ion-item>
+    <app-new-user [show]="userToEdit?.uid == user.uid"
+                  [editUser]="user"
+                  (userCreated)="userToEdit = null"
+    ></app-new-user>
+  </div>
+</ion-list>
