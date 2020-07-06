@@ -248,7 +248,7 @@
             <ion-button slot="end" fill="clear" *ngIf="!narrowScreen" (click)="reportsGeneratorService.selectAllProductsProps()">בחר הכל</ion-button>
           </ion-item-divider>
 
-          <ion-item *ngFor="let prop of (narrowScreen ? reportsGeneratorService.selectedProductProperties : unselectedProductsProps)" button
+          <ion-item *ngFor="let prop of (narrowScreen ? reportsGeneratorService.productProperties : unselectedProductsProps)" button
                     [color]="reportsGeneratorService.selectedProductProperties.has(prop) ? 'tertiary' : ''"
                     (click)="reportsGeneratorService.selectedProductProperties.has(prop) ? reportsGeneratorService.selectedProductProperties.delete(prop) : reportsGeneratorService.selectedProductProperties.add(prop)">
             <ion-icon *ngIf="!narrowScreen" slot="start" name="add-circle" color="success"></ion-icon>
@@ -313,7 +313,7 @@
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         <ion-text>הקודם</ion-text>
       </ion-button>
-      <ion-button shape="round" color="secondary" title="הורד קובץ xlsx" (click)="reportsGeneratorService.downloadFile()">
+      <ion-button shape="round" color="secondary" title="הורד קובץ xlsx" (click)="downloadFile()">
         <ion-icon slot="icon-only" name="download-outline"></ion-icon>
       </ion-button>
       <ion-button shape="round" color="secondary" title="שלח להדפסה" (click)="printTable()">

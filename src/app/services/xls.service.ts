@@ -11,7 +11,6 @@ import * as XLSX from 'xlsx';
 import {AuthService} from './auth.service';
 import {BusinessService} from './business.service';
 import {formatDate, formatNumber} from '@angular/common';
-import {PrintHTML} from '../utilities/PrintHTML';
 import {WritingOptions} from 'xlsx';
 
 @Injectable({

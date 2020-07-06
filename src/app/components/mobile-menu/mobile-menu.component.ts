@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {BusinessService} from '../../services/business.service';
+import {NavigationService} from '../../services/navigation.service';
 
 @Component({
   selector: 'app-mobile-menu',
@@ -12,6 +13,7 @@ export class MobileMenuComponent implements OnInit {
 
   constructor(
     public businessService: BusinessService,
+    public navService: NavigationService,
   ) {}
 
 

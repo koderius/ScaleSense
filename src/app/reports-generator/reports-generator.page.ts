@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ReportsGeneratorService} from '../services/reports-generator.service';
-import {AlertController, Platform} from '@ionic/angular';
+import {AlertController, Platform, ToastController} from '@ionic/angular';
 import {SuppliersService} from '../services/suppliers.service';
 import {CustomersService} from '../services/customers.service';
 import {BusinessService} from '../services/business.service';
@@ -53,6 +53,7 @@ export class ReportsGeneratorPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private users: UsersService,
     private navService: NavigationService,
+    private toastCtrl: ToastController,
   ) { }
 
 
@@ -229,6 +230,16 @@ export class ReportsGeneratorPage implements OnInit {
   // Print the displayed table
   printTable() {
     PrintHTML.PrintHTML(document.getElementById('table-wrapper').innerHTML);
+  }
+
+
+  async downloadFile() {
+    this.reportsGeneratorService.downloadFile();
+    const t = await this.toastCtrl.create({
+      message: 'הורדת הקובץ מתבצעת...',
+      duration: 3000,
+    });
+    t.present();
   }
 
 

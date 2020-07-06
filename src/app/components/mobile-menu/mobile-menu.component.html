@@ -15,7 +15,7 @@
   <ion-content id="menuContent">
     <ion-list>
 
-      <ion-item>
+      <ion-item (click)="navService.goToAppMain(); menu.close()">
         <ion-thumbnail slot="start"  *ngIf="businessService.businessDoc.logo">
           <img [src]="businessService.businessDoc.logo">
         </ion-thumbnail>
