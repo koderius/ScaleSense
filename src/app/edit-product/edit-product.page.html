@@ -163,6 +163,19 @@
             </ion-col>
           </ion-row>
 
+          <ion-row class="input-div" *ngIf="product.offeredPrice">
+            <ion-col size="4">מחיר שהוצע ע"י הספק </ion-col>
+            <ion-col>
+              <mat-form-field aria-label="Price offered">
+                <input matInput type="number" step="any"
+                       name="priceOffered"
+                       [(ngModel)]="product.offeredPrice"
+                       readonly>
+                <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+              </mat-form-field>
+            </ion-col>
+          </ion-row>
+
           <ion-row class="input-div" *ngIf="businessService.side == 'c'">
             <ion-col size="4">טווח מחיר</ion-col>
             <ion-col size="3.75">

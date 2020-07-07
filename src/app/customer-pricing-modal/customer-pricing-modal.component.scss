@@ -7,18 +7,25 @@ ion-content {
   --background: white;
 }
 
-#inputs {
-  padding: 0 2em;
-  margin-top: 4em;
-}
-
-.input-section {
+#price-offer {
+  mat-form-field {
+    max-width: 10em !important;
+  }
   ion-col {
     display: flex;
     align-items: center;
+    &:last-child {
+      justify-content: flex-end;
+    }
   }
-  ion-label {
-    padding: 0 1em;
-    font-weight: bold;
-  }
+}
+
+ion-note {
+  align-self: center;
+  padding-inline-start: 0.5em;
+  font-size: 0.8em;
+}
+
+#product-item {
+  white-space: normal;
 }

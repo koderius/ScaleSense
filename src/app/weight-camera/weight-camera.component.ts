@@ -1,7 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ModalController, ToastController} from '@ionic/angular';
 import {CameraService} from '../services/camera.service';
-import {BusinessService} from '../services/business.service';
 import {WebsocketService} from '../services/websocket.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {ProductType} from '../models/ProductI';

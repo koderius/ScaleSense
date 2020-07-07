@@ -3,7 +3,7 @@ import {ModalController} from '@ionic/angular';
 import {CustomersService} from '../services/customers.service';
 import {ProductPublicDoc} from '../models/ProductI';
 import * as firebase from 'firebase/app';
-import 'firebase/firestore';
+import 'firebase/functions';
 import {AlertsService} from '../services/alerts.service';
 
 @Component({
@@ -15,9 +15,11 @@ export class CustomerPricingModalComponent implements OnInit {
 
   product: ProductPublicDoc;
 
-  selectedCustomerId: string;
+  selectedCustomers = new Set<string>();
 
   newPrice: number;
+
+  offeredPrices: {[cid: string]: number};
 
   constructor(
     private modalCtrl: ModalController,
@@ -25,18 +27,53 @@ export class CustomerPricingModalComponent implements OnInit {
     private alertService: AlertsService,
   ) { }
 
-  ngOnInit() {}
+
+  async ngOnInit() {
+    this.offeredPrices = await this.customerService.getOfferedPrices(this.product.id);
+  }
+
+
+  checkCustomer(customerId: string, checked: boolean) {
+    if(checked)
+      this.selectedCustomers.add(customerId);
+    else
+      this.selectedCustomers.delete(customerId);
+  }
+
+
+  /** Check / uncheck all customers */
+  checkAll(check: boolean) {
+    if(check)
+      this.selectedCustomers = new Set<string>(this.customerService.myCustomers.map((c)=>c.id));
+    else
+      this.selectedCustomers.clear();
+    const checkboxes = document.getElementById('customers').getElementsByTagName('ion-checkbox');
+    for (let i = 0; i < checkboxes.length; i++)
+      checkboxes[i].setAttribute('checked', ''+check);
+  }
+
+
+  areAllSelected() {
+    return this.selectedCustomers.size == this.customerService.myCustomers.length;
+  }
 
 
   /** Set special price fo the customer */
   async setPrice() {
 
+    const ids: string[] = [...this.selectedCustomers.values()];
+
     const l = this.alertService.loaderStart('מציע מחיר...');
 
     try {
       const offerSpecialPrice = firebase.functions().httpsCallable('offerSpecialPrice');
-      await offerSpecialPrice({product: this.product, customerId: this.selectedCustomerId, price: this.newPrice});
-      alert('מחיר הוצע ללקוח');
+      await offerSpecialPrice({product: this.product, customersIds: ids, price: this.newPrice});
+      this.selectedCustomers.forEach((cid)=>{
+        this.offeredPrices[cid] = this.newPrice;
+      });
+      alert('מחיר הוצע ללקוח\\ות');
+      this.checkAll(false);
+      this.newPrice = null;
     }
     catch (e) {
       console.error(e);

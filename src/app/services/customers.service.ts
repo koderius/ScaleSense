@@ -9,7 +9,11 @@ export class CustomersService {
 
   private _myCustomers: BusinessDoc[] = [];
 
-  constructor(private businessService: BusinessService) {
+  offeredPricesRef = this.businessService.businessDocRef.collection('my_offers');
+
+  constructor(
+    private businessService: BusinessService,
+  ) {
 
     // For suppliers only
     if(this.businessService.side != 's')
@@ -38,6 +42,12 @@ export class CustomersService {
   getCustomerByName(q: string) {
     q = q.toLowerCase();
     return this.myCustomers.filter((s)=>s.name.toLowerCase().startsWith(q));
+  }
+
+
+  async getOfferedPrices(productId: string) : Promise<{ [cid: string]: number }> {
+    const res = await this.offeredPricesRef.doc(productId).get();
+    return res.data() || {};
   }
 
 }

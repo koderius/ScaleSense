@@ -129,6 +129,10 @@ export class WeightModalComponent2 implements OnInit, OnDestroy {
 
     this.counter++;
 
+    // Auto done when all boxes were scaled
+    if(this.method == 'fixedTara' && this.counter === this.maxWeights)
+      this.doneProcess();
+
   }
 
 
@@ -150,7 +154,7 @@ export class WeightModalComponent2 implements OnInit, OnDestroy {
     this.nextBox();
 
     if(this.method == 'fixedTara') {
-      const totalTara = this.tara * this.product.boxes;
+      const totalTara = (this.tara * this.product.boxes) || 0;
       if(this.totalWeight >= totalTara)
         this.totalWeight -= totalTara;
       else {

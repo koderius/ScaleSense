@@ -55,7 +55,7 @@ export interface ProductPublicDoc {
   /** BID of the user who changed it */
   modifiedBy?: string;
 
-  /** General price (until special prices are activated) */
+  /** Product's price */
   price?: number;
 
 }
@@ -80,8 +80,8 @@ export interface ProductCustomerDoc extends ProductPublicDoc{
   /** Max weight differences between final order to reception (in %) */
   receiveWeightTolerance?: number;
 
-  /** Special price that has been offered */
-  price?: number;
+  /** Special price that has been offered by the supplier - should be for read only by the app */
+  offeredPrice?: number;
 
 }
 

@@ -12,55 +12,96 @@
 
 <ion-content class="ion-padding">
 
-  <ion-item>
+  <ion-item id="product-item">
     <ion-thumbnail slot="start">
       <img [src]="product.image">
     </ion-thumbnail>
     <ion-label>
-      <h1>{{product.name}} (מק"ט: {{product.catalogNumS}})</h1>
+      <h1>{{product.name}}</h1>
+      <h6> מק"ט: {{product.catalogNumS}}</h6>
       <p>{{product.description}}</p>
-      <h2>מחיר כללי: {{product.price | price}} / {{null | unitAmount : product.type}}</h2>
+      <h2>מחיר כללי: <ion-text color="primary">{{product.price | price}} / {{null | unitAmount : product.type}}</ion-text></h2>
     </ion-label>
   </ion-item>
 
-  <div id="inputs">
+  <ion-row class="ion-margin" id="price-offer">
+    <ion-col>
+      <mat-form-field aria-label="price offer">
+        <input matInput type="number" step="any" [(ngModel)]="newPrice" placeholder="הצעת מחיר" name="priceOffer">
+        <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
+      </mat-form-field>
+    </ion-col>
+    <ion-col>
+      <ion-button color="secondary" shape="round"
+                  class="ion-float-end"
+                  [disabled]="!newPrice || !selectedCustomers.size"
+                  (click)="setPrice()"
+      >הצע מחיר</ion-button>
+    </ion-col>
+  </ion-row>
 
-    <h1>
-      <ion-text color="primary">מחיר ללקוח</ion-text>
-    </h1>
+  <ion-list class="ion-padding ion-margin-vertical" id="customers">
 
-    <ion-row class="input-section">
-      <ion-col>
-        <ion-label>לקוח</ion-label>
-      </ion-col>
-      <ion-col size="9">
-        <app-autocomplete-field
-                [list]="customerService.myCustomers"
-                label="בחר לקוח"
-                (onSelect)="selectedCustomerId = $event"
-                displayProp="name"
-                valueProp="id"
-        ></app-autocomplete-field>
-      </ion-col>
-    </ion-row>
+    <ion-item-divider>
+      <ion-text>בחר לקוחות</ion-text>
+      <ion-button slot="end" fill="clear" (click)="checkAll(!areAllSelected())">{{areAllSelected() ? 'נקה' : 'בחר הכל'}}</ion-button>
+    </ion-item-divider>
 
-    <ion-row class="input-section">
-      <ion-col>
-        <ion-label>מחיר</ion-label>
-      </ion-col>
-      <ion-col size="9">
-        <mat-form-field floatLabel="never">
-          <input matInput type="number" [(ngModel)]="newPrice" placeholder="מחיר" [disabled]="!selectedCustomerId">
-          <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>
-        </mat-form-field>
-      </ion-col>
-    </ion-row>
+    <ion-item *ngFor="let customer of customerService.myCustomers">
+      <ion-checkbox slot="start" (ionChange)="checkCustomer(customer.id, $event.detail.checked)"></ion-checkbox>
+      <ion-thumbnail slot="start" class="ion-hide-sm-down">
+        <img [src]="customer.logo" *ngIf="customer.logo">
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{customer.name}}</h2>
+        <h6>ח.פ {{customer.companyId}}</h6>
+      </ion-label>
+      <ion-note slot="end" class="ion-no-margin" *ngIf="offeredPrices">
+        <ion-text color="primary" *ngIf="offeredPrices[customer.id]">{{offeredPrices[customer.id] | price}}<br>/ {{null | unitAmount : product.type}}</ion-text>
+        <ion-text *ngIf="!offeredPrices[customer.id]">לא נקבע<br>מחיר מיוחד</ion-text>
+      </ion-note>
+    </ion-item>
 
-    <div style="display: flex; justify-content: flex-end; margin-top: 1em">
-      <ion-button shape="round" [disabled]="!newPrice || product.price == newPrice" (click)="setPrice()">הצע מחיר</ion-button>
-    </div>
+  </ion-list>
 
-  </div>
+<!--  <div id="inputs">-->
+<!---->
+<!--    <h1>-->
+<!--      <ion-text color="primary">מחיר ללקוח</ion-text>-->
+<!--    </h1>-->
+
+<!--    <ion-row class="input-section">-->
+<!--      <ion-col>-->
+<!--        <ion-label>לקוח</ion-label>-->
+<!--      </ion-col>-->
+<!--      <ion-col size="9">-->
+<!--        <app-autocomplete-field-->
+<!--                [list]="customerService.myCustomers"-->
+<!--                label="בחר לקוח"-->
+<!--                (onSelect)="selectedCustomerId = $event"-->
+<!--                displayProp="name"-->
+<!--                valueProp="id"-->
+<!--        ></app-autocomplete-field>-->
+<!--      </ion-col>-->
+<!--    </ion-row>-->
+
+<!--    <ion-row class="input-section">-->
+<!--      <ion-col>-->
+<!--        <ion-label>מחיר</ion-label>-->
+<!--      </ion-col>-->
+<!--      <ion-col size="9">-->
+<!--        <mat-form-field floatLabel="never">-->
+<!--          <input matInput type="number" [(ngModel)]="newPrice" placeholder="מחיר" [disabled]="!selectedCustomerId">-->
+<!--          <ion-text matSuffix>{{null | price}} / {{null | unitAmount : product.type}}</ion-text>-->
+<!--        </mat-form-field>-->
+<!--      </ion-col>-->
+<!--    </ion-row>-->
+<!---->
+<!--    <div style="display: flex; justify-content: flex-end; margin-top: 1em">-->
+<!--      <ion-button shape="round" [disabled]="!newPrice || product.price == newPrice" (click)="setPrice()">הצע מחיר</ion-button>-->
+<!--    </div>-->
+<!---->
+<!--  </div>-->
 
 
 </ion-content>

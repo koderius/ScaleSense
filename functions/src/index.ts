@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import {OrderChange, OrderDoc} from '../../src/app/models/OrderI';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {getNewOrderStatus, getRequestedPermission, sendNotification} from './inner_functions';
-import {ProductOrder, ProductPublicDoc} from '../../src/app/models/ProductI';
+import {ProductCustomerDoc, ProductOrder, ProductPublicDoc} from '../../src/app/models/ProductI';
 import {BaseNotificationDoc} from '../../src/app/models/Notification';
 import {ProductsListUtil} from '../../src/app/utilities/productsList';
 import {MailForm} from '../../src/app/website/mail/MailForm';
@@ -22,52 +22,71 @@ const firestore = admin.firestore();
  * This function changes the price of product inside the customer's products list.
  * If the product does not exist in the customer's products list, it will be created there (with the special price).
  */
-export const offerSpecialPrice = functions.https.onCall((data: { product: ProductPublicDoc, customerId: string, price: number }, context) => {
+export const offerSpecialPrice = functions.https.onCall(async (data: { product: ProductPublicDoc, customersIds: string[], price: number }, context) => {
 
-  if (data && context && context.auth) {
+  if (data && data.product && data.customersIds && context && context.auth) {
 
-    return firestore.runTransaction(async transaction => {
+    const uid = context.auth ? context.auth.uid : '';
 
-      const uid = context.auth ? context.auth.uid : '';
+    // Get the supplier ID according to the user who called the function
+    const supplierSnapshot = await firestore.collection('users').doc(uid).get();
+    const permissions = supplierSnapshot.get('permissions');
+    const sid = supplierSnapshot.get('bid');
+    // Check the user has permission
+    if ((!permissions || !permissions['canOfferPrice']) && supplierSnapshot.get('role') != 3)
+      throw new HttpsError('permission-denied', 'The user has no permissions to offer a price');
 
-      // Get the supplier ID according to the user who called the function
-      const supplierSnapshot = (await transaction.get(firestore.collection('users').doc(uid)));
-      const permissions = supplierSnapshot.get('permissions');
-      const sid = supplierSnapshot.get('bid');
-      // Check the user has permission
-      if ((!permissions || !permissions['canOfferPrice']) && supplierSnapshot.get('role') != 3)
-        throw new HttpsError('permission-denied', 'The user has no permissions to offer a price');
+    // For each of the given customers:
+    data.customersIds.forEach(async (customerId: string)=> {
 
-      // Get the private customer data for the requested product
-      const customerProductRef = firestore.collection('customers').doc(data.customerId).collection('my_products').doc(data.product ? (data.product.id as string) : '');
-      const productDoc = await transaction.get(customerProductRef);
+      firestore.runTransaction(async (transaction)=>{
 
-      if (productDoc.exists) {
-        // Check the user is the supplier who owned this product
-        if (productDoc.get('sid') != sid) {
-          throw new HttpsError('permission-denied', 'The supplier does not own this product');
+        // Get the private customer data for the requested product
+        const customerProductRef = firestore.collection('customers').doc(customerId).collection('my_products').doc(data.product ? (data.product.id as string) : '');
+        const productDoc = await transaction.get(customerProductRef);
+
+        // Details to update in the customer product document
+        const productUpdate: Partial<ProductCustomerDoc> = {
+          price: data.price,
+          offeredPrice: data.price,
+          type: data.product.type,
+        };
+
+        if (productDoc.exists) {
+          // Check the user is the supplier who owned this product
+          if (productDoc.get('sid') != sid) {
+            throw new HttpsError('permission-denied', 'The supplier does not own this product');
+          }
+          // Set a special price in the customer private data of this product
+          transaction.update(customerProductRef, productUpdate);
+        } else {
+          // Add product to the customer (with the offered price)
+          transaction.set(customerProductRef, {
+            ...data.product,
+            ...productUpdate
+          });
         }
-        // Set a special price in the customer private data of this product
-        transaction.update(customerProductRef, {price: data.price});
-      } else {
-        // Add product to the customer (with the offered price)
-        const product = data.product;
-        product.price = data.price;
-        transaction.set(customerProductRef, product);
-      }
 
-      // Send alert notification
-      const note: BaseNotificationDoc = {
-        code: 5,
-        refSide: 's',
-        refBid: sid,
-        time: admin.firestore.Timestamp.now().toMillis(),
-        content: {
-          productId: data.product.id,
-          productName: data.product.name,
-        }
-      };
-      sendNotification(transaction, 'c', data.customerId, note);
+        // Set the price in the supplier's list of offers
+        const offerRef = firestore.collection('suppliers').doc(sid).collection('my_offers').doc(data.product.id || '');
+        transaction.set(offerRef, {
+          [customerId]: data.price,
+        }, {merge: true});
+
+        // Send alert notification
+        const note: BaseNotificationDoc = {
+          code: 5,
+          refSide: 's',
+          refBid: sid,
+          time: admin.firestore.Timestamp.now().toMillis(),
+          content: {
+            productId: data.product.id,
+            productName: data.product.name,
+          }
+        };
+        sendNotification(transaction, 'c', customerId, note);
+
+      });
 
     });
 
