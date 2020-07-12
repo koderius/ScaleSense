@@ -70,15 +70,11 @@ const routes: Routes = [
     canActivateChild: [AppEnterGuard],
   },
 
-
-
-
-
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes)
   ],
   exports: [RouterModule]
 })

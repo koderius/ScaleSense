@@ -13,18 +13,23 @@ export class WebsocketService {
 
   scalesId: string;
 
+  private _scalesVersion: string;
+  get scalesVersion() : string {
+    return this.hasConnection && this._scalesVersion;
+  }
+
   // Whether app client is connected
   appConnected: boolean;
 
   // Whether scales client is connected
   scaleConnected: boolean;
 
-  get hasConnection() {
+  get hasConnection() : boolean {
     return this.appConnected && this.scaleConnected;
   }
 
   // Emits every time websocket gets scale message
-  public onScale = new EventEmitter<number>();
+  onScale = new EventEmitter<number>();
 
 
   constructor(private businessService: BusinessService) {}
@@ -61,7 +66,7 @@ export class WebsocketService {
       this.appConnected = true;
     };
 
-    // Get response as {scale ID}:{msg: "connected" / "disconnected" / weight (Kg)}
+    // Get response as {scale ID}:{msg: "some message" or weight (Kg)}
     this.clientSocket.onmessage = (evt) => {
 
       console.log(evt.data);
@@ -72,8 +77,20 @@ export class WebsocketService {
 
       if(id == this.scalesId) {
         switch (msg) {
-          case 'connected': this.scaleConnected = true; break;
-          case 'disconnected': this.scaleConnected = false; break;
+
+          case 'connected':
+            this.scaleConnected = true;
+            this.clientSocket.send('version:' + this.scalesId);
+            break;
+
+          case 'disconnected':
+            this.scaleConnected = false;
+            break;
+
+          case 'version':
+            this._scalesVersion = dataStr.slice(2).join(':');
+            break;
+
           default:
             if(!isNaN(+msg))
               this.onScale.emit(+msg);

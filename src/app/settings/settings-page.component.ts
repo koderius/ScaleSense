@@ -64,6 +64,14 @@ export class SettingsPage implements OnInit {
           disabled: true,
         },
         {
+          value: 'Scales version:',
+          disabled: true,
+        },
+        {
+          value: this.websocketService.scalesVersion || 'No signal',
+          disabled: true,
+        },
+        {
           value: 'Scales ID:',
           disabled: true,
         },

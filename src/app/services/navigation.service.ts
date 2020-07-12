@@ -16,25 +16,21 @@ export class NavigationService {
     private navCtrl: NavController,
     private authService: AuthService,
     private router: Router,
-  ) {
+  ) {}
 
-    // If user is suddenly sign-out, (not while in registration page) throw him to the website homepage
-    // this.authService.onCurrentUser.subscribe((userDoc)=>{
-      // if(!userDoc && !window.location.pathname.includes('register'))
-      //   this.goToWebHomepage();
-    // })
-
-  }
-
-
-  // Go to register website page
-  goToRegister() {
-    this.navCtrl.navigateRoot('register');
-  }
 
   // Go to website homepage
   goToWebHomepage() {
     this.navCtrl.navigateRoot('');
+  }
+
+  goToDetails() {
+    this.navCtrl.navigateForward('details');
+  }
+
+  // Go to register website page
+  goToRegister() {
+    this.navCtrl.navigateRoot('register');
   }
 
 

@@ -13,7 +13,7 @@ import {AlertsService} from '../services/alerts.service';
 })
 export class WeightCameraComponent implements OnInit, OnDestroy {
 
-  mock: boolean = true; // todo
+  mock: boolean = false;
 
   /** Base64 string of the camera snapshot */
   snapshot: string;

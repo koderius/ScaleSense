@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {BusinessSide} from '../models/Business';
 import {MailService} from './mail/mail.service';
 import {MailForm} from './mail/MailForm';
 import {AuthService} from '../services/auth.service';
 import {NavigationService} from '../services/navigation.service';
 import {take} from 'rxjs/operators';
+import {ActivatedRoute} from '@angular/router';
+import {IonContent} from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -23,11 +25,24 @@ export class WebsitePage {
 
   isLogin: boolean;
 
+  @ViewChild('content', {static: true}) content: IonContent;
+
   constructor(
     private authService: AuthService,
     private navService: NavigationService,
     public mailService: MailService,
+    private activatedRoute: ActivatedRoute,
   ) {}
+
+
+  ionViewDidEnter() {
+    this.activatedRoute.fragment.subscribe((f)=>{
+      if(f == 'contact') {
+        this.content.scrollToBottom();
+        window.location.hash = '';
+      }
+    });
+  }
 
   // Go to register page
   goToRegister() {
