@@ -28,7 +28,7 @@ export class UsersPage implements OnInit {
   UserRole = UserRole;
 
   // List of roles
-  roles = Enum.ListEnum(UserRole) as UserRole[];
+  roles = Enum.ListEnum(UserRole).reverse() as UserRole[];
 
   hasChanges: boolean;
 

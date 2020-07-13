@@ -68,7 +68,7 @@ export class PaymentsService {
         if(this.currentBid)
 
           this.paymentSubscription = this.paymentsRef.doc(this.currentBid).onSnapshot((snapshot)=>{
-            this._paymentData = snapshot.data() as Payment;
+            this._paymentData = snapshot.data() as Payment || {};
             this.paymentReady = true;
             this.onPaymentReady.emit();
           });
@@ -87,12 +87,17 @@ export class PaymentsService {
   async isValid() : Promise<boolean> {
 
     return new Promise<boolean>(resolve => {
+
+      if(this.authService.currentUser.side == 's')
+        resolve(true);
+
       if(this.paymentReady)
-        resolve(this._paymentData.validUntil > Date.now());
+        resolve(this._paymentData && this._paymentData.validUntil > Date.now());
       else
         this.onPaymentReady.pipe(first()).subscribe(()=>{
-          resolve(this._paymentData.validUntil > Date.now());
-        })
+          resolve(this._paymentData && this._paymentData.validUntil > Date.now());
+        });
+
     });
 
   }

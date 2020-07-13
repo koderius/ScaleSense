@@ -36,7 +36,10 @@
   <div *ngIf="!websocketService.hasConnection" class="ion-padding">
     <p><ion-text color="danger">בעיה בחיבור</ion-text></p>
     <ul>
-      <li *ngIf="!websocketService.scalesId">לא קיים משקל משוייך</li>
+      <li *ngIf="!websocketService.scalesId">
+        <ion-text>לא קיים משקל משוייך</ion-text>
+        <ion-text class="ion-margin-start" color="primary" style="cursor: pointer; text-decoration: underline" (click)="define()">הגדר</ion-text>
+      </li>
       <li *ngIf="!websocketService.appConnected && websocketService.scalesId">בעיה בחיבור לשרת</li>
       <li *ngIf="!websocketService.scaleConnected && websocketService.appConnected && websocketService.scalesId">לא מקבל אות מהמשקל</li>
     </ul>

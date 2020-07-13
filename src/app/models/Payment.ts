@@ -9,4 +9,7 @@ export type Payment = {
   // Account expiring time
   validUntil?: number;
 
+  // Has free account
+  freeAccount?: boolean;
+
 }

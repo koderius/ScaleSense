@@ -131,7 +131,7 @@
           </mat-form-field>
         </ion-item>
 
-        <ion-item>
+        <ion-item *ngIf="businessService.side == 'c'">
           <mat-form-field class="fullMatInput">
             <mat-chip-list #chipListCategories>
               <mat-chip

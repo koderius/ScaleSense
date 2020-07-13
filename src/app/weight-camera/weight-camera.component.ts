@@ -5,6 +5,7 @@ import {WebsocketService} from '../services/websocket.service';
 import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {ProductType} from '../models/ProductI';
 import {AlertsService} from '../services/alerts.service';
+import {NavigationService} from '../services/navigation.service';
 
 @Component({
   selector: 'app-weight-camera',
@@ -35,6 +36,7 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     private toastCtrl: ToastController,
     private unitAmountPipe: UnitAmountPipe,
     private alertService: AlertsService,
+    private navService: NavigationService,
   ) {}
 
   async ngOnInit() {
@@ -116,6 +118,13 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
   close() {
     this.modalCtrl.dismiss();
   }
+
+
+  define() {
+    this.navService.goToSettings();
+    this.close();
+  }
+
 
   ngOnDestroy(): void {
     if(this.isMobile)

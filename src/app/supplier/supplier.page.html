@@ -32,6 +32,7 @@
       </div>
       <div class="circle-btn primary">
         <ion-button size="large" fill="clear" strong="true" shape="round"
+                    (click)="navService.goToReports()"
                     [disabled]="!userService.hasPermission(UserPermissions.REPORTS)"
         >דוחות</ion-button>
       </div>

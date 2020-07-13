@@ -42,6 +42,8 @@ export class NewUserComponent implements OnInit {
       this.email.disable();
       this.fullName.setValue(this.editUser.displayName);
       this.role.setValue(this.editUser.role);
+      if(this.editUser.role === UserRole.ADMIN)
+        this.role.disable();
     }
   }
 
@@ -69,7 +71,7 @@ export class NewUserComponent implements OnInit {
 
   // Whether all fields have valid values
   allValid() {
-    return this.allControls.every((c)=>c.valid);
+    return this.allControls.every((c)=>c.valid || c.disabled);
   }
 
   // Create user

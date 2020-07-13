@@ -43,7 +43,7 @@ export class ReportsGeneratorPage implements OnInit {
   constructor(
     public reportsGeneratorService: ReportsGeneratorService,
     private platform: Platform,
-    private businessService: BusinessService,
+    public businessService: BusinessService,
     private suppliersService: SuppliersService,
     private customersService: CustomersService,
     private productService: ProductsService,

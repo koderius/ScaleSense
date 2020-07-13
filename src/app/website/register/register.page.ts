@@ -108,7 +108,7 @@ export class RegisterPage implements OnInit {
             this.isPaymentValid = await this.paymentsService.isValid();
           }
           else
-            this.askToSignout();
+            this.navService.goToAppMain();
         }
 
       });
@@ -298,25 +298,6 @@ export class RegisterPage implements OnInit {
     }
     else
       alert('סיסמא ואימות סיסמא לא תואמים');
-  }
-
-
-  async askToSignout() {
-    const a = await this.alertCtrl.create({
-      subHeader: 'משתמש מחובר',
-      message: 'את\\ה מחובר\\ת בתור ' + this.authService.currentUser.displayName,
-      buttons: [
-        {
-          text: 'התנתקות',
-          handler: ()=>this.authService.signOut(),
-        },
-        {
-          text: 'חזרה',
-          handler: ()=>this.navService.goToWebHomepage(),
-        }
-      ]
-    });
-    a.present();
   }
 
 

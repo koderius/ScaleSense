@@ -85,7 +85,7 @@ export class OrderPage implements OnInit {
     private productsService: ProductsService,
     private alerts: AlertsService,
     public businessService: BusinessService,
-    private navService: NavigationService,
+    public navService: NavigationService,
     private unitPipe: UnitAmountPipe,
     private notificationService: NotificationsService,
     private usersService: UsersService,
