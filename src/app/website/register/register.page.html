@@ -255,7 +255,7 @@
           </ion-thumbnail>
           <ion-spinner *ngIf="logoLoader" color="dark" slot="end"></ion-spinner>
           <ion-button color="dark" shape="round" fill="clear" slot="end"
-                      (click)="businessDoc.logo = null"
+                      (click)="businessDoc.logo = inputFile.value = null"
                       *ngIf="businessDoc.logo">
             <ion-icon slot="icon-only" name="close"></ion-icon>
           </ion-button>
@@ -269,13 +269,19 @@
 
       <h5>שלום {{authService.currentUser.displayName}},</h5>
 
-      <p *ngIf="paymentsService.isValid()">
-        <ion-text>חשבון העסק שלך בתוקף עד {{paymentsService.validUntil.toLocaleDateString()}}</ion-text><br>
-        <ion-text>ניתן להאריך אותו לשנה נוספת</ion-text>
+      <p *ngIf="isPaymentValid">
+        <ion-text>חשבון העסק שלך בתוקף עד {{paymentsService.validUntil.toLocaleDateString()}}</ion-text>
+      </p>
+      <p *ngIf="!isPaymentValid && paymentsService.validUntil">
+        <ion-text>חשבון העסק שלך אינו בתוקף מאז {{paymentsService.validUntil.toLocaleDateString()}}</ion-text>
+      </p>
+      <p *ngIf="!isPaymentValid && !paymentsService.validUntil">
+        <ion-text>ברוך הבא ל-Scale Sense!</ion-text>
       </p>
 
-      <ion-row>
-        <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="pay()">לביצוע התשלום</ion-button>
+
+      <ion-row class="ion-margin-top">
+        <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="pay()" *ngIf="payBtnText()">{{payBtnText()}}</ion-button>
       </ion-row>
       <p class="ion-text-center">
         <ion-text color="medium">לצורך ביצוע התשלום, תועבר לאתר חיצוני</ion-text>

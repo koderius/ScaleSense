@@ -7,7 +7,6 @@ import {NavigationService} from '../services/navigation.service';
 import {take} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
 import {IonContent} from '@ionic/angular';
-import {PaymentsService} from '../services/payments.service';
 
 @Component({
   selector: 'app-home',
@@ -33,7 +32,6 @@ export class WebsitePage {
     private navService: NavigationService,
     public mailService: MailService,
     private activatedRoute: ActivatedRoute,
-    public payments: PaymentsService,
   ) {}
 
 
@@ -92,7 +90,6 @@ export class WebsitePage {
   }
 
 
-  // TODO - Better fields checking
   checkContactFields() {
 
     // Check there is a name, content and email and/or phone number

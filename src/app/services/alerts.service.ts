@@ -131,7 +131,7 @@ export class AlertsService {
     const t = await this.toastCtrl.create({
       header: header,
       message: msg,
-      position: 'bottom',
+      position: 'middle',
       color: 'danger',
       buttons: ['Dismiss'],
       keyboardClose: true,

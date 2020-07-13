@@ -80,18 +80,6 @@ export class RegisterPage implements OnInit {
 
   async ngOnInit() {
 
-    // Entering the page in forgot password mode
-    if (this.authService.authStage == AuthStage.FORGOT_PASSWORD) {
-      this.pageStatus = PageStatus.FORGOT_PASSWORD;
-      return;
-    }
-
-    // Entering the page with reset password link
-    if (this.authService.authStage == AuthStage.RESET_PASSWORD) {
-      this.pageStatus = PageStatus.RESET_PASSWORD;
-      return;
-    }
-
     // Get the ID from the URL
     this.id = this.activatedRoute.snapshot.params['id'];
 
@@ -101,6 +89,19 @@ export class RegisterPage implements OnInit {
 
       // If there is a logged-in verified user, go to payment page
       this.authService.onCurrentUser.pipe(take(1)).subscribe(async (user)=>{
+
+        // Entering the page in forgot password mode
+        if (this.authService.authStage == AuthStage.FORGOT_PASSWORD) {
+          this.pageStatus = PageStatus.FORGOT_PASSWORD;
+          return;
+        }
+
+        // Entering the page with reset password link
+        if (this.authService.authStage == AuthStage.RESET_PASSWORD) {
+          this.pageStatus = PageStatus.RESET_PASSWORD;
+          return;
+        }
+
         if(user) {
           if(user.side == 'c') {
             this.pageStatus = PageStatus.PAYMENTS;
@@ -109,6 +110,7 @@ export class RegisterPage implements OnInit {
           else
             this.askToSignout();
         }
+
       });
 
     }
@@ -215,6 +217,8 @@ export class RegisterPage implements OnInit {
 
 
   async uploadLogo(file: File) {
+    if(!file)
+      return;
     // Upload the file to the storage under the business ID name, and get it's URL
     this.logoLoader = true;
     const url = await this.filesService.uploadFile(file, this.id);
@@ -282,8 +286,8 @@ export class RegisterPage implements OnInit {
   }
 
   async sendResetPasswordEmail() {
-    await this.authService.sendPasswordResetEmail(this.email);
-    this.pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
+    if(await this.authService.sendPasswordResetEmail(this.email))
+      this.pageStatus = PageStatus.RESET_PASSWORD_EMAIL_SENT;
   }
 
   async resetPasswordClicked() {
@@ -336,6 +340,19 @@ export class RegisterPage implements OnInit {
       this.navService.goToAppMain();
     })
 
+  }
+
+  payBtnText() : string {
+    if(!this.isPaymentValid && this.paymentsService.validUntil)
+      return 'חידוש המנוי';
+    if(!this.isPaymentValid && !this.paymentsService.validUntil)
+      return 'רכישת מנוי';
+    if(this.isPaymentValid) {
+      const nextMonth = new Date();
+      nextMonth.setMonth(nextMonth.getMonth() + 1);
+      if(nextMonth.getTime() > this.paymentsService.validUntil.getTime())
+        return 'הארכה המנוי';
+    }
   }
 
 }

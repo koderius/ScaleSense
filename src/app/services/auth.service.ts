@@ -52,7 +52,7 @@ export class AuthService {
   // Some stages are defined by the URL 'mode' parameter (like when entering through reset password email)
   private _stage = AuthStage.NONE;
   // Code from the URL (in email verification, password reset, etc...)
-  private readonly _oobCode: string;
+  private _oobCode: string;
 
   // Emits when there is some auth error
   public onAuthError = new EventEmitter<FirebaseError>();
@@ -72,6 +72,11 @@ export class AuthService {
     return (this._user && this._user.emailVerified && this._userDoc) || null;
   }
 
+  // Whether there is a user connected, whose email is unverified
+  get isUnverifiedEmail() : boolean {
+    return !!this._user && !this._user.emailVerified
+  }
+
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -84,7 +89,7 @@ export class AuthService {
     });
 
     // On sign in/out
-    this.auth.onAuthStateChanged((user: User)=>{
+    this.auth.onAuthStateChanged(async (user: User)=>{
 
       // Reset
       this.isAuthReady = false;
@@ -93,6 +98,15 @@ export class AuthService {
       // Get the user, or null when signed out or no one is signed in
       console.log('Current user:', user);
       this._user = user;
+
+      // When loading with email verification or reset password link
+      const urlParams = this.activatedRoute.snapshot.queryParams;
+      this._oobCode = urlParams['oobCode'] as string;
+      this._stage = urlParams['mode'] as AuthStage.VERIFY_EMAIL | AuthStage.RESET_PASSWORD;
+
+      // If the link is a verification link, verify the email
+      if(this._stage == AuthStage.VERIFY_EMAIL)
+        await this.verifyEmail();
 
       // Stop previous document subscription (if there is)
       if(this.docSubscription)
@@ -121,14 +135,6 @@ export class AuthService {
 
     });
 
-    // When loading with email verification or reset password link
-    const urlParams = this.activatedRoute.snapshot.queryParams;
-    this._oobCode = urlParams['oobCode'] as string;
-    this._stage = urlParams['mode'] as AuthStage.VERIFY_EMAIL | AuthStage.RESET_PASSWORD;
-
-    // If the link is a verification link, verify the email
-    if(this._stage == AuthStage.VERIFY_EMAIL)
-      this.verifyEmail();
 
   }
 
@@ -182,10 +188,11 @@ export class AuthService {
   }
 
   // Send the user an email with verification link
-  async sendEmailVerification() : Promise<void> {
+  async sendEmailVerification() : Promise<boolean> {
     try {
       await this._user.sendEmailVerification();
       this._stage = AuthStage.VERIFICATION_SENT;
+      return true;
     }
     catch (e) {
       this.onAuthError.emit(e);
@@ -196,6 +203,7 @@ export class AuthService {
   private async verifyEmail() {
     try {
       await this.auth.applyActionCode(this._oobCode);
+      await this._user.reload();
       this._stage = AuthStage.EMAIL_VERIFIED;
     }
     catch (e) {
@@ -212,10 +220,11 @@ export class AuthService {
   }
 
   // Send a reset password email
-  async sendPasswordResetEmail(email: string) : Promise<void> {
+  async sendPasswordResetEmail(email: string) : Promise<boolean> {
     try {
       await this.auth.sendPasswordResetEmail(email);
       this._stage = AuthStage.RESET_PASSWORD_SENT;
+      return true;
     }
     catch (e) {
       this.onAuthError.emit(e);

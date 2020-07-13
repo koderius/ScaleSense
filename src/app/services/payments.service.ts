@@ -33,11 +33,15 @@ export class PaymentsService {
   private paymentReady: boolean;
   // Emits when payments data loaded
   public onPaymentReady = new EventEmitter<void>();
-  // Time of expiration
-  private _validUntil: number;
+  // Payment data
+  private _paymentData: Payment;
 
   get validUntil() : Date {
-    return new Date(this._validUntil);
+    return this._paymentData && this._paymentData.validUntil ? new Date(this._paymentData.validUntil) : null;
+  }
+
+  get paymentData() {
+    return {...this._paymentData};
   }
 
 
@@ -64,14 +68,13 @@ export class PaymentsService {
         if(this.currentBid)
 
           this.paymentSubscription = this.paymentsRef.doc(this.currentBid).onSnapshot((snapshot)=>{
-            const data = snapshot.data() as Payment;
-            this._validUntil = data && data.validUntil;
+            this._paymentData = snapshot.data() as Payment;
             this.paymentReady = true;
             this.onPaymentReady.emit();
           });
 
         else
-          this._validUntil = null;
+          this._paymentData = null;
 
       }
 
@@ -85,10 +88,10 @@ export class PaymentsService {
 
     return new Promise<boolean>(resolve => {
       if(this.paymentReady)
-        resolve(this._validUntil > Date.now());
+        resolve(this._paymentData.validUntil > Date.now());
       else
         this.onPaymentReady.pipe(first()).subscribe(()=>{
-          resolve(this._validUntil > Date.now());
+          resolve(this._paymentData.validUntil > Date.now());
         })
     });
 

@@ -37,13 +37,6 @@ export class AppEnterGuard implements CanActivateChild {
 
   async canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 
-    // First things first - Check payments
-    if(!await this.paymentsService.isValid()) {
-      alert('תוקף החשבון פג. יש להסדיר את התשלום');
-      this.navService.goToWebHomepage(); // TODO: Go to payments
-      return false;
-    }
-
     // Get parameters from route data, that describe the user requirements
     if(route.data) {
       this.side = route.data['side'];
@@ -55,16 +48,32 @@ export class AppEnterGuard implements CanActivateChild {
     return await new Promise<boolean>(resolve => {
       this.authService.onCurrentUser
         .pipe(takeWhile(user=>!user, true))         // Subscribe as long as there is no user, and the first time there is a user (inclusive)
-        .subscribe((user)=>{
+        .subscribe(async (user)=>{
           // Check the user's requirements
           if(user) {
+            // Check payments
+            if(!await this.paymentsService.isValid()) {
+              alert('תוקף החשבון פג. יש להסדיר את התשלום');
+              this.navService.goToRegister();
+              resolve(false);
+              return;
+            }
+            // Check permissions
             resolve(this.checkUser() || this.throwBack());
             if(this.alert)
               this.alert.dismiss();
           }
           // Ask user to sign in (and keep subscribing)
-          else
-            this.popSignIn();
+          else {
+            if(this.authService.isUnverifiedEmail) {
+              if(await this.authService.sendEmailVerification()) {
+                alert('נשלח דוא"ל לאימות כתובת');
+                this.navService.goToWebHomepage();
+              }
+            }
+            else
+              this.popSignIn();
+          }
         });
     });
 
