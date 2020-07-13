@@ -27,7 +27,7 @@ import {PropertyNamePipe} from './pipes/property-name.pipe';
     AppRoutingModule,
     BrowserAnimationsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
-    ComponentsModule
+    ComponentsModule,
   ],
   providers: [
     StatusBar,

@@ -267,23 +267,19 @@
 
     <div *ngIf="pageStatus == PageStatus.PAYMENTS">
 
-      <ion-input type="tel" placeholder="* מספר כרטיס"></ion-input>
+      <h5>שלום {{authService.currentUser.displayName}},</h5>
+
+      <p *ngIf="paymentsService.isValid()">
+        <ion-text>חשבון העסק שלך בתוקף עד {{paymentsService.validUntil.toLocaleDateString()}}</ion-text><br>
+        <ion-text>ניתן להאריך אותו לשנה נוספת</ion-text>
+      </p>
 
       <ion-row>
-        <ion-col>
-
-        </ion-col>
-        <ion-col>
-
-        </ion-col>
-        <ion-col>
-
-        </ion-col>
+        <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="pay()">לביצוע התשלום</ion-button>
       </ion-row>
-
-      <ion-input placeholder="* שם בעל הכרטיס"></ion-input>
-
-      <ion-input type="tel" placeholder="* 3 ספרות בגב כרטיס"></ion-input>
+      <p class="ion-text-center">
+        <ion-text color="medium">לצורך ביצוע התשלום, תועבר לאתר חיצוני</ion-text>
+      </p>
 
     </div>
 
@@ -297,7 +293,7 @@
     <ion-row class="send-btn">
       <ion-button color="medium" shape="round" (click)="pageStatus = PageStatus.FIRST_STEP" *ngIf="pageStatus == PageStatus.SECOND_STEP">אחורה</ion-button>
       <ion-button color="secondary" shape="round" strong="true" (click)="buttonAction()" *ngIf="buttonText()">{{buttonText()}}</ion-button>
-      <ion-button shape="round" strong="true" *ngIf="pageStatus == PageStatus.PAYMENTS" style="width: 75%" (click)="buttonAction()">סיום הרשמה וכניסה למערכת</ion-button>
+<!--      <ion-button shape="round" strong="true" *ngIf="pageStatus == PageStatus.PAYMENTS" style="width: 75%" (click)="buttonAction()">סיום הרשמה וכניסה למערכת</ion-button>-->
     </ion-row>
     <p id="required-comment" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus <= PageStatus.PAYMENTS">יש למלא את כל השדות המסונים ב*</p>
 

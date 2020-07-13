@@ -12,7 +12,10 @@
         <h3 class="ion-text-center">מערכת ניהול המלאי <b>המדויקת והחסכונית ביותר</b></h3>
         <p>הזמינו סחורה, בצעו מעקב שינויים וקבלו סחורה תוך ניהול מלאי ואינטגרציה מלאה למערכת השקילה הייחודית של Scale Sense.</p>
         <ion-row>
-          <ion-button shape="round" color="secondary" strong style="margin: auto" (click)="navService.goToDetails()">לפרטים נוספים</ion-button>
+          <ion-button shape="round" color="secondary" strong style="margin: auto" (click)="goToDetails()">לפרטים נוספים</ion-button>
+        </ion-row>
+        <ion-row>
+          <ion-button shape="round" color="secondary" strong style="margin: auto" (click)="payments.pay('abcd',{name: 'משה אסטרותי', email: 'mestroti@gmail.com', phone: '0543055965'})">תשלום</ion-button>
         </ion-row>
         <div id="login-buttons">
 <!--          <div class="enter-btn" (click)="enterAs = 'c'" [ngClass]="enterAs == 'c' ? 'selected' : ''">-->

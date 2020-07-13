@@ -12,6 +12,7 @@ import {MailService} from './mail/mail.service';
 import {RecaptchaModule} from 'ng-recaptcha';
 import {MatTooltipModule} from '@angular/material';
 import {DetailsPage} from './details/details.page';
+import {PaymentCompletePage} from './payment-complete/payment-complete.page';
 
 @NgModule({
   imports: [
@@ -34,7 +35,11 @@ import {DetailsPage} from './details/details.page';
       {
         path: 'register',
         redirectTo: 'register/0'
-      }
+      },
+      {
+        path: 'payment-complete',
+        component: PaymentCompletePage,
+      },
     ]),
     RecaptchaModule.forRoot(),
     MatTooltipModule,
@@ -43,9 +48,12 @@ import {DetailsPage} from './details/details.page';
     WebsitePage,
     DetailsPage,
     RegisterPage,
+    PaymentCompletePage,
     FooterComponent,
     WebsiteHeaderComponent,
   ],
-  providers: [MailService],
+  providers: [
+    MailService,
+  ],
 })
 export class WebsitePageModule {}

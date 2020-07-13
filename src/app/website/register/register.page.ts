@@ -11,8 +11,9 @@ import 'firebase/functions';
 import {AlertsService} from '../../services/alerts.service';
 import {FilesService} from '../../services/files.service';
 import {NavigationService} from '../../services/navigation.service';
-import {take} from 'rxjs/operators';
+import {first, take} from 'rxjs/operators';
 import {AlertController} from '@ionic/angular';
+import {PaymentsService} from '../../services/payments.service';
 
 enum PageStatus {
 
@@ -58,6 +59,8 @@ export class RegisterPage implements OnInit {
   // Business details
   businessDoc: BusinessDoc = {contacts: [{},{}]};
 
+  isPaymentValid: boolean;
+
   readonly EmailRegex = AuthService.EMAIL_REGEX;
   readonly PasswordRegex = AuthService.PASSWORD_REGEX;
 
@@ -66,12 +69,13 @@ export class RegisterPage implements OnInit {
   constructor(
     private alerts: AlertsService,
     private alertCtrl: AlertController,
-    private authService: AuthService,
+    public authService: AuthService,
     private activatedRoute: ActivatedRoute,
     private navService: NavigationService,
     public mailService: MailService,
     private businessService: BusinessService,
     private filesService: FilesService,
+    public paymentsService: PaymentsService,
   ) {}
 
   async ngOnInit() {
@@ -94,11 +98,19 @@ export class RegisterPage implements OnInit {
     // For no ID, open contact form
     if (this.id === '0') {
       this.pageStatus = PageStatus.CONTACT;
-      // If there is a logged-in user, ask to sign out
-      this.authService.onCurrentUser.pipe(take(1)).subscribe((user)=>{
-        if(user)
-          this.askToSignout();
+
+      // If there is a logged-in verified user, go to payment page
+      this.authService.onCurrentUser.pipe(take(1)).subscribe(async (user)=>{
+        if(user) {
+          if(user.side == 'c') {
+            this.pageStatus = PageStatus.PAYMENTS;
+            this.isPaymentValid = await this.paymentsService.isValid();
+          }
+          else
+            this.askToSignout();
+        }
       });
+
     }
     else {
       // If the business ID has only initial document, start registration process
@@ -150,7 +162,6 @@ export class RegisterPage implements OnInit {
       case PageStatus.RESET_PASSWORD: this.resetPasswordClicked(); break;
       case PageStatus.FIRST_STEP: this.pageStatus = PageStatus.SECOND_STEP; break;
       case PageStatus.SECOND_STEP: this.doneRegistrationClicked(); break;
-      case PageStatus.PAYMENTS: this.navService.goToAppMain(); break; //TODO: Payments
     }
 
   }
@@ -302,6 +313,29 @@ export class RegisterPage implements OnInit {
       ]
     });
     a.present();
+  }
+
+
+  async pay() {
+
+    // Open the payment window
+    const l = this.alerts.loaderStart('מייד תועבר לעמוד התשלום...');
+    const url = await this.paymentsService.pay(
+      this.authService.currentUser.bid,
+      {
+        name: this.authService.currentUser.displayName || '',
+        email: this.authService.currentUser.email || '',
+        phone: this.businessService.businessDoc.contacts[0].phone || '',
+      }
+    );
+    window.open(url, '_blank', 'location=no');
+    this.alerts.loaderStop(l);
+
+    // Wait for payment verification and go to app
+    this.paymentsService.onPaymentReady.pipe(first()).subscribe(()=>{
+      this.navService.goToAppMain();
+    })
+
   }
 
 }

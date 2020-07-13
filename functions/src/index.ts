@@ -12,10 +12,84 @@ import {ReturnDoc} from '../../src/app/models/Return';
 import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
 import {BusinessDoc, BusinessSide, ContactInfo, NotesSettings} from '../../src/app/models/Business';
 import {smsText, translateNoteContent} from './translate';
+import {Payment} from '../../src/app/models/Payment';
 
 admin.initializeApp();
 
 const firestore = admin.firestore();
+
+
+
+export const payment = functions.https.onCall(async (data)=>{
+
+  try {
+    return (await axios.default.get(data)).data;
+  }
+  catch (e) {
+    console.error(e);
+    return e;
+  }
+
+});
+
+
+export const verifyPayment = functions.https.onCall(async (data)=>{
+
+  try {
+
+    const url = new URL(data);
+
+    // Try verifying the payment
+    const res = await axios.default.get(data);
+    const cCode: number = +(res.data as string).split('=')[1];
+
+    if(cCode == 200) {
+
+      // Get payment data
+      const bid = url.searchParams.get('Order') || '';
+      const payId = url.searchParams.get('Id') || '';
+      const numOfPayments: number = +(url.searchParams.get('Payments') || 0);
+
+      // Get business payments document
+      const payRef = firestore.collection('payments').doc(bid);
+
+      return await firestore.runTransaction(async transaction => {
+
+        const payData: Payment | undefined = (await transaction.get(payRef)).data();
+
+        // If the payment has already been made, throw an error
+        if(payData && payData.paymentsIds && payData.paymentsIds.includes(payId))
+          throw new HttpsError('already-exists','Payment has been already made');
+
+        // Set new expired time according to the number of the payments (each payment is one month)
+        // Extend from now, or from the upcoming expiring date
+        const d = (payData && payData.validUntil && payData.validUntil > Date.now()) ? new Date(payData.validUntil) : new Date();
+        d.setMonth(d.getMonth() + numOfPayments);
+
+        // Set the new data in the payments document
+        await transaction.set(payRef, {
+          bid: bid,
+          paymentsIds: admin.firestore.FieldValue.arrayUnion(payId),
+          validUntil: d.getTime(),
+        }, {merge: true});
+
+        // Return the new valid until
+        return d.getTime();
+
+      });
+
+    }
+
+    else
+      throw new HttpsError('unavailable','Payment was not verified');
+
+  }
+  catch (e) {
+    throw new HttpsError('internal',e);
+  }
+
+});
+
 
 
 /** *

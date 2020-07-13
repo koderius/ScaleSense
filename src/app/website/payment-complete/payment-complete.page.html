@@ -1,0 +1,24 @@
+<ion-content *ngIf="validUntil">
+
+  <h1 class="title">ביצוע תשלום עבור Scale Sense</h1>
+
+  <div class="page-container">
+
+    <div id="message">
+      <ion-icon name="checkmark-circle" color="success"></ion-icon>
+      <h1>התשלום בוצע בהצלחה!</h1>
+    </div>
+
+  </div>
+
+  <div id="details">
+    <p>אסמכתא: {{id}}</p>
+    <p>מס' אישור: {{aCode}}</p>
+    <p>סכום שחוייב: {{amount / payments}} ש"ח לחודש</p>
+    <p>למשך {{payments}} חודשים</p>
+    <p>כרטיס שמסתיים ב-{{last4digit}}</p>
+    <h5>תוקף המנוי עד ה-<b>{{validUntil?.toLocaleDateString()}}</b></h5>
+  </div>
+
+
+</ion-content>

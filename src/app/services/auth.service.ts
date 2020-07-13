@@ -69,13 +69,7 @@ export class AuthService {
 
   // Get current user's document. Only if user's document has loaded, and the user's email is verified
   get currentUser(): UserDoc | null {
-    return (this._user && (this._user.emailVerified || true) && this._userDoc) || null;
-    //                             TODO: delete this ^
-  }
-
-  // Whether the user's email is verified
-  get isUserVerified() : boolean {
-    return this._user && this._user.emailVerified;
+    return (this._user && this._user.emailVerified && this._userDoc) || null;
   }
 
 

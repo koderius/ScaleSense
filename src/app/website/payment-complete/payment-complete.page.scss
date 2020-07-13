@@ -1,0 +1,17 @@
+@import "../website-page.component.scss";
+@import "../register/register.page.scss";
+
+#message {
+  margin-top: 2em;
+  font-size: xx-large;
+  text-align: center;
+  ion-icon {
+    height: 5em;
+    width: 5em;
+  }
+}
+
+#details {
+  text-align: center;
+  margin: auto;
+}

@@ -6,6 +6,7 @@ import {AuthService} from './services/auth.service';
 import {NavigationService} from './services/navigation.service';
 import {AlertController} from '@ionic/angular';
 import {takeWhile} from 'rxjs/operators';
+import {PaymentsService} from './services/payments.service';
 
 /**
  * This guard prevents users entering pages, if they don't have the requested requirements
@@ -30,10 +31,18 @@ export class AppEnterGuard implements CanActivateChild {
     private authService: AuthService,
     private alertCtrl: AlertController,
     private navService: NavigationService,
+    private paymentsService: PaymentsService,
   ) {}
 
 
   async canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
+
+    // First things first - Check payments
+    if(!await this.paymentsService.isValid()) {
+      alert('תוקף החשבון פג. יש להסדיר את התשלום');
+      this.navService.goToWebHomepage(); // TODO: Go to payments
+      return false;
+    }
 
     // Get parameters from route data, that describe the user requirements
     if(route.data) {
