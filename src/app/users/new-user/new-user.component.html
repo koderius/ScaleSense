@@ -32,7 +32,7 @@
     <div>
       <ion-label>* סיסמה</ion-label>
       <mat-form-field aria-label="password">
-        <input matInput [formControl]="password" name="password">
+        <input matInput type="password" [formControl]="password" name="password">
         <mat-error *ngIf="password.hasError('minlength') && !password.hasError('required')">יש להזין לפחות 6 תוים</mat-error>
         <mat-error *ngIf="password.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>
@@ -41,7 +41,7 @@
     <div>
       <ion-label>* אימות סיסמה</ion-label>
       <mat-form-field aria-label="passwordV">
-        <input matInput [formControl]="passwordV" name="password2">
+        <input matInput type="password" [formControl]="passwordV" name="password2">
         <mat-error *ngIf="passwordV.hasError('notSimilar') && !passwordV.hasError('required')">אימות סיסמה לא זהה</mat-error>
         <mat-error *ngIf="passwordV.hasError('required')">שדה חובה</mat-error>
       </mat-form-field>

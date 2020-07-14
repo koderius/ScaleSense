@@ -6,6 +6,8 @@ import {UnitAmountPipe} from '../pipes/unit-amount.pipe';
 import {ProductType} from '../models/ProductI';
 import {AlertsService} from '../services/alerts.service';
 import {NavigationService} from '../services/navigation.service';
+import {BusinessService} from '../services/business.service';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-weight-camera',
@@ -37,9 +39,12 @@ export class WeightCameraComponent implements OnInit, OnDestroy {
     private unitAmountPipe: UnitAmountPipe,
     private alertService: AlertsService,
     private navService: NavigationService,
+    private businessService: BusinessService,
   ) {}
 
   async ngOnInit() {
+
+    this.mock = !environment.production || this.businessService.businessDoc.scalesId == '8.8e8';
 
     // Show camera preview for mobile
     if(this.isMobile)

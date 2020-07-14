@@ -324,6 +324,7 @@ export class RegisterPage implements OnInit {
   }
 
   payBtnText() : string {
+    return 'תשלום'; // TODO
     if(!this.isPaymentValid && this.paymentsService.validUntil)
       return 'חידוש המנוי';
     if(!this.isPaymentValid && !this.paymentsService.validUntil)

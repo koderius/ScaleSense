@@ -24,8 +24,8 @@
 
   <img [src]="snapshot" *ngIf="snapshot" class="view">
 
-  <ion-fab vertical="bottom" horizontal="center">
-    <ion-fab-button color="secondary" (click)="takeSnapshot()" [disabled]="!mock && (!websocketService.hasConnection || !stream)" *ngIf="!snapshot">
+  <ion-fab vertical="bottom" horizontal="center" *ngIf="mock || (websocketService.hasConnection && stream)">
+    <ion-fab-button color="secondary" (click)="takeSnapshot()" *ngIf="!snapshot">
       <ion-icon name="speedometer"></ion-icon>
     </ion-fab-button>
     <ion-fab-button color="secondary" (click)="accept()" *ngIf="snapshot">

@@ -279,13 +279,12 @@
         <ion-text>ברוך הבא ל-Scale Sense!</ion-text>
       </p>
 
-
-      <ion-row class="ion-margin-top">
-        <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="pay()" *ngIf="payBtnText()">{{payBtnText()}}</ion-button>
+      <ion-row class="ion-margin-top" *ngIf="payBtnText()">
+        <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="pay()">{{payBtnText()}}</ion-button>
+        <p class="ion-text-center">
+          <ion-text color="medium">לצורך ביצוע התשלום, תועבר לאתר חיצוני</ion-text>
+        </p>
       </ion-row>
-      <p class="ion-text-center">
-        <ion-text color="medium">לצורך ביצוע התשלום, תועבר לאתר חיצוני</ion-text>
-      </p>
 
     </div>
 
@@ -301,7 +300,7 @@
       <ion-button color="secondary" shape="round" strong="true" (click)="buttonAction()" *ngIf="buttonText()">{{buttonText()}}</ion-button>
 <!--      <ion-button shape="round" strong="true" *ngIf="pageStatus == PageStatus.PAYMENTS" style="width: 75%" (click)="buttonAction()">סיום הרשמה וכניסה למערכת</ion-button>-->
     </ion-row>
-    <p id="required-comment" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus <= PageStatus.PAYMENTS">יש למלא את כל השדות המסונים ב*</p>
+    <p id="required-comment" *ngIf="pageStatus >= PageStatus.FIRST_STEP && pageStatus < PageStatus.PAYMENTS">יש למלא את כל השדות המסונים ב*</p>
 
   </div>
 

@@ -38,6 +38,7 @@ export class AppComponent {
   initializeApp() {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
+      this.statusBar.backgroundColorByName('teal');
       this.splashScreen.hide();
 
       // Set between two modes: Large (992px by Ionic large breakpoint) and small

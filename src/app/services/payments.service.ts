@@ -121,12 +121,18 @@ export class PaymentsService {
 
     // Details
     url.searchParams.append('tmp', '3');
-    url.searchParams.append('pageTimeOut', 'True');
-    url.searchParams.append('Amount', '21600');
-    url.searchParams.append('FixTash', 'True');
-    url.searchParams.append('Tash', '12');
     url.searchParams.append('PageLang', 'HEB');
     url.searchParams.append('MoreData', 'True');
+    url.searchParams.append('pageTimeOut', 'True');
+    url.searchParams.append('FixTash', 'True');
+    url.searchParams.append('Tash', '12');
+    url.searchParams.append('Amount', '21600');
+
+    // HORAAT KEVA
+    // url.searchParams.append('HK', 'True');
+    // url.searchParams.append('Amount', '1800');
+    // url.searchParams.append('Tash', '999');
+    // url.searchParams.append('OnlyOnApprove', 'True');
 
     // Client details
     url.searchParams.append('ClientName', contact.name.split(' ')[0]);
