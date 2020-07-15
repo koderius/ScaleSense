@@ -14,6 +14,7 @@ import {NavigationService} from '../../services/navigation.service';
 import {first, take} from 'rxjs/operators';
 import {AlertController} from '@ionic/angular';
 import {PaymentsService} from '../../services/payments.service';
+import {environment} from '../../../environments/environment';
 
 enum PageStatus {
 
@@ -324,17 +325,20 @@ export class RegisterPage implements OnInit {
   }
 
   payBtnText() : string {
-    return 'תשלום'; // TODO
-    if(!this.isPaymentValid && this.paymentsService.validUntil)
-      return 'חידוש המנוי';
-    if(!this.isPaymentValid && !this.paymentsService.validUntil)
-      return 'רכישת מנוי';
-    if(this.isPaymentValid) {
-      const nextMonth = new Date();
-      nextMonth.setMonth(nextMonth.getMonth() + 1);
-      if(nextMonth.getTime() > this.paymentsService.validUntil.getTime())
-        return 'הארכה המנוי';
+    if(environment.production) {
+      if(!this.isPaymentValid && this.paymentsService.validUntil)
+        return 'חידוש המנוי';
+      if(!this.isPaymentValid && !this.paymentsService.validUntil)
+        return 'רכישת מנוי';
+      if(this.isPaymentValid) {
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        if(nextMonth.getTime() > this.paymentsService.validUntil.getTime())
+          return 'הארכה המנוי';
+      }
     }
+    else
+      return 'ניסוי תשלום';
   }
 
 }

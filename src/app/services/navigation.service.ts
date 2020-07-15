@@ -24,10 +24,6 @@ export class NavigationService {
     this.navCtrl.navigateRoot('');
   }
 
-  goToDetails() {
-    this.navCtrl.navigateForward('details');
-  }
-
   // Go to register website page
   goToRegister() {
     this.navCtrl.navigateRoot('register');

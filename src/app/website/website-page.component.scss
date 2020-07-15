@@ -129,7 +129,6 @@ ion-content {
   right: 20%;
   user-select: none;
   pointer-events: auto;
-  cursor: pointer;
   h1 {
     display: inline-block;
     font-size: 2em;
@@ -147,7 +146,7 @@ ion-content {
 #bottom-container {
   position: relative;
   margin: auto;
-  max-width: 30em;
+  //max-width: 30em;
   padding: 20em 1em 10em 1em;
   text-align: center;
   h1 {
@@ -165,7 +164,6 @@ ion-content {
 #orange-section {
   position: relative;
   top: -2em;
-  padding: 0 1em;
   img {
     object-fit: fill;
   }
@@ -231,4 +229,35 @@ ion-content {
 #send-contact {
   width: 100%;
   --background: var(--ion-color-secondary);
+}
+
+
+#grid {
+  max-width: 900px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  margin: 6em auto 1em;
+}
+
+.det-box {
+  margin: 1em;
+  text-align: center;
+  & > h5 {
+    font-weight: bold;
+    text-shadow: 0 0 12px white;
+  }
+  & > div {
+    padding: 1em;
+    //font-size: 0.8em;
+    height: 18em;
+  }
+  &:first-child > div, &:nth-child(6) > div {
+    background-color: rgb(0,151,156);
+  }
+  &:nth-child(2) > div, &:nth-child(4) > div, &:nth-child(8) > div {
+    background-color: rgb(14,201,207);
+  }
+  &:nth-child(3) > div, &:nth-child(5) > div, &:nth-child(7) > div {
+    background-color: rgb(104,223,227);
+  }
 }

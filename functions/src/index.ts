@@ -19,7 +19,9 @@ admin.initializeApp();
 const firestore = admin.firestore();
 
 
-
+/**
+ * Get link for the payment TODO: Set the API parameters in the function
+ * */
 export const payment = functions.https.onCall(async (data)=>{
 
   try {
@@ -32,7 +34,9 @@ export const payment = functions.https.onCall(async (data)=>{
 
 });
 
-
+/**
+ * Get query params from payment verification page, check their validity, and set the account's payment with new expiration date (according to the number of payments)
+ */
 export const verifyPayment = functions.https.onCall(async (data)=>{
 
   try {
@@ -89,7 +93,6 @@ export const verifyPayment = functions.https.onCall(async (data)=>{
   }
 
 });
-
 
 
 /** *
@@ -273,6 +276,9 @@ export const createAccount = functions.https.onCall(async (data: {adminUserDoc: 
 });
 
 
+/**
+ * Create unique URL for supplier registration and send it by email
+ */
 export const sendSupplierInvitation = functions.https.onCall(async (data: {supplierDoc: BusinessDoc, email: string}, context) => {
 
   if (data && data.supplierDoc && data.email) {
@@ -397,6 +403,9 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
 
 });
 
+/**
+ * Admin can delete other users from his account
+ */
 export const deleteUser = functions.https.onCall(async (data: string, context) => {
 
   // Check admin
@@ -407,14 +416,27 @@ export const deleteUser = functions.https.onCall(async (data: string, context) =
     throw new HttpsError('permission-denied', 'Only admins can delete users');
   }
 
+  // Delete the user
   try {
-    // Delete the user
     await admin.auth().deleteUser(data);
-    // Keep the user's document (for history details), but mark him as not exist
-    return await firestore.collection('users').doc(data).update({exist: false});
   } catch (e) {
     throw new HttpsError('internal', 'Could not delete user', e);
   }
+
+});
+
+
+/**
+ * When some user is being deleted, his user document marked with "exists = false"
+ * */
+export const onUserDelete = functions.auth.user().onDelete(user => {
+
+  // Keep the user's document (for history details), but mark him as not exist
+  const uid = user.uid || '';
+  firestore.collection('users').doc(uid).update({exist: false})
+    .catch((e)=>{
+      console.error(e);
+    });
 
 });
 
@@ -578,6 +600,8 @@ export const updateOrder = functions.https.onCall(async (order: OrderDoc, contex
 
 /**
  * Cloud function that runs every 5 minutes TODO: Update to every minute?
+ * 1. Send alerts (2 kinds) for orders that have not been opened / approved
+ * 2. Periodic deletion of documents
  * */
 export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('every 5 minutes').onRun(async context => {
 
@@ -693,7 +717,9 @@ export const taskRunner = functions.runWith({memory: '2GB'}).pubsub.schedule('ev
 
 });
 
-
+/**
+ * Runs when there are changes in products, and send notifications about it
+ */
 export const onProductWrite = functions.firestore.document('products/{pid}').onWrite((change, context) => {
 
   // Product new data

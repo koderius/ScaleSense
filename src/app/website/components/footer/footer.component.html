@@ -4,21 +4,21 @@
 
   <ion-row id="inner">
 
-    <ion-col size="2">
-      <span class="title">קישורים</span>
-      <a (click)="goHome()">עמוד הבית</a>
-      <a>יצירת קשר</a>
-      <a>אודות המערכת</a>
-      <a>כניסת ספקים</a>
-      <a>כניסת משתמשים</a>
-    </ion-col>
+<!--    <ion-col size="2">-->
+<!--      <span class="title">קישורים</span>-->
+<!--      <a (click)="goHome()">עמוד הבית</a>-->
+<!--      <a>יצירת קשר</a>-->
+<!--      <a>אודות המערכת</a>-->
+<!--      <a>כניסת ספקים</a>-->
+<!--      <a>כניסת משתמשים</a>-->
+<!--    </ion-col>-->
 
-    <ion-col size="2">
-      <span class="title">פעולות</span>
-      <a>כניסת ספק</a>
-      <a>כניסת משתמש</a>
-      <a (click)="register()">הרשמה</a>
-    </ion-col>
+<!--    <ion-col size="2">-->
+<!--      <span class="title">פעולות</span>-->
+<!--      <a>כניסת ספק</a>-->
+<!--      <a>כניסת משתמש</a>-->
+<!--      <a (click)="register()">הרשמה</a>-->
+<!--    </ion-col>-->
 
     <ion-col>
       <span class="title">פרטי החברה</span>
@@ -29,7 +29,10 @@
     </ion-col>
 
     <ion-col size="3">
-      <ion-button shape="round" expand="fill" strong="true">כניסה למערכת</ion-button>
+      <ion-button shape="round" expand="fill" strong="true" (click)="login()">
+          <ion-text>כניסה</ion-text>
+          <ion-text class="ion-hide-sm-down">&nbsp;למערכת</ion-text>
+      </ion-button>
       <ion-button shape="round" expand="fill" strong="true" (click)="register()">הרשמה</ion-button>
     </ion-col>
 

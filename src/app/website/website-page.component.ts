@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {AfterViewChecked, Component, ViewChild} from '@angular/core';
 import {BusinessSide} from '../models/Business';
 import {MailService} from './mail/mail.service';
 import {MailForm} from './mail/MailForm';
@@ -6,14 +6,16 @@ import {AuthService} from '../services/auth.service';
 import {NavigationService} from '../services/navigation.service';
 import {take} from 'rxjs/operators';
 import {ActivatedRoute} from '@angular/router';
-import {IonContent} from '@ionic/angular';
+import {TEXT_BOXES} from './TextBoxes';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'website-page.component.html',
   styleUrls: ['website-page.component.scss'],
 })
-export class WebsitePage {
+export class WebsitePage implements AfterViewChecked {
+
+  boxes = TEXT_BOXES;
 
   enterAs: BusinessSide;
 
@@ -25,8 +27,6 @@ export class WebsitePage {
 
   isLogin: boolean;
 
-  @ViewChild('content', {static: true}) content: IonContent;
-
   constructor(
     private authService: AuthService,
     private navService: NavigationService,
@@ -34,23 +34,9 @@ export class WebsitePage {
     private activatedRoute: ActivatedRoute,
   ) {}
 
-
-  ionViewDidEnter() {
-    this.activatedRoute.fragment.subscribe((f)=>{
-      if(f == 'contact') {
-        this.content.scrollToBottom();
-        window.location.hash = '';
-      }
-    });
-  }
-
   // Go to register page
   goToRegister() {
     this.navService.goToRegister();
-  }
-
-  goToDetails() {
-    this.navService.goToDetails();
   }
 
   // Go to register page in 'forgotPassword' stage
@@ -125,6 +111,32 @@ export class WebsitePage {
 
     this.isSending = false;
 
+  }
+
+
+  // Set boxes style according to the screen
+  ngAfterViewChecked(): void {
+    const gridStyle = window.getComputedStyle(document.getElementById('grid'));
+    const numOfCols = gridStyle.getPropertyValue('grid-template-columns').split(' ').length;
+
+    const boxes = document.getElementsByClassName('det-box');
+    for (let i = 0; i < boxes.length; i++) {
+
+      // Reset border radius
+      boxes[i].getElementsByTagName('div')[0].style.borderRadius = '0';
+
+      // Set border radius according to grid location
+      // First cell
+      if(i === 0)
+        boxes[i].getElementsByTagName('div')[0].style.borderTopRightRadius = '3em';
+      // First in column
+      else if(i % numOfCols === 0)
+        boxes[i].getElementsByTagName('div')[0].style.borderBottomRightRadius = '3em';
+      // Last in column, or last in grid
+      else if(i % numOfCols === numOfCols-1 || (i === boxes.length - 1))
+        boxes[i].getElementsByTagName('div')[0].style.borderBottomLeftRadius = '3em';
+
+    }
   }
 
 }

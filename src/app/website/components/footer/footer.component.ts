@@ -12,8 +12,13 @@ export class FooterComponent implements OnInit {
 
   ngOnInit() {}
 
-  goHome() {
-    this.navService.goToWebHomepage();
+  login() {
+    if(window.location.pathname == '/') {
+      window.location.hash = 'login-buttons';
+      setTimeout(()=>{window.location.hash = ''});
+    }
+    else
+      this.navService.goToWebHomepage();
   }
 
   register() {

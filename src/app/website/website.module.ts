@@ -11,7 +11,6 @@ import {RegisterPage} from './register/register.page';
 import {MailService} from './mail/mail.service';
 import {RecaptchaModule} from 'ng-recaptcha';
 import {MatTooltipModule} from '@angular/material';
-import {DetailsPage} from './details/details.page';
 import {PaymentCompletePage} from './payment-complete/payment-complete.page';
 
 @NgModule({
@@ -23,10 +22,6 @@ import {PaymentCompletePage} from './payment-complete/payment-complete.page';
       {
         path: '',
         component: WebsitePage
-      },
-      {
-        path: 'details',
-        component: DetailsPage,
       },
       {
         path: 'register/:id',
@@ -46,7 +41,6 @@ import {PaymentCompletePage} from './payment-complete/payment-complete.page';
   ],
   declarations: [
     WebsitePage,
-    DetailsPage,
     RegisterPage,
     PaymentCompletePage,
     FooterComponent,
