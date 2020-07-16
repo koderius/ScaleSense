@@ -273,9 +273,8 @@
         </h1>
 
         <ol>
-          <li *ngFor="let change of order.changes; let i = index">
-            <app-order-change-report [change]="change"
-                                     [previousChangeData]="i > 0 ? order.changes[i-1].data : null">
+          <li *ngFor="let change of order.changes">
+            <app-order-change-report [orderChange]="change">
             </app-order-change-report>
           </li>
         </ol>

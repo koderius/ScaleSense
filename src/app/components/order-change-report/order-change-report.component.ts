@@ -1,9 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {OrderChange, OrderDoc, OrderStatus} from '../../models/OrderI';
-import {ProductsService} from '../../services/products.service';
-import {ProductPublicDoc} from '../../models/ProductI';
-import {ProductsChange, ProductsListUtil} from '../../utilities/productsList';
+import {OrderStatus} from '../../models/OrderI';
 import {AuthService} from '../../services/auth.service';
+import {OrderChange, OrderChangeFactory} from '../../models/Changes';
 
 @Component({
   selector: 'app-order-change-report',
@@ -12,38 +10,30 @@ import {AuthService} from '../../services/auth.service';
 })
 export class OrderChangeReportComponent implements OnInit {
 
-  @Input() change: OrderChange;
-  @Input() previousChangeData: string;
+  readonly DELETED = OrderChangeFactory.CommentDeleted;
+
+  @Input() orderChange: OrderChange;
 
   userName: string;
   action: string;
 
-  current: OrderDoc;
-  old: OrderDoc;
-  oldPrice: number = 0;
-  currentPrice: number = 0;
-
-  // productChanges: {old: ProductOrder, current: ProductOrder}[] = [];
-  productChanges: ProductsChange[] = [];
-  productsData: ProductPublicDoc[] = [];
-
-  hasDetails: boolean;
   showMore: boolean;
 
+  // Show changes details only if there are changes and the status was not set to CANCELED or CLOSED
+  get showDetails() {
+    return this.orderChange.hasChanges && this.orderChange.newStatus < OrderStatus.CLOSED;
+  }
 
-  constructor(
-    private authService: AuthService,
-    private productService: ProductsService,
-
-  ) {}
+  constructor(private authService: AuthService) {}
 
   async ngOnInit() {
 
     // Get the user name if on the same side, or a generic name of the other side
-    const user = this.authService.currentUser.side == this.change.side ? (await this.authService.getUserDoc(this.change.by)) : null;
-    this.userName = user ? `<b>${user.displayName}</b>` : (this.change.side == 'c' ? 'הלקוח' : 'הספק');
+    const username = this.authService.currentUser.side == this.orderChange.side ? this.orderChange.username : null;
+    this.userName = username ? `<b>${username}</b>` : (this.orderChange.side == 'c' ? 'הלקוח' : 'הספק');
 
-    switch (this.change.status) {
+    // Get the action name
+    switch (this.orderChange.newStatus) {
       case OrderStatus.SENT: this.action = 'ההזמנה נשלחה ע"י'; return;
       case OrderStatus.EDITED: this.action = 'ההזמנה נערכה ע"י'; break;
       case OrderStatus.OPENED: this.action = 'ההזמנה נפתחה ע"י'; return;
@@ -54,45 +44,6 @@ export class OrderChangeReportComponent implements OnInit {
       case OrderStatus.CANCELED_BY_CUSTOMER: case OrderStatus.CANCELED_BY_SUPPLIER: this.action = 'ההזמנה בוטלה ע"י'; return;
     }
 
-    // Read current version and previous version JSON data
-    this.current = JSON.parse(this.change.data) as OrderDoc;
-    this.old = this.previousChangeData ? JSON.parse(this.previousChangeData) : null as OrderDoc;
-
-    this.productChanges = ProductsListUtil.CompareLists(this.old.products, this.current.products);
-
-    this.hasDetails = !!(this.current.supplyTime != this.old.supplyTime || this.current.comment != this.old.comment || this.productChanges.length);
-
-    // Add lines for changes content
-    if(this.hasDetails) {
-
-      // Calc current price
-      this.current.products.forEach((p)=>{
-        this.currentPrice += ((p.priceInOrder || 0) * (p.amount || 0));
-      });
-
-      // Calc old price
-      this.old.products.forEach((p)=>{
-        this.oldPrice += ((p.priceInOrder || 0) * (p.amount || 0));
-      });
-
-      // Get the products data
-      this.productsData.splice(0);
-      this.productChanges.forEach(async (p)=>{
-        this.productsData.push(await this.productService.getProduct(p.productId));
-      });
-
-    }
-
-  }
-
-  getProductName(productId: string) {
-    const p = this.productsData.find((p)=>p.id == productId);
-    return p ? p.name : '';
-  }
-
-  getProductUnit(productId: string) {
-    const p = this.productsData.find((p)=>p.id == productId);
-    return p ? p.type : null;
   }
 
 }

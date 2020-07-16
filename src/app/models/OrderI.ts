@@ -1,27 +1,6 @@
-import {BusinessSide} from './Business';
 import {ProductOrder} from './ProductI';
+import {OrderChange} from './Changes';
 
-export interface OrderChange {
-
-  /** Time of change */
-  time: number;
-
-  /** User ID who made the change */
-  by: string;
-
-  /** By supplier or by customer */
-  side?: BusinessSide;
-
-  /** The status of the order */
-  status?: OrderStatus;
-
-  /** JSON of order's changeable properties (for comparing changes) */
-  data?: string;
-
-  /** The ID of the order that these changes belongs to - for notifications */
-  orderId?: string;
-
-}
 
 export enum OrderStatus {
 

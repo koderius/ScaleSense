@@ -19,7 +19,7 @@ export const sendNotification = async (transaction: Transaction, side: BusinessS
 
 
 /** Get new status according to current order status and the business side who request to change it */
-export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, requestedStatus?: number) => {
+export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, hasChanges: boolean = false, requestedStatus?: number) : number | never => {
 
   // If order has not been finally approved yet, it is possible to cancel it
   if(requestedStatus == 400)
@@ -35,6 +35,10 @@ export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, req
     if(requestedStatus == 100)
       return 100;
 
+    // Must update with changes
+    if(currentStatus > 0 && !hasChanges)
+      return null;
+
     // The status auto changes as followed:
     switch (currentStatus) {
       case 0: return 10;                                        // Order does not exist -> order sent
@@ -46,24 +50,20 @@ export const getNewOrderStatus = (side: BusinessSide, currentStatus: number, req
 
   if(side == 's') {
 
-    // The supplier can change the status to 'opened', if has not been opened yet
-    if(requestedStatus == 20)
-      if(currentStatus < 20)
-        return 20;
-      else
-        throw new HttpsError('permission-denied', 'Cannot set as "seen" twice');
+    // The supplier should change the status to 'opened', and only then he can do more changes
+    if(requestedStatus == 20 && currentStatus < 20)
+      return 20;
 
-    // If the order has not been finally approved yet, it can be approved or finally approved (changes will be checked further)
+    // If the order has not been finally approved yet, it can be approved or finally approved (with/without changes)
     if(currentStatus < 80 && currentStatus >= 20)
       if(requestedStatus == 80)
-        return 80;
+        return 80 + +hasChanges;
       else
-        return 30;
+        return 30 + +hasChanges;
 
   }
 
-  // Throw error if nothing match
-  throw new HttpsError('permission-denied','The order cannot be changed','The requested changes cannot be made due to the user business side or to the current order status');
+  return null;
 
 };
 

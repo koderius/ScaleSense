@@ -1,95 +1,95 @@
 <div>
 
   <p id="header">
-    <i dir="ltr"><ion-text color="dark">{{change.time | date : 'dd/MM/yyyy HH:mm'}}</ion-text></i>
+    <i dir="ltr"><ion-text color="dark">{{orderChange.time | date : 'dd/MM/yyyy HH:mm'}}</ion-text></i>
     <ion-text>: {{action}} </ion-text>
     <ion-text [innerHTML]="userName"></ion-text>.
-    <a *ngIf="hasDetails" (click)="showMore = !showMore">{{showMore ? 'הסתר פרטים' : 'הצג פרטים'}}</a>
+    <a *ngIf="showDetails" (click)="showMore = !showMore">{{showMore ? 'הסתר פרטים' : 'הצג פרטים'}}</a>
   </p>
 
-  <div *ngIf="old && showMore">
+  <div *ngIf="showMore">
 
-    <div *ngIf="current.supplyTime != old.supplyTime">
+    <div *ngIf="orderChange.supplyTime">
       <p>
         <ion-icon name="calendar-outline" color="dark" class="ion-padding-end"></ion-icon>
         <ion-text>תאריך האספקה שונה מ-</ion-text>
-        <b>{{old.supplyTime | date : 'dd/MM/yyyy בשעה HH:mm'}}</b>
+        <b>{{orderChange.supplyTime.from | date : 'dd/MM/yyyy בשעה HH:mm'}}</b>
         <ion-text> ל-</ion-text>
-        <b>{{current.supplyTime | date : 'dd/MM/yyyy בשעה HH:mm'}}</b>.
+        <b>{{orderChange.supplyTime.to | date : 'dd/MM/yyyy בשעה HH:mm'}}</b>.
       </p>
     </div>
 
-    <div *ngIf="current.comment != old.comment">
-      <p *ngIf="current.comment">
+    <div *ngIf="orderChange.newComment">
+      <p>
         <ion-icon name="pencil-outline" color="dark" class="ion-padding-end"></ion-icon>
-        <ion-text *ngIf="!old.comment">נוספה הערה לספק: </ion-text>
-        <ion-text *ngIf="old.comment">שונתה הערה לספק ל-</ion-text>
-        <b>"{{current.comment}}"</b>.
-      </p>
-      <p *ngIf="!current.comment && old.comment">
-        <ion-text>נמחקה הערה לספק.</ion-text>
+        <ion-text *ngIf="orderChange.newComment == DELETED">נמחקה הערה לספק.</ion-text>
+        <ion-text *ngIf="orderChange.newComment != DELETED">
+          <ion-text>נערכה הערה לספק: </ion-text>
+          <b>"{{orderChange.newComment}}"</b>.
+        </ion-text>
       </p>
     </div>
 
-    <div *ngIf="current.supplierComment != old.supplierComment">
-      <p *ngIf="current.supplierComment">
+    <div *ngIf="orderChange.newSupplierComment">
+      <p>
         <ion-icon name="pencil-outline" color="dark" class="ion-padding-end"></ion-icon>
-        <ion-text *ngIf="!old.supplierComment">נוספה הערה ללקוח: </ion-text>
-        <ion-text *ngIf="old.supplierComment">שונתה הערה ללקוח ל-</ion-text>
-        <b>"{{current.supplierComment}}"</b>.
-      </p>
-      <p *ngIf="!current.supplierComment && old.supplierComment">
-        <ion-text>נמחקה הערה ללקוח.</ion-text>
+        <ion-text *ngIf="orderChange.newSupplierComment == DELETED">נמחקה הערה ללקוח.</ion-text>
+        <ion-text *ngIf="orderChange.newSupplierComment != DELETED">
+          <ion-text>נערכה הערה ללקוח: </ion-text>
+          <b>"{{orderChange.newSupplierComment}}"</b>.
+        </ion-text>
       </p>
     </div>
 
-    <div *ngFor="let product of productChanges">
+    <div *ngFor="let product of (orderChange.productsChanges || [])">
       <p>
 
-        <ion-icon name="add-circle-outline" color="success" class="ion-padding-end" *ngIf="product.type == 'added'"></ion-icon>
-        <ion-icon name="remove-circle-outline" color="danger" class="ion-padding-end" *ngIf="product.type == 'removed'"></ion-icon>
-        <ion-icon name="alert-circle-outline" color="warning" class="ion-padding-end" *ngIf="product.type == 'changed'"></ion-icon>
+        <ion-icon name="add-circle-outline" color="success" class="ion-padding-end" *ngIf="product.change == 'added'"></ion-icon>
+        <ion-icon name="remove-circle-outline" color="danger" class="ion-padding-end" *ngIf="product.change == 'deleted'"></ion-icon>
+        <ion-icon name="alert-circle-outline" color="warning" class="ion-padding-end" *ngIf="product.change == 'changed'"></ion-icon>
 
-        <ion-text *ngIf="product.type == 'added'">נוסף המוצר: </ion-text>
-        <ion-text *ngIf="product.type == 'removed'">הוסר המוצר: </ion-text>
-        <ion-text *ngIf="product.type == 'changed'">שינויים במוצר </ion-text>
-        <b>{{getProductName(product.productId)}}</b>
-        <b *ngIf="product.type == 'added'"> ({{product.amount.new | unitAmount : getProductUnit(product.productId)}})</b>
+        <ion-text *ngIf="product.change == 'added'">נוסף המוצר: </ion-text>
+        <ion-text *ngIf="product.change == 'removed'">הוסר המוצר: </ion-text>
+        <ion-text *ngIf="product.change == 'changed'">שינויים במוצר </ion-text>
+        <b>{{product.name}}</b>
+        <b *ngIf="product.change == 'added'"> ({{product.amount.to | unitAmount : product.type}})</b>
 
-        <ion-text *ngIf="product.type == 'changed'">
+        <ion-text *ngIf="product.change == 'changed'">
           <ion-text>: </ion-text>
 
           <ion-text *ngIf="product.amount">
             <ion-text>הכמות שונתה מ-</ion-text>
-            <b>{{product.amount.old | unitAmount : getProductUnit(product.productId)}}</b>
+            <b>{{product.amount.from | unitAmount : product.type}}</b>
             <ion-text> ל-</ion-text>
-            <b>{{product.amount.new | unitAmount : getProductUnit(product.productId)}}. </b>
+            <b>{{product.amount.to | unitAmount : product.type}}. </b>
           </ion-text>
 
           <ion-text *ngIf="product.price">
             <ion-text>המחיר שונה מ-</ion-text>
-            <b>{{product.price.old | price}}</b>
+            <b>{{product.price.from | price}}</b>
             <ion-text> ל-</ion-text>
-            <b>{{product.price.new | price}}. </b>
+            <b>{{product.price.to | price}}. </b>
           </ion-text>
 
-          <ion-text *ngIf="product.comment">
-            <ion-text *ngIf="product.comment.new">נערכה הערה: </ion-text>
-            <b *ngIf="product.comment.new">"{{product.comment.new}}"</b>.
-            <ion-text *ngIf="!product.comment.new">נמחקה הערה למוצר.</ion-text>
+          <ion-text *ngIf="product.newComment">
+            <ion-text>
+              <ion-text *ngIf="product.newComment != DELETED">נערכה הערה למוצר: </ion-text>
+              <b>"{{product.newComment}}"</b>.
+            </ion-text>
+            <ion-text *ngIf="product.newComment == DELETED">נמחקה הערה למוצר.</ion-text>
           </ion-text>
 
         </ion-text>
       </p>
     </div>
 
-    <div *ngIf="oldPrice != currentPrice">
+    <div *ngIf="orderChange.totalPrice">
       <p>
         <ion-icon name="logo-usd" color="dark" class="ion-padding-end"></ion-icon>
         <ion-text>בעקבות השינוי עודכן מחיר ההזמנה מ-</ion-text>
-        <b>{{oldPrice | price}}</b>
+        <b>{{orderChange.totalPrice.from | price}}</b>
         <ion-text> ל-</ion-text>
-        <b>{{currentPrice | price}}</b>.
+        <b>{{orderChange.totalPrice.to | price}}</b>.
       </p>
     </div>
 

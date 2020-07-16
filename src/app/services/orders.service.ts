@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {OrderChange, OrderDoc, OrderStatus} from '../models/OrderI';
+import {OrderDoc, OrderStatus} from '../models/OrderI';
 import {formatNumber} from '@angular/common';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -16,6 +16,7 @@ import {Dictionary} from '../utilities/dictionary';
 import {ProductOrder} from '../models/ProductI';
 import {Objects} from '../utilities/objects';
 import {isNumber} from 'util';
+import {OrderChange} from '../models/Changes';
 
 @Injectable({
   providedIn: 'root'
@@ -207,7 +208,7 @@ export class OrdersService {
 
     try {
 
-      const updateOrder = firebase.functions().httpsCallable('updateOrder');
+      const updateOrder = firebase.functions().httpsCallable('updateOrder2');
       const res = (await updateOrder(orderDoc)).data as OrderChange;
 
       // On success
@@ -218,7 +219,7 @@ export class OrdersService {
           this.deleteDraft(order.id);
 
         // Get the new order status
-        order.status = res.status;
+        order.status = res.newStatus;
 
         return res;
       }
