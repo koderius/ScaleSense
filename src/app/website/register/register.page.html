@@ -277,6 +277,10 @@
         <ion-text>ברוך הבא ל-Scale Sense!</ion-text>
       </p>
 
+      <ion-row class="ion-margin-top" *ngIf="freePeriod">
+        <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="getFreePeriod()">תקופת ניסיון חינם</ion-button>
+      </ion-row>
+
       <ion-row class="ion-margin-top" *ngIf="payBtnText()">
         <ion-button color="secondary" shape="round" strong style="margin: auto" (click)="pay()">{{payBtnText()}}</ion-button>
         <p class="ion-text-center">

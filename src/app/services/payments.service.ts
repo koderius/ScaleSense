@@ -6,6 +6,7 @@ import {ContactInfo} from '../models/Business';
 import {AuthService} from './auth.service';
 import {Payment} from '../models/Payment';
 import {first} from 'rxjs/operators';
+import {MetadataService} from './metadata.service';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,7 @@ export class PaymentsService {
 
   constructor(
     private authService: AuthService,
+    private metadata: MetadataService,
   ) {
 
     // Subscribe the current business
@@ -103,8 +105,15 @@ export class PaymentsService {
   }
 
 
+  async getBillingData() {
+    return await this.metadata.getBillingDetails();
+  }
+
+
   /** Get link for payment according to API parameters */
   async pay(bid: string, contact: ContactInfo, retry?: boolean) {
+
+    const billing = await this.getBillingData();
 
     const url = new URL(this.API_URL);
 
@@ -125,8 +134,8 @@ export class PaymentsService {
     url.searchParams.append('MoreData', 'True');
     url.searchParams.append('pageTimeOut', 'True');
     url.searchParams.append('FixTash', 'True');
-    url.searchParams.append('Tash', '12');
-    url.searchParams.append('Amount', '21600');
+    url.searchParams.append('Tash', ''+billing.numOfPayments);
+    url.searchParams.append('Amount', ''+(billing.pricePerMonth * billing.numOfPayments));
 
     // HORAAT KEVA
     // url.searchParams.append('HK', 'True');
@@ -178,6 +187,21 @@ export class PaymentsService {
         return await this.verifyPayment(queryParams, true);
     }
 
+  }
+
+
+  /** Can work only if price set to 0 in the database metadata! */
+  async freeAccount(bid: string, retry?: boolean) {
+    try {
+      const fn = firebase.functions().httpsCallable('verifyPayment');
+      const res = await fn(bid);
+      return new Date(res.data as number);
+    }
+    catch (e) {
+      console.error(e);
+      if(!retry)
+        return await this.verifyPayment(bid, true);
+    }
   }
 
 

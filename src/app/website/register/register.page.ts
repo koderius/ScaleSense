@@ -61,6 +61,7 @@ export class RegisterPage implements OnInit {
   businessDoc: BusinessDoc = {contacts: [{},{}]};
 
   isPaymentValid: boolean;
+  freePeriod: boolean;
 
   readonly EmailRegex = AuthService.EMAIL_REGEX;
   readonly PasswordRegex = AuthService.PASSWORD_REGEX;
@@ -107,6 +108,8 @@ export class RegisterPage implements OnInit {
           if(user.side == 'c') {
             this.pageStatus = PageStatus.PAYMENTS;
             this.isPaymentValid = await this.paymentsService.isValid();
+            if(!this.isPaymentValid)
+              this.freePeriod = (await this.paymentsService.getBillingData()).pricePerMonth === 0;
           }
           else
             this.navService.goToAppMain();
@@ -339,6 +342,13 @@ export class RegisterPage implements OnInit {
     }
     else
       return 'ניסוי תשלום';
+  }
+
+
+  async getFreePeriod() {
+    const until = await this.paymentsService.freeAccount(this.businessService.myBid);
+    alert(`מנוי חינם בתוקף עד ${until.toLocaleDateString()}`);
+    this.navService.goToAppMain();
   }
 
 }

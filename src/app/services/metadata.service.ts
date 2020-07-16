@@ -58,4 +58,9 @@ export class MetadataService {
 
   }
 
+
+  async getBillingDetails() : Promise<any> {
+    return (await this.metadataRef.doc('billing').get()).data();
+  }
+
 }
