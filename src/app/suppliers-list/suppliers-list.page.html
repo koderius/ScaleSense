@@ -82,8 +82,9 @@
       </ion-grid>
 
       <app-pagination
-              [numOfResults]="results.length"
-              [totalNumOfResults]="(filteredSuppliers || suppliersService.mySuppliers).length"
+              [page]="page"
+              [numOfItems]="results.length"
+              [totalNumOfItems]="(filteredSuppliers || suppliersService.mySuppliers).length"
               (onForward)="page = page + 1"
               (onBack)="page = page - 1"
       ></app-pagination>

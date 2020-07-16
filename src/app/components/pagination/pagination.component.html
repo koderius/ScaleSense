@@ -1,9 +1,9 @@
-<ion-row id="pages-btns" dir="ltr" *ngIf="_numOfResults || _totalNumOfResults">
-  <ion-button fill="clear" (click)="previousClicked()" title="הקודם" [disabled]="page <= 1" [color]="page <= 1 ? 'dark' : 'primary'">
+<ion-row id="pages-btns" dir="ltr" *ngIf="numOfItems">
+  <ion-button fill="clear" (click)="previousClicked()" title="הקודם" [disabled]="!canGoBack" [color]="canGoBack ? 'primary' : 'dark'">
     <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
   </ion-button>
-  <ion-text>{{(page - 1)*10 + 1}} - {{(page-1)*10 + _numOfResults}}</ion-text>
-  <ion-button fill="clear" (click)="nextClicked()" title="הבא" [disabled]="!canGoForward" [color]="!canGoForward ? 'dark' : 'primary'">
+  <ion-text>{{fromItem}} - {{toItem}}</ion-text>
+  <ion-button fill="clear" (click)="nextClicked()" title="הבא" [disabled]="!canGoForward" [color]="canGoForward ? 'primary' : 'dark'">
     <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
   </ion-button>
 </ion-row>

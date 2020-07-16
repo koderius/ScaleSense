@@ -64,7 +64,9 @@
     </div>
 
     <app-pagination
-            [numOfResults]="myReturns.length"
+            [page]="page"
+            [numOfItems]="myReturns.length"
+            [totalNumOfItems]="null"
             (onForward)="nextPage()"
             (onBack)="prevPage()"
     ></app-pagination>

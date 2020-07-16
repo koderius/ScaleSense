@@ -29,7 +29,9 @@ export class ProductsService {
   private isDataReady: boolean;
 
   get myProducts() {
-    return (this.businessService.side == 'c' ? this._myCustomerProducts : this._mySupplierProducts) || [];
+    const list = (this.businessService.side == 'c' ? this._myCustomerProducts : this._mySupplierProducts) || [];
+    // Sort by name
+    return list.sort((a,b)=>a.name.localeCompare(b.name));
   }
 
   /** The reference to the firestore collection where the list of customer's products is stored */

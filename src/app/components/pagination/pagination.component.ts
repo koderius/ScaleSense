@@ -7,59 +7,52 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 })
 export class PaginationComponent implements OnInit {
 
-  readonly MAX_RESULTS_IN_QUERY = 10;
+  // Number of items per page
+  @Input() itemsPerPage: number = 10;
 
-  page = 1;
+  // The number of shown items
+  private _numOfItems: number = 0;
 
-  canGoForward: boolean;
+  get numOfItems() : number {
+    return this._numOfItems;
+  }
 
-  lastClicked: -1 | 0 | 1 = 0;
+  @Input() set numOfItems(num: number) {
+    // Go back if no more results
+    if(num === 0 && this.page > 1)
+      this.previousClicked();
+    else
+      this._numOfItems = num;
+  }
+
+  // Total number of results, null if unknown
+  @Input() totalNumOfItems: number | null;
+
+  @Input() page: number = 1;
 
   @Output() onBack = new EventEmitter();
   @Output() onForward = new EventEmitter();
 
-  _numOfResults: number;
-  _totalNumOfResults: number;
 
-  // If the total number of results is known
-  @Input() set totalNumOfResults(num: number) {
-    this._totalNumOfResults = num;
-    this.canGoForward = num ? this.page < Math.ceil(num / this.MAX_RESULTS_IN_QUERY) : (this._numOfResults == this.MAX_RESULTS_IN_QUERY);
+  get fromItem() : number {
+    return (this.page - 1) * this.itemsPerPage + 1
   }
 
-  @Input() set numOfResults(num: number) {
+  get toItem() : number {
+    return this.fromItem + this.numOfItems - 1;
+  }
 
-    // For new num of results (not after clicking), set as first page
-    if(this.lastClicked === 0)
-      this.page = 1;
+  get canGoBack() {
+    return this.page > 1;
+  }
 
-    // If the total number of results is unknown, can go forward only if reached the maximum results per page
-    if(!this._totalNumOfResults)
-      this.canGoForward = (num == this.MAX_RESULTS_IN_QUERY);
-
-    // If there are results, get them
-    if(num) {
-
-      this._numOfResults = num;
-
-      // Change the page number, if it was after moving page (make sure page is not under 1)
-      if(this.page + this.lastClicked > 0)
-        this.page += this.lastClicked;
-
-    }
-
-    // If there are no results, and it was not when moving forward, set as first page with empty results
-    else if(this.lastClicked != 1) {
-      this._numOfResults = 0;
-      this.page = 1;
-    }
-
-    // Reset last click
-    this.lastClicked = 0;
-
-    if(this._totalNumOfResults)
-      this.canGoForward = this.page < Math.ceil(this._totalNumOfResults / this.MAX_RESULTS_IN_QUERY);
-
+  get canGoForward() {
+    // For unknown number of results, can go forward only if the current results filled the page (equal to items per page)
+    if(this.totalNumOfItems === null)
+      return this.numOfItems == this.itemsPerPage;
+    // For known number of results - as long as not reached the last result
+    else
+      return this.toItem < this.totalNumOfItems;
   }
 
   constructor() { }
@@ -67,12 +60,10 @@ export class PaginationComponent implements OnInit {
   ngOnInit() {}
 
   nextClicked() {
-    this.lastClicked = 1;
     this.onForward.emit();
   }
 
   previousClicked() {
-    this.lastClicked = -1;
     this.onBack.emit();
   }
 

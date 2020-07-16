@@ -12,6 +12,8 @@ import {ReturnObj} from '../models/ReturnObj';
 })
 export class ReturnsPage implements OnInit {
 
+  page: number = 1;
+
   myReturns: ReturnObj[] = [];
 
   constructor(
@@ -28,9 +30,6 @@ export class ReturnsPage implements OnInit {
 
   }
 
-
-
-
   async deleteReturn(returnDoc: ReturnObj) {
     if(await this.alerts.areYouSure('האם למחוק מסמך החזרה?')) {
       await this.returnService.deleteReturn(returnDoc.id);
@@ -44,6 +43,7 @@ export class ReturnsPage implements OnInit {
   }
 
   async nextPage() {
+    this.page++;
     const res = await this.returnService.loadAllMyReturns(this.myReturns.slice(-1)[0]);
     // Only if there are results on the next page
     if(res.length)
@@ -51,6 +51,7 @@ export class ReturnsPage implements OnInit {
   }
 
   async prevPage() {
+    this.page--;
     this.myReturns = await this.returnService.loadAllMyReturns(this.myReturns[0]);
   }
 

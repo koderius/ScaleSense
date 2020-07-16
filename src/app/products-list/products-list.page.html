@@ -125,8 +125,9 @@
     </div>
 
     <app-pagination
-            [numOfResults]="results.length"
-            [totalNumOfResults]="!showAllProducts ? (filteredList || productsService.myProducts).length : null"
+            [numOfItems]="results.length"
+            [totalNumOfItems]="!showAllProducts ? (filteredList || productsService.myProducts).length : null"
+            [page]="page"
             (onForward)="search(1)"
             (onBack)="search(-1)"
     ></app-pagination>

@@ -32,6 +32,8 @@ export class OrdersListPage implements OnInit, OnDestroy {
   pageMode : OrderActionMode;
   orders: Order[] = [];
 
+  page: number = 1;
+
   query: string = '';
   byStatusGroup: OrderStatus[];
   fromDate: Date;
@@ -41,8 +43,6 @@ export class OrdersListPage implements OnInit, OnDestroy {
   OrderStatusGroup = OrderStatusGroup;
 
   isSearching: boolean;
-
-  numOfNewResults: number;
 
   /** The selected order for returning products, and the list of its products data */
   orderReturn: Order;
@@ -168,6 +168,9 @@ export class OrdersListPage implements OnInit, OnDestroy {
    * */
   async searchOrders(movePage: number = 0) {
 
+    if(movePage === 0)
+      this.page = 1;
+
     const byDate = this.fromDate && this.toDate;
 
     // All statuses group
@@ -188,15 +191,12 @@ export class OrdersListPage implements OnInit, OnDestroy {
       movePage == -1 ? this.orders[0] : null,
     );
 
-    this.numOfNewResults = res.length;
-
     // Get results and set the page number
-    if(this.numOfNewResults)
+    if(res) {
       this.orders = res;
+      this.page += movePage;
+    }
 
-    // In case there are no results, and it was not by moving forward, clear the list
-    else if(movePage != 1)
-      this.orders = [];
 
     this.isSearching = false;
   }

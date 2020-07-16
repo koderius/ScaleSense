@@ -25,7 +25,8 @@ export class ProductsListPage {
   filteredList: (ProductPublicDoc | ProductCustomerDoc)[];
 
   get results() {
-    return (this.filteredList || this.productsService.myProducts).slice((this.page - 1) * 10, this.page * 10);
+    const list = (this.filteredList || this.productsService.myProducts);
+    return this.showAllProducts ? list : list.slice((this.page - 1) * 10, this.page * 10);
   }
 
   businessList: BusinessDoc[] = [];
@@ -97,8 +98,10 @@ export class ProductsListPage {
         movePage == 1 ? this.filteredList.slice(-1)[0].name : null,
         movePage == -1 ? this.filteredList[0].name : null,
       );
-      if(res)
+      if(res) {
         this.filteredList = res;
+        this.page += movePage;
+      }
       this.isSearching = false;
     }
 

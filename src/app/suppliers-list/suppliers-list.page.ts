@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {SuppliersService} from '../services/suppliers.service';
 import {NavigationService} from '../services/navigation.service';
 import {BusinessDoc, SupplierDoc, SupplierStatus} from '../models/Business';
@@ -22,12 +22,7 @@ export class SuppliersListPage implements OnInit {
   page: number = 1;
 
   get results() {
-    const res = (this.filteredSuppliers || this.suppliersService.mySuppliers).slice((this.page - 1) * 10, this.page * 10);
-    if(!res.length && this.page > 1) {
-      this.page--;
-      return this.results;
-    }
-    return res;
+    return (this.filteredSuppliers || this.suppliersService.mySuppliers).slice((this.page - 1) * 10, this.page * 10);
   }
 
   constructor(

@@ -94,7 +94,9 @@
     </div>
 
     <app-pagination
-            [numOfResults]="numOfNewResults"
+            [page]="page"
+            [numOfItems]="orders.length"
+            [totalNumOfItems]="null"
             (onForward)="searchOrders(1)"
             (onBack)="searchOrders(-1)"
     ></app-pagination>
