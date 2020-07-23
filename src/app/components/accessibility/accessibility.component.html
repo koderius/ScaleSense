@@ -1,0 +1,23 @@
+<ion-list>
+  <ion-item>
+    <ion-icon slot="start" name="text"></ion-icon>
+    <ion-label>גודל תצוגה</ion-label>
+    <ion-button slot="end" fill="outline" strong (click)="zoomIn()" [disabled]="AccessibilityComponent.Zoom >= 2">
+      <ion-icon slot="icon-only" name="add"></ion-icon>
+    </ion-button>
+    <ion-button slot="end" fill="outline" strong (click)="zoomOut()" [disabled]="AccessibilityComponent.Zoom <= 1">
+      <ion-icon slot="icon-only" name="remove"></ion-icon>
+    </ion-button>
+  </ion-item>
+  <ion-item>
+    <ion-icon slot="start" name="contrast"></ion-icon>
+    <ion-label>שחור לבן</ion-label>
+    <ion-toggle slot="end" [(ngModel)]="AccessibilityComponent.BnW" [disabled]="AccessibilityComponent.SoftColors"></ion-toggle>
+  </ion-item>
+  <ion-item>
+    <ion-icon slot="start" name="eye"></ion-icon>
+    <ion-label>צבע רך</ion-label>
+    <ion-toggle slot="end" [(ngModel)]="AccessibilityComponent.SoftColors"></ion-toggle>
+  </ion-item>
+  <ion-button fill="outline" expand="block" (click)="reset()">איפוס</ion-button>
+</ion-list>

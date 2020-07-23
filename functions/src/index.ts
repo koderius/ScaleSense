@@ -1,12 +1,13 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import * as axios from 'axios';
+import * as puppeteer from 'puppeteer'
 import {OrderDoc} from '../../src/app/models/OrderI';
 import {HttpsError} from 'firebase-functions/lib/providers/https';
 import {getNewOrderStatus, getRequestedPermission, sendNotification} from './inner_functions';
 import {ProductCustomerDoc, ProductOrder, ProductPublicDoc} from '../../src/app/models/ProductI';
 import {BaseNotificationDoc} from '../../src/app/models/Notification';
 import {MailForm} from '../../src/app/website/mail/MailForm';
-import * as axios from 'axios';
 import {ReturnDoc} from '../../src/app/models/Return';
 import {Permissions, UserDoc} from '../../src/app/models/UserDoc';
 import {BusinessDoc, BusinessSide, ContactInfo, NotesSettings} from '../../src/app/models/Business';
@@ -389,7 +390,7 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
       // Get business details
       const side = user.get('side');
       const bid = user.get('bid');
-      const lang = user.get('lang') || '';
+      const lang = user.get('lang') || 'iw';
 
       // Get default permissions from the business metadata (Each role has array of permission under the field: role{number})
       const defaultPermissions = await firestore.collection(side == 'c' ? 'customers' : 'suppliers').doc(bid).collection('metadata').doc('permissions').get();
@@ -401,7 +402,7 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
         uid: userRec.uid,
         bid: bid,
         side: side,
-        permissions: permissions,
+        permissions: permissions || [],
         lang: lang,
         exist: true,
       }, {merge: true});
@@ -409,6 +410,7 @@ export const createUser = functions.https.onCall(async (data: { userDoc: UserDoc
       return userDoc;
 
     } catch (e) {
+      console.error(e);
       throw new HttpsError('internal', e);
     }
 
@@ -842,7 +844,7 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
     const businessSnapshot = await businessRef.get();
     const notificationsSettings: NotesSettings[] = businessSnapshot.get('notificationsSettings') || [];
     const contacts: ContactInfo[] = businessSnapshot.get('contacts') || [];
-    const lang = businessSnapshot.get('lang');
+    const lang = businessSnapshot.get('lang') || 'iw';
 
     // The notification that has been just created
     const notification: BaseNotificationDoc = snapshot.data() as BaseNotificationDoc;
@@ -896,12 +898,34 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
         {auth:
             {
               username: 'AC5a375e5daab19cdb70d7c3483cdcfbe5',
-              password: '1c9aa4caf9be796d373df229a33d1a83'
+              password: '7eb9c093e7059053f60170321b157243' // July 20, 2020
             }
         });
 
     });
 
+  }
+
+});
+
+
+export const generatePdf = functions.https.onCall(async (data: {html: string, title: string})=>{
+
+  try {
+
+    const browser = await puppeteer.launch({headless: true});
+    const page = await browser.newPage();
+    await page.goto('https://google.com', {waitUntil: 'networkidle0'});
+
+    const buffer = await page.pdf({ format: "A4" });
+    await browser.close();
+
+    return buffer;
+
+  }
+  catch (e) {
+    console.error(e);
+    return null;
   }
 
 });

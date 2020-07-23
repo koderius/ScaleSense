@@ -36,7 +36,8 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
   // Get all users of this business (live updated)
   ngOnInit() {
-    this.usersSubscription = this.usersService.myUsersRef.onSnapshot((snapshot)=>{
+
+    this.usersSubscription = this.usersService.myUsersRef().onSnapshot((snapshot)=>{
 
       // Get all users documents
       this.usersService.users = snapshot.docs.map((doc)=>doc.data() as UserDoc);

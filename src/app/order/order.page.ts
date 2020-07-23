@@ -17,7 +17,6 @@ import {UserPermission} from '../models/UserDoc';
 import {SupplierStatus} from '../models/Business';
 import {Platform, PopoverController} from '@ionic/angular';
 import {TimePickerPopover} from '../app-time-picker/time-picker-popover/time-picker-popover.component';
-import {OrderChangeFactory} from '../models/Changes';
 
 @Component({
   selector: 'app-order',
@@ -426,7 +425,7 @@ export class OrderPage implements OnInit {
       this.alerts.loaderStop(l);
       if(res) {
         this.order = res;
-        // this.updateChanges();
+        this.updateChanges();
       }
       return !!res;
     }
@@ -484,6 +483,7 @@ export class OrderPage implements OnInit {
       const res = await this.ordersService.updateOrder(this.order, final ? OrderStatus.FINAL_APPROVE : OrderStatus.APPROVED);
       if(res) {
         this.updateChanges();
+        this.orderSent = true;
         alert('עדכון נשלח ללקוח');
       }
       this.alerts.loaderStop(l);

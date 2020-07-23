@@ -26,7 +26,7 @@ export class UsersService {
   /** A reference to the users collection */
   readonly usersCollectionRef = firebase.firestore().collection('users');
   /** A reference to all the users of this account */
-  readonly myUsersRef = this.usersCollectionRef.where('bid', '==', this.businessService.myBid).where('exist', '==', true);
+  readonly myUsersRef = ()=>this.usersCollectionRef.where('bid', '==', this.businessService.myBid).where('exist', '==', true);
 
   /** A reference to the permissions metadata, where the default roles permissions are stored */
   readonly permissionsMetadata = this.businessService.businessDocRef.collection('metadata').doc('permissions');

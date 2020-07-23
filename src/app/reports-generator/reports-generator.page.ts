@@ -175,7 +175,7 @@ export class ReportsGeneratorPage implements OnInit {
       productIds: this.productsIds,
       categories: this.categories,
     });
-    if(!this.reportsGeneratorService.results.every((o)=>o.products.length > 0)) {
+    if(!this.reportsGeneratorService.results.length) {
       alert('לא נמצאו מוצרים');
       return;
     }
@@ -229,6 +229,7 @@ export class ReportsGeneratorPage implements OnInit {
 
   // Print the displayed table
   printTable() {
+    console.log('Print clicked!');
     PrintHTML.PrintHTML(document.getElementById('table-wrapper').innerHTML);
   }
 
@@ -247,7 +248,7 @@ export class ReportsGeneratorPage implements OnInit {
   async sendEmail() {
 
     // Contact(s) email(s)
-    const inputs: AlertInput[] = this.businessService.businessDoc.contacts.map((c)=>{return {
+    const inputs: AlertInput[] = this.businessService.businessDoc.contacts.filter((c)=>c.email).map((c)=>{return {
       type: 'checkbox',
       label: c.name,
       value: c.email,

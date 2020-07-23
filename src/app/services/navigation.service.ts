@@ -30,18 +30,23 @@ export class NavigationService {
   }
 
 
-  goToAppMain() {
-    this.navCtrl.navigateRoot(
-      'app/' + (this.authService.currentUser.side == 'c' ? 'customer' : 'supplier'),
-      {animationDirection: 'back'}
+  // Go to the main page of the customer/supplier. Try go there even if the user is not verified (the page's guard will handle it)
+  async goToAppMain() {
+    const userDoc = this.authService.currentUser || this.authService.getUnverifiedUser;
+    if(userDoc)
+      await this.navCtrl.navigateRoot(
+        'app/' + (userDoc.side == 'c' ? 'customer' : 'supplier'),
+        {animationDirection: 'back'}
       );
+    else
+      this.goToWebHomepage();
   }
 
-  /** Go back to the last page in the app's stack. If nothing happened, go to main page */
-  async goBack() {
-    const id = window.history.state.navigationId;
-    await this.navCtrl.pop();
-    if (window.history.state.navigationId == id)
+  /** Go back to the last page in the app's stack, or to the main page if the first on stack */
+  goBack() {
+    if(this.navCtrl['lastNavId'] > 1)
+      this.navCtrl.back();
+    else
       this.goToAppMain();
   }
 
@@ -77,7 +82,7 @@ export class NavigationService {
   }
 
   goToSettings() {
-    this.navCtrl.navigateForward('app/settings');
+    this.navCtrl.navigateRoot('app/settings');
   }
 
   goToSuppliersList() {

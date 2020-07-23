@@ -128,7 +128,7 @@ export class ReportsGeneratorService {
     // Filter in front-side (No firestore indexes for those)
     if(queries.bids && queries.bids.length) {
       const sideProp = this.businessService.side == 'c' ? 'sid' : 'cid';
-      res.filter((o)=>queries.bids.includes(o[sideProp]));
+      res = res.filter((o)=>queries.bids.includes(o[sideProp]));
     }
 
     if(queries.fromCreateTime)
@@ -143,15 +143,16 @@ export class ReportsGeneratorService {
     if(queries.toSerial)
       res = res.filter((o)=>o.serial <= queries.toSerial);
 
-    this.results = res;
+    // Sort results by order's serial number
+    this.results = res.sort(((a, b) => a.serial.localeCompare(b.serial)));
 
   }
 
 
   // Filter products out of the given orders
-  getProducts(queries: {productIds?: string[], categories?: string[]}, orders: OrderDoc[] = this.results) {
+  getProducts(queries: {productIds?: string[], categories?: string[]}) {
 
-    orders.forEach((order)=>{
+    this.results.forEach((order)=>{
 
       // Filter by ID
       if(queries.productIds && queries.productIds.length)
@@ -165,6 +166,9 @@ export class ReportsGeneratorService {
         });
 
     });
+
+    // Keep only orders that has products after filtering
+    this.results = this.results.filter((o)=>o.products && o.products.length);
 
   }
 

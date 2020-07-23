@@ -4,6 +4,18 @@
   // App font (hebrew)
   --ion-font-family: 'Open Sans Hebrew';
 
+  // Accessibility
+  --ion-zoom: 1;
+  zoom: var(--ion-zoom);
+  -moz-transform: scale(var(--ion-zoom));
+  -moz-transform-origin: 0 0;
+  .gray {
+    filter: grayscale(100%);
+  }
+  .soft {
+    filter: saturate(50%);
+  }
+
   // Primary
   --ion-color-primary: #00979c;
   --ion-color-primary-rgb: 0,151,156;
@@ -79,7 +91,7 @@
 
 //@media (prefers-color-scheme: dark) {
 //  /*
-//   * Dark Colors
+//   * Dark BnW
 //   * -------------------------------------------
 //   */
 //

@@ -94,7 +94,7 @@ export class ProductsListPage {
       // Get results
       const res = await this.productsService.querySuppliersProducts(
         this.q,
-        this.bid,
+        this.bid ? [this.bid] : this.suppliersService.mySuppliers.map((s)=>s.id),
         movePage == 1 ? this.filteredList.slice(-1)[0].name : null,
         movePage == -1 ? this.filteredList[0].name : null,
       );

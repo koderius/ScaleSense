@@ -38,7 +38,7 @@
           <p>הרשאות גישה</p>
         </div>
 
-        <div class="item" (click)="openEquipmentSettings()" *ngIf="side == 'c'">
+        <div class="item" (click)="openEquipmentSettings()" *ngIf="side == 'c' && usersService.hasPermission(UserPermission.SETTINGS_EQUIPMENT)">
           <p>הגדרות ציוד</p>
         </div>
 

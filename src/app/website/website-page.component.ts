@@ -70,8 +70,7 @@ export class WebsitePage implements AfterViewChecked {
         ).subscribe(()=>{
           this.navService.goToAppMain();
         });
-      else
-        this.isLogin = false;
+      this.isLogin = false;
     }
   }
 

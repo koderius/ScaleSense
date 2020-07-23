@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FullCustomerOrderProductDoc, ProductCustomerDoc, ProductOrder, ProductPublicDoc} from '../models/ProductI';
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -68,14 +68,14 @@ export class ProductsService {
    * For customers use only, for querying products out of their private list
    * Query products by name and/or supplier, limit to 10 results + pagination
    * */
-  async querySuppliersProducts(q?: string, sid?: string, startAfterName?: string, endBeforeName?: string) : Promise<ProductPublicDoc[]> {
+  async querySuppliersProducts(q?: string, sid?: string[], startAfterName?: string, endBeforeName?: string, limit = 10) : Promise<ProductPublicDoc[]> {
 
     // Sort products by name
     let ref = this.allProductsRef.orderBy('name');
 
     // May filter by supplier
-    if(sid)
-      ref = ref.where('sid', '==', sid);
+    if(sid && sid.length == 1)
+      ref = ref.where('sid', '==', sid[0]);
 
     // May filter by name
     if(q)
@@ -88,9 +88,9 @@ export class ProductsService {
     if(startAfterName)
       ref = ref.startAfter(startAfterName);
     if(endBeforeName)
-      ref = ref.endBefore(endBeforeName).limitToLast(10);
+      ref = ref.endBefore(endBeforeName).limitToLast(limit);
     else
-      ref = ref.limit(10);
+      ref = ref.limit(limit);
 
     // Get results
     try {
@@ -102,7 +102,20 @@ export class ProductsService {
         return null;
 
       // Save the product's list temporally and return the list
-      return res.docs.map((doc)=>doc.data() as ProductPublicDoc);
+      let products = res.docs.map((doc)=>doc.data() as ProductPublicDoc);
+
+      if(sid && sid.length > 1) {
+        products = products.filter((p)=>sid.includes(p.sid));
+        if(products.length < res.docs.length && res.docs.length == limit) {
+          products.push(...await this.querySuppliersProducts(q, sid,
+            endBeforeName ? null : products[limit-1].name,
+            endBeforeName ? products[0].name : null,
+            limit - products.length,
+          ));
+        }
+      }
+
+      return products;
 
     }
     catch (e) {

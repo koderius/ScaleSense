@@ -4,6 +4,8 @@ import {NavigationService} from '../../services/navigation.service';
 import {BusinessService} from '../../services/business.service';
 import {UsersService} from '../../services/users.service';
 import {UserPermission} from '../../models/UserDoc';
+import {PopoverController} from '@ionic/angular';
+import {AccessibilityComponent} from '../accessibility/accessibility.component';
 
 @Component({
   selector: 'app-header',
@@ -23,6 +25,7 @@ export class HeaderComponent implements OnInit {
     private navService: NavigationService,
     private businessService: BusinessService,
     public usersService: UsersService,
+    private popoverCtrl: PopoverController,
   ) { }
 
   ngOnInit() {}
@@ -54,6 +57,18 @@ export class HeaderComponent implements OnInit {
 
   openReports() {
     this.navService.goToReports();
+  }
+
+
+  async openAccess(ev) {
+    const p = await this.popoverCtrl.create({
+      component: AccessibilityComponent,
+      event: ev,
+      showBackdrop: false,
+    });
+    p.present();
+    await p.onDidDismiss();
+    AccessibilityComponent.SaveToLocalStorage();
   }
 
 }

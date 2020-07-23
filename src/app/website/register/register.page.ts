@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {UserDoc} from '../../models/UserDoc';
+import {UserDoc, UserRole} from '../../models/UserDoc';
 import {MailService} from '../mail/mail.service';
 import {MailForm} from '../mail/MailForm';
 import {AuthService, AuthStage} from '../../services/auth.service';
@@ -58,7 +58,10 @@ export class RegisterPage implements OnInit {
   userDoc: UserDoc = {};
 
   // Business details
-  businessDoc: BusinessDoc = {contacts: [{},{}]};
+  businessDoc: BusinessDoc = {
+    contacts: [{},{}],
+    lang: 'iw',
+  };
 
   isPaymentValid: boolean;
   freePeriod: boolean;
@@ -87,7 +90,6 @@ export class RegisterPage implements OnInit {
 
     // For no ID, open contact form
     if (this.id === '0') {
-      this.pageStatus = PageStatus.CONTACT;
 
       // If there is a logged-in verified user, go to payment page
       this.authService.onCurrentUser.pipe(take(1)).subscribe(async (user)=>{
@@ -105,15 +107,18 @@ export class RegisterPage implements OnInit {
         }
 
         if(user) {
-          if(user.side == 'c') {
+          if(user.side == 'c' && user.role == UserRole.ADMIN) {
             this.pageStatus = PageStatus.PAYMENTS;
             this.isPaymentValid = await this.paymentsService.isValid();
             if(!this.isPaymentValid)
               this.freePeriod = (await this.paymentsService.getBillingData()).pricePerMonth === 0;
           }
           else
-            this.navService.goToAppMain();
+            await this.navService.goToAppMain();
         }
+
+        if(!this.pageStatus)
+          this.pageStatus = PageStatus.CONTACT;
 
       });
 

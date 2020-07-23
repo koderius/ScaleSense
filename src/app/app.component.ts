@@ -8,6 +8,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/analytics';
 import 'firebase/firestore';
 import {MetadataService} from './services/metadata.service';
+import {AccessibilityComponent} from './components/accessibility/accessibility.component';
 
 export let ScreenMode: 'l' | 's';
 
@@ -43,6 +44,8 @@ export class AppComponent {
 
       // Set between two modes: Large (992px by Ionic large breakpoint) and small
       ScreenMode = this.platform.width() >= 992 ? 'l' : 's';
+
+      AccessibilityComponent.LoadFromLocalStorage();
 
     });
 

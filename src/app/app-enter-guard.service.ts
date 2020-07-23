@@ -7,6 +7,7 @@ import {NavigationService} from './services/navigation.service';
 import {AlertController} from '@ionic/angular';
 import {takeWhile} from 'rxjs/operators';
 import {PaymentsService} from './services/payments.service';
+import {AlertsService} from './services/alerts.service';
 
 /**
  * This guard prevents users entering pages, if they don't have the requested requirements
@@ -30,6 +31,7 @@ export class AppEnterGuard implements CanActivateChild {
   constructor(
     private authService: AuthService,
     private alertCtrl: AlertController,
+    private alertsService: AlertsService,
     private navService: NavigationService,
     private paymentsService: PaymentsService,
   ) {}
@@ -63,14 +65,17 @@ export class AppEnterGuard implements CanActivateChild {
             if(this.alert)
               this.alert.dismiss();
           }
-          // Ask user to sign in (and keep subscribing)
+
           else {
-            if(this.authService.isUnverifiedEmail) {
-              if(await this.authService.sendEmailVerification()) {
-                alert('נשלח דוא"ל לאימות כתובת');
+            // Send verification email, if the user is not verified
+            const unverifiedUser = this.authService.getUnverifiedUser;
+            if(unverifiedUser) {
+              if(await this.alertsService.areYouSure('כתובת דוא"ל לא מאומתת', `על מנת לאמת את כתובת המשתמש, יישלח קישור לכתובת: ${unverifiedUser.email}`, 'שליחה', 'ביטול')) {
+                await this.authService.sendEmailVerification();
                 this.navService.goToWebHomepage();
               }
             }
+            // Ask user to sign in (and keep subscribing)
             else
               this.popSignIn();
           }

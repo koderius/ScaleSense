@@ -72,9 +72,10 @@ export class AuthService {
     return (this._user && this._user.emailVerified && this._userDoc) || null;
   }
 
-  // Whether there is a user connected, whose email is unverified
-  get isUnverifiedEmail() : boolean {
-    return !!this._user && !this._user.emailVerified
+
+  // Get the document of a logged-in unverified user, or null if the user is verified or no user logged in
+  get getUnverifiedUser() : UserDoc | null {
+    return this._user ? (this._user.emailVerified ? null : this._userDoc) : null
   }
 
 
@@ -203,7 +204,8 @@ export class AuthService {
   private async verifyEmail() {
     try {
       await this.auth.applyActionCode(this._oobCode);
-      await this._user.reload();
+      if(this._user)
+        await this._user.reload();
       this._stage = AuthStage.EMAIL_VERIFIED;
     }
     catch (e) {

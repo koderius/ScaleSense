@@ -60,7 +60,7 @@ export class SettingsPage implements OnInit {
           disabled: true,
         },
         {
-          value: this.cameraService.cameraLabel,
+          placeholder: this.cameraService.cameraLabel || 'No camera',
           disabled: true,
         },
         {
@@ -68,7 +68,7 @@ export class SettingsPage implements OnInit {
           disabled: true,
         },
         {
-          value: this.websocketService.scalesVersion || 'No signal',
+          placeholder: this.websocketService.scalesVersion || 'No signal',
           disabled: true,
         },
         {

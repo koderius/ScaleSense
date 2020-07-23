@@ -293,7 +293,7 @@
           <ion-button shape="round" strong="true"
                       *ngIf="supplierEditMode"
                       (click)="approveOrder()"
-                      [disabled]="!orderHasChanged() && !isFinalApprove && order.status >= OrderStatus.APPROVED"
+                      [disabled]="orderSent && !isFinalApprove && order.status >= OrderStatus.APPROVED"
           >
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="orderHasChanged()">שמירת שינויים ו</ion-text>
@@ -303,7 +303,7 @@
           <ion-button shape="round" strong="true"
                       *ngIf="customerEditMode"
                       (click)="sendOrder()"
-                      [disabled]="!orderHasChanged()"
+                      [disabled]="orderSent"
           >
             <ion-icon src="../../assets/svg/icon_thumb.svg" slot="start"></ion-icon>
             <ion-text *ngIf="!isDraft">שמירת שינויים ו</ion-text>
