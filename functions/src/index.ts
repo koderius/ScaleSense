@@ -898,7 +898,7 @@ export const onNotificationCreated = functions.firestore.document('{businessCol}
         {auth:
             {
               username: 'AC5a375e5daab19cdb70d7c3483cdcfbe5',
-              password: '7eb9c093e7059053f60170321b157243' // July 20, 2020
+              password: '*************************'
             }
         });
 
